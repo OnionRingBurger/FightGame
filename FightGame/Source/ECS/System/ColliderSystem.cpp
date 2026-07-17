@@ -1,0 +1,519 @@
+#include "ColliderSystem.h"
+#include "Components.h"
+
+using namespace Component;
+
+#include <math.h>
+struct SystemHitResult;
+
+bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentHandle<OBBCollider>& otherCollider, SystemHitResult& outThisResult, SystemHitResult& outOtherResult);
+
+// 当たり判定結果を入れるための戻り値、コンポーネントではないので注意
+struct SystemHitResult
+{
+	bool isHit;
+	bool isTrigger;
+	float3 normal;
+	float depth;
+	InfoColliderType otherType;
+
+	SystemHitResult(bool a_isHit, bool a_isTrigger, float3 a_normal, float a_depth, InfoColliderType a_otherType)
+		: isHit(a_isHit)
+		, isTrigger(a_isTrigger)
+		, normal(a_normal)
+		, depth(a_depth)
+		, otherType(a_otherType)
+	{
+	}
+
+	SystemHitResult()
+		: isHit(false)
+		, isTrigger(false)
+		, normal()
+		, depth(0.0f)
+		, otherType(NONE_INFO)
+	{
+	}
+};
+
+
+void ColliderSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<BoxCollider, OBBCollider, Position, Rotation, Scale>>();
+
+	// TODO	Offsetをデバッグ描画にも適用する
+
+	for (auto it : view)
+	{
+		const ComponentHandle<BoxCollider> collider = a_chunk.GetComponent<BoxCollider>(it);
+		ComponentHandle<OBBCollider> obbCollider = a_chunk.GetComponent<OBBCollider>(it);
+		const ComponentHandle<Position> position = a_chunk.GetComponent<Position>(it);
+		const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(it);
+		const ComponentHandle<Scale> scale = a_chunk.GetComponent<Scale>(it);
+
+		std::vector<float3> vertices;
+
+
+		for (int i = 0; i < 8; i++)
+		{
+			float directionX = 1.0f;
+			float directionY = 1.0f;
+			float directionZ = 1.0f;
+
+			directionX = (i) % 2 == 0 ? 1.0f : -1.0f;
+			directionY = (i / 2) % 2 == 0 ? 1.0f : -1.0f;
+			directionZ = (i / 4) % 2 == 0 ? 1.0f : -1.0f;
+
+			float3 vertexPos = {
+				collider.Look().collisionScale.x * directionX * 0.5f,
+				collider.Look().collisionScale.y * directionY * 0.5f,
+				collider.Look().collisionScale.z * directionZ * 0.5f };
+
+			vertices.push_back(vertexPos);
+		}
+
+
+
+		Matrix3X3 matrix = CollectMatrix(vertices);
+		Matrix3X3 eigenVectors = GetEigenVectors(matrix);
+
+		float3 vec1, vec2, vec3;
+		{
+			float x = eigenVectors[0][0];
+			float y = eigenVectors[0][1];
+			float z = eigenVectors[0][2];
+
+			vec1 = float3{ x, y, z };
+		}
+		{
+			float x = eigenVectors[1][0];
+			float y = eigenVectors[1][1];
+			float z = eigenVectors[1][2];
+
+			vec2 = float3{ x, y, z };
+		}
+		{
+			float x = eigenVectors[2][0];
+			float y = eigenVectors[2][1];
+			float z = eigenVectors[2][2];
+
+			vec3 = float3{ x, y, z };
+		}
+
+
+		vec1 = Normalize(vec1);
+		vec2 = Normalize(vec2);
+		vec3 = Normalize(vec3);
+
+		// 全頂点に対して内積を取り、最小値・最大値を計算する
+		float min1 = std::numeric_limits<float>::max();
+		float min2 = std::numeric_limits<float>::max();
+		float min3 = std::numeric_limits<float>::max();
+		float max1 = std::numeric_limits<float>::lowest();
+		float max2 = std::numeric_limits<float>::lowest();
+		float max3 = std::numeric_limits<float>::lowest();
+
+		for (int i = 0; i < vertices.size(); i++)
+		{
+			float3 pos = vertices[i];
+			float dot1 = DotFloat3(vec1, pos);
+			if (dot1 > max1)
+			{
+				max1 = dot1;
+			}
+			if (dot1 < min1)
+			{
+				min1 = dot1;
+			}
+
+			float dot2 = DotFloat3(vec2, pos);
+			if (dot2 > max2)
+			{
+				max2 = dot2;
+			}
+			if (dot2 < min2)
+			{
+				min2 = dot2;
+			}
+
+			float dot3 = DotFloat3(vec3, pos);
+			if (dot3 > max3)
+			{
+				max3 = dot3;
+			}
+			if (dot3 < min3)
+			{
+				min3 = dot3;
+			}
+		}
+
+		float len1 = max1 - min1;
+		float len2 = max2 - min2;
+		float len3 = max3 - min3;
+
+
+		// ローカル座標に変換
+
+		float pitchFixed = (obbCollider.Look().obbBitFlag & OBB_FIXED_PITCH ? 0.0f : 1.0f);
+		float yawFixed = (obbCollider.Look().obbBitFlag & OBB_FIXED_YAW ? 0.0f : 1.0f);
+		float rollFixed = (obbCollider.Look().obbBitFlag & OBB_FIXED_ROLL ? 0.0f : 1.0f);
+
+		float3 floatPosition = { position.Look().x, position.Look().y, position.Look().z };
+		float3 floatRotation = { rotation.Look().pitch * pitchFixed, rotation.Look().yaw * yawFixed, rotation.Look().roll * rollFixed };
+		float3 floatScale = { scale.Look().x, scale.Look().y, scale.Look().z };
+
+		RigidTransform transform(floatPosition, floatRotation, floatScale);
+
+		float3 edge1 = transform.MultiplyVector(vec1 * len1);
+		float3 edge2 = transform.MultiplyVector(vec2 * len2);
+		float3 edge3 = transform.MultiplyVector(vec3 * len3);
+
+
+		std::array<float3, 3> edge =
+		{
+			edge1, edge2, edge3,
+		};
+
+		obbCollider->edges = edge;
+
+		float3 center1 = (vec1 * (max1 + min1)) * 0.5f;
+		float3 center2 = (vec2 * (max2 + min2)) * 0.5f;
+		float3 center3 = (vec3 * (max3 + min3)) * 0.5f;
+
+		float3 addedCenter =
+		{
+			center1.x + center2.x + center3.x,
+			center1.y + center2.y + center3.y,
+			center1.z + center2.z + center3.z,
+		};
+
+		float3 orign = transform.MultiplyPoint(addedCenter);
+
+		obbCollider->center = orign;
+
+		obbCollider->axis[0] = Normalize(transform.MultiplyVector(vec1));
+		obbCollider->axis[1] = Normalize(transform.MultiplyVector(vec2));
+		obbCollider->axis[2] = Normalize(transform.MultiplyVector(vec3));
+
+		obbCollider->half = float3(len1 / 2, len2 / 2, len3 / 2);
+
+	}
+}
+
+void ColliderCheckSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	// 一度のみviewを作る
+	ComponentView view = a_chunk.GetView<ComponentTypes<OBBCollider>>();
+
+
+	// 無駄にview作成や走査しないために一度EntityとColliderをセットで確保
+	using OBBEntry = std::pair<Entity, ComponentHandle<OBBCollider>>;
+
+	std::vector<OBBEntry> obbEntries;
+	for (Entity it : view)
+	{
+		obbEntries.push_back(OBBEntry(it, a_chunk.GetComponent<OBBCollider>(it)));
+	}
+
+
+	// TODO 当たった全ての情報を取得するよう変更
+	// TODO 当たった全ての情報を取得するよう変更
+	for (auto thisIt = obbEntries.begin();
+		thisIt != obbEntries.end();
+		++thisIt)
+	{
+		auto& [thisEntity, thisCollider] = *thisIt;
+		auto hitInfoThis = a_chunk.GetComponent<HitInfomation>(thisEntity);
+
+
+		for (auto otherIt = thisIt + 1;
+			otherIt != obbEntries.end();
+			++otherIt)
+		{
+			auto& [otherEntity, otherCollider] = *otherIt;
+
+			SystemHitResult thisResult;
+			SystemHitResult otherResult;
+
+
+			if (!IsOBBHit(thisCollider, otherCollider, thisResult, otherResult)) continue;
+
+
+			if (hitInfoThis.IsValid())
+			{
+				if (thisResult.isHit)
+				{
+					hitInfoThis->hitResults.push_back(HitInfomation::HitResult(otherEntity, thisResult.normal, thisResult.depth, thisResult.otherType));
+				}
+				else if (thisResult.isTrigger)
+				{
+					hitInfoThis->triggerResults.push_back(HitInfomation::TriggerResult(otherEntity));
+				}
+			}
+
+			auto hitInfoOther = a_chunk.GetComponent<HitInfomation>(otherEntity);
+			if (hitInfoOther.IsValid())
+			{
+				if (otherResult.isHit)
+				{
+					hitInfoOther->hitResults.push_back(HitInfomation::HitResult(thisEntity, otherResult.normal, otherResult.depth, otherResult.otherType));
+				}
+				else if (otherResult.isTrigger)
+				{
+					hitInfoOther->triggerResults.push_back(HitInfomation::TriggerResult(thisEntity));
+				}
+			}
+		}
+	}
+
+}
+
+void ColliderBackSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<HitInfomation, OBBCollider, MotionResult>>();
+
+
+	for (auto it : view)
+	{
+		const ComponentHandle<HitInfomation> info = a_chunk.GetComponent<HitInfomation>(it);
+		const ComponentHandle<OBBCollider> collider = a_chunk.GetComponent<OBBCollider>(it);
+		ComponentHandle<MotionResult> result = a_chunk.GetComponent<MotionResult>(it);
+		for (const auto& hitInfoIt : info.Look().hitResults)
+		{
+			if (collider.Look().obbBitFlag & OBB_TRIGGER || collider.Look().obbBitFlag & OBB_PushOutLocked) continue;
+
+			switch (hitInfoIt.otherType)
+			{
+			case DEFAULT:
+				// 中で変数を作りたいためスコープで囲う
+			{
+				float half = hitInfoIt.depth * 0.5f;
+				result->posOffset.x = hitInfoIt.normal.x * half;
+				result->posOffset.y = hitInfoIt.normal.y * half;
+				result->posOffset.z = hitInfoIt.normal.z * half;
+			}
+			break;
+
+			case PUSHLOCKED:
+				result->posOffset.x = hitInfoIt.normal.x * hitInfoIt.depth;
+				result->posOffset.y = hitInfoIt.normal.y * hitInfoIt.depth;
+				result->posOffset.z = hitInfoIt.normal.z * hitInfoIt.depth;
+				break;
+			}
+		}
+
+	}
+}
+
+
+//===============================//
+//								 //
+//===============================//
+//								 //
+//===============================//
+
+
+bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentHandle<OBBCollider>& otherCollider, SystemHitResult& outThisResult, SystemHitResult& outOtherResult)
+{
+	float3 differenceVector =
+	{
+		otherCollider.Look().center.x - thisCollider.Look().center.x,
+		otherCollider.Look().center.y - thisCollider.Look().center.y,
+		otherCollider.Look().center.z - thisCollider.Look().center.z,
+	};
+
+	Matrix3X3 R;
+	Matrix3X3 AbsR;
+
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			R[i][j] = DotFloat3(thisCollider.Look().axis[i], otherCollider.Look().axis[j]);
+			AbsR[i][j] = abs(R[i][j]) + 0.0001f;
+		}
+	}
+
+
+	// A 側の射影半径
+	float rThisHalf[3] = { thisCollider.Look().half.x, thisCollider.Look().half.y, thisCollider.Look().half.z };
+
+	float resultDepth = FLT_MAX;
+	float3 resultNormal;
+
+	// A0, A1, A2
+	for (int i = 0; i < 3; i++)
+	{
+		// B 側の射影半径
+		float rOther =
+			otherCollider.Look().half.x * AbsR[i][0] +
+			otherCollider.Look().half.y * AbsR[i][1] +
+			otherCollider.Look().half.z * AbsR[i][2];
+
+		// 中心差の射影
+		float t = std::fabs(DotFloat3(differenceVector, thisCollider.Look().axis[i]));
+
+		// 分離していたら抜ける
+		float overlap = (rThisHalf[i] + rOther) - t;
+		if (overlap < 0.0f)
+		{
+			outThisResult.isHit = false;
+			outThisResult.isTrigger = false;
+			outThisResult.normal = float3();
+			outThisResult.depth = 0.0f;
+			outOtherResult.isHit = false;
+			outOtherResult.isTrigger = false;
+			outOtherResult.normal = float3();
+			outOtherResult.depth = 0.0f;
+			return false;
+		}
+
+		if (overlap < resultDepth)
+		{
+			resultDepth = overlap;
+			//resultNormal = thisCollider.Look().axis[i];
+			float3 axis = thisCollider.Look().axis[i];
+			// 中心差と逆向きなら反転
+			if (DotFloat3(differenceVector, axis) > 0.0f)
+			{
+				axis.x = -axis.x;
+				axis.y = -axis.y;
+				axis.z = -axis.z;
+			}
+			resultNormal = axis;
+		}
+	}
+
+	// B 側の射影半径
+	float rOtherHalf[3] = { otherCollider.Look().half.x, otherCollider.Look().half.y, otherCollider.Look().half.z };
+
+	// B0, B1, B2
+	for (int j = 0; j < 3; j++)
+	{
+		float rThis =
+			thisCollider.Look().half.x * AbsR[0][j] +
+			thisCollider.Look().half.y * AbsR[1][j] +
+			thisCollider.Look().half.z * AbsR[2][j];
+
+		float t = std::fabs(DotFloat3(differenceVector, otherCollider.Look().axis[j]));
+
+		float overlap = (rOtherHalf[j] + rThis) - t;
+		if (overlap < 0.0f)
+		{
+			outThisResult.isHit = false;
+			outThisResult.normal = float3();
+			outThisResult.depth = 0.0f;
+			outOtherResult.isHit = false;
+			outOtherResult.normal = float3();
+			outOtherResult.depth = 0.0f;
+			return false;
+		}
+
+		if (overlap < resultDepth)
+		{
+			resultDepth = overlap;
+
+			//resultNormal = otherCollider.Look().axis[j];
+			float3 axis = otherCollider.Look().axis[j];
+
+			if (DotFloat3(differenceVector, axis) > 0.0f)
+			{
+				axis.x = -axis.x;
+				axis.y = -axis.y;
+				axis.z = -axis.z;
+			}
+
+			resultNormal = axis;
+
+		}
+
+	}
+
+	// A0, A1, A2
+	for (int i = 0; i < 3; i++)
+	{
+		int i1 = (i + 1) % 3;
+		int i2 = (i + 2) % 3;
+
+		for (int j = 0; j < 3; j++)
+		{
+			int j1 = (j + 1) % 3;
+			int j2 = (j + 2) % 3;
+
+			float t = std::fabs(
+				DotFloat3(differenceVector, thisCollider.Look().axis[i2]) * R[i1][j] -
+				DotFloat3(differenceVector, thisCollider.Look().axis[i1]) * R[i2][j]
+			);
+
+			float rThis =
+				rThisHalf[i1] * AbsR[i2][j] +
+				rThisHalf[i2] * AbsR[i1][j];
+
+			float rOther =
+				rOtherHalf[j1] * AbsR[i][j2] +
+				rOtherHalf[j2] * AbsR[i][j1];
+
+			float overlap = (rThis + rOther) - t;
+			if (overlap < 0.0f)
+			{
+				outThisResult.isHit = false;
+				outThisResult.normal = float3();
+				outThisResult.depth = 0.0f;
+				outOtherResult.isHit = false;
+				outOtherResult.normal = float3();
+				outOtherResult.depth = 0.0f;
+				return false;
+			}
+
+		}
+	}
+
+
+	// Triggerだった場合Trigger情報をResultに渡して返す
+	if ((thisCollider.Look().obbBitFlag & OBB_TRIGGER) || (otherCollider.Look().obbBitFlag & OBB_TRIGGER))
+	{
+		outThisResult.isTrigger = true;
+		outOtherResult.isTrigger = true;
+		outThisResult.normal = float3();
+		outOtherResult.normal = float3();
+		outThisResult.depth = 0.0f;
+		outOtherResult.depth = 0.0f;
+		return true;
+	}
+
+	float3 otherResultNormal(-resultNormal.x, -resultNormal.y, -resultNormal.z);
+	// TriggerではないのでCollider情報を返す
+	outThisResult.isHit = true;
+	outOtherResult.isHit = true;
+	outThisResult.normal = resultNormal;
+	outOtherResult.normal = otherResultNormal;
+	outThisResult.depth = resultDepth;
+	outOtherResult.depth = resultDepth;
+
+	// 移動出来るかを取る
+	bool isThisMove = !(thisCollider.Look().obbBitFlag & OBB_PushOutLocked);
+	bool isOtherMove = !(thisCollider.Look().obbBitFlag & OBB_PushOutLocked);
+	// 自分側の設定を相手側のResultに入力
+	if (isThisMove)
+	{
+		outOtherResult.otherType = DEFAULT;
+	}
+	else
+	{
+		outOtherResult.otherType = PUSHLOCKED;
+	}
+	// 相手側の設定を自分側のResultに入力
+	if (isOtherMove)
+	{
+		outThisResult.otherType = DEFAULT;
+	}
+	else
+	{
+		outThisResult.otherType = PUSHLOCKED;
+	}
+
+	return true;
+
+}
+
+

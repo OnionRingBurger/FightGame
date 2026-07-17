@@ -1,0 +1,17 @@
+#pragma once
+#include "Chunk.h"
+#include "SystemContext.h"
+
+void FadeUISystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void TrailSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void UIMoveSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void UVMoveSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void HPGaugeSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void SpriteAnimationSystem(Chunk& a_chunk, const SystemContext& a_context);

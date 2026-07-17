@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{61f04a1c-abc1-4264-b9f4-6fbc26a834e8}</ProjectGuid>
+    <RootNamespace>FightGame</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>include\assimp;include\DataManager;include\DirectXTex;include\Drawer;include\ECS\Core;include\Game\Core;include\imGui;include\nlohmann;include\Sound;include\Tool\Debug;include\ECS\System;include\ECS\Component;include\ECS\World;include\Game\Scene;include\Tool\Math;include;Source\imGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>include\assimp;include\DataManager;include\DirectXTex;include\Drawer;include\ECS\Core;include\Game\Core;include\imGui;include\nlohmann;include\Sound;include\Tool\Debug;include\ECS\System;include\ECS\Component;include\ECS\World;include\Game\Scene;include\Tool\Math;include;Source\imGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="include\DataManager\AssimpModelLorder.h" />
+    <ClInclude Include="include\DataManager\IModelCacheAcquisition.h" />
+    <ClInclude Include="include\DataManager\IModelLoader.h" />
+    <ClInclude Include="include\DataManager\IUICacheAcquisition.h" />
+    <ClInclude Include="include\DataManager\ModelCache.h" />
+    <ClInclude Include="include\DataManager\SoundCache.h" />
+    <ClInclude Include="include\DataManager\UICache.h" />
+    <ClInclude Include="include\Drawer\DirectX.h" />
+    <ClInclude Include="include\Drawer\DrawMatrix.h" />
+    <ClInclude Include="include\Drawer\Geometory.h" />
+    <ClInclude Include="include\Drawer\MeshBuffer.h" />
+    <ClInclude Include="include\Drawer\Model.h" />
+    <ClInclude Include="include\Drawer\PolylineBuffer.h" />
+    <ClInclude Include="include\Drawer\PolylineEffect.h" />
+    <ClInclude Include="include\Drawer\Shader.h" />
+    <ClInclude Include="include\Drawer\ShaderList.h" />
+    <ClInclude Include="include\Drawer\Sprite.h" />
+    <ClInclude Include="include\Drawer\GameTexture.h" />
+    <ClInclude Include="include\Drawer\TrailEffect.h" />
+    <ClInclude Include="include\ECS\Component\Components.h" />
+    <ClInclude Include="include\ECS\Core\Chunk.h" />
+    <ClInclude Include="include\ECS\Core\ComponentField.h" />
+    <ClInclude Include="include\ECS\Core\ComponentsSerialize.h" />
+    <ClInclude Include="include\ECS\Core\ComponentStorage.h" />
+    <ClInclude Include="include\ECS\Core\ComponentView.h" />
+    <ClInclude Include="include\ECS\Core\ECSData.h" />
+    <ClInclude Include="include\ECS\Core\EntityManager.h" />
+    <ClInclude Include="include\ECS\Core\HasView.h" />
+    <ClInclude Include="include\ECS\Core\IComponentStorage.h" />
+    <ClInclude Include="include\ECS\Core\StorageManager.h" />
+    <ClInclude Include="include\ECS\Core\ECSTypes.h" />
+    <ClInclude Include="include\ECS\System\BulletSystem.h" />
+    <ClInclude Include="include\ECS\System\CameraSystem.h" />
+    <ClInclude Include="include\ECS\System\CharacterSystem.h" />
+    <ClInclude Include="include\ECS\System\ColliderSystem.h" />
+    <ClInclude Include="include\ECS\System\CoreSystem.h" />
+    <ClInclude Include="include\ECS\System\DebugCameraSystem.h" />
+    <ClInclude Include="include\ECS\System\DrawSystem.h" />
+    <ClInclude Include="include\ECS\System\EffectSystem.h" />
+    <ClInclude Include="include\ECS\System\EnemySystem.h" />
+    <ClInclude Include="include\ECS\System\GameLoopSystem.h" />
+    <ClInclude Include="include\ECS\System\ImGuiSystem.h" />
+    <ClInclude Include="include\ECS\System\ISystemResponse.h" />
+    <ClInclude Include="include\ECS\System\ItemSystem.h" />
+    <ClInclude Include="include\ECS\System\OtherSystem.h" />
+    <ClInclude Include="include\ECS\System\PhysicsSystem.h" />
+    <ClInclude Include="include\ECS\System\PlayerSystem.h" />
+    <ClInclude Include="include\ECS\System\RailSystem.h" />
+    <ClInclude Include="include\ECS\System\SoundSystem.h" />
+    <ClInclude Include="include\ECS\System\System.h" />
+    <ClInclude Include="include\ECS\System\SystemAssist.h" />
+    <ClInclude Include="include\ECS\System\SystemContext.h" />
+    <ClInclude Include="include\ECS\System\SystemResponse.h" />
+    <ClInclude Include="include\ECS\System\TransformSystem.h" />
+    <ClInclude Include="include\ECS\System\VelocitySystem.h" />
+    <ClInclude Include="include\ECS\World\ClearWorld.h" />
+    <ClInclude Include="include\ECS\World\CreateGameWorld.h" />
+    <ClInclude Include="include\ECS\World\GameData.h" />
+    <ClInclude Include="include\ECS\World\GameWorld.h" />
+    <ClInclude Include="include\ECS\World\LoadWorld.h" />
+    <ClInclude Include="include\ECS\World\ProtoWorld.h" />
+    <ClInclude Include="include\ECS\World\ResultWorld.h" />
+    <ClInclude Include="include\ECS\World\TestWorld.h" />
+    <ClInclude Include="include\ECS\World\TitleWorld.h" />
+    <ClInclude Include="include\ECS\World\World.h" />
+    <ClInclude Include="include\Game\Core\Defines.h" />
+    <ClInclude Include="include\Game\Core\Input.h" />
+    <ClInclude Include="include\Game\Core\Loading.h" />
+    <ClInclude Include="include\Game\Core\Main.h" />
+    <ClInclude Include="include\Game\Core\TestObject.h" />
+    <ClInclude Include="include\Game\Core\ThreadSafeQueue.h" />
+    <ClInclude Include="include\Game\Scene\CreateGameScene.h" />
+    <ClInclude Include="include\Game\Scene\GameScene.h" />
+    <ClInclude Include="include\Game\Scene\IScene.h" />
+    <ClInclude Include="include\Game\Scene\LoadScene.h" />
+    <ClInclude Include="include\Game\Scene\TestScene.h" />
+    <ClInclude Include="include\Sound\Sound.h" />
+    <ClInclude Include="include\Sound\SoundManagerEX.h" />
+    <ClInclude Include="include\Tool\Debug\conioex.h" />
+    <ClInclude Include="include\Tool\Debug\Debug.h" />
+    <ClInclude Include="include\Tool\Debug\DebugConsole.h" />
+    <ClInclude Include="include\Tool\Math\MathAssist.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\DataManager\AssimpModelLorder.cpp" />
+    <ClCompile Include="Source\DataManager\IModelLoader.cpp" />
+    <ClCompile Include="Source\DataManager\ModelCache.cpp" />
+    <ClCompile Include="Source\DataManager\SoundCache.cpp" />
+    <ClCompile Include="Source\DataManager\UICache.cpp" />
+    <ClCompile Include="Source\Drawer\DirectX.cpp" />
+    <ClCompile Include="Source\Drawer\DrawMatrix.cpp" />
+    <ClCompile Include="Source\Drawer\Geometory.cpp" />
+    <ClCompile Include="Source\Drawer\MeshBuffer.cpp" />
+    <ClCompile Include="Source\Drawer\Model.cpp" />
+    <ClCompile Include="Source\Drawer\Model_anime.cpp" />
+    <ClCompile Include="Source\Drawer\Model_check.cpp" />
+    <ClCompile Include="Source\Drawer\Model_get.cpp" />
+    <ClCompile Include="Source\Drawer\Model_morph.cpp" />
+    <ClCompile Include="Source\Drawer\PolylineBuffer.cpp" />
+    <ClCompile Include="Source\Drawer\PolylineEffect.cpp" />
+    <ClCompile Include="Source\Drawer\Shader.cpp" />
+    <ClCompile Include="Source\Drawer\ShaderList.cpp" />
+    <ClCompile Include="Source\Drawer\Sprite.cpp" />
+    <ClCompile Include="Source\Drawer\GameTexture.cpp" />
+    <ClCompile Include="Source\Drawer\TrailEffect.cpp" />
+    <ClCompile Include="Source\Drawer\_geometory.cpp" />
+    <ClCompile Include="Source\Drawer\_model.cpp" />
+    <ClCompile Include="Source\ECS\Component\Components.cpp" />
+    <ClCompile Include="Source\ECS\Core\Chunk.cpp" />
+    <ClCompile Include="Source\ECS\Core\ComponentsSerialize.cpp" />
+    <ClCompile Include="Source\ECS\Core\ComponentStorage.cpp" />
+    <ClCompile Include="Source\ECS\Core\ComponentView.cpp" />
+    <ClCompile Include="Source\ECS\Core\EntityManager.cpp" />
+    <ClCompile Include="Source\ECS\Core\HasView.cpp" />
+    <ClCompile Include="Source\ECS\Core\StorageManager.cpp" />
+    <ClCompile Include="Source\ECS\Core\ECSTypes.cpp" />
+    <ClCompile Include="Source\ECS\System\BulletSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\CameraSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\CharacterSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\ColliderSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\CoreSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\DebugCameraSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\DrawSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\EffectSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\EnemySystem.cpp" />
+    <ClCompile Include="Source\ECS\System\GameLoopSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\ImGuiSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\ISystemResponse.cpp" />
+    <ClCompile Include="Source\ECS\System\ItemSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\OtherSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\PhysicsSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\PlayerSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\RailSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\SoundSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\SystemAssist.cpp" />
+    <ClCompile Include="Source\ECS\System\SystemResponse.cpp" />
+    <ClCompile Include="Source\ECS\System\TransformSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\VelocitySystem.cpp" />
+    <ClCompile Include="Source\ECS\World\ClearWorld.cpp" />
+    <ClCompile Include="Source\ECS\World\CreateGameWorld.cpp" />
+    <ClCompile Include="Source\ECS\World\GameWorld.cpp" />
+    <ClCompile Include="Source\ECS\World\LoadWorld.cpp" />
+    <ClCompile Include="Source\ECS\World\ProtoWorld.cpp" />
+    <ClCompile Include="Source\ECS\World\ResultWorld.cpp" />
+    <ClCompile Include="Source\ECS\World\TestWorld.cpp" />
+    <ClCompile Include="Source\ECS\World\TitleWorld.cpp" />
+    <ClCompile Include="Source\ECS\World\World.cpp" />
+    <ClCompile Include="Source\Game\Core\Input.cpp" />
+    <ClCompile Include="Source\Game\Core\Loading.cpp" />
+    <ClCompile Include="Source\Game\Core\Main.cpp" />
+    <ClCompile Include="Source\Game\Core\Startup.cpp" />
+    <ClCompile Include="Source\Game\Core\TestObject.cpp" />
+    <ClCompile Include="Source\Game\Core\ThreadSafeQueue.cpp" />
+    <ClCompile Include="Source\Game\Scene\CreateGameScene.cpp" />
+    <ClCompile Include="Source\Game\Scene\GameScene.cpp" />
+    <ClCompile Include="Source\Game\Scene\IScene.cpp" />
+    <ClCompile Include="Source\Game\Scene\LoadScene.cpp" />
+    <ClCompile Include="Source\Game\Scene\TestScene.cpp" />
+    <ClCompile Include="Source\imGui\imgui.cpp" />
+    <ClCompile Include="Source\imGui\imgui_demo.cpp" />
+    <ClCompile Include="Source\imGui\imgui_draw.cpp" />
+    <ClCompile Include="Source\imGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="Source\imGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="Source\imGui\imgui_tables.cpp" />
+    <ClCompile Include="Source\imGui\imgui_widgets.cpp" />
+    <ClCompile Include="Source\Sound\Sound.cpp" />
+    <ClCompile Include="Source\Sound\SoundManagerEX.cpp" />
+    <ClCompile Include="Source\Tool\Debug\Debug.cpp" />
+    <ClCompile Include="Source\Tool\Debug\DebugConsole.cpp" />
+    <ClCompile Include="Source\Tool\Math\MathAssist.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
