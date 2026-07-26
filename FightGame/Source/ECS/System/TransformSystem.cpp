@@ -31,6 +31,8 @@ void InputMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 	// 結果を返す
 	for (auto it : moveView)
 	{
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_Move)) continue;
+
 		// 座標を取得
 		ComponentHandle<MotionResult> result = a_chunk.GetComponent<MotionResult>(it);
 		// 移動速度などの情報を変更しない形で取得
@@ -71,6 +73,9 @@ void InputMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 			result->posOffset.y += move.y;
 			result->posOffset.z += move.z;
 
+			// 攻撃中だった場合キャンセルする
+			CancelPlayerAttackIfAble(a_chunk, it);
+
 		}
 		else
 		{
@@ -82,35 +87,62 @@ void InputMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 void LookMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
-	// 回転入力のEntityを取得
-	ComponentView rotatoView = a_chunk.GetView<ComponentTypes<InputRotato, MotionResult>>();
 
 	Entity cameraEntity = GetCamera(a_chunk);
+	ComponentHandle<Rotation> cameraRot = a_chunk.GetComponent<Rotation>(cameraEntity);
 
 	// 入力を取得
 	const Axis& leftAxis = a_context.input.GetLeftAxis().magnitube >= a_context.input.GetKeyAxis().magnitube ? a_context.input.GetLeftAxis() : a_context.input.GetKeyAxis();
 
-	ComponentView view = a_chunk.GetView<ComponentTypes<MotionResult>>();
+	// 入力値が0だったら抜ける
+	if (!leftAxis.magnitube) return;
+	ComponentView view = a_chunk.GetView<ComponentTypes<LookMove, Pose, MotionResult>>();
+
 
 	for (auto it : view)
 	{
-		ComponentHandle<MotionResult> result = a_chunk.GetComponent<MotionResult>(it);
-		// 入力値が0だったら抜ける
-		if (!leftAxis.magnitube) return;
+		// 移動不可能だった場合抜ける
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_Move)) continue;
 
 		DirectX::XMMATRIX matrix = DirectX::XMMatrixIdentity();
 		// カメラの角度を取得
-		ComponentHandle<Rotation> cameraRot = a_chunk.GetComponent<Rotation>(cameraEntity);
 		if (cameraRot.IsValid())
 		{
-			matrix *= DirectX::XMMatrixRotationRollPitchYaw(0.0f, cameraRot.Look().yaw, 0.0f);
+			matrix *= DirectX::XMMatrixRotationRollPitchYaw(0.0f, cameraRot.Look().yaw * RAD, 0.0f);
 		}
-		// ベクトルに行列の回転をかけることによりカメラから見た入力方向を取得する
-		float3 vec(leftAxis.x * (1 + leftAxis.magnitube / 2), 0.0f, leftAxis.y * (1 + leftAxis.magnitube / 2));
-		GetLocalOffset(vec, TOFLOAT3(cameraRot.Look()));
-		
+		// カメラの回転から見た前方方向のベクトルを取得する
+		DirectX::XMVECTOR forwardVector = DirectX::XMVector3TransformNormal({0, 0, 1}, matrix);
+		// 前方方向に対して前方入力の大きさをかける事で入力量を取得する
+		forwardVector = DirectX::XMVectorScale(forwardVector, leftAxis.y * (1 + leftAxis.magnitube / 2));
+		// 横方向も同様のことを行う
+		DirectX::XMVECTOR besideVector = DirectX::XMVector3TransformNormal({1, 0, 0}, matrix);
+		besideVector = DirectX::XMVectorScale(besideVector, leftAxis.x * (1 + leftAxis.magnitube / 2));
 
+		// ベクトルを加算して方向を取得
+		DirectX::XMVECTOR moveVector = DirectX::XMVectorAdd(forwardVector, besideVector);
+		DirectX::XMFLOAT3 moveFloat3;
+		XMStoreFloat3(&moveFloat3, moveVector);
+		// 角度に変換
+		float targetAngle = atan2(moveFloat3.x, moveFloat3.z) * DEG;
 
+		// 現在角度を取得
+		ComponentHandle<Pose> pose = a_chunk.GetComponent<Pose>(it);
+		float currentAngle = fmod(pose.Look().rot.y + 180.0f, 360.0f) - 180.0f;
+		while (currentAngle >  180.0f) currentAngle -= 360.0f;
+		while (currentAngle < -180.0f) currentAngle += 360.0f;
+
+		// 角度差から回転方向を取得
+		float angleDiff = targetAngle - currentAngle;
+		while (angleDiff >  180.0f) angleDiff -= 360.0f;
+		while (angleDiff < -180.0f) angleDiff += 360.0f;
+
+		float sign = std::abs(angleDiff) < 180.0f ?  Sign(angleDiff) : Sign(angleDiff) * -1.0f;
+		// 速度を取得する
+		ComponentHandle<LookMove> move = a_chunk.GetComponent<LookMove>(it);
+		float speed = move.Look().rotateSpeed  * a_context.deltaTime < std::abs(angleDiff) ? move.Look().rotateSpeed  * a_context.deltaTime : std::abs(angleDiff);
+		// リザルトに書き込み
+		ComponentHandle<MotionResult> result = a_chunk.GetComponent<MotionResult>(it);
+		result->rotOffset.y += sign * speed;
 	}
 
 }
@@ -132,6 +164,8 @@ void InputRotatoSystem(Chunk& a_chunk, const SystemContext& a_context)
 	// Rotato回転を処理
 	for (auto it : rotatoView)
 	{
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_Aim)) continue;
+
 		const ComponentHandle<InputRotato> inputRotato = a_chunk.GetComponent<InputRotato>(it);
 		ComponentHandle<MotionResult> result = a_chunk.GetComponent<MotionResult>(it);
 
@@ -511,6 +545,50 @@ void ShakeSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 }
 
+void PhysicsPoseSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<Velocity, Pose, FixedResult, MotionResult, EphemeralResult>>();
+
+	for (auto it : view)
+	{
+		SetPosePos(it, a_chunk);
+
+		ComponentHandle<MotionResult> motionResult = a_chunk.GetComponent<MotionResult>(it);
+		motionResult->posOffset = float3(0.0f, 0.0f, 0.0f);
+		motionResult->rotOffset = float3(0.0f, 0.0f, 0.0f);
+		motionResult->isWarp = false;
+		motionResult->warpPos = float3(0.0f, 0.0f, 0.0f);
+
+		ComponentHandle<EphemeralResult> ephemeralResult = a_chunk.GetComponent<EphemeralResult>(it);
+		ephemeralResult->posOffset = float3(0.0f, 0.0f, 0.0f);
+		ephemeralResult->rotOffset = float3(0.0f, 0.0f, 0.0f);
+	}
+}
+
+void LatePhysicsPoseSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	// !!!New!!!
+	// ColliderBack の MotionResult を Pose に反映してから Position へ確定する。
+	ComponentView view = a_chunk.GetView<ComponentTypes<Velocity, Pose, FixedResult, MotionResult, EphemeralResult, Position>>();
+
+	for (auto it : view)
+	{
+		SetPosePos(it, a_chunk);
+
+		ComponentHandle<MotionResult> motionResult = a_chunk.GetComponent<MotionResult>(it);
+		motionResult->posOffset = float3(0.0f, 0.0f, 0.0f);
+		motionResult->isWarp = false;
+		motionResult->warpPos = float3(0.0f, 0.0f, 0.0f);
+
+		const ComponentHandle<Pose> pose = a_chunk.GetComponent<Pose>(it);
+		ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(it);
+
+		pos->x = pose.Look().pos.x;
+		pos->y = pose.Look().pos.y;
+		pos->z = pose.Look().pos.z;
+	}
+}
+
 void PoseSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
 	// Viewを使って表示に必要な座標と角度を更新
@@ -591,7 +669,8 @@ void LatePoseSystem(Chunk& a_chunk, const SystemContext& a_context)
 		POSE_ROT_CAMERA,
 		POSE_ROT_DEBUGCAMERA,
 		POSE_ROT_FOLLOW,
-		POSE_ROT_LOOK
+		POSE_ROT_LOOK,
+		POSE_ROT_LOOKMOVE
 	};
 
 	// 遅延前角度を決定

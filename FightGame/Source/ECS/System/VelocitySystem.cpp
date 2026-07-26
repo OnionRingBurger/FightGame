@@ -48,3 +48,30 @@ void ForceSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 	}
 }
+
+void WorldPowerSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView powerView = a_chunk.GetView<ComponentTypes<WorldPower>>();
+	float3 totalPower(0.0f, 0.0f, 0.0f);
+	bool hasPower = false;
+
+	for (auto it : powerView)
+	{
+		const ComponentHandle<WorldPower> worldPower = a_chunk.GetComponent<WorldPower>(it);
+		totalPower.x += worldPower.Look().power.x;
+		totalPower.y += worldPower.Look().power.y;
+		totalPower.z += worldPower.Look().power.z;
+		hasPower = true;
+	}
+
+	if (!hasPower) return;
+
+	ComponentView velocityView = a_chunk.GetView<ComponentTypes<Velocity>>();
+	for (auto it : velocityView)
+	{
+		ComponentHandle<Velocity> velocity = a_chunk.GetComponent<Velocity>(it);
+		velocity->x += totalPower.x * a_context.deltaTime;
+		velocity->y += totalPower.y * a_context.deltaTime;
+		velocity->z += totalPower.z * a_context.deltaTime;
+	}
+}

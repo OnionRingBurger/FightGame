@@ -6,3 +6,18 @@
 
 
 void HitPointSystem(Chunk& a_chunk, SystemContext& a_context);
+
+// !!!New!!!
+void GroundedSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+// !!!New!!!
+void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+// !!!New!!!
+void AttackActionSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+// !!!New!!!
+void AttackWaitActionSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+// !!!New!!!
+void JumpPhysicsSystem(Chunk& a_chunk, const SystemContext& a_context);

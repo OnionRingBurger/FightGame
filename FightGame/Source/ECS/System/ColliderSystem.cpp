@@ -1,5 +1,6 @@
 #include "ColliderSystem.h"
 #include "Components.h"
+#include "SystemAssist.h"
 
 using namespace Component;
 
@@ -39,7 +40,7 @@ struct SystemHitResult
 
 void ColliderSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
-	ComponentView view = a_chunk.GetView<ComponentTypes<BoxCollider, OBBCollider, Position, Rotation, Scale>>();
+	ComponentView view = a_chunk.GetView<ComponentTypes<BoxCollider, OBBCollider, Scale>>();
 
 	// TODO	Offsetをデバッグ描画にも適用する
 
@@ -47,9 +48,15 @@ void ColliderSystem(Chunk& a_chunk, const SystemContext& a_context)
 	{
 		const ComponentHandle<BoxCollider> collider = a_chunk.GetComponent<BoxCollider>(it);
 		ComponentHandle<OBBCollider> obbCollider = a_chunk.GetComponent<OBBCollider>(it);
+		const ComponentHandle<Scale> scale = a_chunk.GetComponent<Scale>(it);
+
+		// !!!New!!! Pose 優先の座標・回転
+		float3 floatPosition = GetEntityPosePos(a_chunk, it);
+		float3 floatRotation = GetEntityPoseRot(a_chunk, it);
 		const ComponentHandle<Position> position = a_chunk.GetComponent<Position>(it);
 		const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(it);
-		const ComponentHandle<Scale> scale = a_chunk.GetComponent<Scale>(it);
+		const ComponentHandle<Pose> pose = a_chunk.GetComponent<Pose>(it);
+		if (!pose.IsValid() && (!position.IsValid() || !rotation.IsValid())) continue;
 
 		std::vector<float3> vertices;
 
@@ -158,11 +165,14 @@ void ColliderSystem(Chunk& a_chunk, const SystemContext& a_context)
 		float yawFixed = (obbCollider.Look().obbBitFlag & OBB_FIXED_YAW ? 0.0f : 1.0f);
 		float rollFixed = (obbCollider.Look().obbBitFlag & OBB_FIXED_ROLL ? 0.0f : 1.0f);
 
-		float3 floatPosition = { position.Look().x, position.Look().y, position.Look().z };
-		float3 floatRotation = { rotation.Look().pitch * pitchFixed, rotation.Look().yaw * yawFixed, rotation.Look().roll * rollFixed };
 		float3 floatScale = { scale.Look().x, scale.Look().y, scale.Look().z };
+		float3 appliedRotation = {
+			floatRotation.x * pitchFixed,
+			floatRotation.y * yawFixed,
+			floatRotation.z * rollFixed
+		};
 
-		RigidTransform transform(floatPosition, floatRotation, floatScale);
+		RigidTransform transform(floatPosition, appliedRotation, floatScale);
 
 		float3 edge1 = transform.MultiplyVector(vec1 * len1);
 		float3 edge2 = transform.MultiplyVector(vec2 * len2);
@@ -216,7 +226,6 @@ void ColliderCheckSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 
 
-	// TODO 当たった全ての情報を取得するよう変更
 	// TODO 当たった全ての情報を取得するよう変更
 	for (auto thisIt = obbEntries.begin();
 		thisIt != obbEntries.end();
@@ -278,6 +287,13 @@ void ColliderBackSystem(Chunk& a_chunk, const SystemContext& a_context)
 		const ComponentHandle<HitInfomation> info = a_chunk.GetComponent<HitInfomation>(it);
 		const ComponentHandle<OBBCollider> collider = a_chunk.GetComponent<OBBCollider>(it);
 		ComponentHandle<MotionResult> result = a_chunk.GetComponent<MotionResult>(it);
+		ComponentHandle<Velocity> velocity = a_chunk.GetComponent<Velocity>(it);
+		if (info.Look().hitResults.size() >= 2)
+		{
+			int breakP;
+			breakP = info.Look().hitResults.size();
+		}
+
 		for (const auto& hitInfoIt : info.Look().hitResults)
 		{
 			if (collider.Look().obbBitFlag & OBB_TRIGGER || collider.Look().obbBitFlag & OBB_PushOutLocked) continue;
@@ -288,29 +304,93 @@ void ColliderBackSystem(Chunk& a_chunk, const SystemContext& a_context)
 				// 中で変数を作りたいためスコープで囲う
 			{
 				float half = hitInfoIt.depth * 0.5f;
-				result->posOffset.x = hitInfoIt.normal.x * half;
-				result->posOffset.y = hitInfoIt.normal.y * half;
-				result->posOffset.z = hitInfoIt.normal.z * half;
+				result->posOffset.x += hitInfoIt.normal.x * half;
+				result->posOffset.y += hitInfoIt.normal.y * half;
+				result->posOffset.z += hitInfoIt.normal.z * half;
 			}
 			break;
 
 			case PUSHLOCKED:
-				result->posOffset.x = hitInfoIt.normal.x * hitInfoIt.depth;
-				result->posOffset.y = hitInfoIt.normal.y * hitInfoIt.depth;
-				result->posOffset.z = hitInfoIt.normal.z * hitInfoIt.depth;
+				result->posOffset.x += hitInfoIt.normal.x * hitInfoIt.depth;
+				result->posOffset.y += hitInfoIt.normal.y * hitInfoIt.depth;
+				result->posOffset.z += hitInfoIt.normal.z * hitInfoIt.depth;
 				break;
 			}
+
+			if (!velocity.IsValid()) continue;
+
+			float3 vel(velocity.Look().x, velocity.Look().y, velocity.Look().z);
+			
+		    // Velocityと法線方向の一致度を内積で取得
+			float intoSurface = DotFloat3(vel, hitInfoIt.normal);
+			if (intoSurface >= 0.0f) continue;
+			// 一致度に応じて減らす
+			velocity->x -= hitInfoIt.normal.x * intoSurface * 1.0f;
+			velocity->y -= hitInfoIt.normal.y * intoSurface * 1.0f;
+			velocity->z -= hitInfoIt.normal.z * intoSurface * 1.0f;
 		}
 
 	}
 }
 
 
-//===============================//
-//								 //
-//===============================//
-//								 //
-//===============================//
+void SectorCheckSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	// HitInfomationを保持したEntityを予め取得し保持
+	ComponentView targetView = a_chunk.GetView<ComponentTypes<HitInfomation>>();
+
+	using TargetEntry = std::pair<Entity, ComponentHandle<HitInfomation>>;
+	std::vector<TargetEntry> targetEntries;
+	for (Entity it : targetView)
+	{
+		targetEntries.push_back(TargetEntry(it, a_chunk.GetComponent<HitInfomation>(it)));
+	}
+
+	// 扇形当たり判定を持つEntityのViewを取得
+	ComponentView sectorView = a_chunk.GetView<ComponentTypes<SectorHitJudge>>();
+
+	// ループ開始
+	for (auto sectorIt : sectorView)
+	{
+		const ComponentHandle<SectorHitJudge> sector = a_chunk.GetComponent<SectorHitJudge>(sectorIt);
+		float3 sectorPos = GetEntityPosePos(a_chunk, sectorIt);
+		float3 sectorRot = GetEntityPoseRot(a_chunk, sectorIt);
+
+		
+		float3 forward = GetForward(float3(0.0f, sectorRot.y, 0.0f));
+		// 内角の戻り値に合わせて角度をcosの半角に変換する
+		float cosHalfAngle = cosf(sector.Look().angle * 0.5f * RAD);
+
+		// HitInfomationを保持した対象をループで回す
+		for (auto& [targetEntity, targetInfo] : targetEntries)
+		{
+			float3 targetPos = GetEntityPosePos(a_chunk, targetEntity);
+
+			// 敵と自身の距離を取得し範囲内か判定する
+			float3 difference = float3(
+				targetPos.x - sectorPos.x,
+				0.0f,
+				targetPos.z - sectorPos.z);
+			float distance = NormalizeLength(difference.x, difference.y, difference.z);
+			if (distance < sector.Look().minLength || distance > sector.Look().maxLength) continue;
+
+			// AngleをHalfAngleに変換し内角で判定を取る
+			if (distance > 1e-5f)
+			{
+				float cosTheta = DotFloat3(forward, Normalize(difference));
+				if (cosTheta < cosHalfAngle) continue;
+			}
+
+			// 高さを比較する
+			float differenceY = targetPos.y - sectorPos.y;
+			if (differenceY > sector.Look().maxHeight || differenceY < -sector.Look().maxLowness) continue;
+
+			// HitInfomationに結果を代入する
+			targetInfo->triggerResults.push_back(HitInfomation::TriggerResult(sectorIt));
+		}
+	}
+
+}
 
 
 bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentHandle<OBBCollider>& otherCollider, SystemHitResult& outThisResult, SystemHitResult& outOtherResult)

@@ -8,6 +8,7 @@
 using namespace Component;
 
 void OBBDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView);
+void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView);
 void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView, ComponentView entityView);
 void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context);
 void PolylineDraw(Chunk& a_chunk, const SystemContext& a_context);
@@ -22,6 +23,7 @@ void DrawSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 	ComponentView oBBCameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
 	OBBDraw(a_chunk, a_context, oBBCameraView);
+	SectorDraw(a_chunk, a_context, oBBCameraView);
 
 	SpriteDraw(a_chunk, a_context);
 
@@ -517,5 +519,101 @@ void OBBDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView camer
 		}
 
 
+	}
+}
+
+void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView)
+{
+	// !!!New!!!
+	DirectX::XMFLOAT4X4 wvp[3];
+	ComponentHandle<Camera> useCamera;
+	ComponentHandle<Position> cameraPosition;
+
+	auto it = cameraView.begin();
+	auto end = cameraView.end();
+	if (it == end) return;
+
+	for (; it != end; ++it)
+	{
+		ComponentHandle<Camera> itCamera = a_chunk.GetComponent<Camera>(*it);
+		if (!useCamera.IsValid() || (itCamera.Look().cameraPriority > useCamera.Look().cameraPriority))
+		{
+			useCamera = itCamera;
+			cameraPosition = a_chunk.GetComponent<Position>(*it);
+		}
+	}
+
+	if (!useCamera.IsValid() || !cameraPosition.IsValid()) return;
+
+	DrawMatrix::CreateViewMatrix(wvp[1], float3{ cameraPosition->x, cameraPosition->y, cameraPosition->z }, useCamera->lookPosition, useCamera->upVector);
+	DrawMatrix::CreateProjectionMatrix(wvp[2], useCamera->fovy, useCamera->aspect, useCamera->nearCrip, useCamera->farCrip);
+	Geometory::SetView(wvp[1]);
+	Geometory::SetProjection(wvp[2]);
+
+	DirectX::XMFLOAT4 color(1.0f, 0.4f, 0.0f, 1.0f);
+	constexpr int kArcSegments = 16;
+
+	ComponentView sectorView = a_chunk.GetView<ComponentTypes<SectorHitJudge, Position, Rotation>>();
+	for (auto sectorIt : sectorView)
+	{
+		const ComponentHandle<SectorHitJudge> sector = a_chunk.GetComponent<SectorHitJudge>(sectorIt);
+		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(sectorIt);
+		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(sectorIt);
+
+		float yawRad = rot.Look().yaw * RAD;
+		float halfAngleRad = sector.Look().angle * 0.5f * RAD;
+		float topY = pos.Look().y + sector.Look().maxHeight;
+		float bottomY = pos.Look().y - sector.Look().maxLowness;
+
+		auto makePoint = [&](float length, float angleOffsetRad, float y) -> DirectX::XMFLOAT3
+		{
+			float dirAngle = yawRad + angleOffsetRad;
+			return DirectX::XMFLOAT3(
+				pos.Look().x + sinf(dirAngle) * length,
+				y,
+				pos.Look().z + cosf(dirAngle) * length);
+		};
+
+		auto drawSectorAtY = [&](float y)
+		{
+			DirectX::XMFLOAT3 leftInner = makePoint(sector.Look().minLength, -halfAngleRad, y);
+			DirectX::XMFLOAT3 leftOuter = makePoint(sector.Look().maxLength, -halfAngleRad, y);
+			DirectX::XMFLOAT3 rightInner = makePoint(sector.Look().minLength, halfAngleRad, y);
+			DirectX::XMFLOAT3 rightOuter = makePoint(sector.Look().maxLength, halfAngleRad, y);
+			Geometory::AddLine(leftInner, leftOuter, color);
+			Geometory::AddLine(rightInner, rightOuter, color);
+
+			for (int i = 0; i < kArcSegments; ++i)
+			{
+				float t0 = static_cast<float>(i) / static_cast<float>(kArcSegments);
+				float t1 = static_cast<float>(i + 1) / static_cast<float>(kArcSegments);
+				float a0 = -halfAngleRad + (halfAngleRad * 2.0f) * t0;
+				float a1 = -halfAngleRad + (halfAngleRad * 2.0f) * t1;
+
+				Geometory::AddLine(makePoint(sector.Look().maxLength, a0, y), makePoint(sector.Look().maxLength, a1, y), color);
+				if (sector.Look().minLength > 0.0f)
+				{
+					Geometory::AddLine(makePoint(sector.Look().minLength, a0, y), makePoint(sector.Look().minLength, a1, y), color);
+				}
+			}
+		};
+
+		// !!!New!!!
+		drawSectorAtY(topY);
+		drawSectorAtY(bottomY);
+
+		Geometory::AddLine(makePoint(sector.Look().maxLength, -halfAngleRad, topY), makePoint(sector.Look().maxLength, -halfAngleRad, bottomY), color);
+		Geometory::AddLine(makePoint(sector.Look().maxLength, halfAngleRad, topY), makePoint(sector.Look().maxLength, halfAngleRad, bottomY), color);
+		if (sector.Look().minLength > 0.0f)
+		{
+			Geometory::AddLine(makePoint(sector.Look().minLength, -halfAngleRad, topY), makePoint(sector.Look().minLength, -halfAngleRad, bottomY), color);
+			Geometory::AddLine(makePoint(sector.Look().minLength, halfAngleRad, topY), makePoint(sector.Look().minLength, halfAngleRad, bottomY), color);
+		}
+		else
+		{
+			DirectX::XMFLOAT3 originTop(pos.Look().x, topY, pos.Look().z);
+			DirectX::XMFLOAT3 originBottom(pos.Look().x, bottomY, pos.Look().z);
+			Geometory::AddLine(originTop, originBottom, color);
+		}
 	}
 }

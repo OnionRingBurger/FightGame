@@ -4,12 +4,22 @@
 #include "MathAssist.h"
 #include "Components.h"
 
+////////////////////////////////////////////////////
+// システム内で使うための汎用昨日
+////////////////////////////////////////////////////
+
 
 Entity GetPlayer(Chunk& a_chunk, float3 a_position);
 
 Entity GetRail(Chunk& a_chunk);
 
 float3 GetEntityWorldPos(Chunk& a_chunk, Entity a_entity);
+
+// !!!New!!! Pose 優先、無ければ Position
+float3 GetEntityPosePos(Chunk& a_chunk, Entity a_entity);
+
+// !!!New!!! Pose 優先、無ければ Rotation（pitch/yaw/roll）
+float3 GetEntityPoseRot(Chunk& a_chunk, Entity a_entity);
 
 void ResetFixedPosState(ComponentHandle<Component::FixedResult> fixedResult, ComponentHandle<Component::MotionResult> motionResult);
 
@@ -18,3 +28,8 @@ float3 GetLocalOffset(float3 worldOffset, float3 rotation);
 float3 GetWorldOffset(float3 localOffset, float3 rotation);
 
 Entity GetCamera(Chunk& a_chunk);
+
+// 対象Entityが指定したActionを使用可能な状態か確認する
+bool IsActionAllowed(Chunk& a_chunk, Entity a_entity, Component::ActionFlag a_flag);
+
+void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity);

@@ -63,6 +63,8 @@ Chunk GameWorld::CreateNewChunk()
 		DeadState()
 	);
 
+	Entity enemy = newChunk.CreateNewEntity();
+
 	Entity mineCar = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
 			float3(0.0f, kMineCarModelPosition, 0.0f),
@@ -578,6 +580,7 @@ void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 	VelocitySystem(a_chunk, a_context); //oo
 	ColliderSystem(a_chunk, a_context);
 	ColliderCheckSystem(a_chunk, a_context);
+	SectorCheckSystem(a_chunk, a_context);
 	ColliderBackSystem(a_chunk, a_context);//o
 
 	// PoseånÇÃèàóùÇçsÇ§
@@ -605,6 +608,7 @@ void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 	RaySystem(a_chunk, a_context);
 	LaserSystem(a_chunk, a_context);
 	EnemyPlayerSearch(a_chunk, a_context);
+	PlayerAttackSystem(a_chunk, a_context);
 	ItemGetSystem(a_chunk, a_context);
 	CameraViewSystem(a_chunk, a_context);
 	BulletSystem(a_chunk, a_context, a_response);
@@ -612,6 +616,7 @@ void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 	EnemyShooterSystem(a_chunk, a_context);
 	EnemyAttackSystem(a_chunk, a_context, a_response);
 	PlayerDeadSystem(a_chunk, a_context);
+	EnemyAttackHitSystem(a_chunk, a_context);
 	EnemyDeadSystem(a_chunk, a_context);
 	EnemyBulletDeadSystem(a_chunk, a_context);
 	GoalSystem(a_chunk, a_context);
@@ -629,6 +634,7 @@ void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 
 	// èIóπèàóù
 	LifeTimeSystem(a_chunk, a_context);
+	AttackHitRecordCleanupSystem(a_chunk, a_context);
 	ResetSystem(a_chunk, a_context);
 	ChunkChangeSystem(a_chunk, a_context, a_response);
 }

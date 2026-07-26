@@ -31,3 +31,8 @@ void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void EnemyBulletDeadSystem(Chunk& a_chunk, const SystemContext& a_context);
 
+// “G‚Ì”í’e‰ðŒˆ
+void EnemyAttackHitSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void AttackHitRecordCleanupSystem(Chunk& a_chunk, const SystemContext& a_context);
+

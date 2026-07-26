@@ -1,0 +1,10 @@
+---
+description: 
+globs: **/ECS/System/**
+alwaysApply: false
+---
+
+# System系ファイル生成時のルール
+
+- `include/ECS/System/` 配下に新しいSystemヘッダ(例: `FooSystem.h`)を生成した場合、必ず `include/ECS/System/System.h` にそのヘッダの `#include "FooSystem.h"` を追加する
+- includeは既存のinclude群の末尾に追記する

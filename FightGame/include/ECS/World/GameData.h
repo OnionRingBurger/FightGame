@@ -27,6 +27,9 @@ constexpr float kEnemyNormalScale = 1.0f;
 constexpr float3 kEnemyShooterScale = { 1.0f, 1.0f, 1.0f };
 constexpr float kEnemyAttackDamage = 45.0f;
 constexpr float kEnemyShotDamage = 45.0f;
+constexpr float kEnemyMaxHP = 3.0f;
+constexpr float kDefaultAttackHitCooldown = 300.0f;
+constexpr float3 kDefaultWorldPosition = {0.0f, 50.0f, 0.0f};
 
 constexpr float kEnemyShotSpeed = 0.8f;
 

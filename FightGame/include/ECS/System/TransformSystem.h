@@ -27,5 +27,11 @@ void LatePoseSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void TransformSystem(Chunk& a_chunk, const SystemContext& a_context);
 
+// !!!New!!!
+void PhysicsPoseSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+// !!!New!!!
+void LatePhysicsPoseSystem(Chunk& a_chunk, const SystemContext& a_context);
+
 void ShakeSystem(Chunk& a_chunk, const SystemContext& a_context);
 

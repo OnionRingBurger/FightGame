@@ -18,3 +18,4 @@
 #include "DebugCameraSystem.h"
 #include "CharacterSystem.h"
 #include "OtherSystem.h"
+#include "TestSystem.h"

@@ -192,7 +192,7 @@ void SpawnObjectSystem(Chunk& a_chunk, const SystemContext& a_context)
 			int colorIndex = rand % colors.size();
 			float fish = ((rand % 1) - 0.5f) / 5580.0f;
 			
-			for (int i = 0; i < 300; i++)
+			for (int i = 0; i < 80; i++)
 			{
 				float3 rot(
 					std::rand() % 180 - 90,
@@ -211,7 +211,9 @@ void SpawnObjectSystem(Chunk& a_chunk, const SystemContext& a_context)
 					ModelKey("Box"),
 					Velocity(0.0f, 0.0f, 0.0f),
 					LifeTime(300.0f),
-					Component::AlphaBlendComponent(colors[colorIndex], "Alpha")
+					AlphaBlendComponent(colors[colorIndex], "Alpha"),
+					BoxCollider(float3(), float3(0.012f, 0.012, 0.012)),
+					OBBCollider(OBB_PushOutLocked)
 				);
 				// ”š”­ˆÚ“®
 				if (firework.Look().fireworkType & FIREWORK_BURN)

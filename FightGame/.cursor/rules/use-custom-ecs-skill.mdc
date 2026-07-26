@@ -1,0 +1,11 @@
+---
+description: 
+globs: **/ECS/**
+alwaysApply: false
+---
+
+# 自作ECSの参照
+
+このプロジェクトは自作ECS(共通基盤)を使用している。ECS関連のコード(Entity、Component、System、Chunk、World、移動系処理)を読み書きする前に、必ず `custom-ecs` スキル(`~/.cursor/skills/custom-ecs/SKILL.md`)を読むこと。
+
+特にComponentHandleの `operator->`(書き込み用)と `Look()`(読み取り用)の使い分け、移動系のResultコンポーネント経由の座標更新はスキル記載の規約に従う。

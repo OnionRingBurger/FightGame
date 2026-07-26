@@ -1655,6 +1655,7 @@ namespace Component
 		POSE_ROT_CAMERA,
 		POSE_ROT_FOLLOW,
 		POSE_ROT_DEBUGCAMERA,
+		POSE_ROT_LOOKMOVE
 	};
 
 	struct PoseRotState
@@ -2363,4 +2364,258 @@ namespace Component
 		{
 		}
 	};
+
+	struct SectorHitJudge
+	{
+		static constexpr TypeID kTypeId = 108;
+		static constexpr const char* kTypeName = "SectorHitJudge";
+		static constexpr int kVersion = 0;
+
+		// êÓÇÃîÕàÕ
+		float minLength;
+		float maxLength;
+		// êÓÇÃäpìx
+		float angle;
+		// è„â∫ï˚å¸Ç÷ÇÃîªíË
+		float maxHeight;
+		float maxLowness;
+
+		SectorHitJudge(float a_minLength, float a_maxLength, float a_angle, float a_maxHeight, float a_maxLowness)
+			: minLength(a_minLength)
+			, maxLength(a_maxLength)
+			, angle(a_angle)
+			, maxHeight(a_maxHeight)
+			, maxLowness(a_maxLowness)
+		{
+		}
+
+		SectorHitJudge()
+			: SectorHitJudge(0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
+		{
+		}
+	};
+
+	struct PlayerAttackTag
+	{
+		static constexpr TypeID kTypeId = 109;
+		static constexpr const char* kTypeName = "PlayerAttackTag";
+		static constexpr int kVersion = 0;
+		PlayerAttackTag() {};
+	};
+
+	// !!!New!!!
+	enum ActionFlag : BitFlag
+	{
+		ActionFlag_Move = 1 << 0,
+		ActionFlag_Aim = 1 << 1,
+		ActionFlag_Attack = 1 << 2,
+		ActionFlag_Jump = 1 << 3,
+		ActionFlag_All = ActionFlag_Move | ActionFlag_Aim | ActionFlag_Attack | ActionFlag_Jump,
+	};
+
+
+	struct AttackHitRecord
+	{
+		static constexpr TypeID kTypeId = 110;
+		static constexpr const char* kTypeName = "AttackHitRecord";
+		static constexpr int kVersion = 0;
+
+		struct Entry
+		{
+			Entity attackEntity;
+			float remainingCooldown;
+
+			Entry()
+				: Entry(kInvalidEntity, 0.0f)
+			{
+			}
+
+			Entry(Entity a_attackEntity, float a_remainingCooldown)
+				: attackEntity(a_attackEntity)
+				, remainingCooldown(a_remainingCooldown)
+			{
+			}
+		};
+
+		std::vector<Entry> entries;
+
+		AttackHitRecord()
+		{
+		}
+	};
+
+
+	// !!!New!!!
+	struct GroundedState
+	{
+		static constexpr TypeID kTypeId = 111;
+		static constexpr const char* kTypeName = "GroundedState";
+		static constexpr int kVersion = 0;
+
+		bool isGrounded;
+
+		GroundedState(bool a_isGrounded = false)
+			: isGrounded(a_isGrounded)
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct ActionMask
+	{
+		static constexpr TypeID kTypeId = 112;
+		static constexpr const char* kTypeName = "ActionMask";
+		static constexpr int kVersion = 0;
+
+		BitFlag allowed;
+
+		ActionMask(BitFlag a_allowed = ActionFlag_All)
+			: allowed(a_allowed)
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct JumpAction
+	{
+		static constexpr TypeID kTypeId = 113;
+		static constexpr const char* kTypeName = "JumpAction";
+		static constexpr int kVersion = 0;
+
+		JumpAction() = default;
+	};
+
+	struct WorldPower
+	{
+		static constexpr TypeID kTypeId = 114;
+		static constexpr const char* kTypeName = "WorldPower";
+		static constexpr int kVersion = 0;
+
+		float3 power;
+
+		WorldPower()
+			: WorldPower(float3(0.0f, 0.0f, 0.0f))
+		{
+		}
+
+		WorldPower(float3 a_power)
+			: power(a_power)
+		{
+		}
+	};
+
+	struct JumpPower
+	{
+		static constexpr TypeID kTypeId = 115;
+		static constexpr const char* kTypeName = "JumpPower";
+		static constexpr int kVersion = 0;
+
+		float3 initialVelocity;
+
+		JumpPower()
+			: JumpPower(float3(0.0f, 0.0f, 0.0f))
+		{
+		}
+
+		JumpPower(float3 a_initialVelocity)
+			: initialVelocity(a_initialVelocity)
+		{
+		}
+	};
+
+	struct AttackPower
+	{
+		static constexpr TypeID kTypeId = 116;
+		static constexpr const char* kTypeName = "AttackPower";
+		static constexpr int kVersion = 0;
+
+		float minLength;
+		float maxLength;
+		float angle;
+		float maxHeight;
+		float maxLowness;
+		float damageValue;
+		float lifeTime;
+		float3 followOffset;
+		float waitTime;
+
+		AttackPower()
+			: AttackPower(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, float3(), 0.0f)
+		{
+		}
+
+		AttackPower(
+			float a_minLength,
+			float a_maxLength,
+			float a_angle,
+			float a_maxHeight,
+			float a_maxLowness,
+			float a_damageValue,
+			float a_lifeTime,
+			float3 a_followOffset = float3(),
+			float a_waitTime = 0.0f)
+			: minLength(a_minLength)
+			, maxLength(a_maxLength)
+			, angle(a_angle)
+			, maxHeight(a_maxHeight)
+			, maxLowness(a_maxLowness)
+			, damageValue(a_damageValue)
+			, lifeTime(a_lifeTime)
+			, followOffset(a_followOffset)
+			, waitTime(a_waitTime)
+		{
+		}
+	};
+
+	struct AttackAction
+	{
+		static constexpr TypeID kTypeId = 117;
+		static constexpr const char* kTypeName = "AttackAction";
+		static constexpr int kVersion = 0;
+
+		Entity attackEntity;
+		float elapsedTime;
+
+		AttackAction()
+			: AttackAction(kInvalidEntity, 0.0f)
+		{
+		}
+
+		AttackAction(Entity a_attackEntity, float a_elapsedTime = 0.0f)
+			: attackEntity(a_attackEntity)
+			, elapsedTime(a_elapsedTime)
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct AttackWaitAction
+	{
+		static constexpr TypeID kTypeId = 118;
+		static constexpr const char* kTypeName = "AttackWaitAction";
+		static constexpr int kVersion = 0;
+
+		float elapsedTime;
+
+		AttackWaitAction(float a_elapsedTime = 0.0f)
+			: elapsedTime(a_elapsedTime)
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct LookMove
+	{
+		static constexpr TypeID kTypeId = 119;
+		static constexpr const char* kTypeName = "LookMove";
+		static constexpr int kVersion = 0;
+
+		float rotateSpeed;
+
+		LookMove(float a_rotateSpeed = 0.0f)
+			: rotateSpeed(a_rotateSpeed)
+		{
+		}
+	};
+
 }

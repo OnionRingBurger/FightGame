@@ -69,10 +69,55 @@ Entity GetCamera(Chunk& a_chunk)
 	return cameraEntity;
 }
 
+bool IsActionAllowed(Chunk& a_chunk, Entity a_entity, ActionFlag a_flag)
+{
+	const ComponentHandle<ActionMask> mask = a_chunk.GetComponent<ActionMask>(a_entity);
+	if (!mask.IsValid()) return true;
+	return (mask.Look().allowed & a_flag) != 0;
+}
+
+// 攻撃解除可能だった場合キャンセルする
+void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity)
+{
+	ComponentHandle<AttackAction> attackAction = a_chunk.GetComponent<AttackAction>(a_entity);
+	if (!attackAction.IsValid()) return;
+
+	// AttackWaitAction 中はキャンセル不可
+	if (a_chunk.GetComponent<AttackWaitAction>(a_entity).IsValid()) return;
+
+	Entity attackEntity = attackAction.Look().attackEntity;
+	if (a_chunk.GetComponent<PlayerAttackTag>(attackEntity).IsValid())
+	{
+		a_chunk.DeleteChunkEntity(attackEntity);
+	}
+
+	a_chunk.DeleteChunkComponent(a_entity, AttackAction::kTypeId);
+	a_chunk.DeleteChunkComponent(a_entity, AttackWaitAction::kTypeId);
+}
+
 float3 GetEntityWorldPos(Chunk& a_chunk, Entity a_entity)
 {
 	ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(a_entity);
 	if (pos.IsValid()) return TOFLOAT3(pos.Look());
+
+	return float3();
+}
+
+float3 GetEntityPosePos(Chunk& a_chunk, Entity a_entity)
+{
+	const ComponentHandle<Pose> pose = a_chunk.GetComponent<Pose>(a_entity);
+	if (pose.IsValid()) return pose.Look().pos;
+
+	return GetEntityWorldPos(a_chunk, a_entity);
+}
+
+float3 GetEntityPoseRot(Chunk& a_chunk, Entity a_entity)
+{
+	const ComponentHandle<Pose> pose = a_chunk.GetComponent<Pose>(a_entity);
+	if (pose.IsValid()) return pose.Look().rot;
+
+	const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(a_entity);
+	if (rotation.IsValid()) return TOFLOAT3(rotation.Look());
 
 	return float3();
 }

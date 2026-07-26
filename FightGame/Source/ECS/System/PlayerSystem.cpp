@@ -1,5 +1,6 @@
 #include "PlayerSystem.h"
 #include "Components.h"
+#include "SystemAssist.h"
 #include "Sound.h"
 
 using namespace Component;
@@ -74,4 +75,82 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 }
 
+void PlayerAttackSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	// UŒ‚ƒL[‚ª‰Ÿ‚³‚ê‚Ä‚¢‚È‚©‚Á‚½‚çC³
+	if (!a_context.input.IsRegisterTrigger("Shot")) return;
 
+	ComponentView view = a_chunk.GetView<ComponentTypes<PlayerTag, Position, Rotation, AttackPower>>();
+
+	for (auto it : view)
+	{
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_Attack)) continue;
+
+		const ComponentHandle<AttackAction> attackAction = a_chunk.GetComponent<AttackAction>(it);
+		if (attackAction.IsValid()) continue;
+
+		const ComponentHandle<Position> position = a_chunk.GetComponent<Position>(it);
+		const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(it);
+		const ComponentHandle<AttackPower> attackPower = a_chunk.GetComponent<AttackPower>(it);
+
+		Entity attack = a_chunk.CreateNewEntity(
+			MOVE_AND_TRANSFORM_COMPONENT(
+				float3(0.0f, 0.0f, 0.0f), // Fixed‚ÅÀ•W‚ğŒÅ’è‚·‚é‚½‚ßA‰ŠúÀ•W‚Í“ü—Í‚µ‚È‚¢B
+				float3(0.0f, rotation.Look().yaw, 0.0f),
+				float3(1.0f, 1.0f, 1.0f)
+			),
+			SectorHitJudge(
+				attackPower.Look().minLength,
+				attackPower.Look().maxLength,
+				attackPower.Look().angle,
+				attackPower.Look().maxHeight,
+				attackPower.Look().maxLowness
+			),
+			AddDamageComponent(attackPower.Look().damageValue),
+			PlayerAttackTag(),
+			LifeTime(attackPower.Look().lifeTime),
+			FollowPosition(attackPower.Look().followOffset, it, FOLLOW_POS_LOCALOFFSET),
+			PosePosState(POSE_POS_FOLLOW)
+		);
+
+		a_chunk.AddComponent(it, AttackAction(attack, 0.0f));
+		// UŒ‚d’¼ŠÔ‚ª‘¶İ‚·‚éê‡Action‚ğ’Ç‰Á‚·‚é
+		if (attackPower.Look().waitTime > 0.0f)
+		{
+			a_chunk.AddComponent(it, AttackWaitAction(0.0f));
+		}
+	}
+
+}
+
+
+void PlayerJumpSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	if (!a_context.input.IsRegisterTrigger("Jump")) return;
+
+	ComponentView view = a_chunk.GetView<ComponentTypes<PlayerTag, ActionMask, JumpPower>>();
+
+	for (auto it : view)
+	{
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_Jump)) continue;
+
+		const ComponentHandle<JumpAction> jump = a_chunk.GetComponent<JumpAction>(it);
+		if (jump.IsValid()) continue;
+
+		// UŒ‚’†‚¾‚Á‚½ê‡ƒLƒƒƒ“ƒZƒ‹‚·‚é
+		CancelPlayerAttackIfAble(a_chunk, it);
+
+		const ComponentHandle<JumpPower> jumpPower = a_chunk.GetComponent<JumpPower>(it);
+		a_chunk.AddComponent(it, JumpAction());
+
+		ComponentHandle<Velocity> velocity = a_chunk.GetComponent<Velocity>(it);
+		if (!velocity.IsValid())
+		{
+			a_chunk.AddComponent(it, Velocity());
+			velocity = a_chunk.GetComponent<Velocity>(it);
+		}
+		velocity->x = jumpPower.Look().initialVelocity.x;
+		velocity->y = jumpPower.Look().initialVelocity.y;
+		velocity->z = jumpPower.Look().initialVelocity.z;
+	}
+}

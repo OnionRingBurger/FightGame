@@ -184,6 +184,7 @@
     <ClInclude Include="include\ECS\System\SystemAssist.h" />
     <ClInclude Include="include\ECS\System\SystemContext.h" />
     <ClInclude Include="include\ECS\System\SystemResponse.h" />
+    <ClInclude Include="include\ECS\System\TestSystem.h" />
     <ClInclude Include="include\ECS\System\TransformSystem.h" />
     <ClInclude Include="include\ECS\System\VelocitySystem.h" />
     <ClInclude Include="include\ECS\World\ClearWorld.h" />
@@ -267,6 +268,7 @@
     <ClCompile Include="Source\ECS\System\SoundSystem.cpp" />
     <ClCompile Include="Source\ECS\System\SystemAssist.cpp" />
     <ClCompile Include="Source\ECS\System\SystemResponse.cpp" />
+    <ClCompile Include="Source\ECS\System\TestSystem.cpp" />
     <ClCompile Include="Source\ECS\System\TransformSystem.cpp" />
     <ClCompile Include="Source\ECS\System\VelocitySystem.cpp" />
     <ClCompile Include="Source\ECS\World\ClearWorld.cpp" />

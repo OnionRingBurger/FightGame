@@ -174,7 +174,6 @@ void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
 			RailUser(rail)
 		);
 
-		//a_chunk.DeleteChunkComponent(it, EnemyTag::kTypeId);
 		a_chunk.DeleteChunkComponent(it, DeadState::kTypeId);
 		a_chunk.DeleteChunkComponent(it, BoxCollider::kTypeId);
 		a_chunk.DeleteChunkComponent(it, OBBCollider::kTypeId);
@@ -182,6 +181,8 @@ void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
 		a_chunk.DeleteChunkComponent(it, MoveForward::kTypeId);
 		a_chunk.DeleteChunkComponent(it, RailFly::kTypeId);
 		
+		PlaySound(LoadSound("Assets/Sound/kill.mp3"));
+
 		ComponentHandle<LifeTime> lifeTime = a_chunk.GetComponent<LifeTime>(it);
 		if (lifeTime.IsValid())
 		{
@@ -535,6 +536,9 @@ void SpawnNormalEnemy(Chunk& a_chunk, float3 a_targetPos, float3 a_spawnRailPosN
 		EnemyTag{},
 		LifeTime(1200.0f),
 		ModelKey("ghost_FINAL"),
+		HitInfomation(),
+		HitPoint(kEnemyMaxHP),
+		AttackHitRecord(),
 		PlayerViewTag{},
 		PosePosState(POSE_POS_RAIL),
 		PoseRotState(POSE_ROT_LOOK),
@@ -563,6 +567,9 @@ void SpawnShooterEnemy(Chunk& a_chunk, float3 a_targetPos)
 		EnemyTag{},
 		LifeTime(1200.0f),
 		ModelKey("ghost_FINAL"),
+		HitInfomation(),
+		HitPoint(kEnemyMaxHP),
+		AttackHitRecord(),
 		PlayerViewTag{},
 		PosePosState(POSE_POS_RAIL),
 		PoseRotState(POSE_ROT_LOOK),
@@ -595,6 +602,9 @@ void SpawnGroupEnemy(Chunk& a_chunk, float3 a_targetPos, float3 a_spawnRailPosNo
 			EnemyTag{},
 			LifeTime(1200.0f),
 			ModelKey("ghost_FINAL"),
+			HitInfomation(),
+			HitPoint(kEnemyMaxHP),
+			AttackHitRecord(),
 			PlayerViewTag{},
 			PosePosState(POSE_POS_RAIL),
 			PoseRotState(POSE_ROT_LOOK),
@@ -646,6 +656,82 @@ bool SpawnEnemyBullet(Chunk& a_chunk, float3 a_shooterOffset, Entity a_player)
 	);
 
 	return false;
+}
+
+void EnemyAttackHitSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	// HitInfomationを保持したEnemyを取得する
+	ComponentView view = a_chunk.GetView<ComponentTypes<EnemyTag, HitInfomation, HitPoint, AttackHitRecord>>();
+
+	for (auto it : view)
+	{
+		// 敵のぶつかった結果を取得
+		const ComponentHandle<HitInfomation> info = a_chunk.GetComponent<HitInfomation>(it);
+		ComponentHandle<AttackHitRecord> hitRecord = a_chunk.GetComponent<AttackHitRecord>(it);
+
+		for (const auto& triggerIt : info.Look().triggerResults)
+		{
+			// プレイヤー攻撃でなければ次ループへ移行
+			const ComponentHandle<PlayerAttackTag> attackTag = a_chunk.GetComponent<PlayerAttackTag>(triggerIt.triggerEntity);
+			if (!attackTag.IsValid()) continue;
+
+			// ぶつかった対象ダメージを持っていなかった場合は次ループへ移行
+			const ComponentHandle<AddDamageComponent> damage = a_chunk.GetComponent<AddDamageComponent>(triggerIt.triggerEntity);
+			if (!damage.IsValid()) continue;
+
+			// プレイヤーの攻撃が被弾クールタイムなら次ループへ移行
+			bool isOnCooldown = false;
+			for (const auto& entryIt : hitRecord.Look().entries)
+			{
+				if (entryIt.attackEntity == triggerIt.triggerEntity)
+				{
+					isOnCooldown = true;
+					break;
+				}
+			}
+			if (isOnCooldown) continue;
+
+			// 体力にダメージを与える
+			ComponentHandle<HitPoint> hitPoint = a_chunk.GetComponent<HitPoint>(it);
+			hitPoint->currentHP -= damage.Look().damageValue;
+
+			// 被弾履歴に攻撃Entityとクールタイムを記録
+			float cooldownDuration = kDefaultAttackHitCooldown;
+			const ComponentHandle<LifeTime> lifeTime = a_chunk.GetComponent<LifeTime>(triggerIt.triggerEntity);
+
+			// 追加する
+			hitRecord->entries.push_back(AttackHitRecord::Entry(triggerIt.triggerEntity, cooldownDuration));
+			
+		}
+	}
+
+}
+
+void AttackHitRecordCleanupSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	// Viewを取得
+	ComponentView view = a_chunk.GetView<ComponentTypes<AttackHitRecord>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<AttackHitRecord> hitRecord = a_chunk.GetComponent<AttackHitRecord>(it);
+		
+		for (auto entryIt = hitRecord->entries.begin(); entryIt != hitRecord->entries.end();)
+		{
+			// クールタイムを減らす
+			entryIt->remainingCooldown -= a_context.deltaTime;
+
+			// 被弾待機中でない場合対象をイテレータで削除する
+			const ComponentHandle<PlayerAttackTag> attackTag = a_chunk.GetComponent<PlayerAttackTag>(entryIt->attackEntity);
+			if (entryIt->remainingCooldown <= 0.0f || !attackTag.IsValid())
+			{
+				entryIt = hitRecord->entries.erase(entryIt);
+				continue;
+			}
+
+			++entryIt;
+		}
+	}
 }
 
 

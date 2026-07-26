@@ -1,0 +1,22 @@
+---
+description: 
+alwaysApply: true
+---
+
+# Visual Studio プロジェクトへのファイル登録
+
+ファイルペアの生成規約は個人スキル `cpp-file-pair` に従う。このプロジェクトでの「プロジェクトファイルへの登録」は以下の通り。
+
+- .cpp / .h を新規作成・削除・移動・リネームしたら、ファイル1つにつき1回、登録スクリプトを実行する:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .cursor/scripts/register-source.ps1 -RelativePath "include\ECS\System\FooSystem.h"
+```
+
+- 削除・リネーム時は `-Remove` を付けて古いパスを登録解除する。事前確認は `-DryRun`
+- スクリプトは書き込み前に XML を検証し、壊れる場合は書き込まず失敗する
+- `FightGame.vcxproj` / `FightGame.vcxproj.filters` を編集ツール(StrReplace等)で直接編集しない。filters は UTF-8 + 日本語フィルター名を含み、この環境の編集ツールでは文字化けで壊れる
+- vcxproj の構成ブロック(ProjectConfigurations、PropertyGroup、ItemDefinitionGroup、Import)には一切触れない
+- filters に新しい `<Filter>` ノードを勝手に追加しない(必要な場合はユーザーに確認)
+- 新規ソースファイルの文字コードは既存に合わせて Shift-JIS、改行は CRLF
+- 完了後、Visual Studio でプロジェクトの再読み込みが必要な旨をユーザーに伝える
