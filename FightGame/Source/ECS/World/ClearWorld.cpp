@@ -17,8 +17,9 @@ ClearWorld::ClearWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 	a_input.RegisterButton("ChunkChange", VK_PAD_A);
 }
 
-Chunk ClearWorld::CreateNewChunk()
+Chunk ClearWorld::CreateNewChunk(AIManager& a_aiManager)
 {
+	(void)a_aiManager;
 	Chunk newChunk;
 
 	ResetSound();
@@ -75,7 +76,7 @@ Chunk ClearWorld::CreateNewChunk()
 	return newChunk;
 }
 
-void ClearWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response)
+void ClearWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
 {
 	
 	VelocitySystem(a_chunk, a_context);

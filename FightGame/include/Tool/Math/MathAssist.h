@@ -255,9 +255,9 @@ struct int3 {
 	int z;
 
 	constexpr int3()
-		: x(0.0f)
-		, y(0.0f)
-		, z(0.0f)
+		: x(0)
+		, y(0)
+		, z(0)
 	{
 	}
 
@@ -379,8 +379,8 @@ struct int2 {
 	int y;
 
 	constexpr int2()
-		: x(0.0f)
-		, y(0.0f)
+		: x(0)
+		, y(0)
 	{
 	}
 
@@ -494,7 +494,10 @@ Matrix3X3 GetEigenVectors(const Matrix3X3&);
 float GetMaxValue(const Matrix3X3& matrix, int& p, int& q);
 float3 MultiplyVector(float3, float3, float3);
 float3 Normalize(const float3& a_vector);
+float2 Normalize(const float2& a_vector);
 float NormalizeAngle(float radAngle);
+// ìxêîñ@ÇÃäpìxç∑Ç -180..180 Ç…èÙÇﬁ
+float DeltaDeg(float a_fromDeg, float a_toDeg);
 float3 Cross(float3, float3);
 float RSqrt(float x);
 float NormalizeLength(const float x, const float y, const float z);
@@ -503,6 +506,9 @@ float3 Sign(float3 num);
 float3 ExponentialRad(const float3& currentRad, const float3& targetRad, float speed, float dt);
 float3 GetForward(float3 rotation);
 float GetLength(float3 thisPos, float3 otherPos);
+float GetLength(const float2& a_vector);
+float GetLength(float2 a_thisPos, float2 a_otherPos);
+float GetLengthSq(const float2& a_vector);
 
 float Frac(float a_value);
 float Noise(float a_time);

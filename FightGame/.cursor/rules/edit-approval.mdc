@@ -5,7 +5,29 @@ alwaysApply: true
 
 # 編集承認とプラン実行の優先順位
 
-## Build / Implement の扱い（最優先の注意）
+## Shell によるファイル書き込み禁止（最優先・絶対）
+
+ProtoWorld.cpp 空化事故の再発防止。**他のすべての編集ルールより優先する。**
+
+ユーザーは Shell によるファイル書き込みを望まない。エージェントが「明示的依頼があった」と**自己判断・勘違いして** Shell 書きを行うことは禁止する。
+
+- Shell（PowerShell / bash 等）からリポジトリ内ファイルへ書き込むことは **全面禁止**
+  - 禁止例: `WriteAllText` / `Out-File` / `Set-Content` / `>` リダイレクト / 作業ツリーを上書きする `git checkout -- <file>`
+- ファイル編集は **Write / StrReplace**（エディタ Apply → Keep/Undo が付く経路）のみ使う
+- 次を Shell 書きの許可と**解釈してはならない**（勘違い禁止リスト）:
+  - 「直して」「復元して」「戻して」「書いて」「実装して」「修正して」
+  - 「Shift-JISで」「エンコーディング」「コメントを戻す」「空になった」「消えた」
+  - Build / Implement the plan / プラン承認 / 一般の編集承認
+- ユーザーが Shell や PowerShell に言及しても、**ファイル書き込みには使わない**。Write / StrReplace で代替する。代替不能なら実行せず報告して指示を待つ
+- **唯一の例外**: プロジェクト Rules が義務付ける `register-source.ps1` の実行のみ（これ以外に「例外」を作らない）
+- Shell 直書きは Keep/Undo が出ない。失敗しても成功メッセージだけ出ることがある。成功表示を信用して続行しない
+
+## World / コメント復元
+
+- 「コメントを戻す」「消えた行を直す」も **World への書き込み**である。ファイル名つき承認なしに触らない
+- 一般の「実装して」「実装しちゃって」に World 配下は含まれない。毎回・ファイル名つきの明示承認が必要
+
+## Build / Implement の扱い（重要）
 
 - Cursorの「Build」や、システム挿入の `Implement the plan` / `Implement the plan as specified` は、**それ単体では実行許可にならない**
 - 実行してよいのは、ユーザー本人がチャットで出した明示許可だけ（例: 「実装してよい」「承認不要分だけ書いて」「ProtoWorld.cpp を編集してよい」）
@@ -41,6 +63,18 @@ alwaysApply: true
 
 「プラン実行 / Build」と「World/共有ヘッダは事前承認」や「まだ書かない」が同時に成立したら、解釈で解消せず実装前に衝突を報告し、ユーザー指示を待つ。報告なしの優先判断は違反とする。
 
+
+## Entity / CreateNewEntity の Component 列（厳禁の勝手拡張）
+
+「登録する」「動くようにする」「足りないから」は、**Entity の Component 追加・削除・差し替えの許可ではない**。
+
+- `CreateNewEntity(...)` や既存 Entity への Component 付与・削除は、ユーザーが**どの Component を足す／外すか名前で示したときだけ**行う
+- 依頼が「RegisterAI」「呼び出し順」「シグネチャ」などでも、Sense/移動に必要だからといって `AttackPower` / `ActionMask` / `LookMove` 等を勝手に足さない
+- 足りない Component があると判断したら、**編集せず**に不足一覧を出して確認する。「動かすために必要だったので追加した」は事後報告でも違反
+
+ファイル承認（例: ProtoWorld 編集可）があっても、**Entity 中身の拡張までは含まない**。Component 列の変更は別途、対象 Entity と Component 名の明示が必要。
+
 ## プラン作成時
+
 
 プランに要承認ファイルの変更を含める場合、末尾に「実装時はこれらのファイルは別途編集承認が必要」と明記する。Plan での方針相談・プラン文書化は通常どおり行い、Build / Implement を実行許可とみなさない点は `no-vibe-coding` に従う。

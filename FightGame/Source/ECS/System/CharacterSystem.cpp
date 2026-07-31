@@ -42,8 +42,9 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 	for (auto it : view)
 	{
 		ComponentHandle<ActionMask> actionMask = a_chunk.GetComponent<ActionMask>(it);
+		// 一度すべての行動があると仮定する
 		BitFlag allowed = ActionFlag_All;
-
+		// 各情報StateとActionStateから不可能な行動を算出し、フラグを降ろす
 		const ComponentHandle<DeadState> dead = a_chunk.GetComponent<DeadState>(it);
 		if (dead.IsValid() && dead.Look().isDead)
 		{
@@ -93,7 +94,10 @@ void AttackActionSystem(Chunk& a_chunk, const SystemContext& a_context)
 		// TODO 必要に応じて後隙は追加する
 		// 何らかの方法で攻撃判定が消滅した場合攻撃終了する
 		Entity attackEntity = attackAction.Look().attackEntity;
-		if (!a_chunk.GetComponent<PlayerAttackTag>(attackEntity).IsValid())
+		// 攻撃判定が残っている場合削除
+		const bool hasPlayerAttack = a_chunk.GetComponent<PlayerAttackTag>(attackEntity).IsValid();
+		const bool hasEnemyAttack = a_chunk.GetComponent<EnemyAttackTag>(attackEntity).IsValid();
+		if (!hasPlayerAttack && !hasEnemyAttack)
 		{
 			a_chunk.DeleteChunkComponent(it, AttackAction::kTypeId);
 			if (a_chunk.GetComponent<AttackWaitAction>(it).IsValid())

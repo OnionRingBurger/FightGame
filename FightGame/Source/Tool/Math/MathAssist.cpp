@@ -222,6 +222,20 @@ float3 Normalize(const float3& a_vector)
 	return float3{ a_vector.x * invLen, a_vector.y * invLen, a_vector.z * invLen };
 }
 
+float2 Normalize(const float2& a_vector)
+{
+	// !!!New!!!
+	float lengthSq = a_vector.x * a_vector.x + a_vector.y * a_vector.y;
+
+	if (lengthSq < 1e-8f)
+	{
+		return float2(0.0f, 0.0f);
+	}
+
+	float invLen = 1.0f / std::sqrtf(lengthSq);
+	return float2(a_vector.x * invLen, a_vector.y * invLen);
+}
+
 float NormalizeAngle(float radAngle)
 {
 	while (radAngle < -2 * PI)
@@ -233,6 +247,21 @@ float NormalizeAngle(float radAngle)
 		radAngle -= 2 * PI;
 	}
 	return radAngle;
+}
+
+float DeltaDeg(float a_fromDeg, float a_toDeg)
+{
+	// !!!New!!!
+	float delta = a_toDeg - a_fromDeg;
+	while (delta > 180.0f)
+	{
+		delta -= 360.0f;
+	}
+	while (delta < -180.0f)
+	{
+		delta += 360.0f;
+	}
+	return delta;
 }
 
 // ŠOÏ‚ð‹‚ß‚é
@@ -302,6 +331,26 @@ float GetLength(float3 thisPos, float3 otherPos)
 		std::pow(thisPos.y - otherPos.y, 2) +
 		std::pow(thisPos.z - otherPos.z, 2)
 	);
+}
+
+float GetLength(const float2& a_vector)
+{
+	// !!!New!!!
+	return std::sqrtf(a_vector.x * a_vector.x + a_vector.y * a_vector.y);
+}
+
+float GetLength(float2 a_thisPos, float2 a_otherPos)
+{
+	// !!!New!!!
+	const float dx = a_thisPos.x - a_otherPos.x;
+	const float dy = a_thisPos.y - a_otherPos.y;
+	return std::sqrtf(dx * dx + dy * dy);
+}
+
+float GetLengthSq(const float2& a_vector)
+{
+	// !!!New!!!
+	return a_vector.x * a_vector.x + a_vector.y * a_vector.y;
 }
 
 float Frac(float a_value)

@@ -1,5 +1,5 @@
 ---
-description: 
+description: .cpp/.h の追加・削除・移動時は register-source.ps1 で vcxproj 登録する（直接編集禁止）
 alwaysApply: true
 ---
 

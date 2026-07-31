@@ -106,7 +106,6 @@ namespace ComponentSystem
 	{
 		valueFunc("moveSpeedX", component.moveSpeed.x, 0.0f);
 		valueFunc("moveSpeedY", component.moveSpeed.y, 0.0f);
-		valueFunc("isInput", component.isInput, false);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>

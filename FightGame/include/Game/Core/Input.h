@@ -15,8 +15,10 @@
 
 struct Axis
 {
+	// Œü‚«
 	float x;
 	float y;
+	// “ü—Í—Ê
 	float magnitube;
 
 	Axis(float a_x, float a_y, float a_magnitube)

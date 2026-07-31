@@ -18,8 +18,9 @@ CreateGameWorld::CreateGameWorld(IModelCacheAcquisition& a_modelCache,
 {
 }
 
-Chunk CreateGameWorld::CreateNewChunk()
+Chunk CreateGameWorld::CreateNewChunk(AIManager& a_aiManager)
 {
+	(void)a_aiManager;
 	Chunk newChunk;
 
 	std::unique_ptr<ComponentsSerialize> serialize = std::make_unique<ComponentsSerialize>();
@@ -53,7 +54,7 @@ Chunk CreateGameWorld::CreateNewChunk()
 	return newChunk;
 }
 
-void CreateGameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse)
+void CreateGameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager)
 {
 	PoseSystem(a_chunk, a_context);
 	DebugCameraSystem(a_chunk);

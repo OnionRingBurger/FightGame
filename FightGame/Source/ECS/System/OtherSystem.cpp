@@ -195,8 +195,8 @@ void SpawnObjectSystem(Chunk& a_chunk, const SystemContext& a_context)
 			for (int i = 0; i < 80; i++)
 			{
 				float3 rot(
-					std::rand() % 180 - 90,
-					std::rand() % 360,
+					(float)(std::rand() % 180 - 90),
+					(float)(std::rand() % 360),
 					0.0f
 				);
 

@@ -86,7 +86,9 @@ void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity)
 	if (a_chunk.GetComponent<AttackWaitAction>(a_entity).IsValid()) return;
 
 	Entity attackEntity = attackAction.Look().attackEntity;
-	if (a_chunk.GetComponent<PlayerAttackTag>(attackEntity).IsValid())
+	// UŒ‚”»’è‚ªc‚Á‚Ä‚¢‚½ê‡íœ‚·‚é
+	if (a_chunk.GetComponent<PlayerAttackTag>(attackEntity).IsValid()
+		|| a_chunk.GetComponent<EnemyAttackTag>(attackEntity).IsValid())
 	{
 		a_chunk.DeleteChunkEntity(attackEntity);
 	}

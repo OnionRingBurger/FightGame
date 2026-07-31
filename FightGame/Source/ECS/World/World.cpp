@@ -42,8 +42,10 @@ void World::InitWorld()
 
 	systemResponse = std::make_unique<SystemResponse>();
 
-	chunk = CreateNewChunk();
+	// Tree ìoò^ÇêÊÇ…çsÇ¢ÅACreateNewChunk ì‡ÇÃ RegisterAI Ç™ê¨å˜Ç∑ÇÈÇÊÇ§Ç…Ç∑ÇÈ
+	InitAI(aiManager);
 
+	chunk = CreateNewChunk(aiManager);
 
 	ContextUpdate(0.01f);
 	InitChunk(chunk, context, *systemResponse);
@@ -52,6 +54,12 @@ void World::InitWorld()
 void World::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse)
 {
 
+}
+
+void World::InitAI(AIManager& a_aiManager)
+{
+	// !!!New!!!
+	(void)a_aiManager;
 }
 
 void World::InitContext()
@@ -81,7 +89,7 @@ void World::UpdateWorld()
 	{
 	case USECHUNK:
 	{
-		UpdateChunk(chunk, context, *systemResponse);
+		UpdateChunk(chunk, context, *systemResponse, aiManager);
 	}
 	break;
 
@@ -135,14 +143,18 @@ void World::ChangeState(WorldState state)
 //
 //////////////////////////////
 
-Chunk World::CreateNewChunk()
+Chunk World::CreateNewChunk(AIManager& a_aiManager)
 {
+	(void)a_aiManager;
 	return Chunk();
 }
 
-void World::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse)
+void World::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager)
 {
-
+	(void)a_chunk;
+	(void)a_context;
+	(void)a_systemResponse;
+	(void)a_aiManager;
 }
 
 void World::UpdateIMGUI(Chunk& a_chunk, SystemContext& a_context)

@@ -23,6 +23,7 @@ MainGame::MainGame()
 	, fpsOldTime(0.0f)
 	, preExecTime(0.0f)
 	, processingTime(0.0f)
+	, worstProcessingTime(0.0f)
 	, fpsCount(0)
 {
 	uiCache = UICache();
@@ -202,10 +203,6 @@ void MainGame::MainLoop(HWND a_hwnd, MSG& message)
 				ImGui_ImplWin32_NewFrame();
 				ImGui::NewFrame();
 
-				if (nowTime - fpsOldTime >= 1000)
-				{
-					processingTime = static_cast<float>(timeGetTime() - nowTime);
-				}
 
 				AdvanceUpdate(diff);
 				if (true)
@@ -223,16 +220,28 @@ void MainGame::MainLoop(HWND a_hwnd, MSG& message)
 				// IMGUIを更新
 				ImGui::EndFrame();
 
+				float currentProcessingTime = static_cast<float>(timeGetTime() - nowTime);
+				
+				worstProcessingTime = std::max(currentProcessingTime, worstProcessingTime);
+
+				if (nowTime - fpsOldTime >= 1000)
+				{
+					processingTime = currentProcessingTime;
+				}
+
 			}
 			if (nowTime - fpsOldTime >= 1000)
 			{
 #ifdef _DEBUG
 				DebugConsole::SetDrawPos(1, 2);
 				std::cout << "FPS::" << fpsCount << std::endl;
-				std::cout << "直前の処理時間::" << processingTime / 1000 << std::endl;
+				std::cout << "直前の処理時間::" << processingTime / 1000.0f << std::endl;
+				std::cout << "最低値" << worstProcessingTime / 1000.0f <<std::endl;
 #endif
 				fpsCount = 0;
 				fpsOldTime = nowTime;
+				worstProcessingTime = 0.0f;
+				processingTime = 0.0f;
 			}
 		}
 	}

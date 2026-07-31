@@ -104,6 +104,7 @@ private:
 	DWORD preExecTime;
 	DWORD fpsOldTime;
 	float processingTime;
+	float worstProcessingTime;
 	int fpsCount;
 };
 

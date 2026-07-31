@@ -20,67 +20,70 @@ bool IsSetFixedRot(const ComponentHandle<PoseRotState>& a_posePosState, const st
 void InputMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
 	// Poseを変化させるEntityを取得
-	ComponentView moveView = a_chunk.GetView<ComponentTypes<InputMove, MotionResult>>();
+	ComponentView moveView = a_chunk.GetView<ComponentTypes<InputMove, MoveInputResult, MotionResult>>();
 
 	// カメラを取得
 	Entity cameraEntity = GetCamera(a_chunk);
 
-	// 入力を取得
-	const Axis& leftAxis = a_context.input.GetLeftAxis().magnitube >= a_context.input.GetKeyAxis().magnitube ? a_context.input.GetLeftAxis() : a_context.input.GetKeyAxis();
 
 	// 結果を返す
 	for (auto it : moveView)
 	{
 		if (!IsActionAllowed(a_chunk, it, ActionFlag_Move)) continue;
 
+		// 入力を取得
+		ComponentHandle<MoveInputResult> inputResult = a_chunk.GetComponent<MoveInputResult>(it);
+
 		// 座標を取得
-		ComponentHandle<MotionResult> result = a_chunk.GetComponent<MotionResult>(it);
+		ComponentHandle<MotionResult> motionResult = a_chunk.GetComponent<MotionResult>(it);
 		// 移動速度などの情報を変更しない形で取得
 		ComponentHandle<InputMove> inputMove = a_chunk.GetComponent<InputMove>(it);
 
 		// 左スティックの移動値を取得し、移動していた場合の未処理
-		if (leftAxis.magnitube)
+		if (!inputResult.Look().isInput) continue;
+
+		
+		// 移動を求めるために行列を作成
+		DirectX::XMMATRIX matrix = DirectX::XMMatrixIdentity();
+
+		// 角度を持っている場合は向いてる方向に進むようにする
+		ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(cameraEntity);
+		if (rotation.IsValid())
 		{
-			// 移動を求めるために行列を作成
-			DirectX::XMMATRIX matrix = DirectX::XMMatrixIdentity();
-
-			// 角度を持っている場合は向いてる方向に進むようにする
-			ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(cameraEntity);
-			if (rotation.IsValid())
-			{
-				// 横回転のみをかける
-				matrix *= DirectX::XMMatrixRotationRollPitchYaw(0.0f, rotation.Look().yaw * RAD, 0.0f);
-			}
-
-			// カメラの横回転からみた前方向を取得する
-			DirectX::XMVECTOR forwardVector = DirectX::XMVector3TransformNormal({ 0,0,1 }, matrix);
-			// 前方向の入力にベクトルをかける
-			DirectX::XMVECTOR moveForwardVector = DirectX::XMVectorScale(forwardVector, leftAxis.y * (1 + leftAxis.magnitube / 2) * inputMove.Look().moveSpeed.y * a_context.deltaTime);
-
-			DirectX::XMVECTOR besideVector = DirectX::XMVector3TransformNormal({ 1,0,0 }, matrix);
-			DirectX::XMVECTOR moveBesideVector = DirectX::XMVectorScale(besideVector, leftAxis.x * (1 + leftAxis.magnitube / 2) * inputMove.Look().moveSpeed.x * a_context.deltaTime);
-
-			DirectX::XMFLOAT3 moveForward;
-			DirectX::XMStoreFloat3(&moveForward, moveForwardVector);
-
-			DirectX::XMFLOAT3 moveBeside;
-			DirectX::XMStoreFloat3(&moveBeside, moveBesideVector);
-
-			float3 move = { moveForward.x + moveBeside.x, moveForward.y + moveBeside.y, moveForward.z + moveBeside.z };
-
-			inputMove->isInput = true;
-			result->posOffset.x += move.x;
-			result->posOffset.y += move.y;
-			result->posOffset.z += move.z;
-
-			// 攻撃中だった場合キャンセルする
-			CancelPlayerAttackIfAble(a_chunk, it);
-
+			// 横回転のみをかける
+			matrix *= DirectX::XMMatrixRotationRollPitchYaw(0.0f, rotation.Look().yaw * RAD, 0.0f);
 		}
-		else
+
+		//// カメラの横回転からみた前方向を取得する
+		//DirectX::XMVECTOR forwardVector = DirectX::XMVector3TransformNormal({ 0,0,1 }, matrix);
+		//// 前方向の入力にベクトルをかける
+		//DirectX::XMVECTOR moveForwardVector = DirectX::XMVectorScale(forwardVector, leftAxis.y * (1 + leftAxis.magnitube / 2) * inputMove.Look().moveSpeed.y * a_context.deltaTime);
+
+		//DirectX::XMVECTOR besideVector = DirectX::XMVector3TransformNormal({ 1,0,0 }, matrix);
+		//DirectX::XMVECTOR moveBesideVector = DirectX::XMVectorScale(besideVector, leftAxis.x * (1 + leftAxis.magnitube / 2) * inputMove.Look().moveSpeed.x * a_context.deltaTime);
+
+		//DirectX::XMFLOAT3 moveForward;
+		//DirectX::XMStoreFloat3(&moveForward, moveForwardVector);
+
+		//DirectX::XMFLOAT3 moveBeside;
+		//DirectX::XMStoreFloat3(&moveBeside, moveBesideVector);
+
+		//float3 move = { moveForward.x + moveBeside.x, moveForward.y + moveBeside.y, moveForward.z + moveBeside.z };
+
+		float3 move =
 		{
-			inputMove->isInput = false;
-		}
+			inputResult.Look().moveDir.x * (1 + inputResult.Look().magnitube / 2) * inputMove.Look().moveSpeed.x * a_context.deltaTime,
+			0.0f,
+			inputResult.Look().moveDir.y * (1 + inputResult.Look().magnitube / 2) * inputMove.Look().moveSpeed.y * a_context.deltaTime
+		};
+		motionResult->posOffset.x += move.x;
+		motionResult->posOffset.y += move.y;
+		motionResult->posOffset.z += move.z;
+
+		// 攻撃中だった場合攻撃をキャンセルする
+		CancelPlayerAttackIfAble(a_chunk, it);
+
+
 	}
 }
 
@@ -91,39 +94,23 @@ void LookMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 	Entity cameraEntity = GetCamera(a_chunk);
 	ComponentHandle<Rotation> cameraRot = a_chunk.GetComponent<Rotation>(cameraEntity);
 
-	// 入力を取得
-	const Axis& leftAxis = a_context.input.GetLeftAxis().magnitube >= a_context.input.GetKeyAxis().magnitube ? a_context.input.GetLeftAxis() : a_context.input.GetKeyAxis();
-
-	// 入力値が0だったら抜ける
-	if (!leftAxis.magnitube) return;
-	ComponentView view = a_chunk.GetView<ComponentTypes<LookMove, Pose, MotionResult>>();
+		
+	ComponentView view = a_chunk.GetView<ComponentTypes<LookMove, MoveInputResult, Pose, MotionResult>>();
 
 
 	for (auto it : view)
 	{
+		// 入力結果を取得
+		ComponentHandle<MoveInputResult> inputResult = a_chunk.GetComponent<MoveInputResult>(it);
+
+		// 入力されていなかったら抜ける
+		if (!inputResult.Look().isInput) continue;
+
 		// 移動不可能だった場合抜ける
 		if (!IsActionAllowed(a_chunk, it, ActionFlag_Move)) continue;
 
-		DirectX::XMMATRIX matrix = DirectX::XMMatrixIdentity();
-		// カメラの角度を取得
-		if (cameraRot.IsValid())
-		{
-			matrix *= DirectX::XMMatrixRotationRollPitchYaw(0.0f, cameraRot.Look().yaw * RAD, 0.0f);
-		}
-		// カメラの回転から見た前方方向のベクトルを取得する
-		DirectX::XMVECTOR forwardVector = DirectX::XMVector3TransformNormal({0, 0, 1}, matrix);
-		// 前方方向に対して前方入力の大きさをかける事で入力量を取得する
-		forwardVector = DirectX::XMVectorScale(forwardVector, leftAxis.y * (1 + leftAxis.magnitube / 2));
-		// 横方向も同様のことを行う
-		DirectX::XMVECTOR besideVector = DirectX::XMVector3TransformNormal({1, 0, 0}, matrix);
-		besideVector = DirectX::XMVectorScale(besideVector, leftAxis.x * (1 + leftAxis.magnitube / 2));
-
-		// ベクトルを加算して方向を取得
-		DirectX::XMVECTOR moveVector = DirectX::XMVectorAdd(forwardVector, besideVector);
-		DirectX::XMFLOAT3 moveFloat3;
-		XMStoreFloat3(&moveFloat3, moveVector);
 		// 角度に変換
-		float targetAngle = atan2(moveFloat3.x, moveFloat3.z) * DEG;
+		float targetAngle = atan2(inputResult.Look().moveDir.x, inputResult.Look().moveDir.y) * DEG;
 
 		// 現在角度を取得
 		ComponentHandle<Pose> pose = a_chunk.GetComponent<Pose>(it);
@@ -485,11 +472,11 @@ void LookSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		float dirXZ =
 			std::sqrtf(
-				std::pow(relativeDistance.x, 2) + std::pow(relativeDistance.z, 2)
+				std::pow(relativeDistance.x, 2.0f) + std::pow(relativeDistance.z, 2.0f)
 			);
 
 		float dirY = std::sqrtf(
-			std::pow(relativeDistance.y, 2)
+			std::pow(relativeDistance.y, 2.0f)
 		);
 
 		float finalPitch = atan2f(dirY, dirXZ) * (180 / PI) * pitchSign;

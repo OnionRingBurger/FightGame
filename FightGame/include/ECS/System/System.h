@@ -19,3 +19,4 @@
 #include "CharacterSystem.h"
 #include "OtherSystem.h"
 #include "TestSystem.h"
+#include "AISystem.h"

@@ -11,9 +11,9 @@ public:
 	~CreateGameWorld() = default;
 
 private:
-	Chunk CreateNewChunk() override;
+	Chunk CreateNewChunk(AIManager& a_aiManager) override;
 
-	void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse) override;
+	void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager) override;
 
 	void UpdateIMGUI(Chunk& a_chunk, SystemContext& a_context) override;
 

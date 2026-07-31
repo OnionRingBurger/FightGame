@@ -1,5 +1,5 @@
 ---
-description: 
+description: Systemヘッダ新規作成時に System.h へ include を追記する
 globs: **/ECS/System/**
 alwaysApply: false
 ---

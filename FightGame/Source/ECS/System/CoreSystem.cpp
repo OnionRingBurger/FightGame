@@ -58,6 +58,17 @@ void ResetSystem(Chunk& a_chunk, const SystemContext& a_context)
 		result->posOffset = float3(0.0f, 0.0f, 0.0f);
 		result->rotOffset = float3(0.0f, 0.0f, 0.0f);
 	}
+
+	// !!!New!!!
+	ComponentView viewMoveInputResult = a_chunk.GetView<ComponentTypes<MoveInputResult>>();
+	for (auto it : viewMoveInputResult)
+	{
+		ComponentHandle<MoveInputResult> result = a_chunk.GetComponent<MoveInputResult>(it);
+		result->moveDir = float2(0.0f, 0.0f);
+		result->magnitube = 0.0f;
+		result->isInput = false;
+		result->useAttack = false;
+	}
 }
 
 void LifeTimeSystem(Chunk& a_chunk, const SystemContext& a_context)

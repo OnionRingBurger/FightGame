@@ -17,8 +17,9 @@ TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 	a_input.RegisterButton("ChunkChange", VK_PAD_A);
 }
 
-Chunk TitleWorld::CreateNewChunk()
+Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 {
+	(void)a_aiManager;
 	Chunk newChunk;
 
 	ResetSound();
@@ -141,7 +142,7 @@ Chunk TitleWorld::CreateNewChunk()
 	return newChunk;
 }
 
-void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response)
+void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
 {
 	VelocitySystem(a_chunk, a_context);
 	LeapSystem(a_chunk, a_context);

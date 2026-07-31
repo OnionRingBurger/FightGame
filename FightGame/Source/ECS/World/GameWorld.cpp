@@ -21,8 +21,9 @@ GameWorld::GameWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& 
 	a_input.RegisterButton("Shot", VK_PAD_RTRIGGER);
 }
 
-Chunk GameWorld::CreateNewChunk()
+Chunk GameWorld::CreateNewChunk(AIManager& a_aiManager)
 {
+	(void)a_aiManager;
 
 	Chunk newChunk;
 
@@ -574,7 +575,7 @@ void GameWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespon
 	ResetSystem(a_chunk, a_context);
 }
 
-void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response)
+void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
 {
 	// PhysicsŒn‚Ìˆ—‚ğs‚¤
 	VelocitySystem(a_chunk, a_context); //oo

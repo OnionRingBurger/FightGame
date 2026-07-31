@@ -1,5 +1,5 @@
 ---
-description: 
+description: ECS関連コードの読み書き前に custom-ecs スキルを読むこと
 globs: **/ECS/**
 alwaysApply: false
 ---

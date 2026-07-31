@@ -17,8 +17,9 @@ ResultWorld::ResultWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisiti
 	a_input.RegisterButton("ChunkChange", VK_PAD_A);
 }
 
-Chunk ResultWorld::CreateNewChunk()
+Chunk ResultWorld::CreateNewChunk(AIManager& a_aiManager)
 {
+	(void)a_aiManager;
 	Chunk newChunk;
 
 	ResetSound();
@@ -74,7 +75,7 @@ Chunk ResultWorld::CreateNewChunk()
 	return newChunk;
 }
 
-void ResultWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response)
+void ResultWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
 {
 	VelocitySystem(a_chunk, a_context);
 	LeapSystem(a_chunk, a_context);

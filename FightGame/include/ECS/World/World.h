@@ -16,6 +16,7 @@
 #include "IScene.h"
 #include "IModelCacheAcquisition.h"
 #include "IUICacheAcquisition.h"
+#include "AI/AIManager.h"
 
 enum WorldState
 {
@@ -55,7 +56,8 @@ private:
 	void FrameEnd();
 
 	Chunk chunk;
-
+	// !!!New!!!
+	AIManager aiManager;
 	std::unique_ptr<SystemResponse> systemResponse;
 	WorldState m_state;
 	bool isMouseLock;
@@ -68,9 +70,12 @@ protected:
 
 	virtual void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse);
 
-	virtual Chunk CreateNewChunk();
+	// !!!New!!!
+	virtual void InitAI(AIManager& a_aiManager);
 
-	virtual void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse);
+	virtual Chunk CreateNewChunk(AIManager& a_aiManager);
+
+	virtual void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager);
 
 	virtual void UpdateIMGUI(Chunk& a_chunk, SystemContext& a_context);
 

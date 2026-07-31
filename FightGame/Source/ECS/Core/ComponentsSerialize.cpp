@@ -114,7 +114,7 @@ Entity FindEntity(std::string a_key, const nlohmann::json& a_json, const EntityM
 {
 	int targetId = a_json.value(a_key, kNotEntity);
 
-	Entity target{ -1, -1 };
+	Entity target = kInvalidEntity;
 	if (targetId != kNotEntity && a_entityMap.find(targetId) != a_entityMap.end())
 	{
 		target = a_entityMap.at(targetId);

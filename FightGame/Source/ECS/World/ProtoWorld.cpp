@@ -6,6 +6,7 @@
 #include "json.hpp"
 #include "DebugConsole.h"
 #include "ComponentsSerialize.h"
+#include "ChasePlayerAction.h"
 #include "Defines.h"
 
 #include <fstream>
@@ -34,7 +35,7 @@ ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 	a_input.RegisterKey("Jump", VK_SPACE);
 }
 
-Chunk ProtoWorld::CreateNewChunk()
+Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 {
 	
 	Chunk newChunk;
@@ -46,13 +47,16 @@ Chunk ProtoWorld::CreateNewChunk()
 			float3(1.0f, 1.0f, 1.0f)
 		),
 		ModelKey("Box"),
+		InputSource(InputOrigin::Device),
 		InputMove(float2(0.1f, 0.1f)),
+		MoveInputResult(),
 		ShooterComponent(100.0f, 300.0f),
 		Ray(0.0f, 0.0f, 0.0f),
 		LaserOwnerTag(),
 		PlayerTag(),
 		Firework(FIREWORK_NONE),
 		GroundedState(),
+		DeadState(),
 		ActionMask(),
 		Velocity(),
 		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
@@ -73,13 +77,22 @@ Chunk ProtoWorld::CreateNewChunk()
 		ModelKey("Box"),
 		EnemyTag(),
 		HitPoint(3.0f),
+		InputMove(float2(0.1f, 0.1f)),
+		MoveInputResult(),
+		InputSource(InputOrigin::AI),
+		AttackPower(0.0f, 1.7f, 160.0f, 0.5f, 0.5f, 1.0f, 300.0f, float3(), 300.0f),
+		LookMove(480.0f / 60.0f),
+		PoseRotState(POSE_ROT_LOOKMOVE),
+		GroundedState(),
+		DeadState(),
+		ActionMask(),
 		AttackHitRecord(),
 		HitInfomation(),
-		DeadState(),
 		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 10.0f, 1.0f)),
 		OBBCollider(OBB_PushOutLocked)
 	);
 
+	a_aiManager.RegisterAI(debugEnemy, "Enemy");
 
 	Entity cameraRig = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
@@ -199,6 +212,14 @@ Chunk ProtoWorld::CreateNewChunk()
 	return newChunk;
 }
 
+void ProtoWorld::InitAI(AIManager& a_aiManager)
+{
+	std::unique_ptr<BehaviorTree> bt = std::make_unique<BehaviorTree>();
+	RootNode& root = bt->GetRoot();
+	root.AddNode(std::make_unique<ChasePlayerAction>());
+	a_aiManager.RegisterTree("Enemy", std::move(bt));
+}
+
 void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response)
 {
 	// 移動系の処理をあらかじめ行う
@@ -216,6 +237,7 @@ void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 	CharacterActionMaskSystem(a_chunk, a_context);
 
 	// Pose系の処理を行う
+
 	InputMoveSystem(a_chunk, a_context); //oo
 	InputRotatoSystem(a_chunk, a_context);  //oo
 	FlipSystem(a_chunk, a_context); //oo
@@ -243,7 +265,7 @@ void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 	ResetSystem(a_chunk, a_context);
 }
 
-void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response)
+void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
 {
 	TestSystem(a_chunk, a_context);
 
@@ -264,6 +286,7 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	CharacterActionMaskSystem(a_chunk, a_context);
 
 	// Pose系の処理を行う
+	MoveInputResolveSystem(a_chunk, a_context, a_aiManager);
 	InputMoveSystem(a_chunk, a_context);
 	InputRotatoSystem(a_chunk, a_context);
 	VelocitySystem(a_chunk, a_context);
@@ -291,6 +314,10 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	LaserSystem(a_chunk, a_context);
 	CameraViewSystem(a_chunk, a_context);
 	RailUpdateSystem(a_chunk, a_context);
+
+	// AI更新
+	AISenseSystem(a_chunk, a_context, a_aiManager);
+	a_aiManager.TickAI();
 
 	// キャラクターのシステム
 	PlayerAttackSystem(a_chunk, a_context);

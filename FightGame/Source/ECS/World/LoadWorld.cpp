@@ -8,8 +8,9 @@ LoadWorld::LoadWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& 
 {
 }
 
-Chunk LoadWorld::CreateNewChunk()
+Chunk LoadWorld::CreateNewChunk(AIManager& a_aiManager)
 {
+	(void)a_aiManager;
 	Chunk newChunk;
 
 	newChunk.CreateNewEntity(
@@ -50,7 +51,7 @@ Chunk LoadWorld::CreateNewChunk()
 	return newChunk;
 }
 
-void LoadWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response)
+void LoadWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
 {
 	UIMoveSystem(a_chunk, a_context);
 	UVMoveSystem(a_chunk, a_context);

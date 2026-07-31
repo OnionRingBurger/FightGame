@@ -30,8 +30,9 @@ TestWorld::TestWorld(
 
 }
 
-Chunk TestWorld::CreateNewChunk()
+Chunk TestWorld::CreateNewChunk(AIManager& a_aiManager)
 {
+	(void)a_aiManager;
 	Chunk newChunk;
 
 	//std::unique_ptr<ComponentsSerialize> serialize = std::make_unique<ComponentsSerialize>();
@@ -91,7 +92,7 @@ Chunk TestWorld::CreateNewChunk()
 	return newChunk;
 }
 
-void TestWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response)
+void TestWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
 {
 	// PhysicsŒn‚Ìˆ—‚ğs‚¤
 	VelocitySystem(a_chunk, a_context); //oo

@@ -31,7 +31,7 @@ constexpr Entity kInvalidEntity = {
 };
 
 
-// 探しやすいようにnamespaceで囲う、基本はusing namespaceを使う
+// ・ｽT・ｽ・ｽ・ｽ竄ｷ・ｽ・ｽ・ｽ謔､・ｽ・ｽnamespace・ｽﾅ囲ゑｿｽ・ｽA・ｽ・ｽ{・ｽ・ｽusing namespace・ｽ・ｽ・ｽg・ｽ・ｽ
 namespace Component
 {
 	struct PlayerTag
@@ -252,7 +252,6 @@ namespace Component
 		static constexpr int kVersion = 0;
 
 		float2 moveSpeed;
-		bool isInput;
 
 		InputMove()
 			: InputMove(float2())
@@ -261,7 +260,6 @@ namespace Component
 
 		InputMove(float2 a_moveSpeed)
 			:moveSpeed(a_moveSpeed)
-			, isInput(false)
 		{
 		}
 	};
@@ -474,7 +472,7 @@ namespace Component
 		static constexpr int kVersion = 1;
 
 		float3 force;
-		// 減衰率
+		// ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
 		float attenuation;
 
 		Force(float3 a_force, float a_attenuation = 1.0f)
@@ -518,7 +516,7 @@ namespace Component
 		static constexpr int kVersion = 0;
 
 		float speed;
-		// 減衰率
+		// ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
 		float attenuation;
 
 		MoveForward()
@@ -593,17 +591,17 @@ namespace Component
 		static constexpr const char* kTypeName = "OBBCollider";
 		static constexpr int kVersion = 0;
 
-		// ワールドの中心座標
+		// ・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽh・ｽﾌ抵ｿｽ・ｽS・ｽ・ｽ・ｽW
 		float3 center;
 
-		// x,y,zの方向ベクトル
+		// x,y,z・ｽﾌ包ｿｽ・ｽ・ｽ・ｽx・ｽN・ｽg・ｽ・ｽ
 		std::array<float3, 3> axis;
 
 		std::array<float3, 3> edges;
 
 		BitFlag obbBitFlag;
 
-		// 半径	
+		// ・ｽ・ｽ・ｽa	
 		float3 half;
 
 		OBBCollider(BitFlag a_flag = OBB_DEFAULT)
@@ -673,12 +671,12 @@ namespace Component
 		struct HitResult
 		{
 
-			// ぶつかったEntity
+			// ・ｽﾔつゑｿｽ・ｽ・ｽ・ｽ・ｽEntity
 			Entity hitEntity;
 
-			// 押し戻し方向
+			// ・ｽ・ｽ・ｽ・ｽ・ｽﾟゑｿｽ・ｽ・ｽ・ｽ・ｽ
 			float3 normal;
-			// 押し戻し量
+			// ・ｽ・ｽ・ｽ・ｽ・ｽﾟゑｿｽ・ｽ・ｽ
 			float depth;
 
 			InfoColliderType otherType;
@@ -699,7 +697,7 @@ namespace Component
 
 		struct TriggerResult
 		{
-			// 入ってきたEntity
+			// ・ｽ・ｽ・ｽ・ｽ・ｽﾄゑｿｽ・ｽ・ｽEntity
 			Entity triggerEntity;
 
 			TriggerResult()
@@ -966,7 +964,7 @@ namespace Component
 		static constexpr const char* kTypeName = "OwnerComponent";
 		static constexpr int kVersion = 0;
 
-		Entity owner; // 自身を保持しているEntity
+		Entity owner; // ・ｽ・ｽ・ｽg・ｽ・ｽﾛ趣ｿｽ・ｽ・ｽ・ｽﾄゑｿｽ・ｽ・ｽEntity
 
 		OwnerComponent()
 		{
@@ -999,16 +997,16 @@ namespace Component
 		static constexpr const char* kTypeName = "Camera";
 		static constexpr int kVersion = 0;
 
-		// カメラの種類を増やす場合別コンポーネントに分ける
+		// ・ｽJ・ｽ・ｽ・ｽ・ｽ・ｽﾌ趣ｿｽﾞを増やす・ｽ鼾・ｿｽﾊコ・ｽ・ｽ・ｽ|・ｽ[・ｽl・ｽ・ｽ・ｽg・ｽﾉ包ｿｽ・ｽ・ｽ・ｽ・ｽ
 		size_t cameraPriority;
 
 		float3 lookPosition;
 		float3 upVector;
 
-		float	fovy;		// 画角
-		float	aspect;	//　アスペクト比
-		float	nearCrip;		// ニアクリップ
-		float	farCrip;		// ファークリップ
+		float	fovy;		// ・ｽ・ｽp
+		float	aspect;	//・ｽ@・ｽA・ｽX・ｽy・ｽN・ｽg・ｽ・ｽ
+		float	nearCrip;		// ・ｽj・ｽA・ｽN・ｽ・ｽ・ｽb・ｽv
+		float	farCrip;		// ・ｽt・ｽ@・ｽ[・ｽN・ｽ・ｽ・ｽb・ｽv
 
 		Camera()
 			: Camera(0, float3(0.0f, 0.0f, 0.0f), float3(0.0f, 1.0f, 0.0f), 60.0f, 1.77777f, 0.05f, 1000.0f)
@@ -1295,7 +1293,7 @@ namespace Component
 		}
 	};
 
-	// TODO Json読み込みを更新する
+	// TODO Json・ｽﾇみ搾ｿｽ・ｽﾝゑｿｽ・ｽX・ｽV・ｽ・ｽ・ｽ・ｽ
 	struct SpriteComponent
 	{
 		static constexpr TypeID kTypeId = 53;
@@ -2091,13 +2089,13 @@ namespace Component
 		static constexpr const char* kTypeName = "ShakeComponent";
 		static constexpr int kVersion = 0;
 
-		// 振動時間
+		// ・ｽU・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
 		float shakeTime;
-		// 振動の大きさ
+		// ・ｽU・ｽ・ｽ・ｽﾌ大き・ｽ・ｽ
 		float3 shakePower;
-		//! 振動の激しさ
+		//! ・ｽU・ｽ・ｽ・ｽﾌ鯉ｿｽ・ｽ・ｽ・ｽ・ｽ
 		float3 shakeAmplitude;
-		//! 経過時間
+		//! ・ｽo・ｽﾟ趣ｿｽ・ｽ・ｽ
 		float elapsedTime;
 
 		ShakeComponent(float3 a_shakePower, float3 a_shakeAmplitude, float shakeTime = 0.0f)
@@ -2175,9 +2173,9 @@ namespace Component
 	enum ShotUIType
 	{
 		SHOTUI_NONE = 0,
-		SHOTUI_CANSHOT = 1 << 0, // 射撃可能時に描画されるUI
-		SHOTUI_WAIT = 1 << 1, // 射撃待機時に描画されるUI
-		SHOTUI_FADERESET_UP = 1 << 2, // 射撃状況変更時に透明度などがリセットされる
+		SHOTUI_CANSHOT = 1 << 0, // ・ｽﾋ鯉ｿｽ・ｽﾂ能・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
+		SHOTUI_WAIT = 1 << 1, // ・ｽﾋ鯉ｿｽ・ｽﾒ機・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
+		SHOTUI_FADERESET_UP = 1 << 2, // ・ｽﾋ鯉ｿｽ・ｽ?ｵ変更・ｽ・ｽ・ｽﾉ難ｿｽ・ｽ・ｽ・ｽx・ｽﾈどゑｿｽ・ｽ・ｽ・ｽZ・ｽb・ｽg・ｽ・ｽ・ｽ・ｽ・ｽ
 		SHOTUI_FADERESET_DOWN = 1 << 3
 	};
 	struct ShotUI
@@ -2218,7 +2216,7 @@ namespace Component
 		}
 	};
 
-	// 毎フレーム引き継ぐ自由移動
+	// ・ｽ・ｽ・ｽt・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽp・ｽ・ｽ・ｽ・ｽ・ｽR・ｽﾚ難ｿｽ
 	struct MotionTransform
 	{
 		static constexpr TypeID kTypeId = 101;
@@ -2241,7 +2239,7 @@ namespace Component
 	};
 
 
-	// 固定座標のResult
+	// ・ｽﾅ抵ｿｽ・ｽ・ｽW・ｽ・ｽResult
 	struct FixedResult
 	{
 		static constexpr TypeID kTypeId = 102;
@@ -2258,7 +2256,7 @@ namespace Component
 		}
 	};
 
-	// 自由移動のResult
+	// ・ｽ・ｽ・ｽR・ｽﾚ難ｿｽ・ｽ・ｽResult
 	struct MotionResult
 	{
 		static constexpr TypeID kTypeId = 103;
@@ -2280,7 +2278,7 @@ namespace Component
 		}
 	};
 
-	// 1フレーム限りの移動Result
+	// 1・ｽt・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽﾌ移難ｿｽResult
 	struct EphemeralResult
 	{
 		static constexpr TypeID kTypeId = 104;
@@ -2371,12 +2369,12 @@ namespace Component
 		static constexpr const char* kTypeName = "SectorHitJudge";
 		static constexpr int kVersion = 0;
 
-		// 扇の範囲
+		// ・ｽ・ｽﾌ範茨ｿｽ
 		float minLength;
 		float maxLength;
-		// 扇の角度
+		// ・ｽ・ｽﾌ角・ｽx
 		float angle;
-		// 上下方向への判定
+		// ・ｽ繪ｺ・ｽ・ｽ・ｽ・ｽ・ｽﾖの費ｿｽ・ｽ・ｽ
 		float maxHeight;
 		float maxLowness;
 
@@ -2618,4 +2616,67 @@ namespace Component
 		}
 	};
 
+	// !!!New!!!
+	enum class InputOrigin
+	{
+		None = 0,
+		Device = 1,
+		AI = 2,
+	};
+
+	// !!!New!!!
+	struct MoveInputResult
+	{
+		static constexpr TypeID kTypeId = 120;
+		static constexpr const char* kTypeName = "MoveInputResult";
+		static constexpr int kVersion = 0;
+
+		float2 moveDir;
+		float magnitube;
+		bool isInput;
+		bool useAttack;
+
+		MoveInputResult()
+			: moveDir()
+			, magnitube(0.0f)
+			, isInput(false)
+			, useAttack(false)
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct InputSource
+	{
+		static constexpr TypeID kTypeId = 121;
+		static constexpr const char* kTypeName = "InputSource";
+		static constexpr int kVersion = 0;
+
+		InputOrigin move;
+		InputOrigin attack;
+
+
+		InputSource(InputOrigin a_origin = InputOrigin::Device)
+			: move(a_origin)
+			, attack(a_origin)
+		{
+		}
+
+		InputSource(InputOrigin a_move, InputOrigin a_attack)
+			: move(a_move)
+			, attack(a_attack)
+		{
+		}
+	};
+
+	
+	// !!!New!!!
+	struct EnemyAttackTag
+	{
+		static constexpr TypeID kTypeId = 122;
+		static constexpr const char* kTypeName = "EnemyAttackTag";
+		static constexpr int kVersion = 0;
+		EnemyAttackTag() {};
+	};
+	
 }
