@@ -2,6 +2,7 @@
 
 // !!!New!!!
 CompositeNode::CompositeNode()
+	: childNodes()
 {
 }
 
@@ -16,7 +17,7 @@ void CompositeNode::AddNode(std::unique_ptr<Node> child)
 	{
 		return;
 	}
-	child->SetNodePosition(hierarchy + 1, static_cast<int>(childNodes.size()));
+	child->SetNodePosition(hierarchy + 1, childNodes.size());
 	childNodes.push_back(std::move(child));
 }
 
@@ -46,5 +47,7 @@ bool CompositeNode::UpdateContext(AIContext& context, int nextIndex)
 	}
 	// 子ノードを追加する
 	context.nodeIndexes.push_back(nextIndex);
+	// 子ノードが切り替わったため継続時間をリセットする
+	context.actionDuration = 0.0f;
 	return true;
 }

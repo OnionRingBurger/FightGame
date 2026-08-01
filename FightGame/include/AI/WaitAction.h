@@ -1,14 +1,14 @@
 #pragma once
 
-#include "LeafNode.h"
+#include "ActionNode.h"
 
 // !!!New!!!
-// 葉: 条件判定ノード
-class ConditionNode : public LeafNode
+// BB の waitTime 経過まで RUNNING、満了で SUCCESS
+class WaitAction : public ActionNode
 {
 public:
-	ConditionNode();
-	~ConditionNode() override;
+	WaitAction();
+	~WaitAction() override;
 
 	Status Tick(AIContext& context, const AIBlackboard& blackBord, const AISystemInfo& systemInfo, AIResult& result) override;
 };

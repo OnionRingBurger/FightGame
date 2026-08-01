@@ -78,6 +78,12 @@ void AIManager::WriteSense(const AISenseFrame& senseFrame)
 	}
 }
 
+void AIManager::WriteSystem(const AISystemInfo& a_systemInfo)
+{
+	// System情報を書き込む
+	systemInfo = a_systemInfo;
+}
+
 void AIManager::TickAI()
 {
 	// 各Entityを更新
@@ -97,6 +103,6 @@ void AIManager::TickAI()
 		runtime.result.UseAttack = false;
 
 		// 更新を行う
-		treeIt->second->Tick(runtime.context, blackBoard, runtime.result);
+		treeIt->second->Tick(runtime.context, blackBoard, systemInfo, runtime.result);
 	}
 }

@@ -79,6 +79,17 @@ void World::ContextUpdate(float a_delatTime)
 		systemResponse->StepStopTime(normalizeDeltatime);
 		context.deltaTime *= systemResponse->GetStopRate();
 	}
+
+	// AI‚ÌXV•p“x‚ðŠÇ—
+	context.aiTickThisFrame = false;
+	context.aiDeltaTime = 0.0f;
+	aiTickAccum += context.deltaTime;
+	if (aiTickAccum >= kAITickInterval)
+	{
+		context.aiTickThisFrame = true;
+		context.aiDeltaTime = aiTickAccum;
+		aiTickAccum = 0.0f;
+	}
 }
 
 void World::UpdateWorld()

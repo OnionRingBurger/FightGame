@@ -58,6 +58,23 @@ struct AIContext
 };
 
 // !!!New!!!
+// システム／スケジュール情報（更新側が書く。ワールド状態の BB とは別）
+struct AISystemInfo
+{
+	float tickDelta;
+
+	AISystemInfo()
+		: tickDelta(0.0f)
+	{
+	}
+
+	explicit AISystemInfo(float a_tickDelta)
+		: tickDelta(a_tickDelta)
+	{
+	}
+};
+
+// !!!New!!!
 struct AIResult
 {
 	float2 MoveDir;

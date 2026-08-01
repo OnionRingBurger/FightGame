@@ -227,6 +227,7 @@
     <ClInclude Include="include\AI\RootNode.h" />
     <ClInclude Include="include\AI\ChasePlayerAction.h" />
     <ClInclude Include="include\ECS\System\AISystem.h" />
+    <ClInclude Include="include\AI\WaitAction.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\DataManager\AssimpModelLorder.cpp" />
@@ -328,6 +329,7 @@
     <ClCompile Include="Source\AI\RootNode.cpp" />
     <ClCompile Include="Source\AI\ChasePlayerAction.cpp" />
     <ClCompile Include="Source\ECS\System\AISystem.cpp" />
+    <ClCompile Include="Source\AI\WaitAction.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

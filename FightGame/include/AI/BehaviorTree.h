@@ -12,7 +12,7 @@ public:
 	BehaviorTree();
 	~BehaviorTree();
 
-	void Tick(AIContext& context, const AIBlackboard& blackBord, AIResult& result);
+	void Tick(AIContext& context, const AIBlackboard& blackBord, const AISystemInfo& systemInfo, AIResult& result);
 
 	RootNode& GetRoot();
 

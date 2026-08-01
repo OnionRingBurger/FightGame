@@ -64,6 +64,9 @@ private:
 	SystemContext context;
 	bool isGameEnd;
 	bool allLoadModel = false;
+	// !!!New!!!
+	float aiTickAccum = 0.0f;
+	static constexpr float kAITickInterval = 0.1f / 60.0f;
 
 
 protected:

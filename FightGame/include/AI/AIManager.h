@@ -27,6 +27,10 @@ public:
 	// !!!New!!!
 	void WriteSense(const AISenseFrame& senseFrame);
 
+	// !!!New!!!
+	void WriteSystem(const AISystemInfo& a_systemInfo);
+
+	// !!!New!!!
 	void TickAI();
 
 private:
@@ -37,4 +41,6 @@ private:
 	RuntimeMap runtimeMap;
 	// 共有ブラックボード
 	AIBlackboard blackBoard;
+	// システム側の情報
+	AISystemInfo systemInfo;
 };

@@ -9,7 +9,7 @@ Selector::~Selector()
 {
 }
 
-Node::Status Selector::Tick(AIContext& context, const AIBlackboard& blackBord, AIResult& result)
+Node::Status Selector::Tick(AIContext& context, const AIBlackboard& blackBord, const AISystemInfo& systemInfo, AIResult& result)
 {
 	// 子ノードが存在しなかった場合抜ける
 	if (context.nodeIndexes.size() <= static_cast<size_t>(hierarchy)) return NODE_FAILURE;
@@ -21,7 +21,7 @@ Node::Status Selector::Tick(AIContext& context, const AIBlackboard& blackBord, A
 		bool isSafe = UpdateContext(context, i);
 		if(!isSafe) return NODE_FAILURE;
 		// 子ノードを更新
-		Status childState = childNodes.at(i)->Tick(context, blackBord, result);
+		Status childState = childNodes.at(i)->Tick(context, blackBord, systemInfo, result);
 		// 失敗した場合次に行く
 		if (childState == NODE_FAILURE) continue;
 

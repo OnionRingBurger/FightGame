@@ -1,5 +1,7 @@
 #include <memory>
 #include <vector>
+#include <iomanip>
+#include <algorithm>
 
 #include "Main.h"
 #include "Geometory.h"
@@ -24,6 +26,7 @@ MainGame::MainGame()
 	, preExecTime(0.0f)
 	, processingTime(0.0f)
 	, worstProcessingTime(0.0f)
+	, totalProcessingTime(0.0f)
 	, fpsCount(0)
 {
 	uiCache = UICache();
@@ -220,27 +223,31 @@ void MainGame::MainLoop(HWND a_hwnd, MSG& message)
 				// IMGUIを更新
 				ImGui::EndFrame();
 
+				// !!!New!!!
 				float currentProcessingTime = static_cast<float>(timeGetTime() - nowTime);
-				
+				processingTime = currentProcessingTime;
 				worstProcessingTime = std::max(currentProcessingTime, worstProcessingTime);
-
-				if (nowTime - fpsOldTime >= 1000)
-				{
-					processingTime = currentProcessingTime;
-				}
+				totalProcessingTime += currentProcessingTime;
 
 			}
 			if (nowTime - fpsOldTime >= 1000)
 			{
 #ifdef _DEBUG
+				// !!!New!!!
+				float averageProcessingTime = (fpsCount > 0)
+					? (totalProcessingTime / static_cast<float>(fpsCount))
+					: 0.0f;
 				DebugConsole::SetDrawPos(1, 2);
+				std::cout << std::fixed << std::setprecision(1);
 				std::cout << "FPS::" << fpsCount << std::endl;
-				std::cout << "直前の処理時間::" << processingTime / 1000.0f << std::endl;
-				std::cout << "最低値" << worstProcessingTime / 1000.0f <<std::endl;
+				std::cout << "処理時間(直近)::" << processingTime << " ms" << std::endl;
+				std::cout << "平均処理時間::" << averageProcessingTime << " ms" << std::endl;
+				std::cout << "最悪処理時間::" << worstProcessingTime << " ms" << std::endl;
 #endif
 				fpsCount = 0;
 				fpsOldTime = nowTime;
 				worstProcessingTime = 0.0f;
+				totalProcessingTime = 0.0f;
 				processingTime = 0.0f;
 			}
 		}

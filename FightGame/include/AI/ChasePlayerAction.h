@@ -10,5 +10,5 @@ public:
 	ChasePlayerAction();
 	~ChasePlayerAction() override;
 
-	Status Tick(AIContext& context, const AIBlackboard& blackBord, AIResult& result) override;
+	Status Tick(AIContext& context, const AIBlackboard& blackBord, const AISystemInfo& systemInfo, AIResult& result) override;
 };

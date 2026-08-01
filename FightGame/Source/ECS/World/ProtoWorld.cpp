@@ -6,6 +6,8 @@
 #include "json.hpp"
 #include "DebugConsole.h"
 #include "ComponentsSerialize.h"
+#include "Sequencer.h"
+#include "WaitAction.h"
 #include "ChasePlayerAction.h"
 #include "Defines.h"
 
@@ -216,7 +218,14 @@ void ProtoWorld::InitAI(AIManager& a_aiManager)
 {
 	std::unique_ptr<BehaviorTree> bt = std::make_unique<BehaviorTree>();
 	RootNode& root = bt->GetRoot();
-	root.AddNode(std::make_unique<ChasePlayerAction>());
+	
+	std::unique_ptr<Sequencer> sequencer = std::make_unique<Sequencer>();
+
+	sequencer->AddNode(std::make_unique<WaitAction>());
+	sequencer->AddNode(std::make_unique<ChasePlayerAction>());
+
+	root.AddNode(std::move(sequencer));
+
 	a_aiManager.RegisterTree("Enemy", std::move(bt));
 }
 
@@ -316,8 +325,12 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	RailUpdateSystem(a_chunk, a_context);
 
 	// AI更新
+	a_aiManager.WriteSystem(AISystemInfo(a_context.aiDeltaTime));
 	AISenseSystem(a_chunk, a_context, a_aiManager);
-	a_aiManager.TickAI();
+	if (a_context.aiTickThisFrame)
+	{
+		a_aiManager.TickAI();
+	}
 
 	// キャラクターのシステム
 	PlayerAttackSystem(a_chunk, a_context);
