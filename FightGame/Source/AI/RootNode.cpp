@@ -27,7 +27,7 @@ bool RootNode::AddNode(std::unique_ptr<Node> child)
 	return true;
 }
 
-Node::Status RootNode::Tick(AIContext& context, const AIBlackboard& blackBord, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status RootNode::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
 {
 	// !!!New!!!
 	// Root のみが Context に自身(0)と最初の子カーソル(0)を登録する
@@ -42,5 +42,5 @@ Node::Status RootNode::Tick(AIContext& context, const AIBlackboard& blackBord, c
 		return NODE_FAILURE;
 	}
 
-	return childNode->Tick(context, blackBord, systemInfo, result);
+	return childNode->Tick(context, blackBord, mind, systemInfo, result);
 }

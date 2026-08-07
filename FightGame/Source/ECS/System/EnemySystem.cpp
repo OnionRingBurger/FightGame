@@ -658,49 +658,74 @@ bool SpawnEnemyBullet(Chunk& a_chunk, float3 a_shooterOffset, Entity a_player)
 	return false;
 }
 
-void EnemyAttackHitSystem(Chunk& a_chunk, const SystemContext& a_context)
+void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager)
 {
 	// HitInfomationを保持したEnemyを取得する
-	ComponentView view = a_chunk.GetView<ComponentTypes<EnemyTag, HitInfomation, HitPoint, AttackHitRecord>>();
+	ComponentView view = a_chunk.GetView<ComponentTypes<HitInfomation, HitPoint, AttackHitRecord>>();
 
 	for (auto it : view)
 	{
 		// 敵のぶつかった結果を取得
 		const ComponentHandle<HitInfomation> info = a_chunk.GetComponent<HitInfomation>(it);
 		ComponentHandle<AttackHitRecord> hitRecord = a_chunk.GetComponent<AttackHitRecord>(it);
+		const ComponentHandle<GuardAction> guardAction = a_chunk.GetComponent<GuardAction>(it);
+		float guardPower = 1.0f;
+		if (guardAction.IsValid())
+		{
+			guardPower = guardAction.Look().currentGuardPower;
+		};
+
+		bool isPlayer = a_chunk.GetComponent<PlayerTag>(it).IsValid();
+		bool isEnemy = a_chunk.GetComponent<EnemyTag>(it).IsValid();
 
 		for (const auto& triggerIt : info.Look().triggerResults)
 		{
-			// プレイヤー攻撃でなければ次ループへ移行
-			const ComponentHandle<PlayerAttackTag> attackTag = a_chunk.GetComponent<PlayerAttackTag>(triggerIt.triggerEntity);
-			if (!attackTag.IsValid()) continue;
+			// 自身と同じタイプだった場合次ループへ移行
+			if(isPlayer) 
+			{
+				if (a_chunk.GetComponent<PlayerAttackTag>(triggerIt.triggerEntity).IsValid()) continue;
+			}
+			else if(isEnemy)
+			{
+				if (a_chunk.GetComponent<EnemyAttackTag>(triggerIt.triggerEntity).IsValid()) continue;
+			}
 
 			// ぶつかった対象ダメージを持っていなかった場合は次ループへ移行
 			const ComponentHandle<AddDamageComponent> damage = a_chunk.GetComponent<AddDamageComponent>(triggerIt.triggerEntity);
 			if (!damage.IsValid()) continue;
+			
 
-			// プレイヤーの攻撃が被弾クールタイムなら次ループへ移行
-			bool isOnCooldown = false;
-			for (const auto& entryIt : hitRecord.Look().entries)
+			// 攻撃が被弾クールタイムなら次ループへ移行
+			
+			auto coolDownIt = hitRecord->entries.find(triggerIt.triggerEntity);
+			// クールタイムが残っている場合は次ループへ移行
+			if(coolDownIt != hitRecord->entries.end() && coolDownIt->second > 0.0f)
 			{
-				if (entryIt.attackEntity == triggerIt.triggerEntity)
-				{
-					isOnCooldown = true;
-					break;
-				}
+				continue;
 			}
-			if (isOnCooldown) continue;
 
 			// 体力にダメージを与える
 			ComponentHandle<HitPoint> hitPoint = a_chunk.GetComponent<HitPoint>(it);
-			hitPoint->currentHP -= damage.Look().damageValue;
+			hitPoint->currentHP -= damage.Look().damageValue * guardPower;
+
+			// 攻撃成功を保存
+			ComponentHandle<AttackInstance> attackInstance =
+				a_chunk.GetComponent<AttackInstance>(triggerIt.triggerEntity);
+			if (attackInstance.IsValid())
+			{
+				attackInstance->connected = true;
+			}
+
+			if (isPlayer)
+			{
+				a_aiManager.NotifyHitResolved(triggerIt.triggerEntity);
+			}
 
 			// 被弾履歴に攻撃Entityとクールタイムを記録
 			float cooldownDuration = kDefaultAttackHitCooldown;
-			const ComponentHandle<LifeTime> lifeTime = a_chunk.GetComponent<LifeTime>(triggerIt.triggerEntity);
 
 			// 追加する
-			hitRecord->entries.push_back(AttackHitRecord::Entry(triggerIt.triggerEntity, cooldownDuration));
+			hitRecord->entries.insert({triggerIt.triggerEntity, cooldownDuration});
 			
 		}
 	}
@@ -716,20 +741,28 @@ void AttackHitRecordCleanupSystem(Chunk& a_chunk, const SystemContext& a_context
 	{
 		ComponentHandle<AttackHitRecord> hitRecord = a_chunk.GetComponent<AttackHitRecord>(it);
 		
+		std::vector<Entity> removeEntities;
+
 		for (auto entryIt = hitRecord->entries.begin(); entryIt != hitRecord->entries.end();)
 		{
 			// クールタイムを減らす
-			entryIt->remainingCooldown -= a_context.deltaTime;
+			entryIt->second -= a_context.deltaTime;
 
 			// 被弾待機中でない場合対象をイテレータで削除する
-			const ComponentHandle<PlayerAttackTag> attackTag = a_chunk.GetComponent<PlayerAttackTag>(entryIt->attackEntity);
-			if (entryIt->remainingCooldown <= 0.0f || !attackTag.IsValid())
-			{
-				entryIt = hitRecord->entries.erase(entryIt);
-				continue;
-			}
+			const ComponentHandle<PlayerAttackTag> playerAttackTag = a_chunk.GetComponent<PlayerAttackTag>(entryIt->first);
+			const ComponentHandle<EnemyAttackTag> enemyAttackTag = a_chunk.GetComponent<EnemyAttackTag>(entryIt->first);
 
-			++entryIt;
+			bool hasAttackTag = playerAttackTag.IsValid() || enemyAttackTag.IsValid();	
+			if (entryIt->second <= 0.0f || !hasAttackTag)
+			{
+				// イテレータを削除して次のイテレータを取得
+				entryIt = hitRecord->entries.erase(entryIt);
+			}
+			else
+			{
+				// 削除しない場合は次のイテレータへ
+				++entryIt;
+			}
 		}
 	}
 }

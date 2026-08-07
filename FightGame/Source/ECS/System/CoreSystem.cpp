@@ -68,6 +68,7 @@ void ResetSystem(Chunk& a_chunk, const SystemContext& a_context)
 		result->magnitube = 0.0f;
 		result->isInput = false;
 		result->useAttack = false;
+		result->attackIndex = 0;
 	}
 }
 

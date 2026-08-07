@@ -1,14 +1,13 @@
 #pragma once
 
-#include "LeafNode.h"
+#include "CompositeNode.h"
 
 // !!!New!!!
-// ót: èåèîªíËÉmÅ[Éh
-class ConditionNode : public LeafNode
+class ReactiveSelector : public CompositeNode
 {
 public:
-	ConditionNode();
-	~ConditionNode() override;
+	ReactiveSelector();
+	~ReactiveSelector() override;
 
 	Status Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result) override;
 };

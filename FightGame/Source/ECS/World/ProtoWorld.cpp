@@ -6,9 +6,7 @@
 #include "json.hpp"
 #include "DebugConsole.h"
 #include "ComponentsSerialize.h"
-#include "Sequencer.h"
-#include "WaitAction.h"
-#include "ChasePlayerAction.h"
+#include "AI.h"
 #include "Defines.h"
 
 #include <fstream>
@@ -20,9 +18,10 @@ ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 		a_input)
 	, worldRequest(a_worldRequest)
 {
-	a_input.RegisterKey("Shot", VK_RETURN);
+	a_input.RegisterKey("RightAttack", VK_RIGHT);
+	a_input.RegisterKey("LeftAttack", VK_LEFT);
 	a_input.RegisterKey("Jump", VK_SPACE);
-	a_input.RegisterButton("Shot", VK_PAD_RTRIGGER);
+	a_input.RegisterKey("Guard", VK_SHIFT);
 	a_input.RegisterKey("TheWorld", 'E');
 
 	a_input.RegisterKey("Default", '0');
@@ -37,10 +36,32 @@ ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 	a_input.RegisterKey("Jump", VK_SPACE);
 }
 
+void ProtoWorld::InitAI(AIManager& a_aiManager)
+{
+	std::unique_ptr<BehaviorTree> bt = std::make_unique<BehaviorTree>();
+	RootNode& root = bt->GetRoot();
+
+	std::unique_ptr<ReactiveSelector> fightSelector = std::make_unique<ReactiveSelector>();
+
+	fightSelector->AddNode(std::make_unique<InAttackRangeDecorator>(std::make_unique<UseAttackAction>()));
+	fightSelector->AddNode(std::make_unique<ChasePlayerAction>());
+
+	std::unique_ptr<StanceNode> stance = std::make_unique<StanceNode>(
+		std::make_unique<RunPlayerNode>(),
+		std::move(fightSelector),
+		std::make_unique<WaitAction>(100.0f)
+	);
+	root.AddNode(std::move(stance));
+
+	a_aiManager.RegisterTree("Enemy", std::move(bt));
+}
+
 Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 {
 	
 	Chunk newChunk;
+
+
 
 	Entity player = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
@@ -65,33 +86,64 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		OBBCollider(),
 		HitInfomation(),
 		JumpPower(float3(0.0f, 12.0f / 60.0f, 0.0f)),
-		AttackPower(0.0f, 1.7f, 160.0f, 0.5f, 0.5f, 1.0f, 30.0f, float3(), 15.0f),
-		LookMove(480.0f / 60.0f),
-		PoseRotState(POSE_ROT_LOOKMOVE)
+		AttackStatus({ 
+			AttackPower(0.0f, 1.7f, 160.0f, 0.5f, 0.5f, 2.0f, 15.0f, 10.0f, float3(), 12.0f),
+			AttackPower(0.0f, 6.2f, 60.0f, 0.5f, 0.5f, 2.0f, 30.0f, 30.0f, float3(), 22.0f, 50.0f)
+		 }),
+		LookMove(900.0f / 60.0f),
+		PoseRotState(POSE_ROT_LOOKMOVE),
+		HitPoint(30.0f),
+		AttackHitRecord(),
+		GuardState(0.2f)
+
+	);
+
+	Entity hpBack = newChunk.CreateNewEntity(
+		UIComponent("UIBack", float2(-0.58, 0.9f), float2(0.8f, 0.1f), 0.0f)
+	);
+
+	Entity hpGauge = newChunk.CreateNewEntity(
+		UIComponent("UIGauge", float2(-0.58f, 0.9f), float2(0.8f, 0.05f), 0.0f),
+		HPGaugeUI(player, float2(-0.58f, 0.9f), float2(0.71f, 0.05f))
+	);
+
+	Entity hpFrame = newChunk.CreateNewEntity(
+		UIComponent("UIFrame", float2(-0.58, 0.9f), float2(0.8f, 0.1f), 0.0f)
 	);
 
 	Entity debugEnemy = newChunk.CreateNewEntity(
+		// タグ 
+		EnemyTag(),
+		// 移動系
 		MOVE_AND_TRANSFORM_COMPONENT(
 			float3(0.0f, 0.5f, 3.0f) + kDefaultWorldPosition,
 			float3(0.0f, 0.0f, 0.0f),
 			float3(1.0f, 1.0f, 1.0f)
 		),
-		ModelKey("Box"),
-		EnemyTag(),
-		HitPoint(3.0f),
-		InputMove(float2(0.1f, 0.1f)),
+		InputMove(float2(0.03f, 0.03f)),
 		MoveInputResult(),
 		InputSource(InputOrigin::AI),
-		AttackPower(0.0f, 1.7f, 160.0f, 0.5f, 0.5f, 1.0f, 300.0f, float3(), 300.0f),
 		LookMove(480.0f / 60.0f),
 		PoseRotState(POSE_ROT_LOOKMOVE),
+		Velocity(),
+		// 当たり判定
+		HitInfomation(),
+		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
+		OBBCollider(),
+		// AI
+		AIRole(4.0f, 3.0f, 1.2f, 7.0f),
 		GroundedState(),
 		DeadState(),
 		ActionMask(),
+		// ゲームルール
+		HitPoint(30.0f),
+		AttackStatus({
+		AttackPower(0.0f, 2.5f, 160.0f, 0.01f, 0.5f, 1.0f, 30.0f, 3.0f, float3(), 30.0f, 30.0f),
+		AttackPower(2.5f, 5.7f, 110.0f, 0.01f, 0.5f, 3.0f, 60.0f, 10.0f, float3(), 50.0f, 60.0f),
+			}),
 		AttackHitRecord(),
-		HitInfomation(),
-		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 10.0f, 1.0f)),
-		OBBCollider(OBB_PushOutLocked)
+		// モデル
+		ModelKey("Box")
 	);
 
 	a_aiManager.RegisterAI(debugEnemy, "Enemy");
@@ -214,21 +266,6 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 	return newChunk;
 }
 
-void ProtoWorld::InitAI(AIManager& a_aiManager)
-{
-	std::unique_ptr<BehaviorTree> bt = std::make_unique<BehaviorTree>();
-	RootNode& root = bt->GetRoot();
-	
-	std::unique_ptr<Sequencer> sequencer = std::make_unique<Sequencer>();
-
-	sequencer->AddNode(std::make_unique<WaitAction>());
-	sequencer->AddNode(std::make_unique<ChasePlayerAction>());
-
-	root.AddNode(std::move(sequencer));
-
-	a_aiManager.RegisterTree("Enemy", std::move(bt));
-}
-
 void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response)
 {
 	// 移動系の処理をあらかじめ行う
@@ -260,7 +297,7 @@ void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 	ShakeSystem(a_chunk, a_context);
 	PoseSystem(a_chunk, a_context);
 
-	ResetConsoleSystem(a_chunk, a_context);
+	// ResetConsoleSystem(a_chunk, a_context);
 
 	// 追従などの遅延系処理
 	LookMoveSystem(a_chunk, a_context);
@@ -293,9 +330,9 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	// 物理挙動の結果に基づいてキャラクターのステートを決定する
 	GroundedSystem(a_chunk, a_context);
 	CharacterActionMaskSystem(a_chunk, a_context);
+	MoveInputResolveSystem(a_chunk, a_context, a_aiManager);
 
 	// Pose系の処理を行う
-	MoveInputResolveSystem(a_chunk, a_context, a_aiManager);
 	InputMoveSystem(a_chunk, a_context);
 	InputRotatoSystem(a_chunk, a_context);
 	VelocitySystem(a_chunk, a_context);
@@ -333,14 +370,19 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	}
 
 	// キャラクターのシステム
-	PlayerAttackSystem(a_chunk, a_context);
+	CharacterAttackSystem(a_chunk, a_context);
 	PlayerJumpSystem(a_chunk, a_context);
+	AttackStartupSystem(a_chunk, a_context);
 	AttackActionSystem(a_chunk, a_context);
 	AttackWaitActionSystem(a_chunk, a_context);
 	JumpPhysicsSystem(a_chunk, a_context);
-	EnemyAttackHitSystem(a_chunk, a_context);
+	GuardSystem(a_chunk, a_context);
+	GuardActionSystem(a_chunk, a_context);
+	AttackHitSystem(a_chunk, a_context, a_aiManager);
 	HitPointSystem(a_chunk, a_context);
 	AttackHitRecordCleanupSystem(a_chunk, a_context);
+	AttackInstanceEndCheckSystem(a_chunk, a_context);
+	AttackInstanceResolveSystem(a_chunk, a_context, a_aiManager);
 	PlayerDeadSystem(a_chunk, a_context);
 	EnemyDeadSystem(a_chunk, a_context);
 

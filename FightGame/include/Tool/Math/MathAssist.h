@@ -509,6 +509,7 @@ float GetLength(float3 thisPos, float3 otherPos);
 float GetLength(const float2& a_vector);
 float GetLength(float2 a_thisPos, float2 a_otherPos);
 float GetLengthSq(const float2& a_vector);
+float2 AngleToVector(float a_angle);
 
 float Frac(float a_value);
 float Noise(float a_time);

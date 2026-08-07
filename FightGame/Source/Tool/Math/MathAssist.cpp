@@ -353,6 +353,14 @@ float GetLengthSq(const float2& a_vector)
 	return a_vector.x * a_vector.x + a_vector.y * a_vector.y;
 }
 
+float2 AngleToVector(float a_angle)
+{
+	// 角度からラジアンに変換して、cosとsinでベクトルを作る
+	float rad = a_angle * RAD;
+	return float2(std::cosf(rad), std::sinf(rad));
+}
+
+
 float Frac(float a_value)
 {
 	return 	a_value - floor(a_value);

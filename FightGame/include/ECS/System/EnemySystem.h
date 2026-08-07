@@ -4,6 +4,7 @@
 #include "ISystemResponse.h"
 #include "GameData.h"
 #include "MathAssist.h"
+#include "AIManager.h"
 
 void EnemySpawnSystem(Chunk& a_chunk, const SystemContext& a_context);
 
@@ -32,7 +33,7 @@ void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context);
 void EnemyBulletDeadSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 // “G‚Ì”í’e‰ðŒˆ
-void EnemyAttackHitSystem(Chunk& a_chunk, const SystemContext& a_context);
+void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager);
 
 void AttackHitRecordCleanupSystem(Chunk& a_chunk, const SystemContext& a_context);
 

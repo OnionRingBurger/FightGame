@@ -9,6 +9,7 @@ using namespace Component;
 // Chunk情報をAIManagerに登録するSystem
 void AISenseSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager)
 {
+
 	AISenseFrame senseFrame;
 
 	Entity player =	GetPlayer(a_chunk, float3());
@@ -24,7 +25,7 @@ void AISenseSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_
 	}
 
 	// 敵のステータスを全て代入する
-	ComponentView enemyView = a_chunk.GetView<ComponentTypes<EnemyTag, Position, Rotation, AttackPower, DeadState>>();
+	ComponentView enemyView = a_chunk.GetView<ComponentTypes<EnemyTag, Position, Rotation, AttackStatus, DeadState, AIRole>>();
 
 	for (auto it : enemyView)
 	{
@@ -50,18 +51,26 @@ void AISenseSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_
 			enemyData.canMove = false;
 		}
 
-		// 攻撃データも作成し代入する
-		AIBlackboard::BBAttackData enemyAttackData;
-		ComponentHandle<AttackPower> enemyAttackPower = a_chunk.GetComponent<AttackPower>(it);
-		// 攻撃範囲
-		enemyAttackData.maxLength = enemyAttackPower.Look().maxLength;
-		enemyAttackData.minLength = enemyAttackPower.Look().minLength;
-		enemyAttackData.angle = enemyAttackPower.Look().angle;
-		// 火力、継続時間
-		enemyAttackData.waitTime = enemyAttackPower.Look().waitTime;
-		enemyAttackData.damageValue = enemyAttackPower.Look().damageValue;
-		// 敵データに代入
-		enemyData.attackData = enemyAttackData;
+		// 攻撃データを全てコピー
+		ComponentHandle<AttackStatus> enemyAttackStatus = a_chunk.GetComponent<AttackStatus>(it);
+		ComponentHandle<AIRole> enemyRole = a_chunk.GetComponent<AIRole>(it);
+
+		enemyData.attackDatas.clear();
+		for (const AttackPower& power : enemyAttackStatus.Look().attackPowers)
+		{
+			AIBlackboard::BBAttackData enemyAttackData;
+			enemyAttackData.maxLength = power.maxLength;
+			enemyAttackData.minLength = power.minLength;
+			enemyAttackData.angle = power.angle;
+			enemyAttackData.waitTime = power.waitTime;
+			enemyAttackData.damageValue = power.damageValue;
+			enemyData.attackDatas.push_back(enemyAttackData);
+		}
+		// ロール登録
+		enemyData.distCoefficient = enemyRole.Look().distCoefficient;
+		enemyData.farnessCoefficient = enemyRole.Look().farnessCoefficient;
+		enemyData.hitCoefficient = enemyRole.Look().hitCoefficient;
+		enemyData.stanceCoefficient = enemyRole.Look().stanceCoefficient;
 
 		// 対応する位置に上書き
 		senseFrame.enemyDatas[it] = enemyData;
@@ -79,7 +88,12 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 	const Axis& leftAxis = a_context.input.GetLeftAxis().magnitube >= a_context.input.GetKeyAxis().magnitube
 		? a_context.input.GetLeftAxis()
 		: a_context.input.GetKeyAxis();
-	const bool shotTrigger = a_context.input.IsRegisterTrigger("Shot");
+	// !!!New!!!
+	const bool rightAttackTrigger = a_context.input.IsRegisterTrigger("RightAttack");
+	const bool leftAttackTrigger = a_context.input.IsRegisterTrigger("LeftAttack");
+	const bool jumpTrigger = a_context.input.IsRegisterTrigger("Jump");
+	const bool guardPress = a_context.input.IsRegisterPress("Guard");
+
 	Entity cameraEntity = GetCamera(a_chunk);
 
 	ComponentView view = a_chunk.GetView<ComponentTypes<MoveInputResult, InputSource>>();
@@ -93,6 +107,7 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 		result->magnitube = 0.0f;
 		result->isInput = false;
 		result->useAttack = false;
+		result->attackIndex = 0;
 
 		// !!!New!!!
 		switch (source.Look().move)
@@ -147,12 +162,56 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 		switch (source.Look().attack)
 		{
 		case InputOrigin::Device:
-			result->useAttack = shotTrigger;
+			// 右攻撃=0、左攻撃=1。同時押しは右優先
+			if (rightAttackTrigger)
+			{
+				result->useAttack = true;
+				result->attackIndex = 0;
+			}
+			else if (leftAttackTrigger)
+			{
+				result->useAttack = true;
+				result->attackIndex = 1;
+			}
 			break;
 		case InputOrigin::AI:
-			result->useAttack = a_aiManager.ReadResult(it).UseAttack;
+		{
+			const AIResult aiResult = a_aiManager.ReadResult(it);
+			result->useAttack = aiResult.UseAttack;
+			result->attackIndex = aiResult.AttackIndex;
 			break;
+		}
 		case InputOrigin::None:
+		default:
+			break;
+		}
+
+		switch (source.Look().jump)
+		{
+			case InputOrigin::Device:
+			result->useJump = jumpTrigger;
+			
+			break;
+
+			case InputOrigin::AI:
+			result->useJump = false;
+			break;
+
+		default:
+			break;
+		}
+
+		switch (source.Look().guard)
+		{
+			case InputOrigin::Device:
+			result->useGuard = guardPress;
+			
+			break;
+
+			case InputOrigin::AI:
+			result->useGuard = false;
+			break;
+
 		default:
 			break;
 		}

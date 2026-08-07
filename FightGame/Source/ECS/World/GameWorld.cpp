@@ -609,7 +609,7 @@ void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 	RaySystem(a_chunk, a_context);
 	LaserSystem(a_chunk, a_context);
 	EnemyPlayerSearch(a_chunk, a_context);
-	PlayerAttackSystem(a_chunk, a_context);
+
 	ItemGetSystem(a_chunk, a_context);
 	CameraViewSystem(a_chunk, a_context);
 	BulletSystem(a_chunk, a_context, a_response);
@@ -617,7 +617,7 @@ void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 	EnemyShooterSystem(a_chunk, a_context);
 	EnemyAttackSystem(a_chunk, a_context, a_response);
 	PlayerDeadSystem(a_chunk, a_context);
-	EnemyAttackHitSystem(a_chunk, a_context);
+
 	EnemyDeadSystem(a_chunk, a_context);
 	EnemyBulletDeadSystem(a_chunk, a_context);
 	GoalSystem(a_chunk, a_context);
@@ -635,7 +635,6 @@ void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 
 	// èIóπèàóù
 	LifeTimeSystem(a_chunk, a_context);
-	AttackHitRecordCleanupSystem(a_chunk, a_context);
 	ResetSystem(a_chunk, a_context);
 	ChunkChangeSystem(a_chunk, a_context, a_response);
 }

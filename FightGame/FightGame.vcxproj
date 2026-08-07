@@ -228,6 +228,13 @@
     <ClInclude Include="include\AI\ChasePlayerAction.h" />
     <ClInclude Include="include\ECS\System\AISystem.h" />
     <ClInclude Include="include\AI\WaitAction.h" />
+    <ClInclude Include="include\AI\StanceNode.h" />
+    <ClInclude Include="include\AI\DecoratorNode.h" />
+    <ClInclude Include="include\AI\InAttackRangeDecorator.h" />
+    <ClInclude Include="include\AI\UseAttackAction.h" />
+    <ClInclude Include="include\AI\RunPlayerNode.h" />
+    <ClInclude Include="include\AI\ReactiveSelector.h" />
+    <ClInclude Include="include\AI\AI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\DataManager\AssimpModelLorder.cpp" />
@@ -330,6 +337,12 @@
     <ClCompile Include="Source\AI\ChasePlayerAction.cpp" />
     <ClCompile Include="Source\ECS\System\AISystem.cpp" />
     <ClCompile Include="Source\AI\WaitAction.cpp" />
+    <ClCompile Include="Source\AI\StanceNode.cpp" />
+    <ClCompile Include="Source\AI\DecoratorNode.cpp" />
+    <ClCompile Include="Source\AI\InAttackRangeDecorator.cpp" />
+    <ClCompile Include="Source\AI\UseAttackAction.cpp" />
+    <ClCompile Include="Source\AI\RunPlayerNode.cpp" />
+    <ClCompile Include="Source\AI\ReactiveSelector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

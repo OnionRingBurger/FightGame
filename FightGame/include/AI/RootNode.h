@@ -15,7 +15,7 @@ public:
 	// Žq‚Í1‚Â‚Ü‚Å
 	bool AddNode(std::unique_ptr<Node> child);
 
-	Status Tick(AIContext& context, const AIBlackboard& blackBord, const AISystemInfo& systemInfo, AIResult& result) override;
+	Status Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result) override;
 
 private:
 

@@ -1,7 +1,9 @@
 #pragma once
 #include <string>
 #include <array>
+#include <vector>
 #include <limits>
+#include <unordered_set>
 #include "MathAssist.h"
 #include "ECSTypes.h"
 #include "TrailEffect.h"
@@ -2408,7 +2410,8 @@ namespace Component
 		ActionFlag_Aim = 1 << 1,
 		ActionFlag_Attack = 1 << 2,
 		ActionFlag_Jump = 1 << 3,
-		ActionFlag_All = ActionFlag_Move | ActionFlag_Aim | ActionFlag_Attack | ActionFlag_Jump,
+		ActionFlag_Guard = 1 << 4,
+		ActionFlag_All = ActionFlag_Move | ActionFlag_Aim | ActionFlag_Attack | ActionFlag_Jump | ActionFlag_Guard,
 	};
 
 
@@ -2418,24 +2421,7 @@ namespace Component
 		static constexpr const char* kTypeName = "AttackHitRecord";
 		static constexpr int kVersion = 0;
 
-		struct Entry
-		{
-			Entity attackEntity;
-			float remainingCooldown;
-
-			Entry()
-				: Entry(kInvalidEntity, 0.0f)
-			{
-			}
-
-			Entry(Entity a_attackEntity, float a_remainingCooldown)
-				: attackEntity(a_attackEntity)
-				, remainingCooldown(a_remainingCooldown)
-			{
-			}
-		};
-
-		std::vector<Entry> entries;
+		std::unordered_map<Entity, float> entries;
 
 		AttackHitRecord()
 		{
@@ -2521,24 +2507,26 @@ namespace Component
 		}
 	};
 
+	// !!!New!!!
+	// 技1発分の定義（Component ではない）
 	struct AttackPower
 	{
-		static constexpr TypeID kTypeId = 116;
-		static constexpr const char* kTypeName = "AttackPower";
-		static constexpr int kVersion = 0;
-
 		float minLength;
 		float maxLength;
 		float angle;
 		float maxHeight;
 		float maxLowness;
 		float damageValue;
+		float motionTime;
 		float lifeTime;
 		float3 followOffset;
 		float waitTime;
+		// !!!New!!!
+		float startupTime;
+
 
 		AttackPower()
-			: AttackPower(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, float3(), 0.0f)
+			: AttackPower(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, float3(), 0.0f, 0.0f)
 		{
 		}
 
@@ -2549,18 +2537,42 @@ namespace Component
 			float a_maxHeight,
 			float a_maxLowness,
 			float a_damageValue,
+			float a_motionTime,
 			float a_lifeTime,
 			float3 a_followOffset = float3(),
-			float a_waitTime = 0.0f)
+			float a_waitTime = 0.0f,
+			float a_startupTime = 0.0f
+			)
 			: minLength(a_minLength)
 			, maxLength(a_maxLength)
 			, angle(a_angle)
 			, maxHeight(a_maxHeight)
 			, maxLowness(a_maxLowness)
 			, damageValue(a_damageValue)
+			, motionTime(a_motionTime)
 			, lifeTime(a_lifeTime)
 			, followOffset(a_followOffset)
 			, waitTime(a_waitTime)
+			, startupTime(a_startupTime)
+		{
+		}
+	};
+
+	// 攻撃情報を実装
+	struct AttackStatus
+	{
+		static constexpr TypeID kTypeId = 116;
+		static constexpr const char* kTypeName = "AttackStatus";
+		static constexpr int kVersion = 0;
+
+		std::vector<AttackPower> attackPowers;
+
+		AttackStatus()
+		{
+		}
+
+		explicit AttackStatus(std::vector<AttackPower> a_attackPowers)
+			: attackPowers(std::move(a_attackPowers))
 		{
 		}
 	};
@@ -2573,15 +2585,25 @@ namespace Component
 
 		Entity attackEntity;
 		float elapsedTime;
+		int attackIndex;
+		float maxDuration;
 
 		AttackAction()
-			: AttackAction(kInvalidEntity, 0.0f)
+			: AttackAction(kInvalidEntity, 0.0f, 0, 0.0f)
 		{
 		}
 
 		AttackAction(Entity a_attackEntity, float a_elapsedTime = 0.0f)
+			: AttackAction(a_attackEntity, a_elapsedTime, 0, 0.0f)
+		{
+		}
+
+		// !!!New!!!
+		AttackAction(Entity a_attackEntity, float a_elapsedTime, int a_attackIndex, float a_maxDuration)
 			: attackEntity(a_attackEntity)
 			, elapsedTime(a_elapsedTime)
+			, attackIndex(a_attackIndex)
+			, maxDuration(a_maxDuration)
 		{
 		}
 	};
@@ -2594,9 +2616,12 @@ namespace Component
 		static constexpr int kVersion = 0;
 
 		float elapsedTime;
+		// !!!New!!!
+		float waitDuration;
 
-		AttackWaitAction(float a_elapsedTime = 0.0f)
+		AttackWaitAction(float a_elapsedTime = 0.0f, float a_waitDuration = 0.0f)
 			: elapsedTime(a_elapsedTime)
+			, waitDuration(a_waitDuration)
 		{
 		}
 	};
@@ -2634,13 +2659,22 @@ namespace Component
 		float2 moveDir;
 		float magnitube;
 		bool isInput;
+		// 攻撃アクション
 		bool useAttack;
+		int attackIndex;
+
+		// 防御アクション
+		bool useJump;
+		bool useGuard;
 
 		MoveInputResult()
 			: moveDir()
 			, magnitube(0.0f)
 			, isInput(false)
 			, useAttack(false)
+			, attackIndex(0)
+			, useJump(false)
+			, useGuard(false)
 		{
 		}
 	};
@@ -2654,17 +2688,22 @@ namespace Component
 
 		InputOrigin move;
 		InputOrigin attack;
-
+		InputOrigin jump;
+		InputOrigin guard;
 
 		InputSource(InputOrigin a_origin = InputOrigin::Device)
 			: move(a_origin)
 			, attack(a_origin)
+			, jump(a_origin)
+			, guard(a_origin)
 		{
 		}
 
-		InputSource(InputOrigin a_move, InputOrigin a_attack)
+		InputSource(InputOrigin a_move, InputOrigin a_attack, InputOrigin a_jump, InputOrigin a_guard)
 			: move(a_move)
 			, attack(a_attack)
+			, jump(a_jump)
+			, guard(a_guard)
 		{
 		}
 	};
@@ -2678,5 +2717,164 @@ namespace Component
 		static constexpr int kVersion = 0;
 		EnemyAttackTag() {};
 	};
+
+	// 攻撃前隙の表示用扇（判定は持たない。形状は SectorHitJudge と同型）
+	struct AttackTelegraph
+	{
+		static constexpr TypeID kTypeId = 123;
+		static constexpr const char* kTypeName = "AttackTelegraph";
+		static constexpr int kVersion = 0;
+
+		float minLength;
+		float maxLength;
+		float angle;
+		float maxHeight;
+		float maxLowness;
+
+		AttackTelegraph(
+			float a_minLength,
+			float a_maxLength,
+			float a_angle,
+			float a_maxHeight,
+			float a_maxLowness)
+			: minLength(a_minLength)
+			, maxLength(a_maxLength)
+			, angle(a_angle)
+			, maxHeight(a_maxHeight)
+			, maxLowness(a_maxLowness)
+		{
+		}
+
+		AttackTelegraph()
+			: AttackTelegraph(0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
+		{
+		}
+	};
+
+	// 攻撃前隙アクション
+	struct AttackStartupAction
+	{
+		static constexpr TypeID kTypeId = 124;
+		static constexpr const char* kTypeName = "AttackStartupAction";
+		static constexpr int kVersion = 0;
+
+		float elapsedTime;
+		float startupDuration;
+		int attackIndex;
+		// 削除できるよう判定表示Entityを保持
+		Entity telegraphEntity;
+
+		AttackStartupAction()
+			: AttackStartupAction(0.0f, 0, kInvalidEntity)
+		{
+		}
+
+		AttackStartupAction(
+			float a_startupDuration,
+			int a_attackIndex,
+			Entity a_telegraphEntity)
+			: elapsedTime(0.0f)
+			, startupDuration(a_startupDuration)
+			, attackIndex(a_attackIndex)
+			, telegraphEntity(a_telegraphEntity)
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct AttackInstance
+	{
+		static constexpr TypeID kTypeId = 125;
+		static constexpr const char* kTypeName = "AttackInstance";
+		static constexpr int kVersion = 0;
+
+		// 攻撃情報
+		Entity owner;
+		int attackIndex;
+		bool connected;
+
+		// 終了フラグ及び終了条件フラグ
+		bool ended;
+		bool endWithOwnerAction;
+
+		// 継続時間
+		float elapsedTime;
+		float maxDuration;
+		AttackInstance()
+			: AttackInstance(kInvalidEntity, 0, 0.0f, true)
+		{
+		}
+
+		AttackInstance(
+			Entity a_owner,
+			int a_attackIndex,
+			float a_maxDuration,
+			bool a_endWithOwnerAction = true)
+			: owner(a_owner)
+			, attackIndex(a_attackIndex)
+			, connected(false)
+			, ended(false)
+			, elapsedTime(0.0f)
+			, maxDuration(a_maxDuration)
+			, endWithOwnerAction(a_endWithOwnerAction)
+		{
+		}
+	};
+
+	struct AIRole
+	{
+		static constexpr TypeID kTypeId = 126;
+		static constexpr const char* kTypeName = "AIRole";
+		static constexpr int kVersion = 0;
+
+		// 距離による有利判定係数（得意間合い）
+		float distCoefficient = 1.0f;
+		// 様子見用・距離の遠さ係数
+		float farnessCoefficient = 1.0f;
+		// 攻撃命中時の評価係数
+		float hitCoefficient = 3.0f;
+		// 方針連続時の減少係数、1.0f以下だと連続時に増加する
+		float stanceCoefficient = 1.2f;
+
+		// 有利距離用係数、攻撃命中係数、方針連続使用係数、様子見距離用係数
+		AIRole(float a_distCoefficient, float a_hitCoefficient, float a_stanceCoefficient, float a_farnessCoefficient)
+			: distCoefficient(a_distCoefficient)
+			, farnessCoefficient(a_farnessCoefficient)
+			, hitCoefficient(a_hitCoefficient)
+			, stanceCoefficient(a_stanceCoefficient)
+		{
+		}
+
+		AIRole()
+			: AIRole(1.0f, 3.0f, 1.2f, 1.0f)
+		{
+		}
+	};
+
+	struct GuardAction
+	{
+		static constexpr TypeID kTypeId = 127;
+		static constexpr const char* kTypeName = "GuardAction";
+		static constexpr int kVersion = 0;
+
+		float currentGuardPower;
+
+		GuardAction(float a_guardPower)
+			: currentGuardPower(a_guardPower)
+		{
+		}
+	};
 	
+	struct GuardState
+	{
+		static constexpr TypeID kTypeId = 128;
+		static constexpr const char* kTypeName = "GuardState";
+		static constexpr int kVersion = 0;
+		float guardPower;
+		GuardState(float a_guardPower)
+			: guardPower(a_guardPower)
+		{
+		}
+	};
+
 }

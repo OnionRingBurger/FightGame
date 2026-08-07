@@ -66,7 +66,8 @@ private:
 	bool allLoadModel = false;
 	// !!!New!!!
 	float aiTickAccum = 0.0f;
-	static constexpr float kAITickInterval = 0.1f / 60.0f;
+	// 3F‹N‚«‚ÉXV
+	static constexpr float kAITickInterval = 3.0f / 60.0f;
 
 
 protected:

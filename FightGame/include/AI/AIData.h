@@ -6,7 +6,7 @@
 #include "MathAssist.h"
 #include "ECSTypes.h"
 
-// !!!New!!!
+// Worldの状態書き込み
 struct AIBlackboard
 {
 	struct BBAttackData
@@ -22,7 +22,7 @@ struct AIBlackboard
 
 	struct BBEnemyData
 	{
-		// !!!New!!!
+		// 座標系
 		float2 position;
 		float rotation;
 
@@ -31,7 +31,13 @@ struct AIBlackboard
 		bool canAttack;
 
 		// 攻撃データ
-		BBAttackData attackData;
+		std::vector<BBAttackData> attackDatas;
+
+		// Role（性質・カーブ係数）。技キットと同じ袋。モード変更時は一緒に書き換える
+		float distCoefficient = 1.0f;
+		float farnessCoefficient = 1.0f;
+		float hitCoefficient = 3.0f;
+		float stanceCoefficient = 1.2f;
 	};
 
 	float2 playerPos;
@@ -40,7 +46,7 @@ struct AIBlackboard
 	std::unordered_map<Entity, BBEnemyData> enemyDatas;
 };
 
-// !!!New!!!
+// 事実書き込み用データ
 struct AISenseFrame
 {
 	float2 playerPos;
@@ -48,7 +54,7 @@ struct AISenseFrame
 	std::unordered_map<Entity, AIBlackboard::BBEnemyData> enemyDatas;
 };
 
-// !!!New!!!
+// ノードの利用状況
 struct AIContext
 {
 	std::string BTType;
@@ -57,8 +63,7 @@ struct AIContext
 	float actionDuration;
 };
 
-// !!!New!!!
-// システム／スケジュール情報（更新側が書く。ワールド状態の BB とは別）
+// システム情報
 struct AISystemInfo
 {
 	float tickDelta;
@@ -74,16 +79,57 @@ struct AISystemInfo
 	}
 };
 
-// !!!New!!!
+// AI判断結果
 struct AIResult
 {
-	float2 MoveDir;
-	bool UseAttack;
-	bool IsMove;
+	// 移動方向
+	float2 MoveDir = float2(0.0f, 0.0f);
+	bool IsMove = false;
+
+	// 使用する攻撃番号
+	int AttackIndex = 0;
+	bool UseAttack = false;
 };
 
+
+// 敵の行動方針
+enum class AIStance
+{
+	// 何もしない
+	NoneStance = -1,
+	// 不利な位置関係を脱する
+	EscapeDisadvantage = 0,
+	// 有利な位置を維持・活用する
+	HoldAdvantage = 1,
+	// ニュートラル様子見
+	NeutralProbe = 2,
+};
+
+// 思考の状態と記憶
+struct AIMind
+{
+	// 現在の方針
+	AIStance stance = AIStance::NeutralProbe;
+	// 方針再評価用ポイント、最大値を超えると方針の変更を検討する
+	float updatePoints = 0.0f;
+	// 方針再評価用点の最大値
+	float maxUpdatePoints = 120.0f;
+	// 方針連続使用回数
+	int stanceContinueCount = 0;
+	// 攻撃連続使用など
+	int lastHitAttackIndex = 0;
+	int sameAttackStreak = 0;
+	// 攻撃成功、失敗回数
+	int attackSuccessCount = 0;
+	int attackMissCount = 0;
+
+	// TODO Playerの無防備度とかも見る
+};
+
+// ランタイムデータ
 struct AIRuntime
 {
 	AIContext context;
+	AIMind mind;
 	AIResult result;
 };

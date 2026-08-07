@@ -20,7 +20,7 @@ public:
 	void SetNodePosition(int hierarchy, int nodeIndex);
 
 	// ˆ—‚ği‚ß‚é
-	virtual Status Tick(AIContext& context, const AIBlackboard& blackBord, const AISystemInfo& systemInfo, AIResult& result) = 0;
+	virtual Status Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result) = 0;
 
 protected:
 

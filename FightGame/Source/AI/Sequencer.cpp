@@ -10,7 +10,7 @@ Sequencer::~Sequencer()
 {
 }
 
-Node::Status Sequencer::Tick(AIContext& context, const AIBlackboard& blackBord, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status Sequencer::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
 {
 	// 子ノードが存在しない場合成功を返す
 	if (childNodes.empty())
@@ -33,7 +33,7 @@ Node::Status Sequencer::Tick(AIContext& context, const AIBlackboard& blackBord, 
 		bool isSafe = UpdateContext(context, i);
 		if(!isSafe) return NODE_FAILURE;
 		// 子ノードを更新
-		Status childState = childNodes.at(i)->Tick(context, blackBord, systemInfo, result);
+		Status childState = childNodes.at(i)->Tick(context, blackBord, mind, systemInfo, result);
 		// 成功した場合次に行く
 		if (childState == NODE_SUCCES) continue;
 

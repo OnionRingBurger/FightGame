@@ -36,6 +36,7 @@ bool AIManager::RegisterAI(Entity entity, const std::string& aiType)
 	runtime.context.actionDuration = 0.0f;
 	runtime.result.MoveDir = float2(0.0f, 0.0f);
 	runtime.result.UseAttack = false;
+	runtime.result.AttackIndex = 0;
 
 	runtimeMap[entity] = runtime;
 	return true;
@@ -84,6 +85,50 @@ void AIManager::WriteSystem(const AISystemInfo& a_systemInfo)
 	systemInfo = a_systemInfo;
 }
 
+void AIManager::NotifyAttackResolved(Entity attacker, int attackIndex, bool connected)
+{
+	// !!!New!!!
+	const auto it = runtimeMap.find(attacker);
+	if (it == runtimeMap.end())
+	{
+		return;
+	}
+
+	AIMind& mind = it->second.mind;
+	if (connected)
+	{
+		mind.attackSuccessCount++;
+		if (mind.lastHitAttackIndex == attackIndex)
+		{
+			mind.sameAttackStreak++;
+		}
+		else
+		{
+			mind.lastHitAttackIndex = attackIndex;
+			mind.sameAttackStreak = 1;
+		}
+	}
+	else
+	{
+		mind.attackMissCount++;
+		mind.sameAttackStreak = 0;
+	}
+}
+
+void AIManager::NotifyHitResolved(Entity hitEnemy)
+{
+	auto it = runtimeMap.find(hitEnemy);
+	if (it == runtimeMap.end())
+	{
+		return;
+	}
+
+	AIMind& mind = it->second.mind;
+
+	mind.sameAttackStreak++;
+
+}
+
 void AIManager::TickAI()
 {
 	// 各Entityを更新
@@ -101,8 +146,9 @@ void AIManager::TickAI()
 
 		runtime.result.MoveDir = float2(0.0f, 0.0f);
 		runtime.result.UseAttack = false;
+		runtime.result.AttackIndex = 0;
 
 		// 更新を行う
-		treeIt->second->Tick(runtime.context, blackBoard, systemInfo, runtime.result);
+		treeIt->second->Tick(runtime.context, blackBoard, runtime.mind, systemInfo, runtime.result);
 	}
 }

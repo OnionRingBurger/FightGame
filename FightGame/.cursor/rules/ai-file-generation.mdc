@@ -1,0 +1,11 @@
+---
+description: AIヘッダ新規作成時に AI.h へ include を追記する
+globs: **/AI/**
+alwaysApply: false
+---
+
+# AI系ファイル生成時のルール
+
+- `include/AI/` 配下に新しいAIヘッダ(例: `FooNode.h`)を生成した場合、必ず `include/AI/AI.h` にそのヘッダの `#include "FooNode.h"` を追加する
+- `AI.h` 自体は追記対象にしない
+- includeは既存のinclude群の末尾に追記する

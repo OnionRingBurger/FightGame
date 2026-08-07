@@ -1,14 +1,13 @@
 #pragma once
 
-#include "LeafNode.h"
+#include "ActionNode.h"
 
 // !!!New!!!
-// ót: èåèîªíËÉmÅ[Éh
-class ConditionNode : public LeafNode
+class RunPlayerNode : public ActionNode
 {
 public:
-	ConditionNode();
-	~ConditionNode() override;
+	RunPlayerNode();
+	~RunPlayerNode() override;
 
 	Status Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result) override;
 };

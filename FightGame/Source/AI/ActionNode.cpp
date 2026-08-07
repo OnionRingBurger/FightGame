@@ -9,11 +9,12 @@ ActionNode::~ActionNode()
 {
 }
 
-Node::Status ActionNode::Tick(AIContext& context, const AIBlackboard& blackBord, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status ActionNode::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
 {
 	// !!!New!!!
 	(void)context;
 	(void)blackBord;
+	(void)mind;
 	(void)systemInfo;
 	(void)result;
 	return NODE_FAILURE;

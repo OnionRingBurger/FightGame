@@ -31,6 +31,11 @@ public:
 	void WriteSystem(const AISystemInfo& a_systemInfo);
 
 	// !!!New!!!
+	void NotifyAttackResolved(Entity attacker, int attackIndex, bool connected);
+
+	void NotifyHitResolved(Entity hitEnemy);
+
+	// !!!New!!!
 	void TickAI();
 
 private:

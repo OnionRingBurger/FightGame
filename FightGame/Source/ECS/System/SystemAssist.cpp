@@ -79,6 +79,9 @@ bool IsActionAllowed(Chunk& a_chunk, Entity a_entity, ActionFlag a_flag)
 // 攻撃解除可能だった場合キャンセルする
 void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity)
 {
+	// 前隙中はキャンセル不可
+	if (a_chunk.GetComponent<AttackStartupAction>(a_entity).IsValid()) return;
+
 	ComponentHandle<AttackAction> attackAction = a_chunk.GetComponent<AttackAction>(a_entity);
 	if (!attackAction.IsValid()) return;
 

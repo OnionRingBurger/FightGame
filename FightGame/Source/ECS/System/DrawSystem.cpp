@@ -301,6 +301,67 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 
 }
 
+
+void UIDraw(Chunk& a_chunk, const SystemContext& a_context)
+{
+	SetDepthTest(DEPTH_TEST_FALSE);
+
+	ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>>();
+	for (auto it : view)
+	{
+		const ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
+		// アクティブじゃなかったら抜ける
+		if (!ui.Look().isActiv) continue;
+
+		std::shared_ptr<Texture> uiTexture = a_context.uiCache.GetTexture(ui.Look().key);
+
+		DirectX::XMFLOAT4X4 worldMat, viewMat, projMat;
+
+		float2 pos = ui.Look().uiPos;
+		float2 size = ui.Look().uiScale;
+		float rad = -ui.Look().uiRotation * RAD;
+		float2 uvPos = ui.Look().uvPos;
+		float2 uvScale = ui.Look().uvScale;
+		DirectX::XMFLOAT2 dxPos = { pos.x, pos.y };
+		DirectX::XMFLOAT2 dxSize = { size.x, size.y };
+		DirectX::XMFLOAT2 dxUVPos = { uvPos.x, uvPos.y };
+		DirectX::XMFLOAT2 dxUVScale = { uvScale.x, uvScale.y };
+
+		float3 cameraPos = float3(0.0f, 0.0f, 0.0f);
+		float3 lookPos = float3(0.0f, 0.0f, 1.0f);
+		float3 upVector = float3(0.0f, 1.0f, 0.0f);
+
+
+
+
+		DrawMatrix::CreateWorldMatrix(
+			worldMat,
+			float3(0.0f, 0.0f, 1.0f),
+			float3(1.0f, 1.0f, 1.0f),
+			float3(0.0f, 0.0f, rad)
+		);
+
+		DirectX::XMStoreFloat4x4(&viewMat, DirectX::XMMatrixIdentity());
+		DirectX::XMStoreFloat4x4(&projMat, DirectX::XMMatrixIdentity());
+
+		Sprite::SetWorld(worldMat);
+		Sprite::SetView(viewMat);
+		Sprite::SetProjection(projMat);
+		Sprite::SetColor({ 1.0f, 1.0f, 1.0f,  ui.Look().alpha });
+		Sprite::SetSize(dxSize);
+		Sprite::SetOffset(dxPos);
+		Sprite::SetTexture(uiTexture.get());
+		Sprite::SetUVPos(dxUVPos);
+		Sprite::SetUVScale(dxUVScale);
+
+		Sprite::Draw();
+
+	}
+
+	SetDepthTest(DEPTH_TEST_TRUE);
+
+}
+
 void PolylineDraw(Chunk& a_chunk, const SystemContext& a_context)
 {
 	ComponentHandle<Camera> cameraHandle;
@@ -341,65 +402,6 @@ void PolylineDraw(Chunk& a_chunk, const SystemContext& a_context)
 	SetDepthTest(DEPTH_TEST_TRUE);
 }
 
-void UIDraw(Chunk& a_chunk, const SystemContext& a_context)
-{
-	SetDepthTest(DEPTH_TEST_FALSE);
-
-	ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>>();
-	for (auto it : view)
-	{
-		const ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
-		// アクティブじゃなかったら抜ける
-		if (!ui.Look().isActiv) continue;
-
-		std::shared_ptr<Texture> uiTexture = a_context.uiCache.GetTexture(ui.Look().key);
-
-		DirectX::XMFLOAT4X4 worldMat, viewMat, projMat;
-
-		float2 pos = ui.Look().uiPos;
-		float2 size = ui.Look().uiScale;
-		float rad = -ui.Look().uiRotation * RAD;
-		float2 uvPos = ui.Look().uvPos;
-		float2 uvScale = ui.Look().uvScale;
-		DirectX::XMFLOAT2 dxPos = { pos.x, pos.y };
-		DirectX::XMFLOAT2 dxSize = { size.x, size.y };
-		DirectX::XMFLOAT2 dxUVPos = { uvPos.x, uvPos.y };
-		DirectX::XMFLOAT2 dxUVScale = { uvScale.x, uvScale.y };
-
-		float3 cameraPos = float3(0.0f, 0.0f, 0.0f);
-		float3 lookPos = float3(0.0f, 0.0f, 1.0f);
-		float3 upVector = float3(0.0f, 1.0f, 0.0f);
-
-
-
-
-		DrawMatrix::CreateWorldMatrix(
-			worldMat,
-			float3(pos.x, pos.y, 1.0f),
-			float3(1.0f, 1.0f, 1.0f),
-			float3(0.0f, 0.0f, rad)
-		);
-
-		DirectX::XMStoreFloat4x4(&viewMat, DirectX::XMMatrixIdentity());
-		DirectX::XMStoreFloat4x4(&projMat, DirectX::XMMatrixIdentity());
-
-		Sprite::SetWorld(worldMat);
-		Sprite::SetView(viewMat);
-		Sprite::SetProjection(projMat);
-		Sprite::SetColor({ 1.0f, 1.0f, 1.0f,  ui.Look().alpha });
-		Sprite::SetSize(dxSize);
-		Sprite::SetOffset({ 0.0f, 0.0f });
-		Sprite::SetTexture(uiTexture.get());
-		Sprite::SetUVPos(dxUVPos);
-		Sprite::SetUVScale(dxUVScale);
-
-		Sprite::Draw();
-
-	}
-
-	SetDepthTest(DEPTH_TEST_TRUE);
-
-}
 
 DirectX::XMMATRIX CreateBillBoardMatrix(const float3& cameraPos, const float3& lookPos, const float3& upVector)
 {
@@ -550,38 +552,45 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 	Geometory::SetView(wvp[1]);
 	Geometory::SetProjection(wvp[2]);
 
-	DirectX::XMFLOAT4 color(1.0f, 0.4f, 0.0f, 1.0f);
+	DirectX::XMFLOAT4 attackColor(1.0f, 0.4f, 0.0f, 1.0f);
+	DirectX::XMFLOAT4 waitColor(0.0f, 0.4f, 1.0f, 1.0f);
 	constexpr int kArcSegments = 16;
 
-	ComponentView sectorView = a_chunk.GetView<ComponentTypes<SectorHitJudge, Position, Rotation>>();
-	for (auto sectorIt : sectorView)
+	// 描画用ラムダ
+	auto drawSectorLines = [&](
+		float minLength,
+		float maxLength,
+		float angle,
+		float maxHeight,
+		float maxLowness,
+		float posX,
+		float posY,
+		float posZ,
+		float yawDeg,
+		const DirectX::XMFLOAT4& drawColor)
 	{
-		const ComponentHandle<SectorHitJudge> sector = a_chunk.GetComponent<SectorHitJudge>(sectorIt);
-		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(sectorIt);
-		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(sectorIt);
-
-		float yawRad = rot.Look().yaw * RAD;
-		float halfAngleRad = sector.Look().angle * 0.5f * RAD;
-		float topY = pos.Look().y + sector.Look().maxHeight;
-		float bottomY = pos.Look().y - sector.Look().maxLowness;
+		float yawRad = yawDeg * RAD;
+		float halfAngleRad = angle * 0.5f * RAD;
+		float topY = posY + maxHeight;
+		float bottomY = posY - maxLowness;
 
 		auto makePoint = [&](float length, float angleOffsetRad, float y) -> DirectX::XMFLOAT3
 		{
 			float dirAngle = yawRad + angleOffsetRad;
 			return DirectX::XMFLOAT3(
-				pos.Look().x + sinf(dirAngle) * length,
+				posX + sinf(dirAngle) * length,
 				y,
-				pos.Look().z + cosf(dirAngle) * length);
+				posZ + cosf(dirAngle) * length);
 		};
 
 		auto drawSectorAtY = [&](float y)
 		{
-			DirectX::XMFLOAT3 leftInner = makePoint(sector.Look().minLength, -halfAngleRad, y);
-			DirectX::XMFLOAT3 leftOuter = makePoint(sector.Look().maxLength, -halfAngleRad, y);
-			DirectX::XMFLOAT3 rightInner = makePoint(sector.Look().minLength, halfAngleRad, y);
-			DirectX::XMFLOAT3 rightOuter = makePoint(sector.Look().maxLength, halfAngleRad, y);
-			Geometory::AddLine(leftInner, leftOuter, color);
-			Geometory::AddLine(rightInner, rightOuter, color);
+			DirectX::XMFLOAT3 leftInner = makePoint(minLength, -halfAngleRad, y);
+			DirectX::XMFLOAT3 leftOuter = makePoint(maxLength, -halfAngleRad, y);
+			DirectX::XMFLOAT3 rightInner = makePoint(minLength, halfAngleRad, y);
+			DirectX::XMFLOAT3 rightOuter = makePoint(maxLength, halfAngleRad, y);
+			Geometory::AddLine(leftInner, leftOuter, drawColor);
+			Geometory::AddLine(rightInner, rightOuter, drawColor);
 
 			for (int i = 0; i < kArcSegments; ++i)
 			{
@@ -590,30 +599,71 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 				float a0 = -halfAngleRad + (halfAngleRad * 2.0f) * t0;
 				float a1 = -halfAngleRad + (halfAngleRad * 2.0f) * t1;
 
-				Geometory::AddLine(makePoint(sector.Look().maxLength, a0, y), makePoint(sector.Look().maxLength, a1, y), color);
-				if (sector.Look().minLength > 0.0f)
+				Geometory::AddLine(makePoint(maxLength, a0, y), makePoint(maxLength, a1, y), drawColor);
+				if (minLength > 0.0f)
 				{
-					Geometory::AddLine(makePoint(sector.Look().minLength, a0, y), makePoint(sector.Look().minLength, a1, y), color);
+					Geometory::AddLine(makePoint(minLength, a0, y), makePoint(minLength, a1, y), drawColor);
 				}
 			}
 		};
 
-		// !!!New!!!
 		drawSectorAtY(topY);
 		drawSectorAtY(bottomY);
 
-		Geometory::AddLine(makePoint(sector.Look().maxLength, -halfAngleRad, topY), makePoint(sector.Look().maxLength, -halfAngleRad, bottomY), color);
-		Geometory::AddLine(makePoint(sector.Look().maxLength, halfAngleRad, topY), makePoint(sector.Look().maxLength, halfAngleRad, bottomY), color);
-		if (sector.Look().minLength > 0.0f)
+		Geometory::AddLine(makePoint(maxLength, -halfAngleRad, topY), makePoint(maxLength, -halfAngleRad, bottomY), drawColor);
+		Geometory::AddLine(makePoint(maxLength, halfAngleRad, topY), makePoint(maxLength, halfAngleRad, bottomY), drawColor);
+		if (minLength > 0.0f)
 		{
-			Geometory::AddLine(makePoint(sector.Look().minLength, -halfAngleRad, topY), makePoint(sector.Look().minLength, -halfAngleRad, bottomY), color);
-			Geometory::AddLine(makePoint(sector.Look().minLength, halfAngleRad, topY), makePoint(sector.Look().minLength, halfAngleRad, bottomY), color);
+			Geometory::AddLine(makePoint(minLength, -halfAngleRad, topY), makePoint(minLength, -halfAngleRad, bottomY), drawColor);
+			Geometory::AddLine(makePoint(minLength, halfAngleRad, topY), makePoint(minLength, halfAngleRad, bottomY), drawColor);
 		}
 		else
 		{
-			DirectX::XMFLOAT3 originTop(pos.Look().x, topY, pos.Look().z);
-			DirectX::XMFLOAT3 originBottom(pos.Look().x, bottomY, pos.Look().z);
-			Geometory::AddLine(originTop, originBottom, color);
+			DirectX::XMFLOAT3 originTop(posX, topY, posZ);
+			DirectX::XMFLOAT3 originBottom(posX, bottomY, posZ);
+			Geometory::AddLine(originTop, originBottom, drawColor);
 		}
+	};
+
+	// 当たり判定描画
+	ComponentView sectorView = a_chunk.GetView<ComponentTypes<SectorHitJudge, Position, Rotation>>();
+	for (auto sectorIt : sectorView)
+	{
+		const ComponentHandle<SectorHitJudge> sector = a_chunk.GetComponent<SectorHitJudge>(sectorIt);
+		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(sectorIt);
+		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(sectorIt);
+
+		drawSectorLines(
+			sector.Look().minLength,
+			sector.Look().maxLength,
+			sector.Look().angle,
+			sector.Look().maxHeight,
+			sector.Look().maxLowness,
+			pos.Look().x,
+			pos.Look().y,
+			pos.Look().z,
+			rot.Look().yaw,
+			attackColor);
+	}
+
+	// 判定表示を描画
+	ComponentView telegraphView = a_chunk.GetView<ComponentTypes<AttackTelegraph, Position, Rotation>>();
+	for (auto telegraphIt : telegraphView)
+	{
+		const ComponentHandle<AttackTelegraph> telegraph = a_chunk.GetComponent<AttackTelegraph>(telegraphIt);
+		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(telegraphIt);
+		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(telegraphIt);
+
+		drawSectorLines(
+			telegraph.Look().minLength,
+			telegraph.Look().maxLength,
+			telegraph.Look().angle,
+			telegraph.Look().maxHeight,
+			telegraph.Look().maxLowness,
+			pos.Look().x,
+			pos.Look().y,
+			pos.Look().z,
+			rot.Look().yaw,
+			waitColor);
 	}
 }
