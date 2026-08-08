@@ -222,9 +222,10 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 	ComponentView view = a_chunk.GetView<ComponentTypes<SpriteComponent, Position, Scale, Rotation>>();
 	for (auto it : view)
 	{
+		const ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
 		const ComponentHandle<SpriteComponent> sprite = a_chunk.GetComponent<SpriteComponent>(it);
 
-		std::shared_ptr<Texture> uiTexture = a_context.uiCache.GetTexture(sprite.Look().key);
+		std::shared_ptr<Texture> uiTexture = a_context.uiCache.GetTexture(ui.Look().key);
 
 		DirectX::XMFLOAT4X4 worldMat, viewMat, projMat;
 
@@ -233,11 +234,12 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 			reinterpret_cast<const float3&>(a_chunk.GetComponent<Position>(it).Look());
 		const float3 scale = reinterpret_cast<const float3&>(a_chunk.GetComponent<Scale>(it).Look());
 		const float3 rotation = reinterpret_cast<const float3&>(a_chunk.GetComponent<Rotation>(it).Look()) +
-			sprite.Look().offsetRotation;
-		const float2 uvPos = sprite.Look().uvPos;
-		const float2 uvScale = sprite.Look().uvScale;
+			sprite.Look().offsetRotation + float3(0.0f, 0.0f, ui.Look().uiRotation);
+		const float2 offset = ui.Look().uiPos;
+		const float2 uvPos = ui.Look().uvPos;
+		const float2 uvScale = ui.Look().uvScale;
 
-		const float2 size = sprite.Look().size;
+		const float2 size = ui.Look().uiScale;
 
 		float3 cameraPos(
 			cameraPosHandle.Look().x,
@@ -287,9 +289,9 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 		Sprite::SetWorld(worldMat);
 		Sprite::SetView(viewMat);
 		Sprite::SetProjection(projMat);
-		Sprite::SetColor({ 1.0f, 1.0f, 1.0f,  sprite.Look().alpha });
+		Sprite::SetColor({ 1.0f, 1.0f, 1.0f,  ui.Look().alpha });
 		Sprite::SetSize({ size.x, size.y});
-		Sprite::SetOffset({ 0.0f, 0.0f });
+		Sprite::SetOffset({ offset.x, offset.y });
 		Sprite::SetTexture(uiTexture.get());
 		Sprite::SetUVPos({ uvPos.x, uvPos.y });
 		Sprite::SetUVScale({ uvScale.x, uvScale.y });
@@ -306,7 +308,7 @@ void UIDraw(Chunk& a_chunk, const SystemContext& a_context)
 {
 	SetDepthTest(DEPTH_TEST_FALSE);
 
-	ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>>();
+	ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>, ComponentTypes<SpriteComponent>>();
 	for (auto it : view)
 	{
 		const ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);

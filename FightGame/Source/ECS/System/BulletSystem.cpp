@@ -215,31 +215,32 @@ void BulletSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRespons
 
 				float hitLength = GetLength(TOFLOAT3(shooterPos.Look()), info.Look().rayHitPosition);
 
-				a_chunk.CreateNewEntity(
-					MOVE_AND_TRANSFORM_COMPONENT(
-						float3(shotEffectSpawnPos),
-						float3(0.0f, 0.0f, 0.0f),
-						float3(1.0f, 1.0f, 1.0f)
-					),
-					PosePosState(POSE_POS_RAIL),
-					RailUser(railEntity),
-					SpriteComponent("HitEffectRay", float3(), float2(0.07f * hitLength, 0.07f * hitLength), float3(), 1.0f, true),
-					FadeUI(FADE_DOWN, 0.07f),
-					LifeTime(2.0f)
-				);
+				//a_chunk.CreateNewEntity(
+				//	MOVE_AND_TRANSFORM_COMPONENT(
+				//		float3(shotEffectSpawnPos),
+				//		float3(0.0f, 0.0f, 0.0f),
+				//		float3(1.0f, 1.0f, 1.0f)
+				//	),
+				//	PosePosState(POSE_POS_RAIL),
+				//	RailUser(railEntity),
+				//	UIComponent("HitEffectRay", float2(), float2(0.07f * hitLength, 0.07f * hitLength), 0.0f, ),
+				//	SpriteComponent(float3(), float3(), true),
+				//	FadeUI(FADE_DOWN, 0.07f),
+				//	LifeTime(2.0f)
+				//);
 
-				a_chunk.CreateNewEntity(
-					MOVE_AND_TRANSFORM_COMPONENT(
-						float3(shotEffectSpawnPos),
-						float3(0.0f, 0.0f, 0.0f),
-						float3(15.0f, 15.0f, 15.0f)
-					),
-					PosePosState(POSE_POS_RAIL),
-					RailUser(railEntity),
-					SpriteComponent("ShotEffect", float3(), float2(1.25f, 1.25f), float3(), 1.0f, true),
-					SpriteAnimation(6 + 1, int2(5, 2), false),
-					LifeTime(30.0f)
-				);
+				//a_chunk.CreateNewEntity(
+				//	MOVE_AND_TRANSFORM_COMPONENT(
+				//		float3(shotEffectSpawnPos),
+				//		float3(0.0f, 0.0f, 0.0f),
+				//		float3(15.0f, 15.0f, 15.0f)
+				//	),
+				//	PosePosState(POSE_POS_RAIL),
+				//	RailUser(railEntity),
+				//	SpriteComponent("ShotEffect", float3(), float2(1.25f, 1.25f), float3(), 1.0f, true),
+				//	SpriteAnimation(6 + 1, int2(5, 2), false),
+				//	LifeTime(30.0f)
+				//);
 
 				// ƒtƒ‰ƒO‚ð—§‚Ä‚é
 				isHit = true;

@@ -88,7 +88,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		JumpPower(float3(0.0f, 12.0f / 60.0f, 0.0f)),
 		AttackStatus({ 
 			AttackPower(0.0f, 1.7f, 160.0f, 0.5f, 0.5f, 2.0f, 15.0f, 10.0f, float3(), 12.0f),
-			AttackPower(0.0f, 6.2f, 60.0f, 0.5f, 0.5f, 2.0f, 30.0f, 30.0f, float3(), 22.0f, 50.0f)
+			AttackPower(0.0f, 6.2f, 60.0f, 0.5f, 0.5f, 5.0f, 30.0f, 30.0f, float3(), 22.0f, 50.0f)
 		 }),
 		LookMove(900.0f / 60.0f),
 		PoseRotState(POSE_ROT_LOOKMOVE),
@@ -97,6 +97,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		GuardState(0.2f)
 
 	);
+
 
 	Entity hpBack = newChunk.CreateNewEntity(
 		UIComponent("UIBack", float2(-0.58, 0.9f), float2(0.8f, 0.1f), 0.0f)
@@ -144,6 +145,19 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		AttackHitRecord(),
 		// ƒ‚ƒfƒ‹
 		ModelKey("Box")
+	);
+
+	Entity testSprite = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, 1.0f, 0.0f) + kDefaultWorldPosition,
+			float3(0.0f, 0.0f, 0.0f),
+			float3(1.0f, 1.0f, 1.0f)
+		),
+		FollowPosition(float3(0.0f, 0.8f, 0.0f), debugEnemy, FOLLOW_POS_LOCALOFFSET | FOLLOW_POS_FIXED_Y),
+		PosePosState(POSE_POS_FOLLOW),
+		UIComponent("UIGauge", float2(0.0f, 0.0f), float2(1.0f, 0.1f), 0.0f),
+		HPGaugeUI(debugEnemy, float2(0.0f, 0.0f), float2(1.0f, 0.08f)),
+		SpriteComponent(float3(), float3(), true)
 	);
 
 	a_aiManager.RegisterAI(debugEnemy, "Enemy");

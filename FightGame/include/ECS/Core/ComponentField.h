@@ -423,16 +423,12 @@ namespace ComponentSystem
 	template<typename ValueFunc, typename EntityFunc>
 	inline void ApplyToFields(SpriteComponent& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
-		valueFunc("key", component.key, std::string(""));
 		valueFunc("offsetPosX", component.offsetPos.x, 0.0f);
 		valueFunc("offsetPosY", component.offsetPos.y, 0.0f);
 		valueFunc("offsetPosZ", component.offsetPos.z, 0.0f);
-		valueFunc("sizeX", component.size.x, 0.0f);
-		valueFunc("sizeY", component.size.y, 0.0f);
 		valueFunc("offsetRotationX", component.offsetRotation.x, 0.0f);
 		valueFunc("offsetRotationY", component.offsetRotation.y, 0.0f);
 		valueFunc("offsetRotationZ", component.offsetRotation.z, 0.0f);
-		valueFunc("alpha", component.alpha, 0.0f);
 		valueFunc("isBillBoard", component.isBillBoard, false);
 	}
 

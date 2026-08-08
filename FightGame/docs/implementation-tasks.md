@@ -19,7 +19,7 @@
 ### 敵が「問題」を出す
 
 - [ ] **敵攻撃の予兆表示**（最初透明 → 攻撃開始に近づくと色が付く。docs 敵節）
-- [ ] **敵の技選択**（近／遠など。Chase の「0番固定」をやめ、間合いで index を選ぶ）
+- [x] **敵の技選択**（近／遠など。Chase の「0番固定」をやめ、間合いで index を選ぶ）
 - [ ] **BT を戦える最低限まで**（必要な Cond／Action だけ具体化。総合判断の厚みは遊びが立ってからで可）
 
 ### プレイヤーが「答える」（段階実装）
@@ -56,10 +56,15 @@
 
 ### 描画／表示の整理
 
-- [ ] **UI と Sprite の描画統一**（UI を基にする）
-  - 現状: `UIComponent` は画面座標を自己完結、`SpriteComponent` は `Position`/`Scale`/`Rotation`＋オフセットでワールド描画。`DrawSystem` で経路が分かれている（どちらも `uiCache` + `Sprite::Draw`）
-  - 方針: UI 側の持ち方を基準にし、`SpriteComponent` は「Sprite として扱うための座標（オフセット等）」を保持するコンポーネントに寄せる
-  - 着手時は描画経路・Component 責務の設計を先に固め、既存 Entity の差し替え範囲を決めてから実装（`Components.h` / `DrawSystem` / 利用 World は要承認）
+- [x] **UI と Sprite の描画統一**（UI を基にする）
+  - `SpriteComponent` を「Sprite として扱うための座標（オフセット等）」保持に寄せ、UI 側の持ち方を基準に揃えた
+  - 描画パス自体（UI / Sprite）は分けたまま。表示順の問題があり、統合するなら Z バッファ等での解決が必要になるため
+- [ ] **HitEffect の追加**（ヒット時の見た目フィードバック）
+  - 既存の `HitEffectRay` 流用や `BulletSystem` のコメントアウト生成は前提にしない。**1から**作る想定
+  - **Effect** や **Model** としてちゃんと実装する（UI/Sprite の仮置きで済ませない）
+- [ ] **アニメーションの分離実装**（Model から切り離す）
+  - 現状は Model 側にアニメが引っ付いている（`ModelKey::useAnime` / `Model` 内の Anime 系）
+  - **Animation** として分離し、**Cache** に保存して参照する形にしたい
 
 ## P2: ステージ／ゲームループ
 
@@ -67,6 +72,7 @@
 - [ ] チュートリアルステージ
 - [ ] 本編1ステージ（壁、ゴール or ボス）
 - [ ] 回復アイテム（必要なら）
+- [ ] **文字の追加**（タイトル／チュートリアル／リザルト等で使う画面テキスト。現状はテクスチャ文字寄りで、フォント描画としての実装が未着手）
 
 ## P3: 仕様候補（メモ。採用が決まってからタスク化）
 
@@ -90,7 +96,9 @@
 | 攻撃データ | プレイヤー／敵 `AttackStatus`（後隙はある、前隙は未） |
 | 敵 AI | `WaitAction` → `ChasePlayerAction`（攻撃 index はまだ 0 固定寄り） |
 | GameWorld | BT／扇格闘ではなくレール＋接触／射撃 |
-| UI／Sprite 描画 | `DrawSystem` の `UIDraw` と Sprite 経路（`UIComponent` / `SpriteComponent`） |
+| UI／Sprite 描画 | Component 側は統一済み。描画は `UIDraw` / Sprite で分離（表示順。統合するなら Z バッファ等） |
+| HitEffect | 未着手。Effect／Model で1から実装予定（`HitEffectRay` 流用は前提にしない） |
+| Animation | 現状は Model 内。Animation 分離＋Cache 保存が未着手 |
 
 ## 進め方の推奨順（残り約1カ月・確定寄り）
 

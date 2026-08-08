@@ -1300,30 +1300,20 @@ namespace Component
 	{
 		static constexpr TypeID kTypeId = 53;
 		static constexpr const char* kTypeName = "SpriteComponent";
-		static constexpr int kVersion = 1;
+		static constexpr int kVersion = 2;
 
-		std::string key;
 		float3 offsetPos;
-		float2 size;
 		float3 offsetRotation;
-		float2 uvPos;
-		float2 uvScale;
-		float alpha;
 		bool isBillBoard;
 
 		SpriteComponent()
-			: SpriteComponent("", float3(), float2(), float3(), 1.0f, false, float2(0.0f, 0.0f), float2(1.0f, 1.0f))
+			: SpriteComponent(float3(), float3(), false)
 		{
 		}
 
-		SpriteComponent(std::string a_key, float3 a_offsetPos, float2 a_size, float3 a_offsetRotation, float a_alpha = 1.0f, bool a_isBillBoard = false, float2 a_uvPos = { 0.0f, 0.0f }, float2 a_uvScale = { 1.0f, 1.0f })
-			: key(a_key)
-			, offsetPos(a_offsetPos)
-			, size(a_size)
+		SpriteComponent(float3 a_offsetPos, float3 a_offsetRotation, bool a_isBillBoard = false)
+			: offsetPos(a_offsetPos)
 			, offsetRotation(a_offsetRotation)
-			, uvPos(a_uvPos)
-			, uvScale(a_uvScale)
-			, alpha(a_alpha)
 			, isBillBoard(a_isBillBoard)
 		{
 		}
