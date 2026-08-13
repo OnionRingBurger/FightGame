@@ -22,7 +22,6 @@ public:
 	void Uninit();
 
 	void MainLoop(HWND a_hwnd, MSG& message);
-	bool IsMouseLock();
 	bool IsEnd();
 
 private:
@@ -99,6 +98,8 @@ private:
 
 	std::vector<modelLoadData> modelDatas;
 	std::vector<std::string> textureDatas;
+
+	bool isFixedCursor;
 
 	// FPSèàóùóp
 	DWORD preExecTime;

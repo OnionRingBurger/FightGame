@@ -8,77 +8,7 @@ template<typename Component>
 void JsonAddComponent(Entity a_entity, Chunk& a_chunk, const nlohmann::json& a_json, const ComponentsSerialize& a_serialize, const EntityMap& a_entityMap);
 const void* GetIdComponent(TypeID a_id, Chunk& a_chunk, Entity a_entity);
 
-// コンポーネント展開マクロ
-#define COMPONENT_TYPE_LIST(X) \
-	X(PlayerTag) \
-	X(EnemyTag) \
-	X(DarkTag) \
-	X(GoalTag) \
-	X(CameraTag) \
-	X(ItemTag) \
-	X(LaserPointTag) \
-	X(LaserOwnerTag) \
-	X(LaserTag) \
-	X(PlayerViewTag) \
-	X(DontHitRayTag) \
-	X(GunTag) \
-	X(Position) \
-	X(Rotation) \
-	X(Scale) \
-	X(LookLaserPoint) \
-	X(InputMove) \
-	X(InputRotato) \
-	X(ShakingComponent) \
-	X(PlayerWalkTimer) \
-	X(EnemySpawner) \
-	X(Timer) \
-	X(LookComponent) \
-	X(Velocity) \
-	/*X(Force) \
-	X(BoxCollider) \
-	X(MoveForward) \
-	X(ShooterComponent) \
-	X(GhostAreaComponent) \
-	X(OBBCollider) \
-	X(TrackingWarp) \
-	X(HitInfomation) \
-	X(ChunkChange) \
-	X(KeyChunkChange) \
-	X(CreateEffect) \
-	X(ZoomComponent) \
-	X(ZoomMove) \
-	X(EffectKey) \
-	X(DelayChunkChange) \
-	X(FadeUI) \
-	X(FadeChange) \
-	X(OwnerComponent) \
-	X(BulletComponent) \
-	X(Camera) \
-	X(CameraPoint) \
-	X(FollowPosition) \
-	X(FollowRotation) \
-	X(Ray) \
-	X(RayInfomation) \
-	X(LifeTime) \
-	X(TrailComponent) \
-	X(ModelKey) \
-	X(UIComponent) \
-	X(SpriteComponent) \
-	X(Poliline) \
-	X(LeapPosComponent) \
-	X(LeapRotComponent) \
-	X(FlipComponent) \
-	X(UIAngularSpeed) \
-	X(Pose) \
-	X(PosePosState) \
-	X(PoseRotState) \
-	X(RailComponent) \
-	X(RailUser) \
-	X(RailFly) \
-	X(RailApproach) \
-	X(AngleLimitComponent) \
-	X(DebugCameraTag) \
-*/
+
 
 // 渡されたコンポーネントIDに対応する型をSerializeに登録する
 void RegisterByTypeId(ComponentsSerialize& a_serialize, TypeID a_id)

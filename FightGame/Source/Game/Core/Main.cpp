@@ -28,6 +28,7 @@ MainGame::MainGame()
 	, worstProcessingTime(0.0f)
 	, totalProcessingTime(0.0f)
 	, fpsCount(0)
+	, isFixedCursor(true)
 {
 	uiCache = UICache();
 	modelCache = ModelCache();
@@ -208,11 +209,10 @@ void MainGame::MainLoop(HWND a_hwnd, MSG& message)
 
 
 				AdvanceUpdate(diff);
-				if (true)
+				if (isFixedCursor)
 				{
 					SetCursorPos(kMouseFixedPosX, kMouseFixedPosY);
 				}
-				ShowCursor(false);
 				Update();
 				Draw();
 				PostFrameProcess();
@@ -255,11 +255,6 @@ void MainGame::MainLoop(HWND a_hwnd, MSG& message)
 
 }
 
-// TODO Œã‚ÉC³
-bool MainGame::IsMouseLock()
-{
-	return false;
-}
 
 bool MainGame::IsEnd()
 {
@@ -371,7 +366,7 @@ void MainGame::Draw()
 
 	scene->Draw();
 
-	scene->PostFrameProcess();
+	// scene->PostFrameProcess();
 	EndDrawDirectX();
 
 
@@ -501,6 +496,12 @@ bool MainGame::ChangeScene(std::string a_key)
 			[this]()
 			{
 				ResetFPS();
+			},
+			// !!!New!!!
+			[this](bool a_isFixed)
+			{
+				ShowCursor(!a_isFixed);
+				isFixedCursor = a_isFixed;
 			},
 			input
 		);

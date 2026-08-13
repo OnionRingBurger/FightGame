@@ -1,5 +1,8 @@
 #include "CharacterSystem.h"
 
+#include "GameData.h"
+#include "Geometory.h"
+
 using namespace Component;
 
 void CharacterKill(Chunk& a_chunk, Entity killEntity);
@@ -52,6 +55,20 @@ namespace
 		const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(a_attacker);
 		if (!rotation.IsValid()) return kInvalidEntity;
 
+		// !!!New!!!
+		const std::string& sectorKey = a_attackPower.sectorKey;
+		if (!sectorKey.empty())
+		{
+			Geometory::RegisterSector(
+				sectorKey,
+				a_attackPower.minLength,
+				a_attackPower.maxLength,
+				a_attackPower.angle,
+				a_attackPower.maxHeight,
+				a_attackPower.maxLowness,
+				16);
+		}
+
 		// 向いている方向に判定表示を生成
 		return a_chunk.CreateNewEntity(
 			MOVE_AND_TRANSFORM_COMPONENT(
@@ -64,7 +81,8 @@ namespace
 				a_attackPower.maxLength,
 				a_attackPower.angle,
 				a_attackPower.maxHeight,
-				a_attackPower.maxLowness
+				a_attackPower.maxLowness,
+				sectorKey
 			),
 			FollowPosition(a_attackPower.followOffset, a_attacker, FOLLOW_POS_LOCALOFFSET),
 			PosePosState(POSE_POS_FOLLOW)
@@ -150,6 +168,17 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 			{
 				allowed &= ~ActionFlag_Jump;
 				allowed &= ~ActionFlag_Guard;
+			}
+
+			const ComponentHandle<KnockbackAction> knockback = a_chunk.GetComponent<KnockbackAction>(it);
+			if (knockback.IsValid())
+			{
+				allowed &= ~ActionFlag_Jump;
+				allowed &= ~ActionFlag_Guard;
+				allowed &= ~ActionFlag_Move;
+				allowed &= ~ActionFlag_Attack;
+				// ノックバック中は新たにノックバックしない
+				allowed &= ~ActionFlag_KnockBack;
 			}
 
 			const ComponentHandle<JumpAction> jump = a_chunk.GetComponent<JumpAction>(it);
@@ -432,7 +461,12 @@ void GuardSystem(Chunk& a_chunk, const SystemContext& a_context)
 	{
 		ComponentHandle<MoveInputResult> result = a_chunk.GetComponent<MoveInputResult>(it);
 		ComponentHandle<GuardState> guardState = a_chunk.GetComponent<GuardState>(it);
-		
+
+		DebugConsole::SetDrawPos(15, 19);
+		std::cout << "Input = " << a_context.input.IsRegisterPress("Guard") << std::endl;
+		DebugConsole::SetDrawPos(15, 20);
+		std::cout << "GuardSystem: useGuard = " << result.Look().useGuard << std::endl;
+
 		// ガード不可だった場合抜ける
 		if (!result.Look().useGuard || !IsActionAllowed(a_chunk, it, ActionFlag_Guard))
 		{
@@ -441,7 +475,7 @@ void GuardSystem(Chunk& a_chunk, const SystemContext& a_context)
 		// 攻撃中だった場合キャンセルする
 		CancelPlayerAttackIfAble(a_chunk, it);
 		// ガードへ移行
-		a_chunk.AddComponent(it, GuardAction(guardState.Look().guardPower));
+		a_chunk.AddComponent(it, GuardAction(guardState.Look().guardPower, guardState.Look().knockbackRate));
 	}
 }
 
@@ -458,5 +492,302 @@ void GuardActionSystem(Chunk& a_chunk, const SystemContext& a_context)
 		
 		a_chunk.DeleteChunkComponent(it, GuardAction::kTypeId);
 	
+	}
+}
+
+// !!!New!!!
+void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager)
+{
+	// 入力を取得
+	const Axis& leftAxis = a_context.input.GetLeftAxis().magnitube >= a_context.input.GetKeyAxis().magnitube
+		? a_context.input.GetLeftAxis()
+		: a_context.input.GetKeyAxis();
+	// !!!New!!!
+	const bool rightAttackTrigger = a_context.input.IsRegisterTrigger("RightAttack");
+	const bool leftAttackTrigger = a_context.input.IsRegisterTrigger("LeftAttack");
+	const bool jumpTrigger = a_context.input.IsRegisterTrigger("Jump");
+	const bool guardPress = a_context.input.IsRegisterPress("Guard");
+
+	Entity cameraEntity = GetCamera(a_chunk);
+
+	ComponentView view = a_chunk.GetView<ComponentTypes<MoveInputResult, InputSource>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<MoveInputResult> result = a_chunk.GetComponent<MoveInputResult>(it);
+		const ComponentHandle<InputSource> source = a_chunk.GetComponent<InputSource>(it);
+
+		result->moveDir = float2(0.0f, 0.0f);
+		result->magnitube = 0.0f;
+		result->isInput = false;
+		result->useAttack = false;
+		result->attackIndex = 0;
+
+		// !!!New!!!
+		switch (source.Look().move)
+		{
+		case InputOrigin::Device:
+		{
+			if (leftAxis.magnitube == 0.0f)
+			{
+				break;
+			}
+
+			DirectX::XMMATRIX matrix = DirectX::XMMatrixIdentity();
+			// カメラの角度を取得
+			ComponentHandle<Rotation> cameraRot = a_chunk.GetComponent<Rotation>(cameraEntity);
+			if (cameraRot.IsValid())
+			{
+				matrix *= DirectX::XMMatrixRotationRollPitchYaw(0.0f, cameraRot.Look().yaw * RAD, 0.0f);
+			}
+			// カメラの回転から見た前方方向のベクトルを取得する
+			DirectX::XMVECTOR forwardVector = DirectX::XMVector3TransformNormal({ 0, 0, 1 }, matrix);
+			// カメラから見た前方方向にたいして入力をかける
+			forwardVector = DirectX::XMVectorScale(forwardVector, leftAxis.y);
+			// 横方向も同様の計算を行う
+			DirectX::XMVECTOR besideVector = DirectX::XMVector3TransformNormal({ 1, 0, 0 }, matrix);
+			besideVector = DirectX::XMVectorScale(besideVector, leftAxis.x);
+
+			// ベクトルを加算して方向を取得
+			DirectX::XMVECTOR moveVector = DirectX::XMVectorAdd(forwardVector, besideVector);
+			DirectX::XMFLOAT3 moveFloat3;
+			XMStoreFloat3(&moveFloat3, moveVector);
+
+			// 数値を代入
+			result->moveDir = { moveFloat3.x, moveFloat3.z };
+			result->magnitube = leftAxis.magnitube;
+			result->isInput = true;
+			break;
+		}
+		case InputOrigin::AI:
+		{
+			const AIResult aiResult = a_aiManager.ReadResult(it);
+			result->moveDir = aiResult.MoveDir;
+			result->magnitube = 1.0f;
+			result->isInput = aiResult.IsMove;
+			break;
+		}
+		case InputOrigin::None:
+		default:
+			break;
+		}
+
+		// !!!New!!!
+		switch (source.Look().attack)
+		{
+		case InputOrigin::Device:
+			// 右攻撃=0、左攻撃=1。同時押しは右優先
+			if (rightAttackTrigger)
+			{
+				result->useAttack = true;
+				result->attackIndex = 0;
+			}
+			else if (leftAttackTrigger)
+			{
+				result->useAttack = true;
+				result->attackIndex = 1;
+			}
+			break;
+		case InputOrigin::AI:
+		{
+			const AIResult aiResult = a_aiManager.ReadResult(it);
+			result->useAttack = aiResult.UseAttack;
+			result->attackIndex = aiResult.AttackIndex;
+			break;
+		}
+		case InputOrigin::None:
+		default:
+			break;
+		}
+
+		switch (source.Look().jump)
+		{
+		case InputOrigin::Device:
+			result->useJump = jumpTrigger;
+
+			break;
+
+		case InputOrigin::AI:
+			result->useJump = false;
+			break;
+
+		default:
+			break;
+		}
+
+		switch (source.Look().guard)
+		{
+		case InputOrigin::Device:
+			result->useGuard = guardPress;
+
+			break;
+
+		case InputOrigin::AI:
+			result->useGuard = false;
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+
+void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager)
+{
+	// HitInfomationを保持したEnemyを取得する
+	ComponentView view = a_chunk.GetView<ComponentTypes<HitInfomation, HitPoint, AttackHitRecord>>();
+
+	for (auto it : view)
+	{
+		// 敵のぶつかった結果を取得
+		const ComponentHandle<HitInfomation> info = a_chunk.GetComponent<HitInfomation>(it);
+		ComponentHandle<AttackHitRecord> hitRecord = a_chunk.GetComponent<AttackHitRecord>(it);
+		const ComponentHandle<GuardAction> guardAction = a_chunk.GetComponent<GuardAction>(it);
+		float guardPower = 1.0f;
+		if (guardAction.IsValid())
+		{
+			guardPower = guardAction.Look().currentGuardPower;
+		};
+
+		bool isPlayer = a_chunk.GetComponent<PlayerTag>(it).IsValid();
+		bool isEnemy = a_chunk.GetComponent<EnemyTag>(it).IsValid();
+
+		// ノックバック倍率
+		float knockBackRate = 1.0f;
+		if(guardAction.IsValid()) knockBackRate *= guardAction.Look().knockbackRate;
+
+		for (const auto& triggerIt : info.Look().triggerResults)
+		{
+			// 自身と同じタイプだった場合次ループへ移行
+			if (isPlayer)
+			{
+				if (a_chunk.GetComponent<PlayerAttackTag>(triggerIt.triggerEntity).IsValid()) continue;
+			}
+			else if (isEnemy)
+			{
+				if (a_chunk.GetComponent<EnemyAttackTag>(triggerIt.triggerEntity).IsValid()) continue;
+			}
+
+			// ぶつかった対象ダメージを持っていなかった場合は次ループへ移行
+			const ComponentHandle<AddDamageComponent> damage = a_chunk.GetComponent<AddDamageComponent>(triggerIt.triggerEntity);
+			if (!damage.IsValid()) continue;
+
+			// 攻撃が被弾クールタイムなら次ループへ移行
+
+			auto coolDownIt = hitRecord->entries.find(triggerIt.triggerEntity);
+			// クールタイムが残っている場合は次ループへ移行
+			if (coolDownIt != hitRecord->entries.end() && coolDownIt->second > 0.0f)
+			{
+				continue;
+			}
+
+			// 体力にダメージを与える
+			ComponentHandle<HitPoint> hitPoint = a_chunk.GetComponent<HitPoint>(it);
+			hitPoint->currentHP -= damage.Look().damageValue * guardPower;
+
+
+			// ノックバックを入力
+			ComponentHandle<InterferenceResult> interferenceResult = a_chunk.GetComponent<InterferenceResult>(it);
+			ComponentHandle<Position> thisPos = a_chunk.GetComponent<Position>(it);
+			ComponentHandle<Position> triggerPos = a_chunk.GetComponent<Position>(triggerIt.triggerEntity);
+			if (interferenceResult.IsValid() && thisPos.IsValid() && triggerPos.IsValid())
+			{
+				interferenceResult->useKnockback = true;
+				float2 toTriggerVector = float2(triggerPos.Look().x - thisPos.Look().x, triggerPos.Look().z - thisPos.Look().z);
+				float2 normalieVector = Normalize(float2(-toTriggerVector.x, -toTriggerVector.y));
+				interferenceResult->knockBackDir = normalieVector;
+				interferenceResult->knockbackTime = 5.0f * knockBackRate;
+			}
+
+			// 攻撃成功を保存
+			ComponentHandle<AttackInstance> attackInstance =
+				a_chunk.GetComponent<AttackInstance>(triggerIt.triggerEntity);
+			if (attackInstance.IsValid())
+			{
+				attackInstance->connected = true;
+			}
+
+			if (isPlayer)
+			{
+				a_aiManager.NotifyHitResolved(triggerIt.triggerEntity);
+			}
+
+			// 被弾履歴に攻撃Entityとクールタイムを記録
+			float cooldownDuration = kDefaultAttackHitCooldown;
+
+			// 追加する
+			hitRecord->entries.insert({ triggerIt.triggerEntity, cooldownDuration });
+
+		}
+	}
+
+}
+
+void AttackHitRecordCleanupSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	// Viewを取得
+	ComponentView view = a_chunk.GetView<ComponentTypes<AttackHitRecord>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<AttackHitRecord> hitRecord = a_chunk.GetComponent<AttackHitRecord>(it);
+
+		std::vector<Entity> removeEntities;
+
+		for (auto entryIt = hitRecord->entries.begin(); entryIt != hitRecord->entries.end();)
+		{
+			// クールタイムを減らす
+			entryIt->second -= a_context.deltaTime;
+
+			// 被弾待機中でない場合対象をイテレータで削除する
+			const ComponentHandle<PlayerAttackTag> playerAttackTag = a_chunk.GetComponent<PlayerAttackTag>(entryIt->first);
+			const ComponentHandle<EnemyAttackTag> enemyAttackTag = a_chunk.GetComponent<EnemyAttackTag>(entryIt->first);
+
+			bool hasAttackTag = playerAttackTag.IsValid() || enemyAttackTag.IsValid();
+			if (entryIt->second <= 0.0f || !hasAttackTag)
+			{
+				// イテレータを削除して次のイテレータを取得
+				entryIt = hitRecord->entries.erase(entryIt);
+			}
+			else
+			{
+				// 削除しない場合は次のイテレータへ
+				++entryIt;
+			}
+		}
+	}
+}
+
+void KnockbackStateSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<InterferenceResult>>();
+	for (auto it : view)
+	{
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_KnockBack)) continue;
+		ComponentHandle<InterferenceResult> result = a_chunk.GetComponent<InterferenceResult>(it);
+		if (!result->useKnockback) continue;
+
+		a_chunk.AddComponent(it, KnockbackAction(result.Look().knockBackDir, 0.7f, result.Look().knockbackTime));
+	}
+}
+
+// !!!New!!!
+void KnockbackSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<Velocity, KnockbackAction>>();
+	for (auto it : view)
+	{
+		ComponentHandle<Velocity> velocity = a_chunk.GetComponent<Velocity>(it);
+		ComponentHandle<KnockbackAction> knockback = a_chunk.GetComponent<KnockbackAction>(it);
+		velocity->x = knockback->moveDir.x * knockback->speed;
+		velocity->z = knockback->moveDir.y * knockback->speed;
+
+		knockback->elapsedTime += a_context.deltaTime;
+		if (knockback->elapsedTime >= knockback->maxKnockbackTime)
+		{
+			a_chunk.DeleteChunkComponent(it, KnockbackAction::kTypeId);
+			velocity->x = 0.0f;
+			velocity->y = 0.0f;
+		}
 	}
 }

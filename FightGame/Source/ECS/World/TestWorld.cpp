@@ -123,11 +123,11 @@ void TestWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 
 	// Transform“™‚ğg—p‚·‚éSystem‚ğÀs
 	RaySystem(a_chunk, a_context);
-	LaserSystem(a_chunk, a_context);
+	// LaserSystem(a_chunk, a_context);
 	EnemyPlayerSearch(a_chunk, a_context);
 	ItemGetSystem(a_chunk, a_context);
 	CameraViewSystem(a_chunk, a_context);
-	BulletSystem(a_chunk, a_context, a_response);
+	// BulletSystem(a_chunk, a_context, a_response);
 	EnemySpawnSystem(a_chunk, a_context);
 	EnemyShooterSystem(a_chunk, a_context);
 	EnemyAttackSystem(a_chunk, a_context, a_response);

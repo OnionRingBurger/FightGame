@@ -30,7 +30,7 @@ Chunk GameWorld::CreateNewChunk(AIManager& a_aiManager)
 	std::unique_ptr<ComponentsSerialize> serialize = std::make_unique<ComponentsSerialize>();
 	TestRegisterComponent(*serialize);
 
-	//LoadJsonComponent(newChunk, *serialize, "gameEntities");
+	LoadJsonComponent(newChunk, *serialize, "gameEntities");
 
 	ResetSound();
 	PlaySound(LoadSound("Assets/Sound/gamebgm.mp3", true));
@@ -607,12 +607,12 @@ void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 
 	// TransformìôÇégópÇ∑ÇÈSystemÇé¿çs
 	RaySystem(a_chunk, a_context);
-	LaserSystem(a_chunk, a_context);
+	// LaserSystem(a_chunk, a_context);
 	EnemyPlayerSearch(a_chunk, a_context);
 
 	ItemGetSystem(a_chunk, a_context);
 	CameraViewSystem(a_chunk, a_context);
-	BulletSystem(a_chunk, a_context, a_response);
+	// BulletSystem(a_chunk, a_context, a_response);
 	EnemySpawnSystem(a_chunk, a_context);
 	EnemyShooterSystem(a_chunk, a_context);
 	EnemyAttackSystem(a_chunk, a_context, a_response);

@@ -7,5 +7,3 @@
 // !!!New!!!
 void AISenseSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager);
 
-// !!!New!!!
-void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager);

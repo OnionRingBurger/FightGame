@@ -15,6 +15,8 @@ GameScene::GameScene(
 	std::function<void(std::string)> a_sceneChangeRequest,
 	std::function<void()> a_gameEnd,
 	std::function<void()> a_resetFPSRequest,
+	// !!!New!!!
+	std::function<void(bool)> a_setFixedCursor,
 	Input& a_input)
 	: state(GAMESCENE_DEFAULT)
 	, isMouseLock(false)
@@ -24,6 +26,7 @@ GameScene::GameScene(
 	, input(a_input)
 	, gameEnd(a_gameEnd)
 	, resetFPSRequest(a_resetFPSRequest)
+	, setFixedCursor(a_setFixedCursor)
 {
 
 	SetWorld(kStartWorld);
@@ -76,7 +79,7 @@ void GameScene::ChangeState()
 		else if(input.IsRegisterTrigger("IMGUI"))
 		{
 #ifdef _DEBUG
-
+			setFixedCursor(false);
 			state = GAMESCENE_IMGUI;
 			world->ChangeState(IMGUI);
 
@@ -86,8 +89,12 @@ void GameScene::ChangeState()
 
 		break;
 	case GAMESCENE_IMGUI:
-		state = GAMESCENE_DEFAULT;
-		world->ChangeState(USECHUNK);
+		if (input.IsRegisterTrigger("IMGUI"))
+		{
+			setFixedCursor(true);
+			state = GAMESCENE_DEFAULT;
+			world->ChangeState(USECHUNK);
+		}
 		break;
 
 	case GAMESCENE_TUTORIAL:

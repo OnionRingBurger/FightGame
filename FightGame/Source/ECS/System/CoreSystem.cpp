@@ -70,6 +70,15 @@ void ResetSystem(Chunk& a_chunk, const SystemContext& a_context)
 		result->useAttack = false;
 		result->attackIndex = 0;
 	}
+
+	ComponentView viewInterferenceResult = a_chunk.GetView<ComponentTypes<InterferenceResult>>();
+	for(auto it : viewInterferenceResult)
+	{
+		ComponentHandle<InterferenceResult> result = a_chunk.GetComponent<InterferenceResult>(it);
+		result->useKnockback = false;
+		result->knockBackDir = float2(0.0f, 0.0f);
+		result->knockbackTime = 0.0f;
+	}
 }
 
 void LifeTimeSystem(Chunk& a_chunk, const SystemContext& a_context)

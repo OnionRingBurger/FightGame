@@ -6,3 +6,5 @@
 void GoalSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void ChunkChangeSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_chunkRequest);
+
+void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_chunkRequest);

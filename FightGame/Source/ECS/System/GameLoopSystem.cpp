@@ -49,6 +49,8 @@ void GoalSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 }
 
+
+
 void ChunkChangeSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_chunkRequest)
 {
 	ComponentView view = a_chunk.GetView<ComponentTypes<ChunkChange>>();
@@ -81,4 +83,18 @@ void ChunkChangeSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRe
 	}
 }
 
+void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_chunkRequest)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<EnemyTag, ClearTarget>>();
+	for(auto it : view)
+	{
+		// クリア対象が存在した場合関数を終了する
+		return;
+	}
 
+	// クリアシーンに移行する
+	Entity chunkChange = a_chunk.CreateNewEntity(
+		ChunkChange(false, "Clear")
+	);
+
+}

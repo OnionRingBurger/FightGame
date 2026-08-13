@@ -2,8 +2,10 @@
 #define __GEOMETORY_H__
 
 #include <DirectXMath.h>
+#include <unordered_map>
 #include "Shader.h"
 #include "MeshBuffer.h"
+#include <string>
 
 class Geometory
 {
@@ -33,11 +35,17 @@ public:
 	static void DrawCylinder();
 	static void DrawSphere();
 
+	// –‘O‚ÉF‚ñ‚ÈŒ`‚Ìî‚ğ“o˜^‚·‚é
+	static void RegisterSector(std::string key ,float minLength, float maxLength, float angle, float maxHeight, float maxLowness, int circumferenceCount);
+	// “o˜^‚³‚ê‚Ä‚¢‚éîŒ`‚ğ•`‰æ‚·‚é
+	static void DrawSector(std::string key, float progress);
+
 private:
 	static void MakeVS();
 	static void MakePS();
 	static void MakeLineShader();
 	static void MakeLine();
+	static void MakeSectorShader();
 
 private:
 	static void MakeBox();
@@ -54,10 +62,15 @@ private:
 	static MeshBuffer* m_pLines;
 	static Shader* m_pVS;
 	static Shader* m_pPS;
+	static Shader* m_sectorVS;
+	static Shader* m_sectorPS;
 	static Shader* m_pLineShader[2];
 	static DirectX::XMFLOAT4X4 m_WVP[3];
 	static void* m_pLineVtx;
 	static int m_lineCnt;
+	static std::unordered_map<std::string, MeshBuffer*> m_sectorBuffers;
+	static std::unordered_map<std::string, Vertex*> m_dynamicVertexSource;
+	static std::unordered_map<std::string, int*> m_dynamicIndexSource;
 };
 
 #endif // __GEOMETORY_H__

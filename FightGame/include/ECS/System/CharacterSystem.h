@@ -40,3 +40,16 @@ void GuardSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 // ガードアクションステートの管理
 void GuardActionSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+// ノックバックステートの管理
+void KnockbackSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void KnockbackStateSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+// 入力を確定する
+void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager);
+
+// 被弾解決
+void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager);
+
+void AttackHitRecordCleanupSystem(Chunk& a_chunk, const SystemContext& a_context);

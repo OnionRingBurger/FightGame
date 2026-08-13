@@ -649,12 +649,14 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 	}
 
 	// ”»’è•\Ž¦‚ð•`‰æ
-	ComponentView telegraphView = a_chunk.GetView<ComponentTypes<AttackTelegraph, Position, Rotation>>();
-	for (auto telegraphIt : telegraphView)
+	ComponentView telegraphView = a_chunk.GetView<ComponentTypes<AttackStartupAction>>();
+	for (auto startupIt : telegraphView)
 	{
-		const ComponentHandle<AttackTelegraph> telegraph = a_chunk.GetComponent<AttackTelegraph>(telegraphIt);
-		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(telegraphIt);
-		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(telegraphIt);
+		const ComponentHandle<AttackStartupAction> startup = a_chunk.GetComponent<AttackStartupAction>(startupIt);
+		Entity telegraphEntity = startup.Look().telegraphEntity;
+		const ComponentHandle<AttackTelegraph> telegraph = a_chunk.GetComponent<AttackTelegraph>(telegraphEntity);
+		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(telegraphEntity);
+		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(telegraphEntity);
 
 		drawSectorLines(
 			telegraph.Look().minLength,
@@ -667,5 +669,18 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 			pos.Look().z,
 			rot.Look().yaw,
 			waitColor);
+
+		// !!!New!!!
+		if (!telegraph.Look().sectorKey.empty())
+		{
+			DirectX::XMFLOAT4X4 world;
+			const float3 floatPos(pos.Look().x, pos.Look().y, pos.Look().z);
+			const float3 floatScale(1.0f, 1.0f, 1.0f);
+			const float3 floatRot(rot.Look().pitch * RAD, rot.Look().yaw * RAD, rot.Look().roll * RAD);
+			DrawMatrix::CreateWorldMatrix(world, floatPos, floatScale, floatRot, true);
+			Geometory::SetWorld(world);
+			float progress = startup.Look().elapsedTime / startup.Look().startupDuration;
+			Geometory::DrawSector(telegraph.Look().sectorKey, progress * 0.7f);
+		}
 	}
 }

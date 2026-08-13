@@ -11,6 +11,13 @@ DirectX::XMFLOAT4X4 Geometory::m_WVP[3];
 void* Geometory::m_pLineVtx;
 int Geometory::m_lineCnt = 0;
 
+// 毎回忘れるStatic参照、複数ファイルに書くのもNG
+std::unordered_map<std::string, MeshBuffer*> Geometory::m_sectorBuffers;
+std::unordered_map<std::string, Geometory::Vertex*> Geometory::m_dynamicVertexSource;
+std::unordered_map<std::string, int*> Geometory::m_dynamicIndexSource;
+Shader* Geometory::m_sectorVS;
+Shader* Geometory::m_sectorPS;
+
 void Geometory::Init()
 {
 	for (int i = 0; i < 3; ++i)
@@ -22,6 +29,7 @@ void Geometory::Init()
 	MakePS();
 	MakeLineShader();
 	MakeLine();
+	MakeSectorShader();
 }
 void Geometory::Uninit()
 {
@@ -30,10 +38,31 @@ void Geometory::Uninit()
 	SAFE_DELETE(m_pLineShader[0]);
 	SAFE_DELETE(m_pPS);
 	SAFE_DELETE(m_pVS);
+	SAFE_DELETE(m_sectorPS);
+	SAFE_DELETE(m_sectorVS);
 	SAFE_DELETE(m_pLines);
 	SAFE_DELETE(m_pSphere);
 	SAFE_DELETE(m_pCylinder);
 	SAFE_DELETE(m_pBox);
+	
+	for (auto it : m_sectorBuffers)
+	{
+		SAFE_DELETE(it.second);
+	}
+	m_sectorBuffers.clear();
+
+	for (auto it : m_dynamicVertexSource)
+	{
+		SAFE_DELETE_ARRAY(it.second);
+	}
+	m_dynamicVertexSource.clear();
+
+	for (auto it : m_dynamicIndexSource)
+	{
+		SAFE_DELETE_ARRAY(it.second);
+	}
+	m_dynamicIndexSource.clear();
+	
 }
 
 void Geometory::SetWorld(DirectX::XMFLOAT4X4 world)
@@ -98,6 +127,20 @@ void Geometory::DrawSphere()
 	m_pPS->Bind();
 	m_pSphere->Draw();
 }
+
+void Geometory::DrawSector(std::string key, float progress)
+{
+	if (m_sectorBuffers.find(key) == m_sectorBuffers.end() || m_sectorBuffers.at(key) == nullptr) return;
+
+	m_sectorVS->WriteBuffer(0, m_WVP);
+	m_sectorVS->Bind();
+	float pixelBuff[4] = { progress, 0.0f, 0.0f, 0.0f };
+	m_sectorPS->WriteBuffer(0, pixelBuff);
+	m_sectorPS->Bind();
+	m_sectorBuffers.at(key)->Draw();
+
+}
+
 
 void Geometory::MakeVS()
 {
@@ -213,4 +256,60 @@ void Geometory::MakeLine()
 	desc.isWrite = true;
 	m_pLines = new MeshBuffer();
 	m_pLines->Create(desc);
+}
+
+void Geometory::MakeSectorShader()
+{
+	const char* VSCode = R"EOT(
+struct VS_IN {
+	float3 pos : POSITION0;
+	float2 uv : TEXCOORD0;
+};
+struct VS_OUT {
+	float4 pos : SV_POSITION;
+	float2 uv : TEXCOORD0;
+};
+cbuffer Matrix : register(b0) {
+	float4x4 world;
+	float4x4 view;
+	float4x4 proj;
+};
+VS_OUT main(VS_IN vin) {
+	VS_OUT vout;
+	vout.pos = float4(vin.pos, 1.0f);
+	vout.pos = mul(vout.pos, world);
+	vout.pos = mul(vout.pos, view);
+	vout.pos = mul(vout.pos, proj);
+	vout.uv = vin.uv;
+	return vout;
+})EOT";
+
+	m_sectorVS = new VertexShader();
+	m_sectorVS->Compile(VSCode);
+
+	const char* PSCode = R"EOT(
+struct PS_IN {
+	float4 pos : SV_POSITION;
+	float2 uv : TEXCOORD0;
+};
+cbuffer SectorInfo : register(b0){
+	float progress;
+	float3 dummy;
+};
+float4 main(PS_IN pin) : SV_TARGET0 {
+	float4 color = float4(1,1,1,1);
+	float2 halfGrid = floor(abs(pin.uv) * 2.0f);
+	float2 quatGrid = floor(abs(pin.uv) * 8.0f);
+
+	float half = fmod(halfGrid.x + halfGrid.y, 2.0f);
+	float quat = fmod(quatGrid.x + quatGrid.y, 2.0f);
+
+	color.rgb = ((half * 0.1f) * quat + 0.45f) + (1 - quat) * 0.05f;
+	color.rgb = float3(0.8,0.3,0.3);
+	color.a = progress;
+	return color;
+})EOT";
+
+	m_sectorPS = new PixelShader();
+	m_sectorPS->Compile(PSCode);
 }

@@ -13,6 +13,7 @@ public:
 		std::function<void(std::string)> a_sceneChangeRequest,
 		std::function<void()> a_gameEnd,
 		std::function<void()> a_resetFPSRequest,
+		std::function<void(bool)> a_setFixedCursor,
 		Input& a_input
 	);
 	~GameScene() = default;
@@ -57,5 +58,7 @@ private:
 	std::function<void(void)> resetFPSRequest;
 	//! ゲーム終了のコールバック
 	std::function<void(void)> gameEnd;
+	//! カーソル固定状態の変更リクエスト
+	std::function<void(bool)> setFixedCursor;
 };
 

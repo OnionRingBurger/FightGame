@@ -64,7 +64,7 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 	);
 
 	Entity changeScene = newChunk.CreateNewEntity(
-		ChunkChange(true, "Game"),
+		ChunkChange(true, "Proto"),
 		KeyChunkChange("ChunkChange", 240.0f)
 	);
 
