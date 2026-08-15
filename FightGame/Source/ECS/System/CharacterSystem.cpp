@@ -118,6 +118,167 @@ namespace
 			a_attacker,
 			AttackStartupAction(a_attackPower.startupTime, a_attackIndex, telegraph));
 	}
+
+	// !!!New!!!
+	float GetXZDistanceSq(const float3& a_from, const float3& a_to)
+	{
+		const float dx = a_to.x - a_from.x;
+		const float dz = a_to.z - a_from.z;
+		return dx * dx + dz * dz;
+	}
+
+	// !!!New!!!
+	bool IsEnemyAlive(Chunk& a_chunk, Entity a_enemy)
+	{
+		const ComponentHandle<DeadState> deadState = a_chunk.GetComponent<DeadState>(a_enemy);
+		return !deadState.IsValid() || !deadState.Look().isDead;
+	}
+
+	// !!!New!!!
+	bool IsLookOnTargetValid(Chunk& a_chunk, Entity a_target)
+	{
+		if (a_target == kInvalidEntity) return false;
+		if (!a_chunk.GetComponent<EnemyTag>(a_target).IsValid()) return false;
+		const ComponentHandle<Position> targetPos = a_chunk.GetComponent<Position>(a_target);
+		if (!targetPos.IsValid()) return false;
+		return IsEnemyAlive(a_chunk, a_target);
+	}
+
+	// !!!New!!!
+	float GetCameraHorizontalHalfAngleDeg(Chunk& a_chunk, Entity a_cameraEntity)
+	{
+		const ComponentHandle<Camera> camera = a_chunk.GetComponent<Camera>(a_cameraEntity);
+		if (!camera.IsValid()) return 46.0f;
+
+		const float halfVertRad = camera.Look().fovy * 0.5f * RAD;
+		const float halfHorizRad = atanf(tanf(halfVertRad) * camera.Look().aspect);
+		return halfHorizRad * DEG;
+	}
+
+	// 対象がカメラの描画範囲外かどうかを返す
+	bool IsWithinCameraHorizontalFOV(
+		Chunk& a_chunk,
+		Entity a_cameraEntity,
+		const float3& a_from,
+		const float3& a_to,
+		float a_halfAngleDeg)
+	{
+		const ComponentHandle<Rotation> cameraRot = a_chunk.GetComponent<Rotation>(a_cameraEntity);
+		if (!cameraRot.IsValid()) return true;
+
+		const float3 forward = GetForward(float3(0.0f, cameraRot.Look().yaw, 0.0f));
+		float3 toTarget(a_to.x - a_from.x, 0.0f, a_to.z - a_from.z);
+		const float length = NormalizeLength(toTarget.x, toTarget.y, toTarget.z);
+		if (length < 1e-5f) return true;
+
+		toTarget.x /= length;
+		toTarget.z /= length;
+		const float3 dir(toTarget.x, 0.0f, toTarget.z);
+		const float cosHalfAngle = cosf(a_halfAngleDeg * RAD);
+		return DotFloat3(forward, dir) >= cosHalfAngle;
+	}
+
+	// !!!New!!!
+	float2 GetCameraRightXZ(Chunk& a_chunk, Entity a_cameraEntity)
+	{
+		const ComponentHandle<Rotation> cameraRot = a_chunk.GetComponent<Rotation>(a_cameraEntity);
+		if (!cameraRot.IsValid()) return float2(1.0f, 0.0f);
+
+		const float3 forward = GetForward(float3(0.0f, cameraRot.Look().yaw, 0.0f));
+		return float2(forward.z, -forward.x);
+	}
+
+	// AIがアホ、コード嫁
+	int ResolveLookOnSwitchDirection(const SystemContext& a_context)
+	{
+		if (a_context.input.IsRegisterTrigger("LookOnPrev")) return -1;
+		if (a_context.input.IsRegisterTrigger("LookOnNext")) return 1;
+		return 0;
+	}
+
+	// 敵が範囲内に存在するか探索する
+	Entity FindNearestLookOnEnemy(
+		Chunk& a_chunk,
+		const float3& a_playerPos,
+		float a_radiusSq,
+		Entity a_cameraEntity,
+		float a_halfFovDeg)
+	{
+		Entity nearestEnemy = kInvalidEntity;
+		float nearestDistSq = FLT_MAX;
+
+		ComponentView enemyView = a_chunk.GetView<ComponentTypes<EnemyTag, Position>>();
+		for (auto enemyIt : enemyView)
+		{
+			if (!IsEnemyAlive(a_chunk, enemyIt)) continue;
+
+			// 距離を比較して範囲外なら抜ける
+			// AIがアホ、座標は確定しているためPoseを取得する必要性が皆無
+			const float3 enemyPos = GetEntityWorldPos(a_chunk, enemyIt);
+			const float distSq = GetXZDistanceSq(a_playerPos, enemyPos);
+			if (distSq > a_radiusSq) continue;
+			//　カメラの範囲外かも判定
+			if (!IsWithinCameraHorizontalFOV(a_chunk, a_cameraEntity, a_playerPos, enemyPos, a_halfFovDeg)) continue;
+
+			// 一番近かった場合記録する
+			if (distSq < nearestDistSq)
+			{
+				nearestDistSq = distSq;
+				nearestEnemy = enemyIt;
+			}
+		}
+
+		return nearestEnemy;
+	}
+
+	// ロックオン切り替え、現在はカメラから見た方向で取得している
+	Entity FindLookOnSwitchTarget(
+		Chunk& a_chunk,
+		const float3& a_playerPos,
+		Entity a_currentTarget,
+		int a_direction,
+		float a_radiusSq,
+		Entity a_cameraEntity)
+	{
+		if (a_direction == 0 || !IsLookOnTargetValid(a_chunk, a_currentTarget)) return kInvalidEntity;
+
+		const float3 currentPos = GetEntityWorldPos(a_chunk, a_currentTarget);
+		const float2 toCurrent(currentPos.x - a_playerPos.x, currentPos.z - a_playerPos.z);
+		if (GetLengthSq(toCurrent) < 1e-8f) return kInvalidEntity;
+		const float2 currentDir = Normalize(toCurrent);
+		const float2 cameraRight = GetCameraRightXZ(a_chunk, a_cameraEntity);
+
+		Entity bestEnemy = kInvalidEntity;
+		float bestAngle = FLT_MAX;
+
+		ComponentView enemyView = a_chunk.GetView<ComponentTypes<EnemyTag, Position>>();
+		for (auto enemyIt : enemyView)
+		{
+			if (enemyIt == a_currentTarget) continue;
+			if (!IsEnemyAlive(a_chunk, enemyIt)) continue;
+
+			const float3 enemyPos = GetEntityWorldPos(a_chunk, enemyIt);
+			const float distSq = GetXZDistanceSq(a_playerPos, enemyPos);
+			if (distSq > a_radiusSq) continue;
+
+			const float2 toEnemy(enemyPos.x - a_playerPos.x, enemyPos.z - a_playerPos.z);
+			const float2 enemyDir = Normalize(toEnemy);
+			const float sideDot = enemyDir.x * cameraRight.x + enemyDir.y * cameraRight.y;
+			if (a_direction < 0 && sideDot >= 0.0f) continue;
+			if (a_direction > 0 && sideDot <= 0.0f) continue;
+
+			const float dirDot = currentDir.x * enemyDir.x + currentDir.y * enemyDir.y;
+			const float clampedDot = std::clamp(dirDot, -1.0f, 1.0f);
+			const float angle = acosf(clampedDot) * DEG;
+			if (angle < bestAngle)
+			{
+				bestAngle = angle;
+				bestEnemy = enemyIt;
+			}
+		}
+
+		return bestEnemy;
+	}
 }
 
 void GroundedSystem(Chunk& a_chunk, const SystemContext& a_context)
@@ -173,12 +334,13 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 			const ComponentHandle<KnockbackAction> knockback = a_chunk.GetComponent<KnockbackAction>(it);
 			if (knockback.IsValid())
 			{
+				// ノックバック中は新たにノックバックしない
 				allowed &= ~ActionFlag_Jump;
 				allowed &= ~ActionFlag_Guard;
 				allowed &= ~ActionFlag_Move;
 				allowed &= ~ActionFlag_Attack;
-				// ノックバック中は新たにノックバックしない
 				allowed &= ~ActionFlag_KnockBack;
+				allowed &= ~ActionFlag_RotChange;
 			}
 
 			const ComponentHandle<JumpAction> jump = a_chunk.GetComponent<JumpAction>(it);
@@ -188,11 +350,19 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 				allowed &= ~ActionFlag_Guard;
 			}
 
+			const ComponentHandle<LookOnAction> lookonAction = a_chunk.GetComponent<LookOnAction>(it);
+			if (lookonAction.IsValid())
+			{
+				allowed &= ~ActionFlag_LookMove;
+			}
+
 			// !!!New!!!
 			const ComponentHandle<AttackAction> attackAction = a_chunk.GetComponent<AttackAction>(it);
 			if (attackAction.IsValid())
 			{
 				allowed &= ~ActionFlag_Attack;
+				allowed &= ~ActionFlag_LookMove;
+				allowed &= ~ActionFlag_RotChange;
 			}
 
 			// !!!New!!!
@@ -204,6 +374,8 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 				allowed &= ~ActionFlag_Jump;
 				allowed &= ~ActionFlag_Aim;
 				allowed &= ~ActionFlag_Guard;
+				allowed &= ~ActionFlag_LookMove;
+				allowed &= ~ActionFlag_RotChange;
 			}
 
 			const ComponentHandle<AttackWaitAction> attackWait = a_chunk.GetComponent<AttackWaitAction>(it);
@@ -222,6 +394,8 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 				allowed &= ~ActionFlag_Guard;
 				allowed &= ~ActionFlag_Move;
 			}
+
+
 		}
 
 		actionMask->allowed = allowed;
@@ -496,6 +670,109 @@ void GuardActionSystem(Chunk& a_chunk, const SystemContext& a_context)
 }
 
 // !!!New!!!
+void LookOnStateSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	const Entity cameraEntity = GetCamera(a_chunk);
+	const float halfFovDeg = GetCameraHorizontalHalfAngleDeg(a_chunk, cameraEntity);
+	const int switchDirection = ResolveLookOnSwitchDirection(a_context);
+	
+
+	// ロックオン継続管理
+	ComponentView actionView = a_chunk.GetView<ComponentTypes<LookOnState, LookOnAction>>();
+	for (auto playerIt : actionView)
+	{
+		ComponentHandle<LookOnAction> action = a_chunk.GetComponent<LookOnAction>(playerIt);
+		ComponentHandle<LookOnState> state = a_chunk.GetComponent<LookOnState>(playerIt);
+
+		// 
+		const float3 playerPos = GetEntityWorldPos(a_chunk, playerIt);
+		const float releaseRadiusSq = state.Look().releaseRadius * state.Look().releaseRadius;
+		// 死亡込みでロックオン対象がいるか確認する
+		if (!IsLookOnTargetValid(a_chunk, action.Look().target))
+		{
+			ComponentHandle<MotionTransform> transform = a_chunk.GetComponent<MotionTransform>(playerIt);
+			ComponentHandle<FixedResult> result = a_chunk.GetComponent<FixedResult>(playerIt);
+			transform->motionRot = result.Look().newRot;
+			a_chunk.DeleteChunkComponent(playerIt, LookOnAction::kTypeId);
+			ComponentHandle<PoseRotState> poseRot = a_chunk.GetComponent<PoseRotState>(playerIt);
+			if (poseRot.IsValid()) poseRot->state = POSE_ROT_LOOKMOVE;
+			Entity targetMarker = GetLookOnMarker(a_chunk);
+			ComponentHandle<FollowPosition> markerFollow = a_chunk.GetComponent<FollowPosition>(targetMarker);
+			if (markerFollow.IsValid()) markerFollow->targetEntity = kInvalidEntity;
+			continue;
+		}
+
+		// 対象への距離と座標を取得
+		const float3 targetPos = GetEntityWorldPos(a_chunk, action.Look().target);
+		const float targetDistSq = GetXZDistanceSq(playerPos, targetPos);
+		// AIがアホ、勝手に既存フローに乗っていない方法で入力を取ってる
+		if (switchDirection != 0)
+		{
+			
+			// 切り替え方向に対象が存在するか確認
+			const Entity switchTarget = FindLookOnSwitchTarget(
+				a_chunk,
+				playerPos,
+				action.Look().target,
+				switchDirection,
+				releaseRadiusSq,
+				cameraEntity);
+			// 対象が存在した場合代入する
+			if (switchTarget != kInvalidEntity)
+			{
+				action->target = switchTarget;
+				Entity targetMarker = GetLookOnMarker(a_chunk);
+				ComponentHandle<FollowPosition> markerFollow = a_chunk.GetComponent<FollowPosition>(targetMarker);
+				if (markerFollow.IsValid()) markerFollow->targetEntity = switchTarget;
+			}
+			continue;
+		}
+
+		// 対象が範囲外だった場合抜ける
+		if (targetDistSq > releaseRadiusSq)
+		{
+			ComponentHandle<MotionTransform> transform = a_chunk.GetComponent<MotionTransform>(playerIt);
+			ComponentHandle<FixedResult> result = a_chunk.GetComponent<FixedResult>(playerIt);
+			transform->motionRot = result.Look().newRot;
+			a_chunk.DeleteChunkComponent(playerIt, LookOnAction::kTypeId);
+			ComponentHandle<PoseRotState> poseRot = a_chunk.GetComponent<PoseRotState>(playerIt);
+			if (poseRot.IsValid()) poseRot->state = POSE_ROT_LOOKMOVE;
+			Entity targetMarker = GetLookOnMarker(a_chunk);
+			ComponentHandle<FollowPosition> markerFollow = a_chunk.GetComponent<FollowPosition>(targetMarker);
+			if (markerFollow.IsValid()) markerFollow->targetEntity = kInvalidEntity;
+			continue;
+		}
+	}
+	// 一番近い敵を登録
+	ComponentView searchView = a_chunk.GetView<ComponentTypes<LookOnState>, ComponentTypes<LookOnAction>>();
+	for (auto playerIt : searchView)
+	{
+		ComponentHandle<LookOnState> state = a_chunk.GetComponent<LookOnState>(playerIt);
+		const float3 playerPos = GetEntityWorldPos(a_chunk, playerIt);
+		const float captureRadiusSq = state.Look().captureRadius * state.Look().captureRadius;
+
+		const Entity nearestEnemy = FindNearestLookOnEnemy(
+			a_chunk,
+			playerPos,
+			captureRadiusSq,
+			cameraEntity,
+			halfFovDeg);
+		if (nearestEnemy == kInvalidEntity) continue;
+
+		 // 一番近い敵が範囲内だった場合Actionを追加し、登録する
+		a_chunk.AddComponent(playerIt, LookOnAction(nearestEnemy));
+		ComponentHandle<PoseRotState> poseRot = a_chunk.GetComponent<PoseRotState>(playerIt);
+		if (poseRot.IsValid()) poseRot->state = POSE_ROT_LOOK;
+		else a_chunk.AddComponent<PoseRotState>(playerIt, PoseRotState(POSE_ROT_LOOK));
+		ComponentHandle<MotionTransform> transform = a_chunk.GetComponent<MotionTransform>(playerIt);
+		transform->motionRot = float3();
+		Entity targetMarker = GetLookOnMarker(a_chunk);
+		ComponentHandle<FollowPosition> markerFollow = a_chunk.GetComponent<FollowPosition>(targetMarker);
+		if (markerFollow.IsValid()) markerFollow->targetEntity = nearestEnemy;
+	}
+}
+
+// !!!New!!!
 void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager)
 {
 	// 入力を取得
@@ -632,10 +909,12 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 	}
 }
 
-void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager)
+void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response, AIManager& a_aiManager)
 {
 	// HitInfomationを保持したEnemyを取得する
 	ComponentView view = a_chunk.GetView<ComponentTypes<HitInfomation, HitPoint, AttackHitRecord>>();
+
+	Entity camera = GetCamera(a_chunk);
 
 	for (auto it : view)
 	{
@@ -644,17 +923,19 @@ void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& 
 		ComponentHandle<AttackHitRecord> hitRecord = a_chunk.GetComponent<AttackHitRecord>(it);
 		const ComponentHandle<GuardAction> guardAction = a_chunk.GetComponent<GuardAction>(it);
 		float guardPower = 1.0f;
-		if (guardAction.IsValid())
+
+		bool isPlayer = a_chunk.GetComponent<PlayerTag>(it).IsValid();
+		bool isEnemy = a_chunk.GetComponent<EnemyTag>(it).IsValid();
+		bool isGuard = guardAction.IsValid();
+
+		if (isGuard)
 		{
 			guardPower = guardAction.Look().currentGuardPower;
 		};
 
-		bool isPlayer = a_chunk.GetComponent<PlayerTag>(it).IsValid();
-		bool isEnemy = a_chunk.GetComponent<EnemyTag>(it).IsValid();
-
 		// ノックバック倍率
 		float knockBackRate = 1.0f;
-		if(guardAction.IsValid()) knockBackRate *= guardAction.Look().knockbackRate;
+		if(isGuard) knockBackRate *= guardAction.Look().knockbackRate;
 
 		for (const auto& triggerIt : info.Look().triggerResults)
 		{
@@ -710,6 +991,25 @@ void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& 
 			if (isPlayer)
 			{
 				a_aiManager.NotifyHitResolved(triggerIt.triggerEntity);
+			}
+
+			// 画面エフェクトを出す
+			float waitTime = isGuard ? 8.0f : 2.0f;
+			a_response.AddStopTime(waitTime, 20.0f, 0.05f);
+			float3 shakePower = isGuard ? float3(0.15f, 0.15f, 0.15f) : float3(0.2f, 0.2f, 0.2f);
+			float3 shakeAmp = float3(0.1f, 0.1f, 0.1f);
+			float shakeTime = isGuard ? 4.0f : 3.0f;
+			ComponentHandle<ShakeComponent> cameraShake = a_chunk.GetComponent<ShakeComponent>(camera);
+			if (cameraShake.IsValid())
+			{
+				cameraShake->shakePower = shakePower;
+				cameraShake->shakeAmplitude = shakeAmp;
+				cameraShake->elapsedTime = 0.0f;
+				cameraShake->shakeTime = shakeTime;
+			}
+			else
+			{
+				a_chunk.AddComponent(camera, ShakeComponent(shakePower, shakeAmp, shakeTime));
 			}
 
 			// 被弾履歴に攻撃Entityとクールタイムを記録

@@ -298,15 +298,10 @@ cbuffer SectorInfo : register(b0){
 };
 float4 main(PS_IN pin) : SV_TARGET0 {
 	float4 color = float4(1,1,1,1);
-	float2 halfGrid = floor(abs(pin.uv) * 2.0f);
-	float2 quatGrid = floor(abs(pin.uv) * 8.0f);
-
-	float half = fmod(halfGrid.x + halfGrid.y, 2.0f);
-	float quat = fmod(quatGrid.x + quatGrid.y, 2.0f);
-
-	color.rgb = ((half * 0.1f) * quat + 0.45f) + (1 - quat) * 0.05f;
-	color.rgb = float3(0.8,0.3,0.3);
-	color.a = progress;
+	color.rgb = float3(0.8,0.7,0.3);
+	color.a = min(0.6f , progress * 0.6f + 0.05);
+	color.rgb *= 1.0f + max(progress - 0.6f, 0.0f) * 2.0f;
+	
 	return color;
 })EOT";
 

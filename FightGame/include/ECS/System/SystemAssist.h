@@ -14,9 +14,12 @@ Entity GetPlayer(Chunk& a_chunk, float3 a_position);
 
 Entity GetRail(Chunk& a_chunk);
 
+Entity GetLookOnMarker(Chunk& a_chunk);
+
 float3 GetEntityWorldPos(Chunk& a_chunk, Entity a_entity);
 
-// !!!New!!! Pose 優先、無ければ Position
+
+// Pose 優先、無ければ Position。遅延系座標処理でのみ使う
 float3 GetEntityPosePos(Chunk& a_chunk, Entity a_entity);
 
 // !!!New!!! Pose 優先、無ければ Rotation（pitch/yaw/roll）

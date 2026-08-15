@@ -53,6 +53,8 @@ bool IsPlayerHitFromOffView(Chunk& a_chunk, Entity a_player, Entity a_hitEntity,
 
 void EnemyAttackSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_systemResponse)
 {
+	Entity camera = GetCamera(a_chunk);
+
 	ComponentView view = a_chunk.GetView<ComponentTypes<PlayerTag, HitInfomation, HitPoint>>();
 	for (auto it : view)
 	{
@@ -78,8 +80,9 @@ void EnemyAttackSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRe
 				shake->shakeTime = 10.0f;
 			}
 
-			a_systemResponse.AddStopTime(10.0f, 20.0f);
+			a_systemResponse.AddStopTime(20.0f, 20.0f, 0.01f);
 
+			
 
 			if (!enemyTag.IsValid() && !enemyBulletTag.IsValid()) continue;
 
@@ -152,9 +155,10 @@ void EnemyShooterSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 }
 
-void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
+void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response)
 {
 	ComponentView view = a_chunk.GetView<ComponentTypes<EnemyTag, DeadState>>();
+	Entity camera = GetCamera(a_chunk);
 	for (auto it : view)
 	{
 		ComponentHandle<DeadState> dead = a_chunk.GetComponent<DeadState>(it);
@@ -169,7 +173,7 @@ void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
 		Entity rail = GetRail(a_chunk);
 		Entity area = a_chunk.CreateNewEntity(
 			MOVE_AND_TRANSFORM_COMPONENT(float3(areaPos.x, areaPos.y, areaPos.z), float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
-			GhostAreaComponent(65.0f),
+			GhostAreaComponent(5.0f),
 			LifeTime(20.0f),
 			PosePosState(POSE_POS_RAIL),
 			RailUser(rail)
@@ -182,6 +186,24 @@ void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
 		a_chunk.DeleteChunkComponent(it, MoveForward::kTypeId);
 		a_chunk.DeleteChunkComponent(it, RailFly::kTypeId);
 		
+		// 画面エフェクトを出す
+		a_response.AddStopTime(2.0f, 2.0f, 0.01f);
+		float3 shakePower = float3(0.2f, 0.2f, 0.2f);
+		float3 shakeAmp = float3(0.1f, 0.1f, 0.1f);
+		float shakeTime = 5.0f;
+		ComponentHandle<ShakeComponent> cameraShake = a_chunk.GetComponent<ShakeComponent>(camera);
+		if (cameraShake.IsValid())
+		{
+			cameraShake->shakePower = shakePower;
+			cameraShake->shakeAmplitude = shakeAmp;
+			cameraShake->elapsedTime = 0.0f;
+			cameraShake->shakeTime = shakeTime;
+		}
+		else
+		{
+			a_chunk.AddComponent(camera, ShakeComponent(shakePower, shakeAmp, shakeTime));
+		}
+
 		PlaySound(LoadSound("Assets/Sound/kill.mp3"));
 
 		ComponentHandle<LifeTime> lifeTime = a_chunk.GetComponent<LifeTime>(it);

@@ -121,7 +121,8 @@ void MainGame::Init()
 		"Star",
 		"Red",
 		"Purple",
-		"Green"
+		"Green",
+		"LookOnMaker"
 	};
 
 	ChangeScene("Load");

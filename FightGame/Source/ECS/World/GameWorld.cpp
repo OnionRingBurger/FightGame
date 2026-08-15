@@ -618,7 +618,7 @@ void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 	EnemyAttackSystem(a_chunk, a_context, a_response);
 	PlayerDeadSystem(a_chunk, a_context);
 
-	EnemyDeadSystem(a_chunk, a_context);
+	EnemyDeadSystem(a_chunk, a_context, a_response);
 	EnemyBulletDeadSystem(a_chunk, a_context);
 	GoalSystem(a_chunk, a_context);
 	PlayerWalkSystem(a_chunk, a_context);

@@ -45,6 +45,15 @@ Entity GetRail(Chunk& a_chunk)
 	return a_rail;
 }
 
+Entity GetLookOnMarker(Chunk& a_chunk)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<LookOnMarkerTag>>();
+	for (auto it : view)
+	{
+		return it;
+	}
+}
+
 Entity GetCamera(Chunk& a_chunk)
 {
 	// –‘O‚É“o˜^—pƒJƒƒ‰‚ğæ“¾

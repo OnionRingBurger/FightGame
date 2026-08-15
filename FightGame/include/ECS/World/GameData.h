@@ -13,6 +13,8 @@ constexpr float3 kDefaultWorldPosition = { 0.0f, 50.0f, 0.0f };
 constexpr float kDebugWorldSize = 30.0f;
 
 constexpr int kSectorVertexCount = 15;
+constexpr float kWallThickness = 0.02f;
+constexpr float kWallHitboxThickness = 0.2f;
 
 
 ///////////////////////////////////////////////////////////////////////////

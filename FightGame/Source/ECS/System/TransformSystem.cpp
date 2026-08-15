@@ -15,7 +15,7 @@ void SetCurrentPosePos(Entity a_entity, Chunk& a_chunk);
 void SetCurrentPoseRot(Entity a_entity, Chunk& a_chunk);
 bool IsSetFixedPos(const ComponentHandle<PosePosState>& a_posePosState, const std::vector<PosePosStateEnum>& a_setPoseState);
 bool IsSetFixedRot(const ComponentHandle<PoseRotState>& a_posePosState, const std::vector<PoseRotStateEnum>& a_setPoseState);
-
+float3 GetLookRot(Chunk& a_chunk, const Entity user, const Entity target);
 
 void InputMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
@@ -104,7 +104,6 @@ void LookMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 		
 	ComponentView view = a_chunk.GetView<ComponentTypes<LookMove, MoveInputResult, Pose, MotionResult>>();
 
-
 	for (auto it : view)
 	{
 		// ì¸óÕåãâ ÇéÊìæ
@@ -115,6 +114,8 @@ void LookMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		// à⁄ìÆïsâ¬î\ÇæÇ¡ÇΩèÍçáî≤ÇØÇÈ
 		if (!IsActionAllowed(a_chunk, it, ActionFlag_Move)) continue;
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_LookMove)) continue;
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_RotChange)) continue;
 
 		// äpìxÇ…ïœä∑
 		float targetAngle = atan2(inputResult.Look().moveDir.x, inputResult.Look().moveDir.y) * DEG;
@@ -446,53 +447,41 @@ void LookSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
 	ComponentView view = a_chunk.GetView<ComponentTypes<LookComponent, Position, FixedResult>>();
 
+	ComponentView actionView = a_chunk.GetView<ComponentTypes<LookOnAction, Position, FixedResult>>();
+
 	for (auto it : view)
 	{
 		const ComponentHandle<LookComponent> look = a_chunk.GetComponent<LookComponent>(it);
-		const ComponentHandle<Position> position = a_chunk.GetComponent<Position>(it);
 		ComponentHandle<FixedResult> lookResult = a_chunk.GetComponent<FixedResult>(it);
 
-		const ComponentHandle<Position> targetPos = a_chunk.GetComponent<Position>(look.Look().target);
-		if (!targetPos.IsValid())
-		{
-			return;
-		}
 
-		float3 relativeDistance(
-			targetPos.Look().x - position.Look().x,
-			targetPos.Look().y - position.Look().y,
-			targetPos.Look().z - position.Look().z
-		);
+		float3 finalRot = GetLookRot(a_chunk, it, look.Look().target);
 
-		float targetDistance = NormalizeLength(
-			relativeDistance.x,
-			relativeDistance.y,
-			relativeDistance.z
-		);
-
-		if (targetDistance == std::numeric_limits<float>::max())
-		{
-			continue;
-		}
-
-		float pitchSign = Sign(relativeDistance.y) * -1.0f;
-
-		float dirXZ =
-			std::sqrtf(
-				std::pow(relativeDistance.x, 2.0f) + std::pow(relativeDistance.z, 2.0f)
-			);
-
-		float dirY = std::sqrtf(
-			std::pow(relativeDistance.y, 2.0f)
-		);
-
-		float finalPitch = atan2f(dirY, dirXZ) * (180 / PI) * pitchSign;
-		float finalYaw = atan2f(relativeDistance.x, relativeDistance.z) * (180 / PI);
-
-		lookResult->newRot.x = finalPitch;
-		lookResult->newRot.y = finalYaw;
+		lookResult->newRot.x = finalRot.x;
+		lookResult->newRot.y = finalRot.y;
 		lookResult->newRot.z = 0.0f;
 	}
+
+	for (auto it : actionView)
+	{
+		ComponentHandle<LookOnAction> look = a_chunk.GetComponent<LookOnAction>(it);
+		ComponentHandle<FixedResult> lookResult = a_chunk.GetComponent<FixedResult>(it);
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_RotChange))
+		{
+			lookResult->newRot = look.Look().finalRot;
+			continue;
+		};
+		float3 finalRot = GetLookRot(a_chunk, it, look.Look().target);
+
+		lookResult->newRot.x = 0.0f;
+		lookResult->newRot.y = finalRot.y;
+		lookResult->newRot.z = 0.0f;
+
+		look->finalRot = lookResult.Look().newRot;
+	}
+
+
+
 }
 
 void ShakeSystem(Chunk& a_chunk, const SystemContext& a_context)
@@ -793,6 +782,47 @@ bool IsSetFixedRot(const ComponentHandle<PoseRotState>& a_poseRotState, const st
 	}
 
 	return false;
+}
+
+float3 GetLookRot(Chunk& a_chunk, const Entity user, const Entity target)
+{
+	const float3 position = GetEntityPosePos(a_chunk, user);
+
+	const float3 targetPos = GetEntityPosePos(a_chunk, target);
+	
+	
+	float3 relativeDistance(
+		targetPos.x - position.x,
+		targetPos.y - position.y,
+		targetPos.z - position.z
+	);
+
+	float targetDistance = NormalizeLength(
+		relativeDistance.x,
+		relativeDistance.y,
+		relativeDistance.z
+	);
+
+	if (targetDistance == std::numeric_limits<float>::max())
+	{
+		return float3();
+	}
+
+	float pitchSign = Sign(relativeDistance.y) * -1.0f;
+
+	float dirXZ =
+		std::sqrtf(
+			std::pow(relativeDistance.x, 2.0f) + std::pow(relativeDistance.z, 2.0f)
+		);
+
+	float dirY = std::sqrtf(
+		std::pow(relativeDistance.y, 2.0f)
+	);
+
+	float finalPitch = atan2f(dirY, dirXZ) * (180 / PI) * pitchSign;
+	float finalYaw = atan2f(relativeDistance.x, relativeDistance.z) * (180 / PI);
+
+	return float3(finalPitch, finalYaw, 0.0f);
 }
 
 

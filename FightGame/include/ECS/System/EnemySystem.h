@@ -28,7 +28,7 @@ bool IsPlayerHitFromOffView(Chunk& a_chunk, Entity a_player, Entity a_hitEntity,
 
 void EnemyShooterSystem(Chunk& a_chunk, const SystemContext& a_context);
 
-void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context);
+void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response);
 
 void EnemyBulletDeadSystem(Chunk& a_chunk, const SystemContext& a_context);
 

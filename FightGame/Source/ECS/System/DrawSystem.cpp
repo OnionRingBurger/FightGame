@@ -123,7 +123,7 @@ void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		{
 			continue;
 		}
-		bool isGhost = a_chunk.GetComponent<EnemyTag>(it).IsValid() || a_chunk.GetComponent<EnemyBulletTag>(it).IsValid();
+		bool isGhost = a_chunk.GetComponent<EnemyTag>(it).IsValid() || a_chunk.GetComponent<EnemyBulletTag>(it).IsValid() || a_chunk.GetComponent<UseGhostShader>(it).IsValid();
 		bool isAlpha = alphaBlend.IsValid();
 
 		ShaderList::VSKind vsKind = key.Look().useAnime ? ShaderList::VS_ANIME : ShaderList::VS_WORLD;
@@ -680,7 +680,7 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 			DrawMatrix::CreateWorldMatrix(world, floatPos, floatScale, floatRot, true);
 			Geometory::SetWorld(world);
 			float progress = startup.Look().elapsedTime / startup.Look().startupDuration;
-			Geometory::DrawSector(telegraph.Look().sectorKey, progress * 0.7f);
+			Geometory::DrawSector(telegraph.Look().sectorKey, progress);
 		}
 	}
 }

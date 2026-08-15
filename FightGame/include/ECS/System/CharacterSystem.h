@@ -2,6 +2,7 @@
 #include "Components.h"
 #include "Chunk.h"
 #include "SystemContext.h"
+#include "ISystemResponse.h"
 #include "SystemAssist.h"
 #include "AI/AIManager.h"
 
@@ -46,10 +47,13 @@ void KnockbackSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void KnockbackStateSystem(Chunk& a_chunk, const SystemContext& a_context);
 
+// !!!New!!!
+void LookOnStateSystem(Chunk& a_chunk, const SystemContext& a_context);
+
 // “ü—Í‚ðŠm’è‚·‚é
 void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager);
 
 // ”í’e‰ðŒˆ
-void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager);
+void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response, AIManager& a_aiManager);
 
 void AttackHitRecordCleanupSystem(Chunk& a_chunk, const SystemContext& a_context);

@@ -524,7 +524,9 @@ float4 main(PS_IN pin) : SV_TARGET
 	float lineDot = saturate(abs(dot(cameraVector, pin.normal)));
 	float lineValue = pow(1.0f - lineDot, 2);
 	//color.rgb += lineValue;
-	color.a = saturate(color.a + lineValue * fadeByDistance) * 0.7;
+	// color.a = saturate(color.a + lineValue * fadeByDistance) * 0.7;
+	// color.a = saturate(color.a + lineValue) * 0.7;
+	// color += 0.003f;
 
 
 	return color;

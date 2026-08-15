@@ -137,7 +137,9 @@
 	X(EffectKey) \
 	X(KnockbackAction) \
 	X(InterferenceResult) \
-	X(Name)
+	X(Name) \
+	X(LookOnState) \
+	X(LookOnAction)
 
 
 using BitFlag = unsigned int;
@@ -2183,7 +2185,9 @@ namespace Component
 		ActionFlag_Jump = 1 << 3,
 		ActionFlag_Guard = 1 << 4,
 		ActionFlag_KnockBack = 1 << 5,
-		ActionFlag_All = ActionFlag_Move | ActionFlag_Aim | ActionFlag_Attack | ActionFlag_Jump | ActionFlag_Guard | ActionFlag_KnockBack,
+		ActionFlag_LookMove = 1 << 6,
+		ActionFlag_RotChange = 1 << 7,
+		ActionFlag_All = ActionFlag_Move | ActionFlag_Aim | ActionFlag_Attack | ActionFlag_Jump | ActionFlag_Guard | ActionFlag_KnockBack | ActionFlag_LookMove | ActionFlag_RotChange,
 	};
 
 
@@ -2752,6 +2756,80 @@ namespace Component
 			, knockbackTime(0.0f)
 		{
 		}
+	};
+
+	struct UseGhostShader
+	{
+		static constexpr TypeID kTypeId = 133;
+		static constexpr const char* kTypeName = "UseGhostShader";
+		static constexpr int kVersion = 0;
+
+		UseGhostShader()
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct LookOnState
+	{
+		static constexpr TypeID kTypeId = 134;
+		static constexpr const char* kTypeName = "LookOnState";
+		static constexpr int kVersion = 0;
+
+		float captureRadius;
+		float releaseRadius;
+		bool stickSwitchLatch;
+
+		LookOnState()
+			: LookOnState(6.8f, 7.8f)
+		{
+		}
+
+		LookOnState(float a_captureRadius, float a_releaseRadius)
+			: captureRadius(a_captureRadius)
+			, releaseRadius(a_releaseRadius)
+			, stickSwitchLatch(false)
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct LookOnAction
+	{
+		static constexpr TypeID kTypeId = 135;
+		static constexpr const char* kTypeName = "LookOnAction";
+		static constexpr int kVersion = 0;
+
+		Entity target;
+		float3 finalRot;
+
+		LookOnAction()
+			: LookOnAction(kInvalidEntity)
+		{
+		}
+
+		LookOnAction(Entity a_target)
+			: target(a_target)
+			, finalRot()
+		{
+		}
+	};
+
+	struct LookOnMarkerTag
+	{
+		static constexpr TypeID kTypeId = 136;
+		static constexpr const char* kTypeName = "LookOnMarkerTag";
+		static constexpr int kVersion = 0;
+
+		LookOnMarkerTag()
+		{
+		}
+	};
+
+	// FollowPosition“™‚ð‚µ‚Ä‚¢‚éÛA’Ç]‚ð•t‚¯ŠO‚µ‚µ‚½‚­‚È‚Á‚½‚è‚µ‚½Û‚É‚¢‚¿‚¢‚¿
+	struct NullTargetTag
+	{
+
 	};
 }
 
