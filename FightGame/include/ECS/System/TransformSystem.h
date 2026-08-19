@@ -9,6 +9,8 @@ void InputRotatoSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void LookMoveSystem(Chunk& a_chunk, const SystemContext& a_context);
 
+void LookOnSystem(Chunk& a_chunk, const SystemContext& a_context);
+
 void FlipSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void FollowTransformSystem(Chunk& a_chunk, const SystemContext& a_context);
@@ -34,4 +36,6 @@ void PhysicsPoseSystem(Chunk& a_chunk, const SystemContext& a_context);
 void LatePhysicsPoseSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void ShakeSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void MoveForwardSystem(Chunk& a_chunk, const SystemContext& a_context);
 

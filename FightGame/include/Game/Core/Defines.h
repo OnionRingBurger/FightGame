@@ -32,8 +32,11 @@ constexpr int kMouseFixedPosY = 400;
 // シェーダー
 constexpr int kMaxArea = 100;
 
-constexpr const char* kDataPath = "Assets/Data/EntityDataTest.json";
+constexpr const char* kDataPath = "Assets/Data/EntityData.json";
 constexpr const char* kDataTestPath = "Assets/Data/EntityDataTest.json";
+constexpr const char* kAttackDataPath = "Assets/Data/AttackData.json";
+
+// #define CREATEGAME "Game"
 
 // グリッドサイズ(デバッグ用
 static const int	DEBUG_GRID_NUM		= 10;			// グリッド中心から端までの線の本数

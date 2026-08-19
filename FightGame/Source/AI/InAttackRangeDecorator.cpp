@@ -54,8 +54,6 @@ bool InAttackRangeDecorator::CheckCondition(AIContext& context, const AIBlackboa
 	for (const AIBlackboard::BBAttackData& attack : enemy.attackDatas)
 	{
 		float halfAttackAngle = attack.angle * 0.5f;
-		DebugConsole::SetDrawPos(1, 10);
-		std::cout << "toPlayerAngle: " << toPlayerAngle << ", halfAttackAngle: " << halfAttackAngle << std::endl;
 
 		// ŽË’ö‹——£ŠO‚¾‚Á‚½ê‡”²‚¯‚é
 		if (!(dist >= attack.minLength) || !(dist <= attack.maxLength))

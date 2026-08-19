@@ -17,6 +17,7 @@
 #include "IModelCacheAcquisition.h"
 #include "IUICacheAcquisition.h"
 #include "AI/AIManager.h"
+#include "ComponentsSerialize.h"
 
 enum WorldState
 {
@@ -35,7 +36,8 @@ public:
 		IModelCacheAcquisition& modelCache,
 		IUICacheAcquisition& uiCache,
 		std::function<void(int)> tutorialRequest,
-		Input& a_input);
+		Input& a_input,
+		ComponentsSerialize& a_serialize);
 	~World();
 
 	void InitWorld();
@@ -66,11 +68,15 @@ private:
 	bool allLoadModel = false;
 	// !!!New!!!
 	float aiTickAccum = 0.0f;
+
+	ComponentsSerialize& serialize;
+
 	// 3FãNÇ´Ç…çXêV
 	static constexpr float kAITickInterval = 3.0f / 60.0f;
 
-
 protected:
+
+	virtual void InitResponse(std::unique_ptr<SystemResponse>& response);
 
 	virtual void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse);
 
@@ -79,7 +85,7 @@ protected:
 
 	virtual Chunk CreateNewChunk(AIManager& a_aiManager);
 
-	virtual void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager);
+	virtual void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize);
 
 	virtual void UpdateIMGUI(Chunk& a_chunk, SystemContext& a_context);
 

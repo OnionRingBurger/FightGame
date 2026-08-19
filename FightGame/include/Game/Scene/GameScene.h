@@ -13,7 +13,9 @@ public:
 		std::function<void(std::string)> a_sceneChangeRequest,
 		std::function<void()> a_gameEnd,
 		std::function<void()> a_resetFPSRequest,
-		Input& a_input
+		std::function<void(bool)> a_setFixedCursor,
+		Input& a_input,
+		ComponentsSerialize& a_serialize
 	);
 	~GameScene() = default;
 	void AdvanceUpdate(float dt) override;
@@ -50,6 +52,7 @@ private:
 	IUICacheAcquisition& uiCache;
 
 	Input& input;
+	ComponentsSerialize& serialize;
 
 	//! シーン切り替え用のリクエスト
 	std::function<void(std::string)> sceneChangeRequest;
@@ -57,5 +60,7 @@ private:
 	std::function<void(void)> resetFPSRequest;
 	//! ゲーム終了のコールバック
 	std::function<void(void)> gameEnd;
+	//! カーソル固定状態の変更リクエスト
+	std::function<void(bool)> setFixedCursor;
 };
 

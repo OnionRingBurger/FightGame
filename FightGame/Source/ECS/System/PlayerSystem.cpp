@@ -37,15 +37,16 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
 	ComponentView view = a_chunk.GetView<ComponentTypes<PlayerTag, DeadState>>();
 	for (auto it : view)
 	{
-		//ComponentHandle<DeadState> dead = a_chunk.GetComponent<DeadState>(it);
-		//if (!dead.Look().isDead) continue;
+		ComponentHandle<DeadState> dead = a_chunk.GetComponent<DeadState>(it);
+		if (!dead.Look().isDead) continue;
 
+		a_chunk.DeleteChunkComponent(it, PlayerTag::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, InputMove::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, InputRotato::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, Velocity::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, ShooterComponent::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, ShakingComponent::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, OBBCollider::kTypeId);
+		a_chunk.DeleteChunkComponent(it, OBBCollider::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, RailFly::kTypeId);
 
 		//ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>>();
@@ -54,15 +55,15 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
 		//	a_chunk.DeleteChunkEntity(uiIt);
 		//}
 
-		//Entity chunkChange = a_chunk.CreateNewEntity(
-		//	ChunkChange(true, "Result"),
-		//	DelayChunkChange(240.0f)
-		//);
-		//PlaySound(LoadSound("Assets/Sound/dead.mp3"));
+		Entity chunkChange = a_chunk.CreateNewEntity(
+			ChunkChange(true, "Result"),
+			DelayChunkChange(240.0f)
+		);
+		// PlaySound(LoadSound("Assets/Sound/dead.mp3"));
 
-		//Entity createEffect = a_chunk.CreateNewEntity(
-		//	CreateEffect(DARKFADE_UP)
-		//);
+		Entity createEffect = a_chunk.CreateNewEntity(
+			CreateEffect(DARKFADE_UP)
+		);
 
 		//ComponentView gunView = a_chunk.GetView<ComponentTypes<GunTag, ModelKey>>();
 		//// a_chunk.DeleteChunkComponent(it, DeadState::kTypeId);
@@ -75,96 +76,6 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 }
 
-
-void PlayerAttackSystem(Chunk& a_chunk, const SystemContext& a_context)
-{
-
-	//ComponentView view = a_chunk.GetView<ComponentTypes<MoveInputResult, Position, Rotation, AttackStatus>>();
-
-	//for (auto it : view)
-	//{
-	//	const ComponentHandle<MoveInputResult> inputResult = a_chunk.GetComponent<MoveInputResult>(it);
-	//	if (!inputResult.Look().useAttack) continue;
-
-	//	if (!IsActionAllowed(a_chunk, it, ActionFlag_Attack)) continue;
-
-	//	const ComponentHandle<AttackAction> attackAction = a_chunk.GetComponent<AttackAction>(it);
-	//	if (attackAction.IsValid()) continue;
-
-	//	const ComponentHandle<Position> position = a_chunk.GetComponent<Position>(it);
-	//	const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(it);
-	//	const ComponentHandle<AttackStatus> attackStatus = a_chunk.GetComponent<AttackStatus>(it);
-
-	//	// égópÇ∑ÇÈçUåÇî‘çÜÇ…ëŒâûÇ∑ÇÈèÓïÒÇéÊìæ
-	//	const int attackIndex = inputResult.Look().attackIndex;
-	//	if (attackIndex < 0 || attackIndex >= static_cast<int>(attackStatus.Look().attackPowers.size()))
-	//	{
-	//		continue;
-	//	}
-	//	const AttackPower& attackPower = attackStatus.Look().attackPowers[static_cast<size_t>(attackIndex)];
-
-	//	const bool isPlayer = a_chunk.GetComponent<PlayerTag>(it).IsValid();
-	//	const bool isEnemy = a_chunk.GetComponent<EnemyTag>(it).IsValid();
-
-	//	// çUåÇEntityê∂ê¨
-	//	if (isPlayer)
-	//	{
-	//		Entity attack = a_chunk.CreateNewEntity(
-	//			MOVE_AND_TRANSFORM_COMPONENT(
-	//				float3(0.0f, 0.0f, 0.0f),
-	//				float3(0.0f, rotation.Look().yaw, 0.0f),
-	//				float3(1.0f, 1.0f, 1.0f)
-	//			),
-	//			SectorHitJudge(
-	//				attackPower.minLength,
-	//				attackPower.maxLength,
-	//				attackPower.angle,
-	//				attackPower.maxHeight,
-	//				attackPower.maxLowness
-	//			),
-	//			AddDamageComponent(attackPower.damageValue),
-	//			PlayerAttackTag(),
-	//			LifeTime(attackPower.lifeTime),
-	//			FollowPosition(attackPower.followOffset, it, FOLLOW_POS_LOCALOFFSET),
-	//			PosePosState(POSE_POS_FOLLOW)
-	//		);
-
-	//		a_chunk.AddComponent(it, AttackAction(attack, 0.0f));
-	//		if (attackPower.waitTime > 0.0f)
-	//		{
-	//			a_chunk.AddComponent(it, AttackWaitAction(0.0f, attackPower.waitTime));
-	//		}
-	//	}
-	//	else if (isEnemy)
-	//	{
-	//		Entity attack = a_chunk.CreateNewEntity(
-	//			MOVE_AND_TRANSFORM_COMPONENT(
-	//				float3(0.0f, 0.0f, 0.0f),
-	//				float3(0.0f, rotation.Look().yaw, 0.0f),
-	//				float3(1.0f, 1.0f, 1.0f)
-	//			),
-	//			SectorHitJudge(
-	//				attackPower.minLength,
-	//				attackPower.maxLength,
-	//				attackPower.angle,
-	//				attackPower.maxHeight,
-	//				attackPower.maxLowness
-	//			),
-	//			AddDamageComponent(attackPower.damageValue),
-	//			EnemyAttackTag(),
-	//			LifeTime(attackPower.lifeTime),
-	//			FollowPosition(attackPower.followOffset, it, FOLLOW_POS_LOCALOFFSET),
-	//			PosePosState(POSE_POS_FOLLOW)
-	//		);
-
-	//		a_chunk.AddComponent(it, AttackAction(attack, 0.0f));
-	//		if (attackPower.waitTime > 0.0f)
-	//		{
-	//			a_chunk.AddComponent(it, AttackWaitAction(0.0f, attackPower.waitTime));
-	//		}
-	//	}
-	//}
-}
 
 
 void PlayerJumpSystem(Chunk& a_chunk, const SystemContext& a_context)

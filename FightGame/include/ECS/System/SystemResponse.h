@@ -21,7 +21,7 @@ public:
 
 	virtual void CreateWorldRequest(std::string a_key) override;
 	std::string GetWorldRequest();
-	void ResetRequest();
+	virtual void ResetRequest();
 	bool IsWorldRequest();
 	float GetStopRate();
 

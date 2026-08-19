@@ -15,12 +15,14 @@ World::World(
 	IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
 	std::function<void(int)> a_tutorialRequest,
-	Input& a_input)
+	Input& a_input, 
+	ComponentsSerialize& a_serialize)
 	: systemResponse()
 	, m_state(USECHUNK)
 	, isMouseLock(true)
 	, context(a_modelCache, a_uiCache, a_tutorialRequest, a_input) // TODO System側が勝手にリクエストを触れないようにする
 	, isGameEnd(false)
+	, serialize(a_serialize)
 {
 }
 
@@ -40,7 +42,11 @@ void World::InitWorld()
 	// Contextの初期化
 	InitContext();
 
-	systemResponse = std::make_unique<SystemResponse>();
+	InitResponse(systemResponse);
+	if (!systemResponse)	
+	{
+		systemResponse = std::make_unique<SystemResponse>();
+	}
 
 	// Tree 登録を先に行い、CreateNewChunk 内の RegisterAI が成功するようにする
 	InitAI(aiManager);
@@ -49,6 +55,11 @@ void World::InitWorld()
 
 	ContextUpdate(0.01f);
 	InitChunk(chunk, context, *systemResponse);
+}
+
+void World::InitResponse(std::unique_ptr<SystemResponse>& response)
+{
+	systemResponse = std::make_unique<SystemResponse>();
 }
 
 void World::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse)
@@ -100,7 +111,7 @@ void World::UpdateWorld()
 	{
 	case USECHUNK:
 	{
-		UpdateChunk(chunk, context, *systemResponse, aiManager);
+		UpdateChunk(chunk, context, *systemResponse, aiManager, serialize);
 	}
 	break;
 
@@ -160,7 +171,7 @@ Chunk World::CreateNewChunk(AIManager& a_aiManager)
 	return Chunk();
 }
 
-void World::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager)
+void World::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 	(void)a_chunk;
 	(void)a_context;

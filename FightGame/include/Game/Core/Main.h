@@ -22,7 +22,6 @@ public:
 	void Uninit();
 
 	void MainLoop(HWND a_hwnd, MSG& message);
-	bool IsMouseLock();
 	bool IsEnd();
 
 private:
@@ -94,11 +93,14 @@ private:
 	ModelCache modelCache;
 	UICache uiCache;
 	Input input;
+	ComponentsSerialize serialize;
 	std::queue<std::string> sceneChangeQueue;
 	std::thread loadWorker;
 
 	std::vector<modelLoadData> modelDatas;
 	std::vector<std::string> textureDatas;
+
+	bool isFixedCursor;
 
 	// FPSèàóùóp
 	DWORD preExecTime;

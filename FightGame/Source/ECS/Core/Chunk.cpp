@@ -2,9 +2,12 @@
 #include "HasView.h"
 #include "imGui/imgui.h"
 #include "Debug.h"
+#include "Components.h"
+#include "ComponentField.h"
 
 #define CreateAndAddComponent(chunk, ...) 
-
+using namespace Component;
+using namespace ComponentSystem;
 
 Chunk::Chunk()
 	:entitesManager()
@@ -15,25 +18,91 @@ Chunk::Chunk()
 void Chunk::ImGuiInPut()
 {
 
-	if (ImGui::Button("Create Entity", ImVec2(100.0f, 100.0f)))
+	if (ImGui::Button("Create New Entity", ImVec2(150.0f, 30.0f)))
 	{
-		this->CreateNewEntity();
+		Entity entity = this->CreateNewEntity();
+		this->AddComponent(entity, Name("NewEntity"));
 	}
 
-	if (auto result = entitesManager.ImGuiUseEntity())
+
+	static int useEntityCount = 0;
+
+	std::vector<Entity> entities = entitesManager.GetAllEntity();
+	std::vector<string> namesString;
+	std::vector<const char*> names;
+	if (entities.empty())
 	{
-		ImGui::BeginChild(ImGui::GetID((void*)0), ImVec2(250, 100), ImGuiWindowFlags_NoTitleBar);
-
-		HasView view = storageManager.GetHasView(result.value());
-
-		for (auto it : view)
-		{
-			ImGui::Text(std::to_string(it).c_str());
-		}
-
-		ImGui::EndChild();
+		return;
 	}
 	
+	int i = 0;
+	for (auto it : entitesManager.GetAllEntity())
+	{
+
+		ComponentHandle<Name> nameComp = this->GetComponent<Name>(it);
+		namesString.push_back(nameComp.IsValid() ? nameComp.Look().name : "Entity : " + to_string(i));
+		
+		i++;
+	}
+
+	for (auto& it : namesString)
+	{
+		names.push_back(it.c_str());
+	}
+
+	ImGui::Combo("UseEntity", &useEntityCount, names.data(), names.size());
+	
+	Entity useEntity = entities.at(useEntityCount);
+
+	ImGui::BeginChild(ImGui::GetID((void*)0), ImVec2(250, 100), ImGuiWindowFlags_NoTitleBar);
+
+
+	HasView view = storageManager.GetHasView(useEntity);
+	for (auto it : view)
+	{
+		// !!!New!!!
+		// ApplyToFields へはオーバーロード解決のためラムダで包んで渡す（Serialize の NewToJson と同じ形）
+		#define IMGUI_COMPONENT_CASE(T) case T::kTypeId: { \
+		ComponentHandle<T> handle = this->GetComponent<T>(useEntity); \
+		auto imguiValue = [](std::string a_name, auto& a_value, const auto& a_defaultValue) \
+		{ \
+			CreateImGuiValue(a_name + "(" + T::kTypeName + ")", a_value, a_defaultValue); \
+		}; \
+		auto imguiEntity = [](std::string a_name, Entity& a_entity) \
+		{ \
+			CreateImGuiEntity(a_name + "(" + T::kTypeName + ")", a_entity); \
+		}; \
+		ApplyToFields(*handle.operator->(), imguiValue, imguiEntity); \
+		} break;\
+	
+		switch (it)
+		{
+			COMPONENT_TYPE_LIST(IMGUI_COMPONENT_CASE)
+		}
+
+		#undef IMGUI_COMPONENT_CASE
+	}
+	ImGui::EndChild();
+
+	TypeID addId;
+
+	addId = Position::kTypeId;
+
+	#define IMGUI_ADDCOMPONENT_CASE(T) case T::kTypeId: {\
+		this->AddComponent(useEntity, T()); \
+	}\
+	break; \
+	
+	if (ImGui::Button("AddComponent", ImVec2(100.0f, 20.0f)))
+	{
+		switch (addId)
+		{
+			COMPONENT_TYPE_LIST(IMGUI_ADDCOMPONENT_CASE)
+		}
+	}
+
+	
+	#undef IMGUI_ADDCOMPONENT_CASE
 }
 
 std::vector<Entity> Chunk::GetAllEntity()

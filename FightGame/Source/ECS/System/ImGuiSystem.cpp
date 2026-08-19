@@ -1,5 +1,6 @@
 #include "ImGuiSystem.h"
 #include "Components.h"
+#include "DebugSystemResponse.h"
 #include "imGui/imgui.h"
 
 using namespace Component;
@@ -8,44 +9,67 @@ void ImGuiSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
 	ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_Once);
 	ImGui::SetNextWindowSize(ImVec2(300.0f, 200.0f), ImGuiCond_Once);
-	ImGui::Begin("DefaultWindow");
-
+	ImGui::Begin("ChunkWindow");
 
 	a_chunk.ImGuiInPut();
 
 	a_chunk.ImGuiOutPut();
 
+	ImGui::End();
 
+}
 
-	float lx = a_context.input.GetLeftAxis().x;
-	float ly = a_context.input.GetLeftAxis().y;
-	float rx = a_context.input.GetRightAxis().x;
-	float ry = a_context.input.GetRightAxis().y;
+void SaveWorldSystem(Chunk& a_chunk, const SystemContext& a_context, SystemResponse& response)
+{
+	
 
-	static float3 CamerSlider = { 0.0f, 0.0f, 0.0f };
-	//ImGui::SliderFloat("x", &CamerSlider.x, 180.0f, -180.0f);
-	//ImGui::SliderFloat("y", &CamerSlider.y, 180.0f, -180.0f);
-	//ImGui::SliderFloat("z", &CamerSlider.z, 180.0f, -180.0f);
-	ComponentView view = a_chunk.GetView<ComponentTypes<Position, Rotation, Camera>>();
-	for (auto it : view)
+	ImGui::SetNextWindowPos(ImVec2(50.0f, 600.0f), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(200.0f, 200.0f), ImGuiCond_Once);
+	ImGui::Begin("Test");
+
+	if (!ImGui::Button("SaveEntity", ImVec2(150.0f, 30.0f)))
 	{
-		const ComponentHandle<Position> position = a_chunk.GetComponent<Position>(it);
-		const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(it);
-
-		ImGui::Text("pos.x,%.2f", position.Look().x);
-		ImGui::Text("pos.y,%.2f", position.Look().y);
-		ImGui::Text("pos.z,%.2f", position.Look().z);
-
-		ImGui::Text("pitch,%.2f", rotation.Look().pitch);
-		ImGui::Text("yaw,%.2f", rotation.Look().yaw);
-		ImGui::Text("roll,%.2f", rotation.Look().roll);
-
-		//rotation->x = CamerSlider.x;
-		//rotation->y = CamerSlider.y;
-		//rotation->z = CamerSlider.z;
+		ImGui::End();
+		return;
 	}
 
-	ImGui::Text("delta,%.2f", a_context.deltaTime);
+	DebugSystemResponse& debugSystemResponse = dynamic_cast<DebugSystemResponse&>(response);
+	debugSystemResponse.SaveRequest();
+
+	ComponentView view = a_chunk.GetView<ComponentTypes<DebugEntityTag>>();
+	for (auto it : view)
+	{
+		a_chunk.DeleteChunkEntity(it);
+	}
 
 	ImGui::End();
+	
+}
+
+void UndoWorldSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	Entity debugCamera = a_chunk.CreateNewEntity(
+		DebugCameraTag(),
+		DebugEntityTag(),
+		Camera(10, float3(0.0f, 0.0f, 1.0f), float3(0.0f, 1.0f, 0.0f), 60.0f, 1.77777f, 0.05f, 1000.0f),
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, 0.0f, 0.0f),
+			float3(0.0f, 0.0f, 0.0f),
+			float3(1.0f, 1.0f, 1.0f)
+		),
+		PosePosState(POSE_POS_DEBUGCAMERA),
+		PoseRotState(POSE_ROT_DEBUGCAMERA)
+	);
+
+	Entity debugCameraPoint = a_chunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, 0.0f, 0.0f),
+			float3(0.0f, 0.0f, 0.0f),
+			float3(1.0f, 1.0f, 1.0f)
+		),
+		DebugEntityTag(),
+		InputMove(),
+		InputRotato(),
+		CameraPoint(1000000000, 10000.0f, 10000.f)
+	);
 }

@@ -6,11 +6,12 @@
 
 using namespace Component;
 
-ResultWorld::ResultWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input)
+ResultWorld::ResultWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
 	: World(a_modelCache,
 		a_uiCache,
 		a_tutorialRequest,
-		a_input)
+		a_input,
+		a_serialize)
 	, worldRequest(a_worldRequest)
 {
 	a_input.RegisterKey("ChunkChange", VK_LBUTTON);
@@ -55,14 +56,7 @@ Chunk ResultWorld::CreateNewChunk(AIManager& a_aiManager)
 		CreateEffect(DARKFADE_CLEAR)
 	);
 
-	Entity mineCar = newChunk.CreateNewEntity(
-		TRANSFORM_COMPONENT(
-			float3(0.0f, 0.0f, 0.0f),
-			float3(0.0f, 20.0f, 0.0f),
-			float3(0.7f, 0.7f, 0.7f)
-		),
-		ModelKey("Minecart")
-	);
+
 
 	Entity tombstone = newChunk.CreateNewEntity(
 		TRANSFORM_COMPONENT(
@@ -70,12 +64,12 @@ Chunk ResultWorld::CreateNewChunk(AIManager& a_aiManager)
 			float3(-90.0f, 20.0f, 0.0f),
 			float3(0.7f, 0.7f, 0.7f)
 		),
-		ModelKey("CrackedTombstone")
+		ModelKey("Box")
 	);
 	return newChunk;
 }
 
-void ResultWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
+void ResultWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 	VelocitySystem(a_chunk, a_context);
 	LeapSystem(a_chunk, a_context);

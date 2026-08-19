@@ -57,6 +57,7 @@ void ColliderSystem(Chunk& a_chunk, const SystemContext& a_context)
 		const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(it);
 		const ComponentHandle<Pose> pose = a_chunk.GetComponent<Pose>(it);
 		if (!pose.IsValid() && (!position.IsValid() || !rotation.IsValid())) continue;
+		floatPosition += collider.Look().offset;
 
 		std::vector<float3> vertices;
 

@@ -3,6 +3,8 @@
 #include "SystemContext.h"
 #include "MathAssist.h"
 #include "Components.h"
+#include "ComponentsSerialize.h"
+#include "AIManager.h"
 
 ////////////////////////////////////////////////////
 // システム内で使うための汎用昨日
@@ -12,11 +14,16 @@
 
 Entity GetPlayer(Chunk& a_chunk, float3 a_position);
 
+Entity GetCameraRig(Chunk& a_chunk);
+
 Entity GetRail(Chunk& a_chunk);
+
+Entity GetLookOnMarker(Chunk& a_chunk);
 
 float3 GetEntityWorldPos(Chunk& a_chunk, Entity a_entity);
 
-// !!!New!!! Pose 優先、無ければ Position
+
+// Pose 優先、無ければ Position。遅延系座標処理でのみ使う
 float3 GetEntityPosePos(Chunk& a_chunk, Entity a_entity);
 
 // !!!New!!! Pose 優先、無ければ Rotation（pitch/yaw/roll）
@@ -34,3 +41,5 @@ Entity GetCamera(Chunk& a_chunk);
 bool IsActionAllowed(Chunk& a_chunk, Entity a_entity, Component::ActionFlag a_flag);
 
 void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity);
+
+void NewEnemySpawn(ComponentsSerialize& a_serialize,Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName);

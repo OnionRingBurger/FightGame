@@ -5,6 +5,25 @@ constexpr float kTonnelHeight = 120.0f;
 constexpr float kTonnelColliderLength = 600.0f;
 constexpr float kTonnelLength = 10000.0f;
 
+
+
+
+
+constexpr float3 kDefaultWorldPosition = { 0.0f, 50.0f, 50.0f };
+constexpr float3 kDebugWorldSize = float3(30.0, 20.0f, 20.0f);
+
+constexpr int kSectorVertexCount = 15;
+constexpr float kWallThickness = 0.02f;
+constexpr float kWallHitboxThickness = 0.2f;
+
+constexpr float2 kPlayerMoveSpeed = float2(0.09f, 0.09f);
+
+
+///////////////////////////////////////////////////////////////////////////
+// 
+// 過去のデータ、ビルドエラーにならないよう過去ワールドを削除するまで残す
+// 
+///////////////////////////////////////////////////////////////////////////
 // ループするトンネル区間（GameWorld のトンネル生成と対応）
 constexpr int kTonnelSegmentCount = 6;
 constexpr float kTonnelSegmentLength = 60.0f;
@@ -29,7 +48,6 @@ constexpr float kEnemyAttackDamage = 45.0f;
 constexpr float kEnemyShotDamage = 45.0f;
 constexpr float kEnemyMaxHP = 3.0f;
 constexpr float kDefaultAttackHitCooldown = 300.0f;
-constexpr float3 kDefaultWorldPosition = {0.0f, 50.0f, 0.0f};
 
 constexpr float kEnemyShotSpeed = 0.8f;
 

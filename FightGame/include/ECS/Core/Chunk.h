@@ -49,6 +49,7 @@ private:
 	std::vector<std::pair<Entity, TypeID>> deleteComponents;
 	std::vector<Entity> deleteEntities;
 
+
 };
 
 template<typename ...Components>
@@ -88,6 +89,8 @@ inline ComponentView Chunk::GetView()
 {
 	return storageManager.GetView<UseComponentsTypes, ExclusionComponentsTypes>();
 }
+
+
 
 
 #endif

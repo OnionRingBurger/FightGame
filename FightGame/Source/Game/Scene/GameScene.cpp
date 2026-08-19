@@ -7,7 +7,7 @@
 #include "TestWorld.h"
 #include "ProtoWorld.h"
 
-constexpr const char* kStartWorld = "Proto";
+constexpr const char* kStartWorld = "Title";
 
 GameScene::GameScene(
 	IModelCacheAcquisition& a_modelCache,
@@ -15,7 +15,10 @@ GameScene::GameScene(
 	std::function<void(std::string)> a_sceneChangeRequest,
 	std::function<void()> a_gameEnd,
 	std::function<void()> a_resetFPSRequest,
-	Input& a_input)
+	// !!!New!!!
+	std::function<void(bool)> a_setFixedCursor,
+	Input& a_input,
+	ComponentsSerialize& a_serialize)
 	: state(GAMESCENE_DEFAULT)
 	, isMouseLock(false)
 	, sceneChangeRequest(a_sceneChangeRequest)
@@ -24,6 +27,8 @@ GameScene::GameScene(
 	, input(a_input)
 	, gameEnd(a_gameEnd)
 	, resetFPSRequest(a_resetFPSRequest)
+	, setFixedCursor(a_setFixedCursor)
+	, serialize(a_serialize)
 {
 
 	SetWorld(kStartWorld);
@@ -76,7 +81,7 @@ void GameScene::ChangeState()
 		else if(input.IsRegisterTrigger("IMGUI"))
 		{
 #ifdef _DEBUG
-
+			setFixedCursor(false);
 			state = GAMESCENE_IMGUI;
 			world->ChangeState(IMGUI);
 
@@ -86,8 +91,12 @@ void GameScene::ChangeState()
 
 		break;
 	case GAMESCENE_IMGUI:
-		state = GAMESCENE_DEFAULT;
-		world->ChangeState(USECHUNK);
+		if (input.IsRegisterTrigger("IMGUI"))
+		{
+			setFixedCursor(true);
+			state = GAMESCENE_DEFAULT;
+			world->ChangeState(USECHUNK);
+		}
 		break;
 
 	case GAMESCENE_TUTORIAL:
@@ -136,7 +145,8 @@ bool GameScene::SetWorld(std::string a_key)
 			uiCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
-			input
+			input,
+			serialize
 		);
 
 		world->InitWorld();
@@ -148,7 +158,8 @@ bool GameScene::SetWorld(std::string a_key)
 			uiCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
-			input
+			input,
+			serialize
 		);
 
 		world->InitWorld();
@@ -161,7 +172,8 @@ bool GameScene::SetWorld(std::string a_key)
 			uiCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key);},
-			input
+			input,
+			serialize
 		);
 
 		world->InitWorld();
@@ -173,7 +185,8 @@ bool GameScene::SetWorld(std::string a_key)
 			uiCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
-			input
+			input,
+			serialize
 		);
 
 		world->InitWorld();
@@ -185,7 +198,8 @@ bool GameScene::SetWorld(std::string a_key)
 			uiCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
-			input
+			input,
+			serialize
 		);
 
 		world->InitWorld();
@@ -197,7 +211,8 @@ bool GameScene::SetWorld(std::string a_key)
 			uiCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
-			input
+			input,
+			serialize
 		);
 
 		world->InitWorld();

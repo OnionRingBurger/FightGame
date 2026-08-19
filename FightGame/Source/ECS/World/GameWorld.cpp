@@ -5,16 +5,16 @@
 #include "GameData.h"
 #include "json.hpp"
 #include "DebugConsole.h"
-#include "ComponentsSerialize.h"
 #include "Defines.h"
 
 #include <fstream>
 
-GameWorld::GameWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input)
+GameWorld::GameWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
 	: World(a_modelCache,
 		a_uiCache,
 		a_tutorialRequest,
-		a_input)
+		a_input, 
+		a_serialize)
 	, worldRequest(a_worldRequest)
 {
 	a_input.RegisterKey("Shot", VK_LBUTTON);
@@ -27,10 +27,9 @@ Chunk GameWorld::CreateNewChunk(AIManager& a_aiManager)
 
 	Chunk newChunk;
 
-	std::unique_ptr<ComponentsSerialize> serialize = std::make_unique<ComponentsSerialize>();
-	TestRegisterComponent(*serialize);
+	
+	/*TestRegisterComponent(*serialize);*/
 
-	//LoadJsonComponent(newChunk, *serialize, "gameEntities");
 
 	ResetSound();
 	PlaySound(LoadSound("Assets/Sound/gamebgm.mp3", true));
@@ -575,7 +574,7 @@ void GameWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespon
 	ResetSystem(a_chunk, a_context);
 }
 
-void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
+void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 	// Physics系の処理を行う
 	VelocitySystem(a_chunk, a_context); //oo
@@ -607,18 +606,18 @@ void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 
 	// Transform等を使用するSystemを実行
 	RaySystem(a_chunk, a_context);
-	LaserSystem(a_chunk, a_context);
+	// LaserSystem(a_chunk, a_context);
 	EnemyPlayerSearch(a_chunk, a_context);
 
 	ItemGetSystem(a_chunk, a_context);
 	CameraViewSystem(a_chunk, a_context);
-	BulletSystem(a_chunk, a_context, a_response);
+	// BulletSystem(a_chunk, a_context, a_response);
 	EnemySpawnSystem(a_chunk, a_context);
 	EnemyShooterSystem(a_chunk, a_context);
 	EnemyAttackSystem(a_chunk, a_context, a_response);
 	PlayerDeadSystem(a_chunk, a_context);
 
-	EnemyDeadSystem(a_chunk, a_context);
+	EnemyDeadSystem(a_chunk, a_context, a_response);
 	EnemyBulletDeadSystem(a_chunk, a_context);
 	GoalSystem(a_chunk, a_context);
 	PlayerWalkSystem(a_chunk, a_context);

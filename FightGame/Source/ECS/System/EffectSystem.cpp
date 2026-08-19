@@ -12,7 +12,6 @@ void FadeUISystem(Chunk& a_chunk, const SystemContext& a_context)
 	{
 
 		ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
-		ComponentHandle<SpriteComponent> sprite = a_chunk.GetComponent<SpriteComponent>(it);
 		ComponentHandle<FadeUI> fade = a_chunk.GetComponent<FadeUI>(it);
 
 		float speed = fade.Look().fadeSpeed;
@@ -23,7 +22,6 @@ void FadeUISystem(Chunk& a_chunk, const SystemContext& a_context)
 		}
 
 		if(ui.IsValid()) ui->alpha = std::clamp(ui.Look().alpha + speed * a_context.effectStepTime, 0.0f, 1.0f);
-		if (sprite.IsValid()) sprite->alpha = std::clamp(sprite.Look().alpha + speed * a_context.effectStepTime, 0.0f, 1.0f);
 
 		ComponentHandle<FadeChange> change = a_chunk.GetComponent<FadeChange>(it);
 		if (!change.IsValid()) continue;
@@ -302,12 +300,6 @@ void SpriteAnimationSystem(Chunk& a_chunk, const SystemContext& a_context)
 		{
 			ui->uvPos = uvPos;
 			ui->uvScale = uvScale;
-		}
-		ComponentHandle<SpriteComponent>sprite = a_chunk.GetComponent<SpriteComponent>(it);
-		if (sprite.IsValid())
-		{
-			sprite->uvPos = uvPos;
-			sprite->uvScale = uvScale;
 		}
 	}
 }

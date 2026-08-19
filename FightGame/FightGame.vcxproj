@@ -105,6 +105,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>include\assimp;include\DataManager;include\DirectXTex;include\Drawer;include\ECS\Core;include\Game\Core;include\imGui;include\nlohmann;include\Sound;include\Tool\Debug;include\ECS\System;include\ECS\Component;include\ECS\World;include\Game\Scene;include\Tool\Math;include;Source\imGui;include\AI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -123,6 +124,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>include\assimp;include\DataManager;include\DirectXTex;include\Drawer;include\ECS\Core;include\Game\Core;include\imGui;include\nlohmann;include\Sound;include\Tool\Debug;include\ECS\System;include\ECS\Component;include\ECS\World;include\Game\Scene;include\Tool\Math;include;Source\imGui;include\AI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -168,6 +170,7 @@
     <ClInclude Include="include\ECS\System\ColliderSystem.h" />
     <ClInclude Include="include\ECS\System\CoreSystem.h" />
     <ClInclude Include="include\ECS\System\DebugCameraSystem.h" />
+    <ClInclude Include="include\ECS\System\DebugSystemResponse.h" />
     <ClInclude Include="include\ECS\System\DrawSystem.h" />
     <ClInclude Include="include\ECS\System\EffectSystem.h" />
     <ClInclude Include="include\ECS\System\EnemySystem.h" />
@@ -275,6 +278,7 @@
     <ClCompile Include="Source\ECS\System\ColliderSystem.cpp" />
     <ClCompile Include="Source\ECS\System\CoreSystem.cpp" />
     <ClCompile Include="Source\ECS\System\DebugCameraSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\DebugSystemResponse.cpp" />
     <ClCompile Include="Source\ECS\System\DrawSystem.cpp" />
     <ClCompile Include="Source\ECS\System\EffectSystem.cpp" />
     <ClCompile Include="Source\ECS\System\EnemySystem.cpp" />

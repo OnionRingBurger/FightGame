@@ -14,30 +14,30 @@ void ResetConsoleSystem(Chunk& a_chunk, const SystemContext& a_context)
 		ComponentHandle<Firework> firework = a_chunk.GetComponent<Firework>(it);
 
 		DebugConsole::ClearConsole();
-		DebugConsole::SetDrawPos(1, 5);
-		std::string mode = (firework.Look().fireworkType & FIREWORK_BURN) ? "ON " : "OFF";
-		std::cout << "爆発移動" << mode << std::endl;
-		mode = (firework.Look().fireworkType & FIREWORK_DROP) ? "ON " : "OFF";
-		DebugConsole::SetDrawPos(1, 6);
-		std::cout << "落下" << mode << std::endl;
-		mode = (firework.Look().fireworkType & FIREWORK_FLY) ? "ON " : "OFF";
-		DebugConsole::SetDrawPos(1, 7);
-		std::cout << "ふわふわ" << mode << std::endl;
-		mode = (firework.Look().fireworkType & FIREWORK_SHAKE) ? "ON " : "OFF";
-		DebugConsole::SetDrawPos(1, 8);
-		std::cout << "振動" << mode << std::endl;
-		mode = (firework.Look().fireworkType & FIREWORK_RETRO) ? "ON " : "OFF";
-		DebugConsole::SetDrawPos(1, 9);
-		std::cout << "レトロゲーム" << mode << std::endl;
-		mode = (firework.Look().fireworkType & FIREWORK_INPUT_MOVE) ? "ON " : "OFF";
-		DebugConsole::SetDrawPos(1, 10);
-		std::cout << "キー操作" << mode << std::endl;
-		mode = (firework.Look().fireworkType & FIREWORK_INPUT_ANGLE) ? "ON " : "OFF";
-		DebugConsole::SetDrawPos(1, 11);
-		std::cout << "マウス操作" << mode << std::endl;
-		mode = (firework.Look().fireworkType & FIREWORK_FISH) ? "ON " : "OFF";
-		DebugConsole::SetDrawPos(1, 12);
-		std::cout << "魚群" << mode << std::endl;
+		//DebugConsole::SetDrawPos(1, 5);
+		//std::string mode = (firework.Look().fireworkType & FIREWORK_BURN) ? "ON " : "OFF";
+		//std::cout << "爆発移動" << mode << std::endl;
+		//mode = (firework.Look().fireworkType & FIREWORK_DROP) ? "ON " : "OFF";
+		//DebugConsole::SetDrawPos(1, 6);
+		//std::cout << "落下" << mode << std::endl;
+		//mode = (firework.Look().fireworkType & FIREWORK_FLY) ? "ON " : "OFF";
+		//DebugConsole::SetDrawPos(1, 7);
+		//std::cout << "ふわふわ" << mode << std::endl;
+		//mode = (firework.Look().fireworkType & FIREWORK_SHAKE) ? "ON " : "OFF";
+		//DebugConsole::SetDrawPos(1, 8);
+		//std::cout << "振動" << mode << std::endl;
+		//mode = (firework.Look().fireworkType & FIREWORK_RETRO) ? "ON " : "OFF";
+		//DebugConsole::SetDrawPos(1, 9);
+		//std::cout << "レトロゲーム" << mode << std::endl;
+		//mode = (firework.Look().fireworkType & FIREWORK_INPUT_MOVE) ? "ON " : "OFF";
+		//DebugConsole::SetDrawPos(1, 10);
+		//std::cout << "キー操作" << mode << std::endl;
+		//mode = (firework.Look().fireworkType & FIREWORK_INPUT_ANGLE) ? "ON " : "OFF";
+		//DebugConsole::SetDrawPos(1, 11);
+		//std::cout << "マウス操作" << mode << std::endl;
+		//mode = (firework.Look().fireworkType & FIREWORK_FISH) ? "ON " : "OFF";
+		//DebugConsole::SetDrawPos(1, 12);
+		//std::cout << "魚群" << mode << std::endl;
 	}
 
 }

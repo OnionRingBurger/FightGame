@@ -6,11 +6,12 @@
 
 using namespace Component;
 
-ClearWorld::ClearWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input)
+ClearWorld::ClearWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
 	: World(a_modelCache,
 		a_uiCache,
 		a_tutorialRequest,
-		a_input)
+		a_input,
+		a_serialize)
 	, worldRequest(a_worldRequest)
 {
 	a_input.RegisterKey("ChunkChange", VK_LBUTTON);
@@ -68,15 +69,11 @@ Chunk ClearWorld::CreateNewChunk(AIManager& a_aiManager)
 		PoseRotState(POSE_ROT_CAMERA)
 	);
 
-	Entity mapModel = newChunk.CreateNewEntity(
-		ModelKey("low_poly_treesNXT_5flat", float3(), float3(), MODEL_DRAW_SHADOW),
-		MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(-90.0f, 0.0f, 0.0f), float3(0.05f, 0.05f, 0.05f))
-	);
 
 	return newChunk;
 }
 
-void ClearWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
+void ClearWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 	
 	VelocitySystem(a_chunk, a_context);

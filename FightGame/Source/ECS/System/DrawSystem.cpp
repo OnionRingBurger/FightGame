@@ -22,7 +22,7 @@ void DrawSystem(Chunk& a_chunk, const SystemContext& a_context)
 	CameraDraw(a_chunk, a_context, cameraView, entityView);
 
 	ComponentView oBBCameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
-	OBBDraw(a_chunk, a_context, oBBCameraView);
+	// OBBDraw(a_chunk, a_context, oBBCameraView);
 	SectorDraw(a_chunk, a_context, oBBCameraView);
 
 	SpriteDraw(a_chunk, a_context);
@@ -123,7 +123,7 @@ void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		{
 			continue;
 		}
-		bool isGhost = a_chunk.GetComponent<EnemyTag>(it).IsValid() || a_chunk.GetComponent<EnemyBulletTag>(it).IsValid();
+		bool isGhost = a_chunk.GetComponent<UseGhostShader>(it).IsValid();
 		bool isAlpha = alphaBlend.IsValid();
 
 		ShaderList::VSKind vsKind = key.Look().useAnime ? ShaderList::VS_ANIME : ShaderList::VS_WORLD;
@@ -222,9 +222,10 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 	ComponentView view = a_chunk.GetView<ComponentTypes<SpriteComponent, Position, Scale, Rotation>>();
 	for (auto it : view)
 	{
+		const ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
 		const ComponentHandle<SpriteComponent> sprite = a_chunk.GetComponent<SpriteComponent>(it);
 
-		std::shared_ptr<Texture> uiTexture = a_context.uiCache.GetTexture(sprite.Look().key);
+		std::shared_ptr<Texture> uiTexture = a_context.uiCache.GetTexture(ui.Look().key);
 
 		DirectX::XMFLOAT4X4 worldMat, viewMat, projMat;
 
@@ -233,11 +234,12 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 			reinterpret_cast<const float3&>(a_chunk.GetComponent<Position>(it).Look());
 		const float3 scale = reinterpret_cast<const float3&>(a_chunk.GetComponent<Scale>(it).Look());
 		const float3 rotation = reinterpret_cast<const float3&>(a_chunk.GetComponent<Rotation>(it).Look()) +
-			sprite.Look().offsetRotation;
-		const float2 uvPos = sprite.Look().uvPos;
-		const float2 uvScale = sprite.Look().uvScale;
+			sprite.Look().offsetRotation + float3(0.0f, 0.0f, ui.Look().uiRotation);
+		const float2 offset = ui.Look().uiPos;
+		const float2 uvPos = ui.Look().uvPos;
+		const float2 uvScale = ui.Look().uvScale;
 
-		const float2 size = sprite.Look().size;
+		const float2 size = ui.Look().uiScale;
 
 		float3 cameraPos(
 			cameraPosHandle.Look().x,
@@ -287,9 +289,9 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 		Sprite::SetWorld(worldMat);
 		Sprite::SetView(viewMat);
 		Sprite::SetProjection(projMat);
-		Sprite::SetColor({ 1.0f, 1.0f, 1.0f,  sprite.Look().alpha });
+		Sprite::SetColor({ 1.0f, 1.0f, 1.0f,  ui.Look().alpha });
 		Sprite::SetSize({ size.x, size.y});
-		Sprite::SetOffset({ 0.0f, 0.0f });
+		Sprite::SetOffset({ offset.x, offset.y });
 		Sprite::SetTexture(uiTexture.get());
 		Sprite::SetUVPos({ uvPos.x, uvPos.y });
 		Sprite::SetUVScale({ uvScale.x, uvScale.y });
@@ -306,7 +308,7 @@ void UIDraw(Chunk& a_chunk, const SystemContext& a_context)
 {
 	SetDepthTest(DEPTH_TEST_FALSE);
 
-	ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>>();
+	ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>, ComponentTypes<SpriteComponent>>();
 	for (auto it : view)
 	{
 		const ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
@@ -647,12 +649,14 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 	}
 
 	// ”»’è•\Ž¦‚ð•`‰æ
-	ComponentView telegraphView = a_chunk.GetView<ComponentTypes<AttackTelegraph, Position, Rotation>>();
-	for (auto telegraphIt : telegraphView)
+	ComponentView telegraphView = a_chunk.GetView<ComponentTypes<AttackStartupAction>>();
+	for (auto startupIt : telegraphView)
 	{
-		const ComponentHandle<AttackTelegraph> telegraph = a_chunk.GetComponent<AttackTelegraph>(telegraphIt);
-		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(telegraphIt);
-		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(telegraphIt);
+		const ComponentHandle<AttackStartupAction> startup = a_chunk.GetComponent<AttackStartupAction>(startupIt);
+		Entity telegraphEntity = startup.Look().telegraphEntity;
+		const ComponentHandle<AttackTelegraph> telegraph = a_chunk.GetComponent<AttackTelegraph>(telegraphEntity);
+		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(telegraphEntity);
+		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(telegraphEntity);
 
 		drawSectorLines(
 			telegraph.Look().minLength,
@@ -664,6 +668,19 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 			pos.Look().y,
 			pos.Look().z,
 			rot.Look().yaw,
-			waitColor);
+			attackColor);
+
+		// !!!New!!!
+		if (!telegraph.Look().sectorKey.empty())
+		{
+			DirectX::XMFLOAT4X4 world;
+			const float3 floatPos(pos.Look().x, pos.Look().y, pos.Look().z);
+			const float3 floatScale(1.0f, 1.0f, 1.0f);
+			const float3 floatRot(rot.Look().pitch * RAD, rot.Look().yaw * RAD, rot.Look().roll * RAD);
+			DrawMatrix::CreateWorldMatrix(world, floatPos, floatScale, floatRot, true);
+			Geometory::SetWorld(world);
+			float progress = startup.Look().elapsedTime / startup.Look().startupDuration;
+			Geometory::DrawSector(telegraph.Look().sectorKey, progress);
+		}
 	}
 }

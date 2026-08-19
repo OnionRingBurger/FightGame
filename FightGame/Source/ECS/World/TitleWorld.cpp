@@ -6,11 +6,12 @@
 
 using namespace Component;
 
-TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input)
+TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
 	: World(a_modelCache,
 		a_uiCache,
 		a_tutorialRequest,
-		a_input)
+		a_input,
+		a_serialize)
 	, worldRequest(a_worldRequest)
 {
 	a_input.RegisterKey("ChunkChange", VK_LBUTTON);
@@ -55,98 +56,62 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 	);
 
 	Entity titleCameraPoint = newChunk.CreateNewEntity(
-		MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 10.0f, 0.0f), float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
+		MOVE_AND_TRANSFORM_COMPONENT(float3(-3.0f, 0.0f, -15.0f), float3(32.0f, 20.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
 		PosePosState(POSE_POS_LEAP),
-		LeapPosComponent(true, float3(0.0f, 13.5f, 0.0f), float3(0.0f, 10.5f, 20.0f), 300.0f),
-		LeapRotComponent(true, float3(20.0f, 0.0f, 0.0f), float3(5.0f, 0.0f, 0.0f), 300.0f),
-		Velocity(0.0f, 0.0f, 0.05f),
-		CameraPoint(100.0f, 100.0f, 100.0f)
+		/*LeapRotComponent(true, float3(60.0f, 0.0f, 0.0f), float3(5.0f, 0.0f, 0.0f), 300.0f),*/
+		// Velocity(0.0f, 0.0f, 0.05f),
+		CameraPoint(100.0f, 100.0f, 100.0f),
+		RailFly(1.0f, 0.02f)
 	);
 
 	Entity changeScene = newChunk.CreateNewEntity(
-		ChunkChange(true, "Game"),
+		ChunkChange(true, "Proto"),
 		KeyChunkChange("ChunkChange", 240.0f)
 	);
 
-	Entity forwardDark = newChunk.CreateNewEntity(
-		MOVE_AND_TRANSFORM_COMPONENT(
-			float3(0.0f, 0.0f, 0.0f),
-			float3(0.0f, 0.0f, 0.0f),
-			float3(kTonnelWidth, kTonnelHeight, 0.1f)
-		),
-		PosePosState(POSE_POS_FOLLOW),
-		FollowPosition(0.0f, 0.0f, kTitleTonnelSegmentLength * (kTitleTonnelSegmentCount - 2), titleCameraPoint, FOLLOW_POS_FIXED_X | FOLLOW_POS_FIXED_Y),
-		ModelKey("Dark", float3(), float3(), MODEL_DRAW_SHADOW)
+	Entity character = newChunk.CreateNewEntity(
+		ModelKey("Box")
 	);
 
-	for (int i = 0; i < kTitleTonnelSegmentCount; i++)
-	{
-		Entity titleTonnel = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, kTitleTonnelHeight / 2, kTitleTonnelSegmentLength * i), float3(0.0f, 0.0f, 0.0f), float3(0.1f, 0.1f, 0.1f)),
-			TrackingWarp(
-				titleCamera,
-				float3(0.0f, 0.0f, -kTitleTonnelSegmentLength),
-				float3(0.0f, 0.0f, kTitleTonnelSegmentLength * (kTitleTonnelSegmentCount - 1) - kTitleTonnelWarpMargin),
-				TRACK_FIXED_X | TRACK_FIXED_Y)
-		);
+	Entity floor = newChunk.CreateNewEntity(
+		TRANSFORM_COMPONENT(
+			float3(0.0f, -50.0f, 0.0f),
+			float3(0.0f, 0.0f, 0.0f),
+			float3(kDebugWorldSize.x, 80.0f, kDebugWorldSize.z)
+		),
+		ModelKey("Box"),
+		AlphaBlendComponent("Red", "Blue")
+	);
 
-		Entity titleFloor1 = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 0.0f), float3(kTitleTonnelMeshSize, 1.0f, kTitleTonnelFloorDepth)),
-			PosePosState(POSE_POS_FOLLOW),
-			ModelKey("bricktexture1"),
-			HitInfomation(),
-			FollowPosition(0.0f, -kTitleTonnelHeight / 2, 0.0f, titleTonnel)
-		);
-
-		Entity titleFloor2 = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 0.0f), float3(kTitleTonnelMeshSize, 1.0f, kTitleTonnelFloorDepth)),
-			PosePosState(POSE_POS_FOLLOW),
-			ModelKey("bricktexture1"),
-			HitInfomation(),
-			FollowPosition(0.0f, kTitleTonnelHeight / 2, 0.0f, titleTonnel)
-		);
-
-		Entity titleFloor3 = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 0.0f), float3(1.0f, kTitleTonnelMeshSize, kTitleTonnelFloorDepth)),
-			PosePosState(POSE_POS_FOLLOW),
-			ModelKey("bricktexture1"),
-			HitInfomation(),
-			FollowPosition(kTitleTonnelWidth / 2, 0.0f, 0.0f, titleTonnel)
-		);
-
-		Entity titleFloor4 = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 0.0f), float3(1.0f, kTitleTonnelMeshSize, kTitleTonnelFloorDepth)),
-			PosePosState(POSE_POS_FOLLOW),
-			ModelKey("bricktexture1"),
-			HitInfomation(),
-			FollowPosition(-kTitleTonnelWidth / 2, 0.0f, 0.0f, titleTonnel)
-		);
-
-		Entity titleFloor5 = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 45.0f), float3(1.0f, kTitleTonnelMeshSize, kTitleTonnelFloorDepth)),
-			PosePosState(POSE_POS_FOLLOW),
-			ModelKey("bricktexture1"),
-			HitInfomation(),
-			FollowPosition(kTitleTonnelWidth / 3.0f, kTitleTonnelHeight / 3.0f, 0.0f, titleTonnel)
-		);
-
-		Entity titleFloor6 = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 225.0f), float3(kTitleTonnelMeshSize, 1.0f, kTitleTonnelFloorDepth)),
-			PosePosState(POSE_POS_FOLLOW),
-			ModelKey("bricktexture1"),
-			HitInfomation(),
-			FollowPosition(-kTitleTonnelWidth / 3.0f, kTitleTonnelHeight / 3.0f, 0.0f, titleTonnel)
-		);
-	}
+	Entity underFloor = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, -40.0f, 10.0f),
+			float3(0.0f, 0.0f, 0.0f),
+			float3(kDebugWorldSize.x * 10.0f, 1.0, kDebugWorldSize.z * 6.0f)
+		),
+		ModelKey("Box"),
+		AlphaBlendComponent("White", "White")
+	);
+	
+	Entity sky = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, 0.0f, 80.0f),
+			float3(0.0f, 0.0f, 0.0f),
+			float3(kDebugWorldSize.x * 10.0f, 180.0, 1.0f)
+		),
+		ModelKey("Box"),
+		AlphaBlendComponent("White", "Blue")
+	);
 
 	return newChunk;
 }
 
-void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
+void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 	VelocitySystem(a_chunk, a_context);
 	LeapSystem(a_chunk, a_context);
 	TrackingWarpSystem(a_chunk, a_context);
+	FlySystem(a_chunk, a_context);
 	PoseSystem(a_chunk, a_context);
 
 	FollowTransformSystem(a_chunk, a_context);

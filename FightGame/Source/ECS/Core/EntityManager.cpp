@@ -94,40 +94,9 @@ bool EntityManager::IsEntityIsAlive(Entity a_entity)
 }
 
 
-
-std::optional<Entity> EntityManager::ImGuiUseEntity()
-{
-	
-	if (entitys.empty()) return std::nullopt;
-
-	static int useEntity = 0;
-
-	std::vector<EntityID> vec;
-	std::vector<const char*> name;
-
-	int i = 0;
-
-	for (auto it : entitys)
-	{
-		if (!it.isAlive) continue;
-
-		vec.push_back(i);
-
-		name.push_back(std::to_string(i).c_str());
-		i++;
-	}
-
-	ImGui::Combo("UseEntity", &useEntity, name.data(), name.size());
-	
-
-	EntityID id = vec.at(useEntity);
-	return Entity{id, entitys.at(id).generation};
-}
-
 void EntityManager::DefaultImGuiOutPut()
 {
 	std::string haveEntities = "Have entities count = ";
 	haveEntities += std::to_string(entitys.size());
 	ImGui::Text(haveEntities.c_str());
-
 }

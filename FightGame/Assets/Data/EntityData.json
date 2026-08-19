@@ -1,34 +1,494 @@
 {
-	"gameEntities": [
-	{
-		"number": 0,
-		"components": [
-		{"typeId": 12,"typeName": "Position", "data": { "x": 0.0, "y": 0.0, "z": 0.0}},
-		{"typeId": 13,"typeName": "Rotation", "data": { "pitch": 0.0, "roll": 0.0, "yaw": 0.0}},
-		{"typeId": 14,"typeName": "Scale",	 "data": { "x": 1.0, "y": 1.0, "z": 1.0}},
-		{"typeId": 45,"typeName": "FollowPosition", "data": { "offsetX": 5.0, "offsetY": 0.0, "offsetZ": 0.0, "target": 1, "flag": 0}},
-		{"typeId": 51, "typeName": "ModelKey", "data": { "key": "bricktexture1", "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotateX": 0.0, "rotateY": 0.0, "rotateZ": 0.0, "flag": 0, "useAnime": false}}
-		]
-	},
-	{
-		"number": 1,
-		"components": [
-		{"typeId": 12, "typeName": "Position", "data": { "x": 0.0, "y": 1.0, "z": 10.0}},
-		{"typeId": 13, "typeName": "Rotation", "data": { "pitch": 0.0, "roll": 0.0, "yaw": 0.0}},
-		{"typeId": 14, "typeName": "Scale",	 "data": { "x": 1.0, "y": 1.0, "z": 1.0}},
-		{"typeId": 23, "typeName": "Velocity", "data": { "x": 0.0, "y": 0.0, "z": 0.005}},
-		{"typeId": 51, "typeName": "ModelKey", "data": { "key": "Box", "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotateX": 0.0, "rotateY": 0.0, "rotateZ": 0.0, "flag": 0, "useAnime": false}}
-		]
-	},
-	{
-		"number": 2,
-		"components": [
-		{"typeId": 12, "typeName": "Position", "data": { "x": 0.0, "y": 5.0, "z": -5.0}},
-		{"typeId": 13, "typeName": "Rotation", "data": { "pitch": 10.0, "roll": 0.0, "yaw": 0.0}},
-		{"typeId": 14, "typeName": "Scale",	 "data": { "x": 1.0, "y": 1.0, "z": 1.0}},
-		{"typeId": 23, "typeName": "Velocity", "data": { "x": 0.0, "y": 0.0, "z": 0.0}},
-		{"typeId": 43, "typeName": "Camera", "data": { "priority": 100, "lookPosX": 0.0, "lookPosY": 0.0, "lookPosZ": 0.0, "upVectorX": 0.0, "upVectorY": 1.0, "upVectorZ": 0.0, "fovy": 60.0, "aspect": 1.77777, "nearClip": 0.05, "farClip": 1000}}
-		]
-	}
-	]
+    "Stage1Phase1": [
+        {
+            "number": 0,
+            "components": [
+                {
+                    "typeId": 12,
+                    "virsion": 0,
+                    "typeName": "Position",
+                    "data": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 3.0
+                    }
+                },
+                {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                },
+                {
+                    "typeId": 101,
+                    "virsion": 0,
+                    "typeName": "MotionTransform",
+                    "data": {
+                        "motionPosX": 0.0,
+                        "motionPosY": 0.0,
+                        "motionPosZ": 3.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 13,
+                    "virsion": 1,
+                    "typeName": "Rotation",
+                    "data": {
+                        "pitch": 0.0,
+                        "yaw": 0.0,
+                        "roll": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 0.0,
+                        "posZ": 3.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 102,
+                    "virsion": 0,
+                    "typeName": "FixedResult",
+                    "data": {
+                        "newPosX": 0.0,
+                        "newPosY": 0.0,
+                        "newPosZ": 0.0,
+                        "newRotX": 0.0,
+                        "newRotY": 0.0,
+                        "newRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 103,
+                    "virsion": 0,
+                    "typeName": "MotionResult",
+                    "data": {
+                        "posOffsetX": 0.0,
+                        "posOffsetY": 0.0,
+                        "posOffsetZ": 0.0,
+                        "rotOffsetX": 0.0,
+                        "rotOffsetY": 0.0,
+                        "rotOffsetZ": 0.0,
+                        "isWarp": false,
+                        "warpPosX": 0.0,
+                        "warpPosY": 0.0,
+                        "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 104,
+                    "virsion": 0,
+                    "typeName": "EphemeralResult",
+                    "data": {
+                        "posOffsetX": 0.0,
+                        "posOffsetY": 0.0,
+                        "posOffsetZ": 0.0,
+                        "rotOffsetX": 0.0,
+                        "rotOffsetY": 0.0,
+                        "rotOffsetZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 130,
+                    "virsion": 0,
+                    "typeName": "Name",
+                    "data": {
+                        "name": "Enemy1"
+                    }
+                },
+                {
+                    "typeId": 73,
+                    "virsion": 0,
+                    "typeName": "PoseRotState",
+                    "data": {
+                        "state": 5
+                    }
+                },
+                {
+                    "typeId": 16,
+                    "virsion": 0,
+                    "typeName": "InputMove",
+                    "data": {
+                        "moveSpeedX": 0.05999999865889549,
+                        "moveSpeedY": 0.05999999865889549
+                    }
+                },
+                {
+                    "typeId": 51,
+                    "virsion": 0,
+                    "typeName": "ModelKey",
+                    "data": {
+                        "key": "Box",
+                        "offsetX": 0.0,
+                        "offsetY": 0.0,
+                        "offsetZ": 0.0,
+                        "rotateX": 0.0,
+                        "rotateY": 0.0,
+                        "rotateZ": 0.0,
+                        "defaultRotateX": 0.0,
+                        "defaultRotateY": 0.0,
+                        "defaultRotateZ": 0.0,
+                        "flag": 0,
+                        "useAnime": false
+                    }
+                },
+                {
+                    "typeId": 106,
+                    "virsion": 0,
+                    "typeName": "AlphaBlendComponent",
+                    "data": {
+                        "textureKey1": "Blue",
+                        "textureKey2": "Green"
+                    }
+                },
+                {
+                    "typeId": 1,
+                    "virsion": 0,
+                    "typeName": "EnemyTag"
+                },
+                {
+                    "typeId": 129,
+                    "virsion": 0,
+                    "typeName": "ClearTarget"
+                },
+                {
+                    "typeId": 120,
+                    "virsion": 0,
+                    "typeName": "MoveInputResult",
+                    "data": {
+                        "moveDirX": 0.0,
+                        "moveDirY": 0.0,
+                        "magnitube": 0.0,
+                        "isInput": false,
+                        "useAttack": false,
+                        "attackIndex": 0,
+                        "useJump": false,
+                        "useGuard": false
+                    }
+                },
+                {
+                    "typeId": 121,
+                    "virsion": 0,
+                    "typeName": "InputSource",
+                    "data": {
+                        "move": 2,
+                        "attack": 2,
+                        "jump": 2,
+                        "guard": 2
+                    }
+                },
+                {
+                    "typeId": 119,
+                    "virsion": 0,
+                    "typeName": "LookMove",
+                    "data": {
+                        "rotateSpeed": 8.0
+                    }
+                },
+                {
+                    "typeId": 23,
+                    "virsion": 0,
+                    "typeName": "Velocity",
+                    "data": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    }
+                },
+                {
+                    "typeId": 31,
+                    "virsion": 0,
+                    "typeName": "HitInfomation"
+                },
+                {
+                    "typeId": 25,
+                    "virsion": 0,
+                    "typeName": "BoxCollider",
+                    "data": {
+                        "offsetX": 0.0,
+                        "offsetY": 2.0,
+                        "offsetZ": 0.0,
+                        "collisionScaleX": 1.0,
+                        "collisionScaleY": 5.0,
+                        "collisionScaleZ": 1.0
+                    }
+                },
+                {
+                    "typeId": 29,
+                    "virsion": 0,
+                    "typeName": "OBBCollider",
+                    "data": {
+                        "centerX": 0.0,
+                        "centerY": 0.0,
+                        "centerZ": 0.0,
+                        "halfX": 0.0,
+                        "halfY": 0.0,
+                        "halfZ": 0.0,
+                        "obbBitFlag": 0
+                    }
+                },
+                {
+                    "typeId": 93,
+                    "virsion": 0,
+                    "typeName": "DeadState",
+                    "data": {
+                        "isDead": false
+                    }
+                },
+                {
+                    "typeId": 126,
+                    "virsion": 0,
+                    "typeName": "AIRole",
+                    "data": {
+                        "distCoefficient": 4.0,
+                        "farnessCoefficient": 7.0,
+                        "hitCoefficient": 3.0,
+                        "stanceCoefficient": 1.2000000476837158
+                    }
+                },
+                {
+                    "typeId": 111,
+                    "virsion": 0,
+                    "typeName": "GroundedState",
+                    "data": {
+                        "isGrounded": false
+                    }
+                },
+                {
+                    "typeId": 112,
+                    "virsion": 0,
+                    "typeName": "ActionMask",
+                    "data": {
+                        "allowed": 255
+                    }
+                },
+                {
+                    "typeId": 132,
+                    "virsion": 0,
+                    "typeName": "InterferenceResult",
+                    "data": {
+                        "useKnockback": false,
+                        "knockBackDirX": 0.0,
+                        "knockBackDirY": 0.0
+                    }
+                },
+                {
+                    "typeId": 92,
+                    "virsion": 0,
+                    "typeName": "HitPoint",
+                    "data": {
+                        "maxHP": 22.0,
+                        "currentHP": 22.0
+                    }
+                },
+                {
+                    "typeId": 28,
+                    "virsion": 0,
+                    "typeName": "GhostAreaComponent",
+                    "data": {
+                        "length": 2.0
+                    }
+                },
+                {
+                    "typeId": 143,
+                    "virsion": 0,
+                    "typeName": "AttackKeyLoad",
+                    "data": {
+                        "size": 3,
+                        "attack0": "Enemy1Attack1",
+                        "attack1": "Enemy1Attack2",
+                        "attack2": "Enemy1Attack3"
+                    }
+                },
+                {
+                    "typeId": 110,
+                    "virsion": 0,
+                    "typeName": "AttackHitRecord"
+                }
+            ]
+        },
+        {
+            "number": 1,
+            "components": [
+                {
+                    "typeId": 12,
+                    "virsion": 0,
+                    "typeName": "Position",
+                    "data": {
+                        "x": 0.0,
+                        "y": 1.0,
+                        "z": 0.0
+                    }
+                },
+                {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                },
+                {
+                    "typeId": 101,
+                    "virsion": 0,
+                    "typeName": "MotionTransform",
+                    "data": {
+                        "motionPosX": 0.0,
+                        "motionPosY": 1.0,
+                        "motionPosZ": 0.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 13,
+                    "virsion": 1,
+                    "typeName": "Rotation",
+                    "data": {
+                        "pitch": 0.0,
+                        "yaw": 0.0,
+                        "roll": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 1.0,
+                        "posZ": 0.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 102,
+                    "virsion": 0,
+                    "typeName": "FixedResult",
+                    "data": {
+                        "newPosX": 0.0,
+                        "newPosY": 0.0,
+                        "newPosZ": 0.0,
+                        "newRotX": 0.0,
+                        "newRotY": 0.0,
+                        "newRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 103,
+                    "virsion": 0,
+                    "typeName": "MotionResult",
+                    "data": {
+                        "posOffsetX": 0.0,
+                        "posOffsetY": 0.0,
+                        "posOffsetZ": 0.0,
+                        "rotOffsetX": 0.0,
+                        "rotOffsetY": 0.0,
+                        "rotOffsetZ": 0.0,
+                        "isWarp": false,
+                        "warpPosX": 0.0,
+                        "warpPosY": 0.0,
+                        "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 104,
+                    "virsion": 0,
+                    "typeName": "EphemeralResult",
+                    "data": {
+                        "posOffsetX": 0.0,
+                        "posOffsetY": 0.0,
+                        "posOffsetZ": 0.0,
+                        "rotOffsetX": 0.0,
+                        "rotOffsetY": 0.0,
+                        "rotOffsetZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 72,
+                    "virsion": 0,
+                    "typeName": "PosePosState",
+                    "data": {
+                        "state": 3
+                    }
+                },
+                {
+                    "typeId": 45,
+                    "virsion": 0,
+                    "typeName": "FollowPosition",
+                    "data": {
+                        "offsetX": 0.0,
+                        "offsetY": 0.800000011920929,
+                        "offsetZ": 0.0,
+                        "target": 0,
+                        "flag": 8
+                    }
+                },
+                {
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
+                    "data": {
+                        "key": "UIGauge",
+                        "uiPosX": 0.0,
+                        "uiPosY": 0.0,
+                        "uiScaleX": 1.0,
+                        "uiScaleY": 0.10000000149011612,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
+                    }
+                },
+                {
+                    "typeId": 94,
+                    "virsion": 0,
+                    "typeName": "HPGaugeUI",
+                    "data": {
+                        "target": 0,
+                        "gaugePosX": 0.0,
+                        "gaugePosY": 0.0,
+                        "gaugeScaleX": 1.0,
+                        "gaugeScaleY": 0.07999999821186066
+                    }
+                },
+                {
+                    "typeId": 53,
+                    "virsion": 2,
+                    "typeName": "SpriteComponent",
+                    "data": {
+                        "offsetPosX": 0.0,
+                        "offsetPosY": 0.0,
+                        "offsetPosZ": 0.0,
+                        "offsetRotationX": 0.0,
+                        "offsetRotationY": 0.0,
+                        "offsetRotationZ": 0.0,
+                        "isBillBoard": true
+                    }
+                }
+            ]
+        }
+    ]
 }
