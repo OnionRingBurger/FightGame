@@ -2,6 +2,7 @@
 #include "DebugConsole.h"
 #include "LoadWorld.h"
 #include <unordered_set>
+#include "Defines.h"
 
 LoadScene::LoadScene(
 	std::function<void(std::string)> a_sceneChange,
@@ -11,7 +12,8 @@ LoadScene::LoadScene(
 	std::vector<std::string> a_textureDatas,
 	IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
-	Input& a_input)
+	Input& a_input,
+	ComponentsSerialize& a_serialize)
 	: sceneChange(a_sceneChange)
 	, inited(false)
 	, modelJobQueue(a_modelJobQueue)
@@ -19,7 +21,7 @@ LoadScene::LoadScene(
 	, modelDatas(a_modelDatas)
 	, textureDatas(a_textureDatas)
 {
-	DebugConsole::ToggleConsole();
+	// DebugConsole::ToggleConsole();
 
 	std::vector<modelLoadData> useModelDatas = {
 	};
@@ -45,7 +47,7 @@ LoadScene::LoadScene(
 	}
 
 
-	world = std::make_unique<LoadWorld>(a_modelCache, a_uiCache, a_input);
+	world = std::make_unique<LoadWorld>(a_modelCache, a_uiCache, a_input, a_serialize);
 	world->InitWorld();
 	// ƒ[ƒh—Ê‚ð•ÛŽ
 	maxLoadCount = loadEndFlags.size();
@@ -81,14 +83,18 @@ void LoadScene::Update()
 		}
 	}
 
-
-
 	if (!inited) return;
 	RemoveIfFlaged(loadEndFlags);
 	if (loadEndFlags.empty())
 	{
-		DebugConsole::ToggleConsole();
+#ifdef CREATEGAME
+		sceneChange("CreateGame");
+#else
 		sceneChange("Game");
+		
+#endif // CREATEGAME
+
+		
 	}
 	world->UpdateWorld();
 }

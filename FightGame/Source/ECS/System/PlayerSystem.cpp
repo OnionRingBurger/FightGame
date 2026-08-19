@@ -40,12 +40,13 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
 		ComponentHandle<DeadState> dead = a_chunk.GetComponent<DeadState>(it);
 		if (!dead.Look().isDead) continue;
 
+		a_chunk.DeleteChunkComponent(it, PlayerTag::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, InputMove::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, InputRotato::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, Velocity::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, ShooterComponent::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, ShakingComponent::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, OBBCollider::kTypeId);
+		a_chunk.DeleteChunkComponent(it, OBBCollider::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, RailFly::kTypeId);
 
 		//ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>>();
@@ -55,14 +56,14 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
 		//}
 
 		Entity chunkChange = a_chunk.CreateNewEntity(
-			ChunkChange(false, "Result"),
+			ChunkChange(true, "Result"),
 			DelayChunkChange(240.0f)
 		);
-		//PlaySound(LoadSound("Assets/Sound/dead.mp3"));
+		// PlaySound(LoadSound("Assets/Sound/dead.mp3"));
 
-		//Entity createEffect = a_chunk.CreateNewEntity(
-		//	CreateEffect(DARKFADE_UP)
-		//);
+		Entity createEffect = a_chunk.CreateNewEntity(
+			CreateEffect(DARKFADE_UP)
+		);
 
 		//ComponentView gunView = a_chunk.GetView<ComponentTypes<GunTag, ModelKey>>();
 		//// a_chunk.DeleteChunkComponent(it, DeadState::kTypeId);

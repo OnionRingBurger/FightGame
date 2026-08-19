@@ -9,14 +9,17 @@
 #include "AI.h"
 #include "Defines.h"
 #include "Geometory.h"
+#include "SystemAssist.h"
 
 #include <fstream>
 
-ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input)
+ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
 	: World(a_modelCache,
 		a_uiCache,
 		a_tutorialRequest,
-		a_input)
+		a_input,
+		a_serialize
+	)
 	, worldRequest(a_worldRequest)
 {
 	//a_input.RegisterKey("RightAttack", VK_RIGHT);
@@ -82,7 +85,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		),
 		ModelKey("Box"),
 		InputSource(InputOrigin::Device),
-		InputMove(float2(0.09f, 0.09f)),
+		InputMove(kPlayerMoveSpeed),
 		MoveInputResult(),
 		ShooterComponent(100.0f, 300.0f),
 		Ray(0.0f, 0.0f, 0.0f),
@@ -99,18 +102,19 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		HitInfomation(),
 		JumpPower(float3(0.0f, 20.0f / 60.0f, 0.0f)),
 		AttackStatus({
-			AttackPower(0.0f, 1.7f, 160.0f, 0.5f, 0.5f, 2.0f, 20.0f, 15.0f, float3(), 12.0f, 20.0f, "Player1Attack1"),
+			AttackPower(0.0f, 1.7f, 160.0f, 0.5f, 0.5f, 2.5f, 20.0f, 15.0f, float3(), 12.0f, 20.0f, "Player1Attack1"),
 			AttackPower(0.0f, 6.2f, 60.0f, 0.5f, 0.5f, 5.0f, 30.0f, 30.0f, float3(), 22.0f, 50.0f, "Player1Attack2")
 			}),
 		LookMove(800.0f / 60.0f),
 		PoseRotState(POSE_ROT_LOOKMOVE),
-		HitPoint(30.0f),
+		HitPoint(15.0f),
 		AttackHitRecord(),
 		GuardState(0.2f, 3.0f),
 		Name("Player"),
 		InterferenceResult(),
 		GhostAreaComponent(1.4f),
-		LookOnState(7.0f, 8.5f)
+		LookOnState(7.0f, 7.8f),
+		AlphaBlendComponent("Red", "Red")
 
 	);
 
@@ -130,67 +134,68 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		UIComponent("UIFrame", float2(-0.58, 0.9f), float2(0.8f, 0.1f), 0.0f)
 	);
 
-	Entity debugEnemy = newChunk.CreateNewEntity(
-		// タグ 
-		Name("Enemy"),
-		EnemyTag(),
-		ClearTarget(),
-		// 移動系
-		MOVE_AND_TRANSFORM_COMPONENT(
-			float3(0.0f, 0.5f, 3.0f) + kDefaultWorldPosition,
-			float3(0.0f, 180.0f, 0.0f),
-			float3(1.0f, 1.0f, 1.0f)
-		),
-		InputMove(float2(0.06f, 0.06f)),
-		MoveInputResult(),
-		InputSource(InputOrigin::AI),
-		LookMove(480.0f / 60.0f),
-		PoseRotState(POSE_ROT_LOOKMOVE),
-		Velocity(),
-		// 当たり判定
-		HitInfomation(),
-		BoxCollider(float3(0.0f, 2.0f, 0.0f), float3(1.0, 5.0f, 1.0f)),
-		OBBCollider(),
-		// AI、ステート
-		AIRole(4.0f, 3.0f, 1.2f, 7.0f),
-		GroundedState(),
-		DeadState(),
-		ActionMask(),
-		InterferenceResult(),
-		// ゲームルール
-		HitPoint(30.0f),
-		AttackStatus({
-		AttackPower(0.0f, 2.5f, 160.0f, 0.01f, 0.5f, 1.0f, 30.0f, 10.0f, float3(), 30.0f, 30.0f, "Enemy1Attack1"),
-		AttackPower(1.3f, 3.7f, 110.0f, 0.01f, 0.5f, 3.0f, 60.0f, 10.0f, float3(), 50.0f, 60.0f, "Enemy1Attack2"),
-		AttackPower(0.0f, 4.2f, 30.0f, 0.01f, 0.5f, 3.0f, 20.0f, 10.0f, float3(), 50.0f, 60.0f, "Enemy1Attack3"),
-			}),
-		AttackHitRecord(),
-		// モデル
-		ModelKey("Box"),
-		GhostAreaComponent(2.0f)
-	);
-	a_aiManager.RegisterAI(debugEnemy, "Enemy");
+	//Entity debugEnemy = newChunk.CreateNewEntity(
+	//	// タグ 
+	//	Name("Enemy1"),
+	//	EnemyTag(),
+	//	ClearTarget(),
+	//	// 移動系
+	//	MOVE_AND_TRANSFORM_COMPONENT(
+	//		float3(0.0f, 0.5f, 3.0f) + kDefaultWorldPosition,
+	//		float3(0.0f, 180.0f, 0.0f),
+	//		float3(1.0f, 1.0f, 1.0f)
+	//	),
+	//	InputMove(float2(0.06f, 0.06f)),
+	//	MoveInputResult(),
+	//	InputSource(InputOrigin::AI),
+	//	LookMove(480.0f / 60.0f),
+	//	PoseRotState(POSE_ROT_LOOKMOVE),
+	//	Velocity(),
+	//	// 当たり判定
+	//	HitInfomation(),
+	//	BoxCollider(float3(0.0f, 2.0f, 0.0f), float3(1.0, 5.0f, 1.0f)),
+	//	OBBCollider(),
+	//	// AI、ステート
+	//	AIRole(4.0f, 3.0f, 1.2f, 7.0f),
+	//	GroundedState(),
+	//	DeadState(),
+	//	ActionMask(),
+	//	InterferenceResult(),
+	//	// ゲームルール
+	//	HitPoint(22.0f),
+	//	AttackStatus({
+	//	AttackPower(0.0f, 2.5f, 270.0f, 0.01f, 0.5f, 1.0f, 30.0f, 10.0f, float3(), 30.0f, 30.0f, "Enemy1Attack1"),
+	//	AttackPower(1.3f, 3.7f, 110.0f, 0.01f, 0.5f, 2.5f, 60.0f, 10.0f, float3(), 50.0f, 60.0f, "Enemy1Attack2"),
+	//	AttackPower(3.5f, 7.5f, 30.0f, 0.01f, 0.5f, 5.0f, 12.0f, 10.0f, float3(), 50.0f, 40.0f, "Enemy1Attack3"),
+	//		}),
+	//	AttackHitRecord(),
+	//	// モデル
+	//	ModelKey("Box"),
+	//	GhostAreaComponent(2.0f),
+	//	AlphaBlendComponent("Blue", "Green")
+	//);
+	// a_aiManager.RegisterAI(debugEnemy, "Enemy");
 
-	Geometory::RegisterSector("Enemy1Attack1", 0.0f, 2.5f, 160.0f, 0.01f, 0.5f, kSectorVertexCount);
+	Geometory::RegisterSector("Enemy1Attack1", 0.0f, 2.5f, 360.0f, 0.01f, 0.5f, kSectorVertexCount);
 	Geometory::RegisterSector("Enemy1Attack2", 1.3f, 3.7f, 110.0f, 0.01f, 0.5f, kSectorVertexCount);
-	Geometory::RegisterSector("Enemy1Attack3", 0.0f, 4.2f, 30.0f, 0.01f, 0.5f, kSectorVertexCount);
+	Geometory::RegisterSector("Enemy1Attack3", 3.5f, 7.5f, 30.0f, 0.01f, 0.5f, kSectorVertexCount);
 
-	Entity enemyHp = newChunk.CreateNewEntity(
-		MOVE_AND_TRANSFORM_COMPONENT(
-			float3(0.0f, 1.0f, 0.0f) + kDefaultWorldPosition,
-			float3(0.0f, 0.0f, 0.0f),
-			float3(1.0f, 1.0f, 1.0f)
-		),
-		FollowPosition(float3(0.0f, 0.8f, 0.0f), debugEnemy, FOLLOW_POS_LOCALOFFSET | FOLLOW_POS_FIXED_Y),
-		PosePosState(POSE_POS_FOLLOW),
-		UIComponent("UIGauge", float2(0.0f, 0.0f), float2(1.0f, 0.1f), 0.0f),
-		HPGaugeUI(debugEnemy, float2(0.0f, 0.0f), float2(1.0f, 0.08f)),
-		SpriteComponent(float3(), float3(), true)
-	);
+	//Entity enemyHp = newChunk.CreateNewEntity(
+	//	MOVE_AND_TRANSFORM_COMPONENT(
+	//		float3(0.0f, 1.0f, 0.0f),
+	//		float3(0.0f, 0.0f, 0.0f),
+	//		float3(1.0f, 1.0f, 1.0f)
+	//	),
+	//	FollowPosition(float3(0.0f, 0.8f, 0.0f), debugEnemy, FOLLOW_POS_LOCALOFFSET),
+	//	PosePosState(POSE_POS_FOLLOW),
+	//	UIComponent("UIGauge", float2(0.0f, 0.0f), float2(1.0f, 0.1f), 0.0f),
+	//	HPGaugeUI(debugEnemy, float2(0.0f, 0.0f), float2(1.0f, 0.08f)),
+	//	SpriteComponent(float3(), float3(), true)
+	//);
 
 	Entity debugEnemy2 = newChunk.CreateNewEntity(
 		// タグ 
-		Name("Enemy"),
+		Name("Enemy2"),
 		EnemyTag(),
 		ClearTarget(),
 		// 移動系
@@ -216,26 +221,27 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		ActionMask(),
 		InterferenceResult(),
 		// ゲームルール
-		HitPoint(10.0f),
+		HitPoint(12.0f),
 		AttackStatus({
-		AttackPower(0.0f, 2.5f, 160.0f, 0.01f, 0.5f, 1.0f, 25.0f, 10.0f, float3(), 30.0f, 30.0f, "Enemy2Attack1"),
+		AttackPower(0.0f, 2.5f, 160.0f, 0.01f, 0.5f, 1.0f, 25.0f, 10.0f, float3(), 30.0f, 30.0f, "Enemy2Attack1")
 			}),
 			AttackHitRecord(),
 			// モデル
 		ModelKey("Box"),
-		GhostAreaComponent(2.0f)
+		GhostAreaComponent(2.0f),
+		AlphaBlendComponent("Red", "Purple")
 		);
 		a_aiManager.RegisterAI(debugEnemy2, "Enemy");
 		Geometory::RegisterSector("Enemy2Attack1", 0.0f, 2.5f, 160.0f, 0.01f, 0.5f, kSectorVertexCount);
 
-
+		
 		Entity enemyHp2 = newChunk.CreateNewEntity(
 			MOVE_AND_TRANSFORM_COMPONENT(
-				float3(0.0f, 1.0f, 0.0f) + kDefaultWorldPosition,
+				float3(0.0f, 1.0f, 0.0f),
 				float3(0.0f, 0.0f, 0.0f),
 				float3(1.0f, 1.0f, 1.0f)
 			),
-			FollowPosition(float3(0.0f, 0.8f, 0.0f), debugEnemy2, FOLLOW_POS_LOCALOFFSET | FOLLOW_POS_FIXED_Y),
+			FollowPosition(float3(0.0f, 0.8f, 0.0f), debugEnemy2, FOLLOW_POS_LOCALOFFSET),
 			PosePosState(POSE_POS_FOLLOW),
 			UIComponent("UIGauge", float2(0.0f, 0.0f), float2(1.0f, 0.1f), 0.0f),
 			HPGaugeUI(debugEnemy2, float2(0.0f, 0.0f), float2(1.0f, 0.08f)),
@@ -253,43 +259,41 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 			FollowPosition(float3(), kInvalidEntity),
 			PosePosState(POSE_POS_FOLLOW),
 			UIComponent("LookOnMaker", float2(0.0f, 0.0f), float2(0.6f, 0.6f), 0.0f),
-			SpriteComponent(float3(0.0f, 1.7f, 0.0f), float3(), true),
+			SpriteComponent(float3(0.0f, 2.2f, 0.0f), float3(), true),
 			RailFly(0.08f, 0.09f)
 		);
 
+		Entity spawner = newChunk.CreateNewEntity(
+			PhaseSpawner(
+				{ 
+					"Stage1Phase1",
+					"Stage1Phase1",
+					"Stage1Phase1"
+				}
 
-	//Entity JumpGaurd = newChunk.CreateNewEntity(
-	//	MOVE_AND_TRANSFORM_COMPONENT(
-	//		float3(0.0f, 0.0,  0.0f),
-	//		float3(0.0f, 0.0f, 0.0f),
-	//		float3(1.0f, 1.0f, 1.0f)
-	//	),
-	//	PosePosState(POSE_POS_FOLLOW),
-	//	FollowPosition(float3(0.0f, 2.0f, 0.0f), debugEnemy),
-	//	PoseRotState(POSE_ROT_FOLLOW),
-	//	FollowRotation(float3(0.0f, 0.0f, 0.0f), debugEnemy),
-	//	OBBCollider(OBB_PushOutLocked),
-	//	BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 2.95f, 1.0f))
+			)
+		);
 
-	//);
 
-		
+// #define CAMERA_3RD
 
+#ifdef CAMERA_3RD
 	Entity cameraRig = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
-			float3(0.0f, 52.0f, 0.0f),
+			float3(0.0f, 0.5f, 0.0f) + kDefaultWorldPosition,
 			float3(30.0f, 0.0f, 0.0f),
 			float3(1.0f, 1.0f, 1.0f)
 		),
+		CameraRigTag(),
 		FollowPosition(float3(0.0f, 0.0f, 0.0f), player, FOLLOW_POS_LOCALOFFSET | FOLLOW_POS_FIXED_Y),
+		FollowLeap(float3(kPlayerMoveSpeed.x, 0.0f, kPlayerMoveSpeed.y)),
 		PosePosState(POSE_POS_FOLLOW),
-		CameraPoint(100.0f, 100.0f, 100.0f, float3(0.0f, 0.0f, -10.0f)),
-		InputRotato(float2(1.0f, 0.0f), float2(1.0f, 0.0f))
+		CameraPoint(100.0f, 100.0f, 100.0f, float3(0.0f, 0.0f, -10.5f))
 	);
 
 	Entity camera = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
-			float3(0.0f, 0.5f, 0.0f),
+			float3(0.0f, 0.0f, 0.0f),
 			float3(0.0f, 0.0f, 0.0f),
 			float3(1.0f, 1.0f, 1.0f)
 		),
@@ -299,76 +303,83 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		PoseRotState(POSE_ROT_CAMERA)
 	);
 
+#else
+	Entity cameraRig = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, 0.5f, 0.0f) + kDefaultWorldPosition,
+			float3(55.0f, 0.0f, 0.0f),
+			float3(1.0f, 1.0f, 1.0f)
+		),
+		FollowPosition(float3(0.0f, 0.0f, 0.0f), player, FOLLOW_POS_LOCALOFFSET | FOLLOW_POS_FIXED_Y),
+		FollowLeap(float3(kPlayerMoveSpeed.x, 0.0f, kPlayerMoveSpeed.y)),
+		PosePosState(POSE_POS_FOLLOW),
+		CameraPoint(100.0f, 100.0f, 100.0f, float3(0.0f, 0.0f, -15.0f))
+	);
+
+	Entity camera = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, 0.0f, 0.0f),
+			float3(0.0f, 0.0f, 0.0f),
+			float3(1.0f, 1.0f, 1.0f)
+		),
+		Camera(100.0f, float3(0.0f, 0.0f, 0.0f), float3(0.0f, 1.0f, 0.0f), 60.0f, 1.77777f, 0.05f, 1000.0f),
+		CameraTag(),
+		PosePosState(POSE_POS_CAMERA),
+		PoseRotState(POSE_ROT_CAMERA)
+	);
+
+#endif
+
 
 	Entity worldPower = newChunk.CreateNewEntity(
 		WorldPower(float3(0.0f, -1.2f / 60.0f, 0.0f), float3(0.5f, 1.0f, 0.5f))
 	);
-	//Entity fire = newChunk.CreateNewEntity(
-	//	MOVE_AND_TRANSFORM_COMPONENT(
-	//		float3(0.0f, 0.0f, 1.0f),
-	//		float3(0.0f, 0.0f, 0.0f),
-	//		float3(1.0f, 1.0f, 1.0f)
-	//	),
-	//	//ModelKey("Box"),
-	//	Velocity(0.0f, 0.0f, 0.0f),
-	//	//LifeTime(300.0f),
-	//	Component::AlphaBlendComponent("Star", "Star")
-	//);
+
 
 	Entity floor = newChunk.CreateNewEntity(
 		TRANSFORM_COMPONENT(
-			float3(0.0f, kDebugWorldSize, 0.0f) + kDefaultWorldPosition,
+			float3(0.0f, kDebugWorldSize.y, 0.0f) + kDefaultWorldPosition,
 			float3(0.0f, 0.0f, 0.0f),
-			float3(kDebugWorldSize, 0.05f, kDebugWorldSize)
+			float3(kDebugWorldSize.x, 0.05f, kDebugWorldSize.z)
 		),
-		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(kDebugWorldSize, 0.05f, kDebugWorldSize)),
+		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(kDebugWorldSize.x, 0.05f, kDebugWorldSize.z)),
 		OBBCollider(OBB_PushOutLocked)
 	);
 
 
 	Entity floor2 = newChunk.CreateNewEntity(
 		TRANSFORM_COMPONENT(
-			float3(0.0f, -10.0f, 0.0f) + kDefaultWorldPosition,
+			float3(0.0f, -40.0f, 0.0f) + kDefaultWorldPosition,
 			float3(0.0f, 0.0f, 0.0f),
-			float3(kDebugWorldSize, 20.05f, kDebugWorldSize)
+			float3(kDebugWorldSize.x, 80.0f, kDebugWorldSize.z)
 		),
 		ModelKey("Box"),
-		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(kDebugWorldSize, 20.05f, kDebugWorldSize)),
+		BoxCollider(float3(0.0f, 30.0f, 0.0f), float3(kDebugWorldSize.x, 20.00f, kDebugWorldSize.z)),
 		OBBCollider(OBB_PushOutLocked),
-		UseGhostShader()
+		AlphaBlendComponent("Red", "Blue")
 	);
-
-	//Entity floorModel = newChunk.CreateNewEntity(
-	//	TRANSFORM_COMPONENT(
-	//		float3(0.0f, 2.5f, 0.0f) + kDefaultWorldPosition,
-	//		float3(-90.0f, 0.0f, 0.0f),
-	//		float3(1.0f, 1.0f, 1.0f)
-	//	),
-	//	ModelKey("plane"),
-	//	Name("FloorModel")
-	//);
 
 
 	Entity floor3 = newChunk.CreateNewEntity(
 		TRANSFORM_COMPONENT(
-			float3(kDebugWorldSize / 2.0f, kDebugWorldSize / 2.0f, 0.0f) + kDefaultWorldPosition,
+			float3(kDebugWorldSize.x / 2.0f, kDebugWorldSize.y / 2.0f, 0.0f) + kDefaultWorldPosition,
 			float3(0.0f, 0.0f, 0.0f),
-			float3(kWallThickness, kDebugWorldSize, kDebugWorldSize)
+			float3(kWallThickness, kDebugWorldSize.y, kDebugWorldSize.z)
 		),
 		// ModelKey("Box"),
-		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(2.0f, kDebugWorldSize, kDebugWorldSize)),
+		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(2.0f, kDebugWorldSize.y, kDebugWorldSize.z)),
 		OBBCollider(OBB_PushOutLocked),
 		UseGhostShader()
 	);
 
 	Entity floor4 = newChunk.CreateNewEntity(
 		TRANSFORM_COMPONENT(
-			float3(-kDebugWorldSize / 2.0f, kDebugWorldSize / 2.0f, 0.0f) + kDefaultWorldPosition,
+			float3(-kDebugWorldSize.x / 2.0f, kDebugWorldSize.y / 2.0f, 0.0f) + kDefaultWorldPosition,
 			float3(0.0f, 0.0f, 0.0f),
-			float3(kWallThickness, kDebugWorldSize, kDebugWorldSize)
+			float3(kWallThickness, kDebugWorldSize.y, kDebugWorldSize.z)
 		),
 		// ModelKey("Box"),
-		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(2.0f, kDebugWorldSize, kDebugWorldSize)),
+		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(2.0f, kDebugWorldSize.y, kDebugWorldSize.x)),
 		OBBCollider(OBB_PushOutLocked),
 		UseGhostShader()
 	);
@@ -376,12 +387,12 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 
 	Entity floor5 = newChunk.CreateNewEntity(
 		TRANSFORM_COMPONENT(
-			float3(0.0f, kDebugWorldSize / 2.0f, kDebugWorldSize / 2.0f) + kDefaultWorldPosition,
+			float3(0.0f, kDebugWorldSize.y / 2.0f, kDebugWorldSize.z / 2.0f) + kDefaultWorldPosition,
 			float3(0.0f, 0.0f, 0.0f),
-			float3(kDebugWorldSize, kDebugWorldSize, kWallThickness)
+			float3(kDebugWorldSize.x, kDebugWorldSize.y, kWallThickness)
 		),
 		// ModelKey("Box"),
-		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(kDebugWorldSize, kDebugWorldSize, 2.0f)),
+		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(kDebugWorldSize.x, kDebugWorldSize.y, 2.0f)),
 		OBBCollider(OBB_PushOutLocked),
 		UseGhostShader()
 
@@ -389,14 +400,24 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 
 	Entity floor6 = newChunk.CreateNewEntity(
 		TRANSFORM_COMPONENT(
-			float3(0.0f, kDebugWorldSize / 2.0f, -kDebugWorldSize / 2.0f) + kDefaultWorldPosition,
+			float3(0.0f, kDebugWorldSize.y / 2.0f, -kDebugWorldSize.z / 2.0f) + kDefaultWorldPosition,
 			float3(0.0f, 0.0f, 0.0f),
-			float3(kDebugWorldSize, kDebugWorldSize, kWallThickness)
+			float3(kDebugWorldSize.x, kDebugWorldSize.y, kWallThickness)
 		),
 		// ModelKey("Box"),
-		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(kDebugWorldSize, kDebugWorldSize, 2.0f)),
+		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(kDebugWorldSize.x, kDebugWorldSize.y, 2.0f)),
 		OBBCollider(OBB_PushOutLocked),
 		UseGhostShader()
+	);
+
+	Entity underFloor = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, -20.0f, 10.0f) + kDefaultWorldPosition,
+			float3(0.0f, 0.0f, 0.0f),
+			float3(kDebugWorldSize.x * 10.0f, 1.0, kDebugWorldSize.z * 6.0f)
+		),
+		ModelKey("Box"),
+		AlphaBlendComponent("White", "Blue")
 	);
 
 	return newChunk;
@@ -447,9 +468,9 @@ void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 	ResetSystem(a_chunk, a_context);
 }
 
-void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
+void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
-	TestSystem(a_chunk, a_context);
+	TestSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 
 	// Physics系の処理を行う
 	WorldPowerSystem(a_chunk, a_context);
@@ -484,6 +505,7 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	// 追従などの遅延系処理
 	LookMoveSystem(a_chunk, a_context);
 	LookSystem(a_chunk, a_context);
+	LookOnSystem(a_chunk, a_context);
 	FollowTransformSystem(a_chunk, a_context);
 	CameraMoveSystem(a_chunk, a_context);
 	LatePoseSystem(a_chunk, a_context);
@@ -536,7 +558,7 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 
 	// 終了処理
 	LifeTimeSystem(a_chunk, a_context);
-	CheckAliveTargetEnemySystem(a_chunk, a_context, a_response);
+	CheckAliveTargetEnemySystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 	ResetSystem(a_chunk, a_context);
 	ChunkChangeSystem(a_chunk, a_context, a_response);
 }

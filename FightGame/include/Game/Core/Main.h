@@ -93,6 +93,7 @@ private:
 	ModelCache modelCache;
 	UICache uiCache;
 	Input input;
+	ComponentsSerialize serialize;
 	std::queue<std::string> sceneChangeQueue;
 	std::thread loadWorker;
 

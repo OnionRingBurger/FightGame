@@ -126,7 +126,7 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 		for (int j = 0; j < outsideVertexCount; j++)
 		{
 			// アングルから位置を取得
-			float currentAngle = (angle / circumferenceCount) * j - angle / 2;
+			float currentAngle = (angle / (circumferenceCount - 1)) * j - angle / 2;
 
 			float2 vec = AngleToVector(-currentAngle + 90.0f);
 
@@ -143,7 +143,7 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 		for (int j = 0; j < insideVertexCount; j++)
 		{
 			// アングルから位置を取得
-			float currentAngle = (angle / insideVertexCount) * j - angle / 2;
+			float currentAngle = (angle / (insideVertexCount - 1)) * j - angle / 2;
 
 			float2 vec = AngleToVector(-currentAngle + 90.0f);
 
@@ -172,12 +172,13 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 	{
 		for (int j = 0; j < outsideVertexCount - 1; j++)
 		{
-			float currentIndexRatio = (float)(j + 1.0f) / (float)outsideVertexCount; 
+			float currentIndexRatio = (float)(j + 1.0f) / (float)(outsideVertexCount - 1); 
 
 			int insideIndex = insideVertexCount - 1;
 			for(int k = 0; k < insideVertexCount - 1; k++)
 			{
-				if(currentIndexRatio > (1.0f / (float)insideVertexCount) * (float)(k + 1)) continue;
+				float insideRatio = (float)(k + 1) / (float)(insideVertexCount - 1);
+				if(currentIndexRatio > insideRatio) continue;
 
 				insideIndex = k;
 				break;
@@ -196,26 +197,28 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 
 	for(int i = 0; i < 2; i++)
 	{
-		for(int j = insideVertexCount - 1; j > 0 ; j--)
+		for(int j = 0; j < insideVertexCount - 1 ; j++)
 		{
-			float currentIndexRatio = (float)j / (float)insideVertexCount; 
+			// 割合を出す
+			float nextIndexRatio = (float)(j + 1)/ (float)(insideVertexCount - 1); 
 
 			int outsideIndex = 1;
-			for(int k = outsideVertexCount; k > 0; k--)
+			for(int k = 0; k < outsideVertexCount; k++)
 			{
-				if(currentIndexRatio < (1.0f / (float)outsideVertexCount) * k) continue;
+				float currentOutsideRatio = (float)(k + 1) / (float)(outsideVertexCount - 1);
+				if(nextIndexRatio >= currentOutsideRatio) continue;
 
 				outsideIndex = k;
 				break;
 			}
 
 			int in0 = j + insideVertexCount * i + outsideVertexCount * 2;
-			int in1 = j - 1 + insideVertexCount * i + outsideVertexCount * 2;
+			int in1 = (j + 1) + insideVertexCount * i + outsideVertexCount * 2;
 			int out0 = outsideIndex + outsideVertexCount * i;
 
-			indexes[(j - 1) * 3 + (insideVertexCount - 1) * 3 * i + indexProgress] =  in1;
+			indexes[(j - 1) * 3 + (insideVertexCount - 1) * 3 * i + indexProgress] =  in0;
 			indexes[(j - 1) * 3 + 1 + (insideVertexCount - 1) * 3 * i + indexProgress] = out0;
-			indexes[(j - 1) * 3 + 2 + (insideVertexCount - 1) * 3 * i + indexProgress] = in0;
+			indexes[(j - 1) * 3 + 2 + (insideVertexCount - 1) * 3 * i + indexProgress] = in1;
 		}
 	}
 

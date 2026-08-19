@@ -1,5 +1,7 @@
 #include "GameLoopSystem.h"
 #include "Components.h"
+#include "Sound.h"
+#include "SystemAssist.h"
 
 using namespace Component;
 
@@ -83,18 +85,49 @@ void ChunkChangeSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRe
 	}
 }
 
-void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_chunkRequest)
+void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
-	ComponentView view = a_chunk.GetView<ComponentTypes<EnemyTag, ClearTarget>>();
-	for(auto it : view)
+	ComponentView enemyView = a_chunk.GetView<ComponentTypes<EnemyTag, ClearTarget>>();
+	for(auto it : enemyView)
 	{
 		// クリア対象が存在した場合関数を終了する
 		return;
 	}
 
+	bool spawn = false;
+	ComponentView spawnerView = a_chunk.GetView<ComponentTypes<PhaseSpawner>>();
+	for (auto it : spawnerView)
+	{
+		ComponentHandle<PhaseSpawner> spawner = a_chunk.GetComponent<PhaseSpawner>(it);
+		if (spawner.Look().spawnName.empty()) continue;
+		spawn = true;
+
+		NewEnemySpawn(a_serialize, a_chunk, a_aiManager, spawner.Look().spawnName.at(0));
+		std::vector<std::string> tmp;
+		for (int i = 1; i < spawner.Look().spawnName.size(); i++)
+		{
+			tmp.push_back(spawner.Look().spawnName.at(i));
+		}
+
+		spawner->spawnName.swap(tmp);
+	}
+
+	if (spawn) return;
+
+	ComponentView chunkChangeView = a_chunk.GetView<ComponentTypes<DelayChunkChange>>();
+
+	for (auto it : chunkChangeView)
+	{
+		return;
+	}
+
+	PlaySound(LoadSound("Shot"));
+	a_systemResponse.AddStopTime(200.0f, 200.0f, 0.3f);
+
 	// クリアシーンに移行する
 	Entity chunkChange = a_chunk.CreateNewEntity(
-		ChunkChange(false, "Clear")
+		ChunkChange(true, "Clear"),
+		DelayChunkChange(60.0f)
 	);
 
 }

@@ -1,5 +1,6 @@
 #include "Components.h"
 #include "ECSTypes.h"
+
 using namespace Component;
 
 namespace ComponentSystem
@@ -910,4 +911,14 @@ namespace ComponentSystem
 		valueFunc("name", component.name, std::string(""));
 	}
 
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(AttackKeyLoad& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("size", component.size, 0);
+		if(component.size != component.attackKeys.size()) component.attackKeys.resize(component.size);
+		for (int i = 0; i < component.size; i++)
+		{
+			valueFunc("attack" + std::to_string(i), component.attackKeys[i], std::string(""));
+		}
+	}
 };

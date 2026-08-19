@@ -139,7 +139,8 @@
 	X(InterferenceResult) \
 	X(Name) \
 	X(LookOnState) \
-	X(LookOnAction)
+	X(LookOnAction)\
+	X(AttackKeyLoad)
 
 
 using BitFlag = unsigned int;
@@ -2353,6 +2354,18 @@ namespace Component
 		{
 		}
 
+
+		// float minLength;
+		// float maxLength;
+		// float angle;
+		// float maxHeight;
+		// float maxLowness;
+		// float damageValue;
+		// float motionTime;
+		// float lifeTime;
+		// float3 followOffset;
+		// float waitTime;
+		// float startupTime;
 		explicit AttackStatus(std::vector<AttackPower> a_attackPowers)
 			: attackPowers(std::move(a_attackPowers))
 		{
@@ -2830,6 +2843,124 @@ namespace Component
 	struct NullTargetTag
 	{
 
+	};
+
+	struct SelectCursor
+	{
+		static constexpr TypeID kTypeId = 137;
+		static constexpr const char* kTypeName = "SelectCursor";
+		static constexpr int kVersion = 0;
+
+		Entity selectEntity;
+		bool isActiv;
+	};
+
+	struct SelectBox
+	{
+		static constexpr TypeID kTypeId = 138;
+		static constexpr const char* kTypeName = "SelectBox";
+		static constexpr int kVersion = 0;
+
+		float2 pos;
+		float2 cursorScale;
+
+		SelectBox(float2 a_pos, float2 a_cursorScale)
+			: pos(a_pos)
+			, cursorScale(a_cursorScale)
+		{
+		}
+	};
+
+	struct CameraRigTag
+	{
+		static constexpr TypeID kTypeId = 139;
+		static constexpr const char* kTypeName = "CameraRigTag";
+		static constexpr int kVersion = 0;
+
+		CameraRigTag()
+		{
+		}
+	};
+
+	struct RigLookOn
+	{
+		static constexpr TypeID kTypeId = 140;
+		static constexpr const char* kTypeName = "RigLookOn";
+		static constexpr int kVersion = 0;
+
+		RigLookOn()
+		{
+		}
+	};
+
+	struct FollowLeap
+	{
+		static constexpr TypeID kTypeId = 141;
+		static constexpr const char* kTypeName = "FollowLeap";
+		static constexpr int kVersion = 0;
+		float3 followLeap;
+
+		FollowLeap(float3 a_followLeap)
+			:followLeap(a_followLeap)
+		{
+		}
+	};
+
+	struct DebugEntityTag
+	{
+		static constexpr TypeID kTypeId = 142;
+		static constexpr const char* kTypeName = "DebugEntityTag";
+		static constexpr int kVersion = 0;
+
+		DebugEntityTag()
+		{
+		}
+	};
+
+	struct AttackKeyLoad
+	{
+		static constexpr TypeID kTypeId = 143;
+		static constexpr const char* kTypeName = "AttackKeyLoad";
+		static constexpr int kVersion = 0;
+
+		int size;
+		std::vector<std::string> attackKeys;
+
+		AttackKeyLoad()
+			: size(0)
+			, attackKeys()
+
+		{
+		}
+
+		AttackKeyLoad(std::vector<std::string> a_attackKeys)
+			: attackKeys(a_attackKeys)
+			, size(a_attackKeys.size())
+		{
+		}
+	};
+
+	struct PhaseSpawner
+	{
+		static constexpr TypeID kTypeId = 144;
+		static constexpr const char* kTypeName = "PhaseSpawner";
+		static constexpr int kVersion = 0;
+
+		int size;
+		std::vector<std::string> spawnName;
+
+		PhaseSpawner()
+			: size(0)
+			, spawnName()
+
+		{
+		}
+
+		PhaseSpawner(std::vector<std::string> a_spawnName)
+			: spawnName(a_spawnName)
+			, size(a_spawnName.size())
+		{
+		}
 	};
 }
 

@@ -3,14 +3,19 @@
 
 CreateGameScene::CreateGameScene(
 	IModelCacheAcquisition& modelCache,
-	IUICacheAcquisition& uiCache)
+	IUICacheAcquisition& uiCache,
+	Input& a_input,
+	ComponentsSerialize& a_serialize)
 {
 
 
-	//world = std::make_unique<CreateGameWorld>(
-	//	modelCache,
-	//	uiCache,
-	//	[this](int a_id) {TutorialRequest(a_id); });
+	world = std::make_unique<CreateGameWorld>(
+		modelCache,
+		uiCache,
+		[this](int a_id) {},
+		a_input,
+		a_serialize
+		);
 
 
 

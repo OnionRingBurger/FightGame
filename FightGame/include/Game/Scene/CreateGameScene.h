@@ -7,8 +7,11 @@
 class CreateGameScene : public IScene
 {
 public:
-	CreateGameScene(IModelCacheAcquisition& modelCache,
-		IUICacheAcquisition& uiCache);
+	CreateGameScene(
+		IModelCacheAcquisition& modelCache,
+		IUICacheAcquisition& uiCache,
+		Input& a_input,
+		ComponentsSerialize& a_serialize);
 	void AdvanceUpdate(float dt) override;
 	void Update() override;
 	void Draw() override;

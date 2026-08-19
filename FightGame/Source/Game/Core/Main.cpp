@@ -17,6 +17,7 @@
 #include "GameScene.h"
 #include "LoadScene.h"
 #include "TestScene.h"
+#include "CreateGameScene.h"
 
 MainGame::MainGame()
 	: scene(nullptr)
@@ -33,6 +34,7 @@ MainGame::MainGame()
 	uiCache = UICache();
 	modelCache = ModelCache();
 	input = Input();
+	serialize = ComponentsSerialize();
 
 }
 
@@ -68,23 +70,9 @@ void MainGame::Init()
 
 	modelDatas =
 	{
-		{"bricktexture1", 0.005f},
-		{"assaultRifle", 5.3f},
-		{"ghost_FINAL", 0.13f},
-		{"SM_SimpleTunnel", 1.0f},
 		{"Box", 1.0f},
 		{"Ball", 1.0f},
-		{"Laser", 1.0f},
-		{"LaserPoint", 1.0f},
-		{"Dark", 20.0f},
-		{"FireAnimation", 1.0f},
-		{"Light", 20.0f},
-		{"low_poly_treesNXT_5flat", 1.0f},
-		{"bolita_pinchos_pintada", 0.01f},
-		{"GreekPillar", 50.0f},
-		{"track_txt", 7.0f},
-		{"Minecart", 0.06f},
-		{"CrackedTombstone", 5.0f}
+		{"Light", 20.0f}
 	};
 
 	textureDatas =
@@ -122,7 +110,8 @@ void MainGame::Init()
 		"Red",
 		"Purple",
 		"Green",
-		"LookOnMaker"
+		"LookOnMaker",
+		"White"
 	};
 
 	ChangeScene("Load");
@@ -130,7 +119,8 @@ void MainGame::Init()
 	input.RegisterKey("GameEnd", VK_ESCAPE);
 	input.RegisterKey("DebugConsole", VK_F1);
 	
-
+	TestRegisterComponentType(serialize);
+	
 	// SoundÇÃèâä˙âª
 	InitSound();
 	
@@ -474,7 +464,8 @@ bool MainGame::ChangeScene(std::string a_key)
 			textureDatas,
 			modelCache,
 			uiCache,
-			input
+			input,
+			serialize
 		);
 
 		modelDatas.clear();
@@ -482,7 +473,6 @@ bool MainGame::ChangeScene(std::string a_key)
 	}
 	else if (a_key == "Game")
 	{
-
 		scene = make_unique<GameScene>(
 			modelCache,
 			uiCache,
@@ -504,7 +494,8 @@ bool MainGame::ChangeScene(std::string a_key)
 				ShowCursor(!a_isFixed);
 				isFixedCursor = a_isFixed;
 			},
-			input
+			input,
+			serialize
 		);
 	}
 	else if (a_key == "End")
@@ -513,6 +504,18 @@ bool MainGame::ChangeScene(std::string a_key)
 	else if (a_key == "Test")
 	{
 		scene = make_unique<TestScene>();
+	}
+	else if (a_key == "CreateGame")
+	{
+		ShowCursor(true);
+		isFixedCursor = false;
+
+		scene = make_unique<CreateGameScene>(
+			modelCache,
+			uiCache,
+			input,
+			serialize
+		);
 	}
 	else
 	{

@@ -299,7 +299,7 @@ cbuffer SectorInfo : register(b0){
 float4 main(PS_IN pin) : SV_TARGET0 {
 	float4 color = float4(1,1,1,1);
 	color.rgb = float3(0.8,0.7,0.3);
-	color.a = min(0.6f , progress * 0.6f + 0.05);
+	// color.a = min(0.6f , progress * 0.6f + 0.05);
 	color.rgb *= 1.0f + max(progress - 0.6f, 0.0f) * 2.0f;
 	
 	return color;

@@ -8,6 +8,7 @@ template<typename Component>
 void JsonAddComponent(Entity a_entity, Chunk& a_chunk, const nlohmann::json& a_json, const ComponentsSerialize& a_serialize, const EntityMap& a_entityMap);
 const void* GetIdComponent(TypeID a_id, Chunk& a_chunk, Entity a_entity);
 
+using ComponentData = std::any;
 
 
 // 渡されたコンポーネントIDに対応する型をSerializeに登録する
@@ -67,7 +68,7 @@ int ToEntityIndex(Entity a_targetEntity, const std::vector<Entity>& a_entities)
 	return kNotEntity;
 }
 
-void TestRegisterComponent(ComponentsSerialize& a_serialize)
+void TestRegisterComponentType(ComponentsSerialize& a_serialize)
 {
 #define REGISTER_ALL(T) RegisterByTypeId(a_serialize, T::kTypeId);
 	COMPONENT_TYPE_LIST(REGISTER_ALL)
@@ -79,13 +80,28 @@ ComponentsSerialize::ComponentsSerialize()
 
 }
 
+ComponentData ComponentsSerialize::GetData(TypeID a_id, const nlohmann::json& a_json, const EntityMap& a_entityMap) const
+{
+	// Tag等のデータが存在しないコンポーネントがあるためデータが存在するか確認
+	if (a_json.contains(kJsonDataPath) && !a_json[kJsonDataPath].is_null())
+	{
+		// 存在する場合データを使って生成
+		return factory.at(a_id)(a_json, a_entityMap);
+	}
+	// データが存在しない場合空のJsonを渡す
+	static const nlohmann::json kEmptyData = nlohmann::json::object();
+	return factory.at(a_id)(kEmptyData, a_entityMap);
+}
+
 nlohmann::ordered_json ComponentsSerialize::CreateJson(TypeID a_id, const void* a_component, const std::vector<Entity>& a_entities) const
 {
 	return createJson.at(a_id)(a_component, a_entities);
 }
 
-void LoadJsonComponent(Chunk& a_chunk, const ComponentsSerialize& a_serialize, std::string a_key)
+std::vector<Entity> LoadJsonComponent(Chunk& a_chunk, const ComponentsSerialize& a_serialize, std::string a_key)
 {
+	std::vector<Entity> ret;
+
 	// ファイルを読み込む
 	std::ifstream stream(kDataPath);
 	nlohmann::json json;
@@ -95,7 +111,9 @@ void LoadJsonComponent(Chunk& a_chunk, const ComponentsSerialize& a_serialize, s
 	EntityMap entityMap;
 	for (auto itEntity : json[a_key])
 	{
-		entityMap[itEntity["number"]] = a_chunk.CreateNewEntity();
+		Entity newEntity = a_chunk.CreateNewEntity();
+		entityMap[itEntity["number"]] = newEntity;
+		ret.push_back(newEntity);
 	}
 
 	// 作成したエンティティにコンポーネントを追加
@@ -108,6 +126,8 @@ void LoadJsonComponent(Chunk& a_chunk, const ComponentsSerialize& a_serialize, s
 			AddComponentByTypeId(typeId, entity, a_chunk, itComponents, a_serialize, entityMap);
 		}
 	}
+
+	return ret;
 }
 
 const void* GetIdComponent(TypeID a_id, Chunk& a_chunk, Entity a_entity)

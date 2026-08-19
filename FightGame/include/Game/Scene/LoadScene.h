@@ -20,7 +20,8 @@ public:
 		std::vector<std::string> a_textureDatas,
 		IModelCacheAcquisition& a_modelCache,
 		IUICacheAcquisition& a_uiCache,
-		Input& a_input);
+		Input& a_input,
+		ComponentsSerialize& a_serialize);
 
 	~LoadScene() = default;
 	void AdvanceUpdate(float dt) override;

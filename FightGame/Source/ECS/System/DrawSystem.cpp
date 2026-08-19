@@ -22,7 +22,7 @@ void DrawSystem(Chunk& a_chunk, const SystemContext& a_context)
 	CameraDraw(a_chunk, a_context, cameraView, entityView);
 
 	ComponentView oBBCameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
-	OBBDraw(a_chunk, a_context, oBBCameraView);
+	// OBBDraw(a_chunk, a_context, oBBCameraView);
 	SectorDraw(a_chunk, a_context, oBBCameraView);
 
 	SpriteDraw(a_chunk, a_context);
@@ -123,7 +123,7 @@ void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		{
 			continue;
 		}
-		bool isGhost = a_chunk.GetComponent<EnemyTag>(it).IsValid() || a_chunk.GetComponent<EnemyBulletTag>(it).IsValid() || a_chunk.GetComponent<UseGhostShader>(it).IsValid();
+		bool isGhost = a_chunk.GetComponent<UseGhostShader>(it).IsValid();
 		bool isAlpha = alphaBlend.IsValid();
 
 		ShaderList::VSKind vsKind = key.Look().useAnime ? ShaderList::VS_ANIME : ShaderList::VS_WORLD;
@@ -668,7 +668,7 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 			pos.Look().y,
 			pos.Look().z,
 			rot.Look().yaw,
-			waitColor);
+			attackColor);
 
 		// !!!New!!!
 		if (!telegraph.Look().sectorKey.empty())

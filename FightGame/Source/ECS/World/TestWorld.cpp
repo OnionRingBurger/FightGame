@@ -19,11 +19,13 @@ TestWorld::TestWorld(
 	IUICacheAcquisition& a_uiCache,
 	std::function<void(int)> a_tutorialRequest,
 	std::function<void(std::string)> a_worldRequest,
-	Input& a_input)
+	Input& a_input,
+	ComponentsSerialize& a_serialize)
 	: World(a_modelCache,
 		a_uiCache,
 		a_tutorialRequest,
-		a_input
+		a_input,
+		a_serialize
 	)
 	, worldRequest(a_worldRequest)
 {
@@ -92,7 +94,7 @@ Chunk TestWorld::CreateNewChunk(AIManager& a_aiManager)
 	return newChunk;
 }
 
-void TestWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
+void TestWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 	// PhysicsŒn‚Ìˆ—‚ğs‚¤
 	VelocitySystem(a_chunk, a_context); //oo

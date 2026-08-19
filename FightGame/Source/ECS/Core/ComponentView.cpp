@@ -14,7 +14,7 @@ ComponentView::ComponentView(std::vector<std::vector<Entity>>& a_entities)
 	{
 		if (&entitiesIt == &a_entities.at(0))
 		{
-			trueEntities = a_entities.at(0);
+			trueEntities.swap(a_entities.at(0));
 			continue;
 		}
 
@@ -34,11 +34,12 @@ ComponentView::ComponentView(std::vector<std::vector<Entity>>& a_entities)
 			
 		}
 		
-		trueEntities = cmpEntities;
+		trueEntities.swap(cmpEntities);
+		cmpEntities.clear();
 
 	}
 	
-	entities = trueEntities;
+	entities.swap(trueEntities);
 }
 
 ComponentView::ComponentView(std::vector<std::vector<Entity>>& a_entities, std::vector<std::vector<Entity>>& a_exclusionEntities)
@@ -53,7 +54,7 @@ ComponentView::ComponentView(std::vector<std::vector<Entity>>& a_entities, std::
 	{
 		if (&entitiesIt == &a_entities.at(0))
 		{
-			trueEntities = a_entities.at(0);
+			trueEntities.swap(a_entities.at(0));
 			continue;
 		}
 
@@ -73,7 +74,8 @@ ComponentView::ComponentView(std::vector<std::vector<Entity>>& a_entities, std::
 
 		}
 
-		trueEntities = cmpEntities;
+		trueEntities.swap(cmpEntities);
+		cmpEntities.clear();
 
 	}
 
@@ -105,11 +107,12 @@ ComponentView::ComponentView(std::vector<std::vector<Entity>>& a_entities, std::
 		}
 
 		// trueEntityÇçXêV
-		trueEntities = cmpEntities;
+		trueEntities.swap(cmpEntities);
+		cmpEntities.clear();
 
 	}
 
-	entities = trueEntities;
+	entities.swap(trueEntities);
 }
 
 

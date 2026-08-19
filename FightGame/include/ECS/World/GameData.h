@@ -9,12 +9,14 @@ constexpr float kTonnelLength = 10000.0f;
 
 
 
-constexpr float3 kDefaultWorldPosition = { 0.0f, 50.0f, 0.0f };
-constexpr float kDebugWorldSize = 30.0f;
+constexpr float3 kDefaultWorldPosition = { 0.0f, 50.0f, 50.0f };
+constexpr float3 kDebugWorldSize = float3(30.0, 20.0f, 20.0f);
 
 constexpr int kSectorVertexCount = 15;
 constexpr float kWallThickness = 0.02f;
 constexpr float kWallHitboxThickness = 0.2f;
+
+constexpr float2 kPlayerMoveSpeed = float2(0.09f, 0.09f);
 
 
 ///////////////////////////////////////////////////////////////////////////

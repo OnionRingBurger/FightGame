@@ -4,7 +4,7 @@
 
 using namespace Component;
 
-LoadWorld::LoadWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, Input& a_input) : World(a_modelCache, a_uiCache, nullptr, a_input)
+LoadWorld::LoadWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, Input& a_input, ComponentsSerialize& a_serialize) : World(a_modelCache, a_uiCache, nullptr, a_input, a_serialize)
 {
 }
 
@@ -51,7 +51,7 @@ Chunk LoadWorld::CreateNewChunk(AIManager& a_aiManager)
 	return newChunk;
 }
 
-void LoadWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
+void LoadWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 	UIMoveSystem(a_chunk, a_context);
 	UVMoveSystem(a_chunk, a_context);

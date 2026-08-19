@@ -1,5 +1,9 @@
+#include <fstream>
+
 #include "SystemAssist.h"
 #include "Components.h"
+#include "GameData.h"
+#include "Defines.h"
 
 using namespace Component;
 
@@ -29,6 +33,18 @@ Entity GetPlayer(Chunk& a_chunk, const float3 a_position)
 	}
 
 	return player;
+}
+
+Entity GetCameraRig(Chunk& a_chunk)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<CameraRigTag>>();
+
+	for (auto it : view)
+	{
+		return it;
+	}
+
+	return kInvalidEntity;
 }
 
 Entity GetRail(Chunk& a_chunk)
@@ -107,6 +123,60 @@ void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity)
 
 	a_chunk.DeleteChunkComponent(a_entity, AttackAction::kTypeId);
 	a_chunk.DeleteChunkComponent(a_entity, AttackWaitAction::kTypeId);
+}
+
+void NewEnemySpawn(ComponentsSerialize& a_serialize, Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName)
+{
+	std::vector<Entity> newEntity = LoadJsonComponent(a_chunk, a_serialize, a_newSceneName);
+	for (auto it : newEntity)
+	{
+		ComponentHandle<EnemyTag> enemyTag = a_chunk.GetComponent<EnemyTag>(it);
+		if (!enemyTag.IsValid()) continue;
+
+		ComponentHandle<MotionTransform> motion = a_chunk.GetComponent<MotionTransform>(it);
+		if (!motion.IsValid()) continue;
+		motion->motionPos += kDefaultWorldPosition;
+
+
+		ComponentHandle<AttackKeyLoad> keyLoad = a_chunk.GetComponent<AttackKeyLoad>(it);
+		if (keyLoad.IsValid())
+		{
+			std::ifstream stream(kAttackDataPath);
+			if (!stream.is_open()) return;
+			nlohmann::json json;
+			stream >> json;
+			AttackStatus status;
+			for (auto attackIt : keyLoad.Look().attackKeys)
+			{
+				status.attackPowers.push_back(
+					AttackPower(
+						json[attackIt].value("MinLength", 0.0f),
+						json[attackIt].value("MaxLength", 0.0f),
+						json[attackIt].value("Angle", 0.0f),
+						json[attackIt].value("MaxHeight", 0.0f),
+						json[attackIt].value("MaxLowness", 0.0f),
+						json[attackIt].value("DamageValue", 0.0f),
+						json[attackIt].value("MotionTime", 0.0f),
+						json[attackIt].value("LifeTime", 0.0f),
+						float3(
+							json[attackIt].value("FollowOffsetX", 0.0f),
+							json[attackIt].value("FollowOffsetY", 0.0f),
+							json[attackIt].value("FollowOffsetZ", 0.0f)
+						),
+						json[attackIt].value("WaitTime", 0.0f),
+						json[attackIt].value("StartupTime", 0.0f),
+						attackIt)
+
+				);
+
+			}
+
+			a_chunk.AddComponent(it, status);
+			a_chunk.DeleteChunkComponent(it, AttackKeyLoad::kTypeId);
+			aiManager.RegisterAI(it, "Enemy");
+		
+		}
+	}
 }
 
 float3 GetEntityWorldPos(Chunk& a_chunk, Entity a_entity)

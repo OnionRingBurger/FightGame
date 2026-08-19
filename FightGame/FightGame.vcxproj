@@ -170,6 +170,7 @@
     <ClInclude Include="include\ECS\System\ColliderSystem.h" />
     <ClInclude Include="include\ECS\System\CoreSystem.h" />
     <ClInclude Include="include\ECS\System\DebugCameraSystem.h" />
+    <ClInclude Include="include\ECS\System\DebugSystemResponse.h" />
     <ClInclude Include="include\ECS\System\DrawSystem.h" />
     <ClInclude Include="include\ECS\System\EffectSystem.h" />
     <ClInclude Include="include\ECS\System\EnemySystem.h" />
@@ -277,6 +278,7 @@
     <ClCompile Include="Source\ECS\System\ColliderSystem.cpp" />
     <ClCompile Include="Source\ECS\System\CoreSystem.cpp" />
     <ClCompile Include="Source\ECS\System\DebugCameraSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\DebugSystemResponse.cpp" />
     <ClCompile Include="Source\ECS\System\DrawSystem.cpp" />
     <ClCompile Include="Source\ECS\System\EffectSystem.cpp" />
     <ClCompile Include="Source\ECS\System\EnemySystem.cpp" />
