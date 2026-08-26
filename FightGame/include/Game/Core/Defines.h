@@ -36,6 +36,8 @@ constexpr const char* kDataPath = "Assets/Data/EntityData.json";
 constexpr const char* kDataTestPath = "Assets/Data/EntityDataTest.json";
 constexpr const char* kAttackDataPath = "Assets/Data/AttackData.json";
 
+constexpr const char* kTestEffect = "Freeze.efk";
+
 // #define CREATEGAME "Game"
 
 // グリッドサイズ(デバッグ用

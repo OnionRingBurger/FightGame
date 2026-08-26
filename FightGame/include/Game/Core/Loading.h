@@ -8,9 +8,16 @@
 #include "Model.h"
 #include "Texture.h"
 #include "Sound.h"
+#include "Effekseer.h"
 #include "DebugConsole.h"
 
 using modelLoadData = std::pair<std::string, float>;
+
+struct effectLoadData
+{
+	std::string key;
+	float magnificent;
+};
 
 struct ModelLoadJob
 {
@@ -48,11 +55,33 @@ struct TextureLoadJob
 
 };
 
+struct EffectLoadJob
+{
+	std::string key;
+	float magnificent;
+	std::shared_ptr<std::atomic_bool> const endFlagPointer;
+
+	EffectLoadJob(std::string a_key, float a_magnificent, std::shared_ptr<std::atomic_bool> const a_endFlagPointer = nullptr)
+		: key(a_key)
+		, magnificent(a_magnificent)
+		, endFlagPointer(a_endFlagPointer)
+	{
+		if (endFlagPointer)
+		{
+			endFlagPointer->store(false);
+		}
+	}
+	
+};
+
 struct SoundLoadJob
 {
 	std::string path;
+	std::shared_ptr<std::atomic_bool> const endFlagPointer;
 
-	SoundLoadJob(std::string a_path)
+	SoundLoadJob(
+		std::string a_path,
+		std::shared_ptr<std::atomic_bool> const endFlagPointer)
 		: path(a_path)
 	{
 	};
@@ -101,7 +130,27 @@ struct TextureLoadResult
 	}
 };
 
+struct EffectLoadResult
+{
+	std::string key;
+	Effekseer::EffectRef effect;
+
+	EffectLoadResult()
+		: key("")
+		, effect(nullptr)
+	{
+
+	}
+
+	EffectLoadResult(std::string a_key, Effekseer::EffectRef a_effect)
+		: key(a_key)
+		, effect(a_effect)
+	{
+	}
+};
+
 void LoadSound();
 
 ModelLoadResult LoadModel(const ModelLoadJob& job);
 TextureLoadResult LoadTexture(const TextureLoadJob& job);
+EffectLoadResult LoadEffect(const EffectLoadJob& job);

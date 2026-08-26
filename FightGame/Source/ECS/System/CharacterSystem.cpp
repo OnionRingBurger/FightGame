@@ -2,6 +2,7 @@
 
 #include "GameData.h"
 #include "Geometory.h"
+#include "Sound.h"
 
 using namespace Component;
 
@@ -94,6 +95,8 @@ namespace
 	{
 		Entity attack = SpawnActiveAttackEntity(a_chunk, a_attacker, a_attackPower, a_attackIndex);
 		if (attack == kInvalidEntity) return;
+
+		PlaySound(LoadSound("Assets/Sound/attack.mp3"));
 
 		// アクションを追加
 		a_chunk.AddComponent(a_attacker, AttackAction(attack, 0.0f, a_attackIndex, a_attackPower.motionTime));
@@ -355,17 +358,24 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 		BitFlag allowed = ActionFlag_All;
 		// 各情報StateとActionStateから不可能な行動を算出し、フラグを降ろす
 		const ComponentHandle<DeadState> dead = a_chunk.GetComponent<DeadState>(it);
-		if (dead.IsValid() && dead.Look().isDead)
+		if ((dead.IsValid() && dead.Look().isDead))
 		{
 			allowed = 0;
 		}
 		else
 		{
+			const ComponentHandle<EntryAction> entry = a_chunk.GetComponent<EntryAction>(it);
+			if(entry.IsValid())
+			{
+				allowed = 0 | ActionFlag_EntryDuration;
+			}
+
 			const ComponentHandle<GroundedState> grounded = a_chunk.GetComponent<GroundedState>(it);
 			if (grounded.IsValid() && !grounded.Look().isGrounded)
 			{
 				allowed &= ~ActionFlag_Jump;
 				allowed &= ~ActionFlag_Guard;
+				allowed &= ~ActionFlag_EntryDuration;
 			}
 
 			const ComponentHandle<KnockbackAction> knockback = a_chunk.GetComponent<KnockbackAction>(it);
@@ -543,10 +553,14 @@ void CharacterAttackSystem(Chunk& a_chunk, const SystemContext& a_context)
 		if (attackPower.startupTime > 0.0f)
 		{
 			BeginAttackTelegraphFromPower(a_chunk, it, attackPower, attackIndex);
+			if (isPlayer) PlaySound(LoadSound("Assets/Sound/startup.mp3"));
+			else PlaySound(LoadSound("Assets/Sound/enemystartup.mp3"));
+
 			continue;
 		}
 		// ない場合攻撃を生成
 		BeginActiveAttackFromPower(a_chunk, it, attackPower, attackIndex);
+
 	}
 }
 
@@ -1044,6 +1058,24 @@ void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResp
 				a_chunk.AddComponent(camera, ShakeComponent(shakePower, shakeAmp, shakeTime));
 			}
 
+			// ダメージエフェクトを出す
+			Entity hit = a_chunk.CreateNewEntity(
+				TRANSFORM_COMPONENT(
+					float3(thisPos.Look().x, thisPos.Look().y, thisPos.Look().z),
+					float3(),
+					float3(1.0f, 1.0f, 1.0f)
+				),
+				EfkEffectKey(kHitEffect, false)
+				);
+
+			if (isPlayer)
+			{
+				PlaySound(LoadSound("Assets/Sound/hit.mp3"));
+			}
+			else
+			{
+				PlaySound(LoadSound("Assets/Sound/enemyhit.mp3"));
+			}
 			// 被弾履歴に攻撃Entityとクールタイムを記録
 			float cooldownDuration = kDefaultAttackHitCooldown;
 
@@ -1122,4 +1154,42 @@ void KnockbackSystem(Chunk& a_chunk, const SystemContext& a_context)
 			velocity->y = 0.0f;
 		}
 	}
+}
+
+void EntryActionSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<EntryAction>>();
+	for (auto it : view)
+	{
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_EntryDuration)) continue;
+
+		ComponentHandle<EntryAction> action = a_chunk.GetComponent<EntryAction>(it);
+		if (action.Look().canPlayEffect)
+		{
+			ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(it);
+			
+			// エフェクトを生成
+			a_chunk.CreateNewEntity(
+				TRANSFORM_COMPONENT(
+					float3(pos.Look().x, pos.Look().y - 0.5f, pos.Look().z),
+					float3(),
+					float3(1.0f, 1.0f, 1.0f)
+				),
+				EfkEffectKey(kEntryEffect, false)
+			);
+			action->canPlayEffect = false;
+
+			PlaySound(LoadSound("Assets/Sound/entry.mp3"));
+
+			// TODO カメラを揺らす
+		}
+		
+
+		action->duration += a_context.deltaTime;
+		if (action.Look().duration >= action.Look().maxDuration)
+		{
+			a_chunk.DeleteChunkComponent(it, EntryAction::kTypeId);
+		}
+	}
+
 }

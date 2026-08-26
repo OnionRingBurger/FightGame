@@ -1,5 +1,6 @@
 #include "ShaderList.h"
 #include "Defines.h"
+#include <algorithm>
 
 VertexShader* ShaderList::m_pVS[VS_KIND_MAX];
 PixelShader* ShaderList::m_pPS[PS_KIND_MAX];
@@ -135,7 +136,7 @@ void ShaderList::SetFog(DirectX::XMFLOAT4 color, float start, float range)
 void ShaderList::SetArea(GhostAreas areas)
 {
 	DirectX::XMFLOAT4 param[kMaxArea + 1];
-	int areaCount = min(100, areas.size());
+	int areaCount = std::min(100, (int)areas.size());
 	for (int i = 0; i < areas.size(); i++)
 	{
 		param[i] = {

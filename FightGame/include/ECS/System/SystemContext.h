@@ -5,6 +5,7 @@
 #include "Input.h"
 #include "IModelCacheAcquisition.h"
 #include "IUICacheAcquisition.h"
+#include "IEffectCacheAcquisition.h"
 #include "TrailEffect.h"
 
 struct SystemContext
@@ -12,6 +13,7 @@ struct SystemContext
 	const Input& input;
 	IModelCacheAcquisition& modelCache;
 	IUICacheAcquisition& uiCache;
+	IEffectCacheAcquisition& effectCache;
 	std::unique_ptr<TrailEffect> trailEffect;
 	float deltaTime;
 	float effectStepTime;
@@ -20,13 +22,14 @@ struct SystemContext
 	float aiDeltaTime;
 	std::function<void(int)> tutorialRequest;
 
-	SystemContext(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, const Input& a_input)
+	SystemContext(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, const Input& a_input)
 		: deltaTime(0.0f)
 		, effectStepTime(0.0f)
 		, aiTickThisFrame(false)
 		, aiDeltaTime(0.0f)
 		, modelCache(a_modelCache)
 		, uiCache(a_uiCache)
+		, effectCache(a_effectCache)
 		, trailEffect(std::make_unique<TrailEffect>())
 		, tutorialRequest(a_tutorialRequest)
 		, input(a_input)

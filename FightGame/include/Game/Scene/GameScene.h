@@ -10,6 +10,7 @@ public:
 	GameScene(
 		IModelCacheAcquisition& modelCache,
 		IUICacheAcquisition& uiCache,
+		IEffectCacheAcquisition& effectCache,
 		std::function<void(std::string)> a_sceneChangeRequest,
 		std::function<void()> a_gameEnd,
 		std::function<void()> a_resetFPSRequest,
@@ -50,6 +51,7 @@ private:
 
 	IModelCacheAcquisition& modelCache;
 	IUICacheAcquisition& uiCache;
+	IEffectCacheAcquisition& effectCache;
 
 	Input& input;
 	ComponentsSerialize& serialize;

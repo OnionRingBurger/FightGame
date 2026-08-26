@@ -6,9 +6,10 @@
 
 using namespace Component;
 
-TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
+TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
 	: World(a_modelCache,
 		a_uiCache,
+		a_effectCache,
 		a_tutorialRequest,
 		a_input,
 		a_serialize)
@@ -24,7 +25,7 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 	Chunk newChunk;
 
 	ResetSound();
-	PlaySound(LoadSound("Assets/Sound/title.mp3", true));
+
 
 	Entity titleLogo = newChunk.CreateNewEntity(
 		UIComponent("TitleLogo", float2(0.0f, 0.4f), float2(1.0f, 1.0f), 0.0f)
@@ -36,9 +37,9 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		FadeChange(FADE_CHANGE_FLICKER)
 	);
 
-	Entity titleMask = newChunk.CreateNewEntity(
-		UIComponent("DarkMask", float2(0.0f, 0.0f), float2(2.0f, 2.0f), 0.0f)
-	);
+	//Entity titleMask = newChunk.CreateNewEntity(
+	//	UIComponent("DarkMask", float2(0.0f, 0.0f), float2(2.0f, 2.0f), 0.0f)
+	//);
 
 	Entity createEffectKey = newChunk.CreateNewEntity(
 		EffectKey(WHITEFADE_UP, "ChunkChange")
@@ -103,6 +104,7 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		AlphaBlendComponent("White", "Blue")
 	);
 
+	PlaySound(LoadSound("Assets/Sound/title.mp3", true));
 	return newChunk;
 }
 

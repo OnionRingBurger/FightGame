@@ -7,7 +7,20 @@ using namespace Component;
 #include <math.h>
 struct SystemHitResult;
 
-bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentHandle<OBBCollider>& otherCollider, SystemHitResult& outThisResult, SystemHitResult& outOtherResult);
+bool IsOBBHitObb(const OBBCollider& thisCollider, const OBBCollider& otherCollider, SystemHitResult& outThisResult, SystemHitResult& outOtherResult);
+
+bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentHandle<OBBCollider>& otherCollider, SystemHitResult& outThisResult, SystemHitResult& outOtherResult)
+{
+	return IsOBBHitObb(thisCollider.Look(), otherCollider.Look(), outThisResult, outOtherResult);
+}
+
+bool SweepOBBTranslate(
+	const ComponentHandle<OBBCollider>& a_movingCollider,
+	float3 a_motion,
+	const ComponentHandle<OBBCollider>& a_staticCollider,
+	float& outHitTime,
+	float3& outNormal,
+	float& outDepth);
 
 // “–‚½‚è”»’èŒ‹‰Ê‚ğ“ü‚ê‚é‚½‚ß‚Ì–ß‚è’lAƒRƒ“ƒ|[ƒlƒ“ƒg‚Å‚Í‚È‚¢‚Ì‚Å’ˆÓ
 struct SystemHitResult
@@ -200,6 +213,16 @@ void ColliderSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		float3 orign = transform.MultiplyPoint(addedCenter);
 
+		// !!!New!!!
+		if (obbCollider.Look().setOldCenter)
+		{
+			obbCollider->oldCenter = obbCollider.Look().center;
+		}
+		else
+		{
+			obbCollider->oldCenter = orign;
+			obbCollider->setOldCenter = true;
+		}
 		obbCollider->center = orign;
 
 		obbCollider->axis[0] = Normalize(transform.MultiplyVector(vec1));
@@ -227,7 +250,7 @@ void ColliderCheckSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 
 
-	// TODO “–‚½‚Á‚½‘S‚Ä‚Ìî•ñ‚ğæ“¾‚·‚é‚æ‚¤•ÏX
+	// ‘–¸‚·‚é
 	for (auto thisIt = obbEntries.begin();
 		thisIt != obbEntries.end();
 		++thisIt)
@@ -245,37 +268,114 @@ void ColliderCheckSystem(Chunk& a_chunk, const SystemContext& a_context)
 			SystemHitResult thisResult;
 			SystemHitResult otherResult;
 
-
-			if (!IsOBBHit(thisCollider, otherCollider, thisResult, otherResult)) continue;
-
-
-			if (hitInfoThis.IsValid())
+			// “–‚½‚Á‚Ä‚¢‚é‚©Šm”F
+			if (IsOBBHit(thisCollider, otherCollider, thisResult, otherResult))
 			{
-				if (thisResult.isHit)
+				if (hitInfoThis.IsValid())
 				{
-					hitInfoThis->hitResults.push_back(HitInfomation::HitResult(otherEntity, thisResult.normal, thisResult.depth, thisResult.otherType));
+					if (thisResult.isHit)
+					{
+						hitInfoThis->hitResults.push_back(HitInfomation::HitResult(otherEntity, false, thisResult.normal, thisResult.depth, float3(), 0.0f, thisResult.otherType));
+					}
+					else if (thisResult.isTrigger)
+					{
+						hitInfoThis->triggerResults.push_back(HitInfomation::TriggerResult(otherEntity));
+					}
 				}
-				else if (thisResult.isTrigger)
+
+				auto hitInfoOther = a_chunk.GetComponent<HitInfomation>(otherEntity);
+				if (hitInfoOther.IsValid())
 				{
-					hitInfoThis->triggerResults.push_back(HitInfomation::TriggerResult(otherEntity));
+					if (otherResult.isHit)
+					{
+						hitInfoOther->hitResults.push_back(HitInfomation::HitResult(thisEntity, false, otherResult.normal, otherResult.depth, float3(), 0.0f, otherResult.otherType));
+					}
+					else if (otherResult.isTrigger)
+					{
+						hitInfoOther->triggerResults.push_back(HitInfomation::TriggerResult(thisEntity));
+					}
 				}
+
+				continue;
 			}
 
-			auto hitInfoOther = a_chunk.GetComponent<HitInfomation>(otherEntity);
-			if (hitInfoOther.IsValid())
-			{
-				if (otherResult.isHit)
-				{
-					hitInfoOther->hitResults.push_back(HitInfomation::HitResult(thisEntity, otherResult.normal, otherResult.depth, otherResult.otherType));
-				}
-				else if (otherResult.isTrigger)
-				{
-					hitInfoOther->triggerResults.push_back(HitInfomation::TriggerResult(thisEntity));
-				}
-			}
+			//// !!!New!!!
+			//const bool thisLocked = (thisCollider.Look().obbBitFlag & OBB_PushOutLocked) != 0;
+			//const bool otherLocked = (otherCollider.Look().obbBitFlag & OBB_PushOutLocked) != 0;
+			//if (thisLocked == otherLocked) continue;
+			//if ((thisCollider.Look().obbBitFlag & OBB_TRIGGER) || (otherCollider.Look().obbBitFlag & OBB_TRIGGER)) continue;
+
+			//const ComponentHandle<OBBCollider> movingCollider = otherLocked ? thisCollider : otherCollider;
+			//const ComponentHandle<OBBCollider> staticCollider = otherLocked ? otherCollider : thisCollider;
+			//const Entity staticEntity = otherLocked ? otherEntity : thisEntity;
+			//auto hitInfoMoving = otherLocked ? hitInfoThis : a_chunk.GetComponent<HitInfomation>(otherEntity);
+			//if (!hitInfoMoving.IsValid()) continue;
+			//if (!movingCollider.Look().setOldCenter) continue;
+
+			//float3 motion =
+			//{
+			//	movingCollider.Look().center.x - movingCollider.Look().oldCenter.x,
+			//	movingCollider.Look().center.y - movingCollider.Look().oldCenter.y,
+			//	movingCollider.Look().center.z - movingCollider.Look().oldCenter.z,
+			//};
+
+			//float hitTime = 0.0f;
+			//float3 sweepNormal;
+			//float sweepDepth = 0.0f;
+			//if (!SweepOBBTranslate(movingCollider, motion, staticCollider, hitTime, sweepNormal, sweepDepth)) continue;
+
+			//hitInfoMoving->hitResults.push_back(HitInfomation::HitResult(staticEntity, true, sweepNormal, sweepDepth, motion, hitTime, PUSHLOCKED));
 		}
 	}
 
+}
+
+bool SweepOBBTranslate(
+	const ComponentHandle<OBBCollider>& a_movingCollider,
+	float3 a_motion,
+	const ComponentHandle<OBBCollider>& a_staticCollider,
+	float& outHitTime,
+	float3& outNormal,
+	float& outDepth)
+{
+	// ˆÚ“®—Ê‚ª\•ª¬‚³‚¯‚ê‚Î false
+	float motionAmount = NormalizeLength(a_motion.x, a_motion.y, a_motion.z);
+    if(motionAmount < 0.001f)
+	{
+		return false;
+	}
+	// ˆÚ“®ü•ª‚ÆÃ~ OBB ‚Ì‰ÚG t (0?1) ‚ğ‹‚ß‚é
+	const float3 startCenter = a_movingCollider.Look().oldCenter;
+	OBBCollider movingAtT = a_movingCollider.Look();
+	const OBBCollider staticObb = a_staticCollider.Look();
+
+	
+	static constexpr int kSweepSteps = 32;
+	int sweepSteps = std::max(kSweepSteps * (int)(0.5f + motionAmount * 0.3f), 1000);
+
+	for (int step = 1; step <= sweepSteps; ++step)
+	{
+		const float t = static_cast<float>(step) / static_cast<float>(sweepSteps);
+		movingAtT.center =
+		{
+			startCenter.x + a_motion.x * t,
+			startCenter.y + a_motion.y * t,
+			startCenter.z + a_motion.z * t,
+		};
+
+		SystemHitResult movingResult;
+		SystemHitResult staticResult;
+		if (!IsOBBHitObb(movingAtT, staticObb, movingResult, staticResult)) continue;
+		if (!movingResult.isHit) continue;
+
+		outHitTime = t;
+		outNormal = movingResult.normal;
+ 		outDepth = (1.0f - t) * motionAmount;
+		return true;
+	}
+
+	// ÚG‚µ‚È‚¯‚ê‚Î false
+	return false;
 }
 
 void ColliderBackSystem(Chunk& a_chunk, const SystemContext& a_context)
@@ -312,14 +412,31 @@ void ColliderBackSystem(Chunk& a_chunk, const SystemContext& a_context)
 			break;
 
 			case PUSHLOCKED:
-				result->posOffset.x += hitInfoIt.normal.x * hitInfoIt.depth;
-				result->posOffset.y += hitInfoIt.normal.y * hitInfoIt.depth;
-				result->posOffset.z += hitInfoIt.normal.z * hitInfoIt.depth;
+				if(hitInfoIt.isSweep)
+				{
+					float rate = 1.0f - hitInfoIt.normalizeHitTime;
+					result->posOffset.x -= hitInfoIt.sweepMotion.x * rate;
+					result->posOffset.y -= hitInfoIt.sweepMotion.y * rate;
+					result->posOffset.z -= hitInfoIt.sweepMotion.z * rate;
+					DebugConsole::SetDrawPos(1, 25);
+					static int count = 0;
+					count++;
+
+					std::cout << "Count = " << count << std::endl;
+				}
+				else
+				{
+					result->posOffset.x += hitInfoIt.normal.x * hitInfoIt.depth;
+					result->posOffset.y += hitInfoIt.normal.y * hitInfoIt.depth;
+					result->posOffset.z += hitInfoIt.normal.z * hitInfoIt.depth;
+				}
+
 				break;
 			}
 
 			if (!velocity.IsValid()) continue;
 
+			// –@ü•ûŒü‚É“ü‚Á‚Ä‚¢‚é‘¬“x¬•ª‚ğ‘Å‚¿Ø‚é
 			float3 vel(velocity.Look().x, velocity.Look().y, velocity.Look().z);
 			
 		    // Velocity‚Æ–@ü•ûŒü‚Ìˆê’v“x‚ğ“àÏ‚Åæ“¾
@@ -394,13 +511,13 @@ void SectorCheckSystem(Chunk& a_chunk, const SystemContext& a_context)
 }
 
 
-bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentHandle<OBBCollider>& otherCollider, SystemHitResult& outThisResult, SystemHitResult& outOtherResult)
+bool IsOBBHitObb(const OBBCollider& thisCollider, const OBBCollider& otherCollider, SystemHitResult& outThisResult, SystemHitResult& outOtherResult)
 {
 	float3 differenceVector =
 	{
-		otherCollider.Look().center.x - thisCollider.Look().center.x,
-		otherCollider.Look().center.y - thisCollider.Look().center.y,
-		otherCollider.Look().center.z - thisCollider.Look().center.z,
+		otherCollider.center.x - thisCollider.center.x,
+		otherCollider.center.y - thisCollider.center.y,
+		otherCollider.center.z - thisCollider.center.z,
 	};
 
 	Matrix3X3 R;
@@ -410,14 +527,14 @@ bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentH
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			R[i][j] = DotFloat3(thisCollider.Look().axis[i], otherCollider.Look().axis[j]);
+			R[i][j] = DotFloat3(thisCollider.axis[i], otherCollider.axis[j]);
 			AbsR[i][j] = abs(R[i][j]) + 0.0001f;
 		}
 	}
 
 
 	// A ‘¤‚ÌË‰e”¼Œa
-	float rThisHalf[3] = { thisCollider.Look().half.x, thisCollider.Look().half.y, thisCollider.Look().half.z };
+	float rThisHalf[3] = { thisCollider.half.x, thisCollider.half.y, thisCollider.half.z };
 
 	float resultDepth = FLT_MAX;
 	float3 resultNormal;
@@ -427,12 +544,12 @@ bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentH
 	{
 		// B ‘¤‚ÌË‰e”¼Œa
 		float rOther =
-			otherCollider.Look().half.x * AbsR[i][0] +
-			otherCollider.Look().half.y * AbsR[i][1] +
-			otherCollider.Look().half.z * AbsR[i][2];
+			otherCollider.half.x * AbsR[i][0] +
+			otherCollider.half.y * AbsR[i][1] +
+			otherCollider.half.z * AbsR[i][2];
 
 		// ’†S·‚ÌË‰e
-		float t = std::fabs(DotFloat3(differenceVector, thisCollider.Look().axis[i]));
+		float t = std::fabs(DotFloat3(differenceVector, thisCollider.axis[i]));
 
 		// •ª—£‚µ‚Ä‚¢‚½‚ç”²‚¯‚é
 		float overlap = (rThisHalf[i] + rOther) - t;
@@ -452,8 +569,8 @@ bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentH
 		if (overlap < resultDepth)
 		{
 			resultDepth = overlap;
-			//resultNormal = thisCollider.Look().axis[i];
-			float3 axis = thisCollider.Look().axis[i];
+			//resultNormal = thisCollider.axis[i];
+			float3 axis = thisCollider.axis[i];
 			// ’†S·‚Æ‹tŒü‚«‚È‚ç”½“]
 			if (DotFloat3(differenceVector, axis) > 0.0f)
 			{
@@ -466,17 +583,17 @@ bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentH
 	}
 
 	// B ‘¤‚ÌË‰e”¼Œa
-	float rOtherHalf[3] = { otherCollider.Look().half.x, otherCollider.Look().half.y, otherCollider.Look().half.z };
+	float rOtherHalf[3] = { otherCollider.half.x, otherCollider.half.y, otherCollider.half.z };
 
 	// B0, B1, B2
 	for (int j = 0; j < 3; j++)
 	{
 		float rThis =
-			thisCollider.Look().half.x * AbsR[0][j] +
-			thisCollider.Look().half.y * AbsR[1][j] +
-			thisCollider.Look().half.z * AbsR[2][j];
+			thisCollider.half.x * AbsR[0][j] +
+			thisCollider.half.y * AbsR[1][j] +
+			thisCollider.half.z * AbsR[2][j];
 
-		float t = std::fabs(DotFloat3(differenceVector, otherCollider.Look().axis[j]));
+		float t = std::fabs(DotFloat3(differenceVector, otherCollider.axis[j]));
 
 		float overlap = (rOtherHalf[j] + rThis) - t;
 		if (overlap < 0.0f)
@@ -494,8 +611,8 @@ bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentH
 		{
 			resultDepth = overlap;
 
-			//resultNormal = otherCollider.Look().axis[j];
-			float3 axis = otherCollider.Look().axis[j];
+			//resultNormal = otherCollider.axis[j];
+			float3 axis = otherCollider.axis[j];
 
 			if (DotFloat3(differenceVector, axis) > 0.0f)
 			{
@@ -522,8 +639,8 @@ bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentH
 			int j2 = (j + 2) % 3;
 
 			float t = std::fabs(
-				DotFloat3(differenceVector, thisCollider.Look().axis[i2]) * R[i1][j] -
-				DotFloat3(differenceVector, thisCollider.Look().axis[i1]) * R[i2][j]
+				DotFloat3(differenceVector, thisCollider.axis[i2]) * R[i1][j] -
+				DotFloat3(differenceVector, thisCollider.axis[i1]) * R[i2][j]
 			);
 
 			float rThis =
@@ -551,7 +668,7 @@ bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentH
 
 
 	// Trigger‚¾‚Á‚½ê‡Triggerî•ñ‚ğResult‚É“n‚µ‚Ä•Ô‚·
-	if ((thisCollider.Look().obbBitFlag & OBB_TRIGGER) || (otherCollider.Look().obbBitFlag & OBB_TRIGGER))
+	if ((thisCollider.obbBitFlag & OBB_TRIGGER) || (otherCollider.obbBitFlag & OBB_TRIGGER))
 	{
 		outThisResult.isTrigger = true;
 		outOtherResult.isTrigger = true;
@@ -572,8 +689,8 @@ bool IsOBBHit(const ComponentHandle<OBBCollider>& thisCollider, const ComponentH
 	outOtherResult.depth = resultDepth;
 
 	// ˆÚ“®o—ˆ‚é‚©‚ğæ‚é
-	bool isThisMove = !(thisCollider.Look().obbBitFlag & OBB_PushOutLocked);
-	bool isOtherMove = !(thisCollider.Look().obbBitFlag & OBB_PushOutLocked);
+	bool isThisMove = !(thisCollider.obbBitFlag & OBB_PushOutLocked);
+	bool isOtherMove = !(otherCollider.obbBitFlag & OBB_PushOutLocked);
 	// ©•ª‘¤‚Ìİ’è‚ğ‘Šè‘¤‚ÌResult‚É“ü—Í
 	if (isThisMove)
 	{

@@ -12,6 +12,7 @@ constexpr const char* kStartWorld = "Title";
 GameScene::GameScene(
 	IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
+	IEffectCacheAcquisition& a_effectCache,
 	std::function<void(std::string)> a_sceneChangeRequest,
 	std::function<void()> a_gameEnd,
 	std::function<void()> a_resetFPSRequest,
@@ -24,6 +25,7 @@ GameScene::GameScene(
 	, sceneChangeRequest(a_sceneChangeRequest)
 	, modelCache(a_modelCache)
 	, uiCache(a_uiCache)
+	, effectCache(a_effectCache)
 	, input(a_input)
 	, gameEnd(a_gameEnd)
 	, resetFPSRequest(a_resetFPSRequest)
@@ -143,6 +145,7 @@ bool GameScene::SetWorld(std::string a_key)
 		world = std::make_unique<TitleWorld>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
 			input,
@@ -156,6 +159,7 @@ bool GameScene::SetWorld(std::string a_key)
 		world = std::make_unique<GameWorld>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
 			input,
@@ -170,6 +174,7 @@ bool GameScene::SetWorld(std::string a_key)
 		world = std::make_unique<ResultWorld>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key);},
 			input,
@@ -183,6 +188,7 @@ bool GameScene::SetWorld(std::string a_key)
 		world = std::make_unique<ClearWorld>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
 			input,
@@ -196,6 +202,7 @@ bool GameScene::SetWorld(std::string a_key)
 		world = std::make_unique<TestWorld>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
 			input,
@@ -209,6 +216,7 @@ bool GameScene::SetWorld(std::string a_key)
 		world = std::make_unique<ProtoWorld>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
 			input,

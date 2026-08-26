@@ -65,10 +65,16 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 	for (auto it : createView)
 	{
-		const ComponentHandle<CreateEffect> effect = a_chunk.GetComponent<CreateEffect>(it);
+		ComponentHandle<CreateEffect> effect = a_chunk.GetComponent<CreateEffect>(it);
 
 		float2 posOffset = effect.Look().posOffset;
 		float angleOffset = effect.Look().angleOffset;
+
+		if (effect.Look().duration < effect.Look().maxWaitTime)
+		{
+			effect->duration += a_context.deltaTime;
+			continue;
+		}
 
 		switch (effect.Look().type)
 		{
@@ -187,7 +193,21 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 				FadeUI(FADE_DOWN, 0.04f)
 			);
 			break;
+
+		case BATTLESTART:
+			Entity battleStart = a_chunk.CreateNewEntity(
+				UIComponent("BattleStart", float2(0.0f, 4.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
+				UIPosLerp(float2(0.0f, 2.0f) + posOffset, posOffset, 18.0f),
+				UIScaleLerp(float2(0.6f * 5.8f, 0.48f * 5.8f), float2(0.6, 0.48f), 18.0f),
+				LifeTime(130.0f),
+				StartUITag()
+			);
+
+			break;
+
 		}
+
+		a_chunk.DeleteChunkEntity(it);
 	}
 
 }
@@ -304,4 +324,109 @@ void SpriteAnimationSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 }
 
+void SpawnEfkEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<EfkEffectKey, Position>, ComponentTypes<EfkEffectRuntime>>();
 
+	for (auto it : view)
+	{
+		ComponentHandle<EfkEffectKey> key = a_chunk.GetComponent<EfkEffectKey>(it);
+		ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(it);
+		Effekseer::EffectRef ref;
+
+		if (!a_context.effectCache.TryGetEffect(key.Look().handleId, ref)) continue;
+
+		if(!key.Look().isLoop) a_chunk.DeleteChunkComponent(it, EfkEffectKey::kTypeId);
+		a_chunk.AddComponent(it, EfkEffectRuntime(GetEffectManager()->Play(ref, pos.Look().x, pos.Look().y, pos.Look().z)));
+	}
+}
+
+void UpdateEfkEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<EfkEffectRuntime, Position>>();
+	
+	for (auto it : view)
+	{
+		ComponentHandle<EfkEffectRuntime> runtime = a_chunk.GetComponent<EfkEffectRuntime>(it);
+		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(it);
+		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(it);
+
+		if (!GetEffectManager()->Exists(runtime.Look().handle))
+		{
+			a_chunk.DeleteChunkComponent(it, EfkEffectRuntime::kTypeId);
+			continue;
+		}
+
+
+		GetEffectManager()->SetLocation(runtime.Look().handle, pos.Look().x, pos.Look().y, pos.Look().z);
+		GetEffectManager()->SetRotation(runtime.Look().handle, rot.Look().pitch * RAD, rot.Look().yaw * RAD, rot.Look().roll * RAD);
+		GetEffectManager()->UpdateHandle(runtime.Look().handle, a_context.deltaTime / 4);
+	}
+	static int time = 0;
+	time++;
+
+	Effekseer::Manager::UpdateParameter updateParameter;
+	GetEffectManager()->Update(updateParameter);
+}
+
+void UILerpSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView posView = a_chunk.GetView<ComponentTypes<UIComponent, UIPosLerp>>();
+	for (auto it : posView)
+	{
+		// 進行終了していたら抜ける
+		ComponentHandle<UIPosLerp> posLerp = a_chunk.GetComponent<UIPosLerp>(it);
+		if (posLerp.Look().progress >= 1.0f)
+		{
+			continue;
+		}
+		
+		ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
+		
+		// 進行度を更新
+		float newProgress = posLerp.Look().progress + a_context.deltaTime / posLerp.Look().maxLerpTime;
+		posLerp->progress = std::clamp(newProgress, 0.0f, 1.0f);
+		// ui座標を更新
+		ui->uiPos.x = Lerp(posLerp.Look().startPos.x, posLerp.Look().targetPos.x, posLerp.Look().progress);
+		ui->uiPos.y = Lerp(posLerp.Look().startPos.y, posLerp.Look().targetPos.y, posLerp.Look().progress);
+	}
+
+	ComponentView scaleView = a_chunk.GetView<ComponentTypes<UIComponent, UIScaleLerp>>();
+	for (auto it : scaleView)
+	{
+		// 進行終了していたら抜ける
+		ComponentHandle<UIScaleLerp> scaleLerp = a_chunk.GetComponent<UIScaleLerp>(it);
+		if (scaleLerp.Look().progress >= 1.0f) continue;
+
+		ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
+
+		// 進行度を更新
+		float newProgress = scaleLerp.Look().progress + a_context.deltaTime / scaleLerp.Look().maxLerpTime;
+		scaleLerp->progress = std::clamp(newProgress, 0.0f, 1.0f);
+		// ui座標を更新
+		ui->uiScale.x = Lerp(scaleLerp.Look().startScale.x, scaleLerp.Look().targetScale.x, scaleLerp.Look().progress);
+		ui->uiScale.y = Lerp(scaleLerp.Look().startScale.y, scaleLerp.Look().targetScale.y, scaleLerp.Look().progress);
+	}
+}
+
+void StartUISystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<StartUITag>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<UIPosLerp> posLerp = a_chunk.GetComponent<UIPosLerp>(it);
+		if (!posLerp.IsValid() || posLerp.Look().progress < 1.0f) continue;
+		ComponentHandle<UIScaleLerp> scaleLerp = a_chunk.GetComponent<UIScaleLerp>(it);
+		if (!scaleLerp.IsValid() || scaleLerp.Look().progress < 1.0f) continue;
+		
+		a_chunk.DeleteChunkComponent(it, UIPosLerp::kTypeId);
+		a_chunk.DeleteChunkComponent(it, UIScaleLerp::kTypeId);
+
+		a_chunk.AddComponent(it, Component::FadeUI(FADE_DOWN, 0.02f));
+		PlaySound(LoadSound("Assets/Sound/startui.mp3"));
+		PlaySound(LoadSound("Assets/Sound/startui2.mp3"));
+		
+	}
+
+}

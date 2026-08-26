@@ -1,6 +1,7 @@
 #pragma once
 #include "IScene.h"
 #include "World.h"
+#include "IEffectCacheAcquisition.h"
 
 #include <memory>
 
@@ -10,6 +11,7 @@ public:
 	CreateGameScene(
 		IModelCacheAcquisition& modelCache,
 		IUICacheAcquisition& uiCache,
+		IEffectCacheAcquisition& a_effectCache,
 		Input& a_input,
 		ComponentsSerialize& a_serialize);
 	void AdvanceUpdate(float dt) override;

@@ -13,6 +13,7 @@
 #include "imGui/imgui_impl_win32.h"
 #include "DebugConsole.h"
 #include "Debug.h"
+#include "GameData.h"
 
 #include "GameScene.h"
 #include "LoadScene.h"
@@ -33,6 +34,7 @@ MainGame::MainGame()
 {
 	uiCache = UICache();
 	modelCache = ModelCache();
+	effectCache = EffectCache();
 	input = Input();
 	serialize = ComponentsSerialize();
 
@@ -63,6 +65,8 @@ void MainGame::Init()
 		std::ref(modelResultQueue),
 		std::ref(textureJobQueue),
 		std::ref(textureResultQueue),
+		std::ref(effectJobQueue),
+		std::ref(effectResultQueue),
 		std::ref(soundJobQueue),
 		std::ref(soundResultQueue),
 		std::ref(runningLoadLoop));
@@ -111,7 +115,21 @@ void MainGame::Init()
 		"Purple",
 		"Green",
 		"LookOnMaker",
-		"White"
+		"White",
+		"UIBack2",
+		"Sea",
+		"Ready",
+		"Fight",
+		"BattleStart"
+	};
+
+	effectDatas =
+	{
+		{kTestEffect, 1.0f},
+		{kHitEffect, 0.55f},
+		{kSpawnEffect, 0.45f},
+		{kSnowEffect, 3.0f},
+		{kEntryEffect, 1.5f}
 	};
 
 	ChangeScene("Load");
@@ -252,7 +270,7 @@ bool MainGame::IsEnd()
 	return isEnd;
 }
 
-
+// ロード結果を受け取り登録
 void MainGame::LoadLoopUpdate()
 {
 	// 各アセットの読み込み
@@ -260,16 +278,24 @@ void MainGame::LoadLoopUpdate()
 	while (!modelResultQueue.IsEnpty())
 	{
 		ModelLoadResult result;
-		if (modelResultQueue.TryPop(result));
+		if (modelResultQueue.TryPop(result)) // ifが機能してなかったので修正
 		modelCache.RegisterModel(result.key, result.data);
 	}
 
 	while (!textureResultQueue.IsEnpty())
 	{
 		TextureLoadResult result;
-		if (textureResultQueue.TryPop(result));
+		if (textureResultQueue.TryPop(result))
 		uiCache.RegisterModel(result.key, result.data);
 	}
+
+	while (!effectResultQueue.IsEnpty())
+	{
+		EffectLoadResult result;
+		if (effectResultQueue.TryPop(result) && result.effect) 
+		effectCache.RegisterEffect(result.key, result.effect);
+	}
+
 	// TODO Soundを読み込めるようにする
 }
 
@@ -400,6 +426,8 @@ void MainGame::WorkerLoop(
 	ThreadSafeQueue<ModelLoadResult>& a_modelResultQueue,
 	ThreadSafeQueue<TextureLoadJob>& a_textureJobQueue,
 	ThreadSafeQueue<TextureLoadResult>& a_textureResultQueue,
+	ThreadSafeQueue<EffectLoadJob>& a_effectJobQueue,
+	ThreadSafeQueue<EffectLoadResult>& a_effectResultQueue,
 	ThreadSafeQueue<SoundLoadJob>& a_soundJobQueue,
 	ThreadSafeQueue<SoundLoadResult>& a_soundResultQueue,
 	std::atomic<bool>& a_running)
@@ -443,6 +471,18 @@ void MainGame::WorkerLoop(
 			}
 		}
 
+		while (!effectJobQueue.IsEnpty())
+		{
+			EffectLoadJob effectJob = a_effectJobQueue.Pop();
+
+			EffectLoadResult effectResult = LoadEffect(effectJob);
+			a_effectResultQueue.Push(std::move(effectResult));
+			if (effectJob.endFlagPointer)
+			{
+				effectJob.endFlagPointer->store(true);
+			}
+		}
+
 	}
 
 	CoUninitialize();
@@ -460,10 +500,13 @@ bool MainGame::ChangeScene(std::string a_key)
 			},
 			modelJobQueue,
 			textureJobQueue,
+			effectJobQueue,
 			modelDatas,
 			textureDatas,
+			effectDatas,
 			modelCache,
 			uiCache,
+			effectCache,
 			input,
 			serialize
 		);
@@ -473,9 +516,11 @@ bool MainGame::ChangeScene(std::string a_key)
 	}
 	else if (a_key == "Game")
 	{
+		scene.release();
 		scene = make_unique<GameScene>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](std::string a_key)
 			{
 				sceneChangeQueue.push(a_key);
@@ -513,6 +558,7 @@ bool MainGame::ChangeScene(std::string a_key)
 		scene = make_unique<CreateGameScene>(
 			modelCache,
 			uiCache,
+			effectCache,
 			input,
 			serialize
 		);

@@ -4,6 +4,7 @@
 CreateGameScene::CreateGameScene(
 	IModelCacheAcquisition& modelCache,
 	IUICacheAcquisition& uiCache,
+	IEffectCacheAcquisition& effectCache,
 	Input& a_input,
 	ComponentsSerialize& a_serialize)
 {
@@ -12,6 +13,7 @@ CreateGameScene::CreateGameScene(
 	world = std::make_unique<CreateGameWorld>(
 		modelCache,
 		uiCache,
+		effectCache,
 		[this](int a_id) {},
 		a_input,
 		a_serialize

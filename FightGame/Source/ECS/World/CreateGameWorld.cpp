@@ -11,11 +11,13 @@ constexpr const char* startWorld = "testEntities";
 
 CreateGameWorld::CreateGameWorld(IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
+	IEffectCacheAcquisition& a_effectCache,
 	std::function<void(int)> a_tutorialRequest,
 	Input& a_input,
 	ComponentsSerialize& a_serialize) :
 	World(a_modelCache,
 		a_uiCache,
+		a_effectCache,
 		a_tutorialRequest,
 		a_input,
 		a_serialize

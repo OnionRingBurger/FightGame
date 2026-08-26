@@ -32,7 +32,7 @@ void PlayerWalkSystem(Chunk& a_chunk, const SystemContext& a_context)
 	//}
 }
 
-void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
+void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response)
 {
 	ComponentView view = a_chunk.GetView<ComponentTypes<PlayerTag, DeadState>>();
 	for (auto it : view)
@@ -61,8 +61,10 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
 		);
 		// PlaySound(LoadSound("Assets/Sound/dead.mp3"));
 
+		a_response.AddStopTime(200.0f, 200.0f, 0.3f);
+
 		Entity createEffect = a_chunk.CreateNewEntity(
-			CreateEffect(DARKFADE_UP)
+			CreateEffect(WHITEFADE_UP)
 		);
 
 		//ComponentView gunView = a_chunk.GetView<ComponentTypes<GunTag, ModelKey>>();

@@ -5,6 +5,10 @@
 
 #pragma comment(lib, "d3d11.lib")
 
+#include "Effekseer.h"
+#include "EffekseerRendererDX11.h"
+
+
 #define SAFE_DELETE(p)			do{if(p){delete p; p = nullptr;}}while(0)
 #define SAFE_DELETE_ARRAY(p)	do{if(p){delete[] p; p = nullptr;}}while(0)
 #define SAFE_RELEASE(p)			do{if(p){p->Release(); p = nullptr;}}while(0)
@@ -42,6 +46,8 @@ ID3D11DeviceContext* GetContext();
 IDXGISwapChain* GetSwapChain();
 RenderTarget* GetDefaultRTV();
 DepthStencil* GetDefaultDSV();
+Effekseer::ManagerRef GetEffectManager();
+EffekseerRenderer::RendererRef GetEffectRenderer();
 
 HRESULT InitDirectX(HWND hWnd, UINT width, UINT height, bool fullscreen);
 void UninitDirectX();

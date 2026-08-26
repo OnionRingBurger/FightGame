@@ -4,6 +4,7 @@
 #include "ShaderList.h"
 #include "Sprite.h"
 #include "GameData.h"
+#include "Defines.h"
 
 using namespace Component;
 
@@ -13,23 +14,32 @@ void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context);
 void PolylineDraw(Chunk& a_chunk, const SystemContext& a_context);
 void UIDraw(Chunk& a_chunk, const SystemContext& a_context);
+void EffectDraw(Chunk& a_chunk, const SystemContext& a_context);
+
 DirectX::XMMATRIX CreateBillBoardMatrix(const float3& cameraPos, const float3& lookPos, const float3& upVector);
 
 void DrawSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
+
+	ComponentView oBBCameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
+	OBBDraw(a_chunk, a_context, oBBCameraView);
+	SectorDraw(a_chunk, a_context, oBBCameraView);
+
 	ComponentView entityView = a_chunk.GetView<ComponentTypes<ModelKey, Position, Rotation, Scale>>();
 	ComponentView cameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
 	CameraDraw(a_chunk, a_context, cameraView, entityView);
+	
 
-	ComponentView oBBCameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
-	// OBBDraw(a_chunk, a_context, oBBCameraView);
-	SectorDraw(a_chunk, a_context, oBBCameraView);
-
+	
 	SpriteDraw(a_chunk, a_context);
 
-	//PolylineDraw(a_chunk, a_context);
+	EffectDraw(a_chunk, a_context);
+
+	//// PolylineDraw(a_chunk, a_context);
 
 	UIDraw(a_chunk, a_context);
+
+
 }
 
 
@@ -250,7 +260,7 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 		float3 upVector = cameraHandle.Look().upVector;
 
 		DrawMatrix::CreateViewMatrix(viewMat, cameraPos, lookPos, upVector);
-		DrawMatrix::CreateProjectionMatrix(projMat, cameraHandle.Look().fovy, cameraHandle.Look().aspect, cameraHandle.Look().farCrip, cameraHandle.Look().nearCrip);
+		DrawMatrix::CreateProjectionMatrix(projMat, cameraHandle.Look().fovy, cameraHandle.Look().aspect, cameraHandle.Look().nearCrip, cameraHandle.Look().farCrip);
 
 
 
@@ -282,7 +292,7 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 				worldMat,
 				pos,
 				scale,
-				rotation
+				float3(rotation.x * RAD, rotation.y * RAD, rotation.z * RAD)
 			);
 
 		}
@@ -295,7 +305,7 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 		Sprite::SetTexture(uiTexture.get());
 		Sprite::SetUVPos({ uvPos.x, uvPos.y });
 		Sprite::SetUVScale({ uvScale.x, uvScale.y });
-
+		
 		Sprite::Draw();
 
 	}
@@ -362,6 +372,101 @@ void UIDraw(Chunk& a_chunk, const SystemContext& a_context)
 
 	SetDepthTest(DEPTH_TEST_TRUE);
 
+}
+
+void EffectDraw(Chunk& a_chunk, const SystemContext& a_context)
+{
+	DirectX::XMFLOAT4X4 wvp[3];
+	ComponentHandle<Camera> useCamera;
+	ComponentHandle<Position> cameraPosition;
+	ComponentHandle<Rotation> cameraRotation;
+	ComponentHandle<ZoomComponent> zoom;
+	// 一番優先度の高いカメラを取得
+
+	ComponentView cameraView = a_chunk.GetView<ComponentTypes<CameraTag, Camera, Position, Rotation>>();
+
+	auto it = cameraView.begin();
+	auto end = cameraView.end();
+
+	if (it == end) return;
+
+	for (; it != end; ++it)
+	{
+		ComponentHandle<Camera> itCamera = a_chunk.GetComponent<Camera>(*it);
+
+		if (!useCamera.IsValid() || (itCamera.Look().cameraPriority > useCamera.Look().cameraPriority))
+		{
+			useCamera = itCamera;
+			cameraPosition = a_chunk.GetComponent<Position>(*it);
+			cameraRotation = a_chunk.GetComponent<Rotation>(*it);
+			zoom = a_chunk.GetComponent<ZoomComponent>(*it);
+		}
+	}
+	// カメラがなかった場合抜ける
+	if (!useCamera.IsValid() || !cameraPosition.IsValid() || !cameraRotation.IsValid()) return;
+
+	float fovy = useCamera->fovy;
+	float aspect = useCamera->aspect;
+	float nearCrip = useCamera->nearCrip;
+	float farCrip = useCamera->farCrip;
+	float3 cameraForward = GetForward(TOFLOAT3(cameraRotation));
+
+	if (zoom.IsValid())
+	{
+		if (zoom.Look().zoom > 1.0f) fovy /= zoom.Look().zoom;
+	}
+
+	DirectX::XMFLOAT4X4 view;
+	DirectX::XMFLOAT4X4 proj;
+
+	DrawMatrix::CreateViewMatrix(view, float3{ cameraPosition->x, cameraPosition->y, cameraPosition->z }, useCamera->lookPosition, useCamera->upVector, false);
+	DrawMatrix::CreateProjectionMatrix(proj, fovy, aspect, nearCrip, farCrip, false);
+
+	Effekseer::Matrix44 cameraMat;
+	Effekseer::Matrix44 projMat;
+
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			cameraMat.Values[i][j] = ((float*)&view)[(i) * 4  + j];
+		}
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			projMat.Values[i][j] = ((float*)&proj)[(i) * 4 + j];
+		}
+	}
+
+	::Effekseer::Vector3D viewerPosition = ::Effekseer::Vector3D(10.0f, 5.0f, 20.0f);
+
+	// Specify a projection matrix
+	// 投影行列を設定
+	::Effekseer::Matrix44 projectionMatrix;
+	projectionMatrix.PerspectiveFovRH(90.0f / 180.0f * 3.14f, (float)SCREEN_WIDTH  / (float)SCREEN_HEIGHT, 1.0f, 500.0f);
+
+	// Specify a camera matrix
+	// カメラ行列を設定
+	::Effekseer::Matrix44 cameraMatrix;
+	cameraMatrix.LookAtRH(viewerPosition, ::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(0.0f, 1.0f, 0.0f));
+
+	GetEffectRenderer()->SetCameraMatrix(cameraMat);
+	GetEffectRenderer()->SetProjectionMatrix(projMat);
+
+
+	GetEffectRenderer()->BeginRendering();
+
+	Effekseer::Manager::DrawParameter drawParameter;
+	drawParameter.ZNear = 0.0f;
+	drawParameter.ZFar = 1.0f;
+	drawParameter.ViewProjectionMatrix = GetEffectRenderer()->GetCameraProjectionMatrix();
+
+
+	GetEffectManager()->Draw(drawParameter);
+	GetEffectRenderer()->EndRendering();
 }
 
 void PolylineDraw(Chunk& a_chunk, const SystemContext& a_context)

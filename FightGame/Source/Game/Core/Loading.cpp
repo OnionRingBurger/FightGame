@@ -1,8 +1,10 @@
 #include "Loading.h"
 #include "Debug.h"
+#include <codecvt>
 
 constexpr const char* kModelFilePath = "Assets/Model/";
 constexpr const char* kTextureFilePath = "Assets/Texture/";
+constexpr const char* kEffectFilePath = "Assets/Effect/";
 
 ModelLoadResult LoadModel(const ModelLoadJob& job)
 {
@@ -41,6 +43,16 @@ TextureLoadResult LoadTexture(const TextureLoadJob& job)
 	
 
 	return TextureLoadResult(job.key, texture);
+}
+
+EffectLoadResult LoadEffect(const EffectLoadJob& job)
+{
+	std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
+	std::u16string convertedKey = converter.from_bytes(kEffectFilePath + job.key);
+
+	Effekseer::EffectRef ref = Effekseer::Effect::Create(GetEffectManager(), convertedKey.c_str(), job.magnificent);
+
+	return EffectLoadResult(job.key, ref);
 }
 
 void LoadSound()

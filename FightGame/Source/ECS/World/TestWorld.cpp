@@ -17,12 +17,14 @@
 TestWorld::TestWorld(
 	IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
+	IEffectCacheAcquisition& a_effectCache,
 	std::function<void(int)> a_tutorialRequest,
 	std::function<void(std::string)> a_worldRequest,
 	Input& a_input,
 	ComponentsSerialize& a_serialize)
 	: World(a_modelCache,
 		a_uiCache,
+		a_effectCache,
 		a_tutorialRequest,
 		a_input,
 		a_serialize
@@ -133,7 +135,7 @@ void TestWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 	EnemySpawnSystem(a_chunk, a_context);
 	EnemyShooterSystem(a_chunk, a_context);
 	EnemyAttackSystem(a_chunk, a_context, a_response);
-	PlayerDeadSystem(a_chunk, a_context);
+	PlayerDeadSystem(a_chunk, a_context, a_response);
 	EnemyDeadSystem(a_chunk, a_context, a_response);
 	EnemyBulletDeadSystem(a_chunk, a_context);
 	GoalSystem(a_chunk, a_context);

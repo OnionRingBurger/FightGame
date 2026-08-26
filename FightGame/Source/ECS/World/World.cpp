@@ -14,13 +14,14 @@
 World::World(
 	IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
+	IEffectCacheAcquisition& effectCache,
 	std::function<void(int)> a_tutorialRequest,
 	Input& a_input, 
 	ComponentsSerialize& a_serialize)
 	: systemResponse()
 	, m_state(USECHUNK)
 	, isMouseLock(true)
-	, context(a_modelCache, a_uiCache, a_tutorialRequest, a_input) // TODO System側が勝手にリクエストを触れないようにする
+	, context(a_modelCache, a_uiCache, effectCache, a_tutorialRequest, a_input) // TODO System側が勝手にリクエストを触れないようにする
 	, isGameEnd(false)
 	, serialize(a_serialize)
 {

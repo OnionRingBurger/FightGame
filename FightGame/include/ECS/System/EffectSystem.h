@@ -15,3 +15,11 @@ void UVMoveSystem(Chunk& a_chunk, const SystemContext& a_context);
 void HPGaugeSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void SpriteAnimationSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void SpawnEfkEffectSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void UpdateEfkEffectSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void UILerpSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void StartUISystem(Chunk& a_chunk, const SystemContext& a_context);

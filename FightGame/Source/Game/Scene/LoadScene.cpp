@@ -8,18 +8,24 @@ LoadScene::LoadScene(
 	std::function<void(std::string)> a_sceneChange,
 	ThreadSafeQueue<ModelLoadJob>& a_modelJobQueue,
 	ThreadSafeQueue<TextureLoadJob>& a_textureJobQueue,
+	ThreadSafeQueue<EffectLoadJob>& a_effectJobQueue,
 	std::vector<modelLoadData> a_modelDatas,
 	std::vector<std::string> a_textureDatas,
+	std::vector<effectLoadData> a_effectDatas,
 	IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
+	IEffectCacheAcquisition& effectCache,
 	Input& a_input,
 	ComponentsSerialize& a_serialize)
 	: sceneChange(a_sceneChange)
 	, inited(false)
 	, modelJobQueue(a_modelJobQueue)
 	, textureJobQueue(a_textureJobQueue)
+	, effectJobQueue(a_effectJobQueue)
 	, modelDatas(a_modelDatas)
 	, textureDatas(a_textureDatas)
+	, effectDatas(a_effectDatas)
+	
 {
 	// DebugConsole::ToggleConsole();
 
@@ -47,7 +53,7 @@ LoadScene::LoadScene(
 	}
 
 
-	world = std::make_unique<LoadWorld>(a_modelCache, a_uiCache, a_input, a_serialize);
+	world = std::make_unique<LoadWorld>(a_modelCache, a_uiCache, effectCache, a_input, a_serialize);
 	world->InitWorld();
 	// ÉçÅ[Éhó Çï€éù
 	maxLoadCount = loadEndFlags.size();
@@ -79,6 +85,13 @@ void LoadScene::Update()
 		{
 			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
 			textureJobQueue.Push(std::move(TextureLoadJob(it, endFlag)));
+			loadEndFlags.push_back(endFlag);
+		}
+
+		for (auto it : effectDatas)
+		{
+			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
+			effectJobQueue.Push(std::move(EffectLoadJob(it.key, it.magnificent, endFlag)));
 			loadEndFlags.push_back(endFlag);
 		}
 	}

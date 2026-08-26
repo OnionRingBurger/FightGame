@@ -3,7 +3,7 @@
 class LoadWorld : public World
 {
 public:
-	LoadWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, Input& a_input, ComponentsSerialize& a_serialize);
+	LoadWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, Input& a_input, ComponentsSerialize& a_serialize);
 	~LoadWorld() = default;
 
 

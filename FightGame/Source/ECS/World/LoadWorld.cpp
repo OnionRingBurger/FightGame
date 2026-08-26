@@ -4,7 +4,7 @@
 
 using namespace Component;
 
-LoadWorld::LoadWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, Input& a_input, ComponentsSerialize& a_serialize) : World(a_modelCache, a_uiCache, nullptr, a_input, a_serialize)
+LoadWorld::LoadWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, Input& a_input, ComponentsSerialize& a_serialize) : World(a_modelCache, a_uiCache, a_effectCache, nullptr, a_input, a_serialize)
 {
 }
 

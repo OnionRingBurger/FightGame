@@ -6,9 +6,10 @@
 
 using namespace Component;
 
-ClearWorld::ClearWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
+ClearWorld::ClearWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
 	: World(a_modelCache,
 		a_uiCache,
+		a_effectCache,
 		a_tutorialRequest,
 		a_input,
 		a_serialize)

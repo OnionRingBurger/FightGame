@@ -11,7 +11,9 @@ ID3D11RasterizerState*		g_pRasterizerState[3];
 ID3D11DepthStencilState*	g_pDepthStencilState[3];
 ID3D11BlendState*			g_pBlendState[BLEND_MAX];
 ID3D11SamplerState*			g_pSamplerState[SAMPLER_MAX];
-
+Effekseer::ManagerRef managerRef;
+EffekseerRendererDX11::RendererRef rendererRef;
+Effekseer::Backend::GraphicsDeviceRef graphicsRef;
 
 ID3D11Device* GetDevice()
 {
@@ -32,6 +34,15 @@ RenderTarget* GetDefaultRTV()
 DepthStencil* GetDefaultDSV()
 {
 	return g_pDSV;
+}
+Effekseer::ManagerRef GetEffectManager()
+{
+	return managerRef;
+}
+
+EffekseerRenderer::RendererRef GetEffectRenderer()
+{
+	return rendererRef;
 }
 
 HRESULT InitDirectX(HWND hWnd, UINT width, UINT height, bool fullscreen)
@@ -204,11 +215,45 @@ HRESULT InitDirectX(HWND hWnd, UINT width, UINT height, bool fullscreen)
 	}
 	SetSamplerState(SAMPLER_LINEAR);
 
+	managerRef = Effekseer::Manager::Create(8000);
+
+	graphicsRef = EffekseerRendererDX11::CreateGraphicsDevice(GetDevice(), GetContext());
+	rendererRef = EffekseerRendererDX11::Renderer::Create(GetDevice(), GetContext(), 10000);
+
+	// Sprcify rendering modules
+// 描画モジュールの設定
+	managerRef->SetSpriteRenderer(rendererRef->CreateSpriteRenderer());
+	managerRef->SetRibbonRenderer(rendererRef->CreateRibbonRenderer());
+	managerRef->SetRingRenderer(rendererRef->CreateRingRenderer());
+	managerRef->SetTrackRenderer(rendererRef->CreateTrackRenderer());
+	managerRef->SetModelRenderer(rendererRef->CreateModelRenderer());
+
+	// Specify a texture, model, curve and material loader
+	// It can be extended by yourself. It is loaded from a file on now.
+	// テクスチャ、モデル、カーブ、マテリアルローダーの設定する。
+	// ユーザーが独自で拡張できる。現在はファイルから読み込んでいる。
+	managerRef->SetTextureLoader(rendererRef->CreateTextureLoader());
+	managerRef->SetModelLoader(rendererRef->CreateModelLoader());
+	managerRef->SetMaterialLoader(rendererRef->CreateMaterialLoader());
+	managerRef->SetCurveLoader(Effekseer::MakeRefPtr<Effekseer::CurveLoader>());
+
+	if (false)
+	{
+		managerRef->SetGpuTimer(rendererRef->CreateGpuTimer());
+	}
+
+	managerRef->SetCoordinateSystem(Effekseer::CoordinateSystem::LH);
+
 	return S_OK;
 }
 
 void UninitDirectX()
 {
+	rendererRef = nullptr;
+	graphicsRef = nullptr;
+	managerRef = nullptr;
+	
+
 	SAFE_DELETE(g_pDSV);
 	SAFE_DELETE(g_pRTV);
 

@@ -1,5 +1,6 @@
 #include "Geometory.h"
 #include "MathAssist.h"
+#include <algorithm>
 
 #define MAX_VERTEX (4 * 6)
 #define MAX_INDEX (6 * 6)
@@ -110,7 +111,7 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 	int vertexCount = 0;
 	int outsideVertexCount = circumferenceCount;
 	float insideRate = (maxLength - minLength) / maxLength;
-	int insideVertexCount = max((int)(circumferenceCount * insideRate), 1);
+	int insideVertexCount = std::max((int)(circumferenceCount * insideRate), 1);
 	
 	maxLowness *= -1.0f;
 

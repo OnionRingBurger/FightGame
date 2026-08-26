@@ -104,13 +104,13 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>include\assimp;include\DataManager;include\DirectXTex;include\Drawer;include\ECS\Core;include\Game\Core;include\imGui;include\nlohmann;include\Sound;include\Tool\Debug;include\ECS\System;include\ECS\Component;include\ECS\World;include\Game\Scene;include\Tool\Math;include;Source\imGui;include\AI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include\assimp;include\DataManager;include\DirectXTex;include\Drawer;include\ECS\Core;include\Game\Core;include\imGui;include\nlohmann;include\Sound;include\Tool\Debug;include\ECS\System;include\ECS\Component;include\ECS\World;include\Game\Scene;include\Tool\Math;include;Source\imGui;include\AI;include\EffekseerFiles;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>xinput.lib;EffekseerRendererDX11d.lib;Effekseerd.lib;EffekseerRendererCommond.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -123,17 +123,19 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>include\assimp;include\DataManager;include\DirectXTex;include\Drawer;include\ECS\Core;include\Game\Core;include\imGui;include\nlohmann;include\Sound;include\Tool\Debug;include\ECS\System;include\ECS\Component;include\ECS\World;include\Game\Scene;include\Tool\Math;include;Source\imGui;include\AI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include\assimp;include\DataManager;include\DirectXTex;include\Drawer;include\ECS\Core;include\Game\Core;include\imGui;include\nlohmann;include\Sound;include\Tool\Debug;include\ECS\System;include\ECS\Component;include\ECS\World;include\Game\Scene;include\Tool\Math;include;Source\imGui;include\AI;include\EffekseerFiles;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>xinput.lib;Effekseer.lib;EffekseerRendererDX11.lib;EffekseerRendererCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\DataManager\AssimpModelLorder.h" />
+    <ClInclude Include="include\DataManager\EffectCache.h" />
+    <ClInclude Include="include\DataManager\IEffectCacheAcquisition.h" />
     <ClInclude Include="include\DataManager\IModelCacheAcquisition.h" />
     <ClInclude Include="include\DataManager\IModelLoader.h" />
     <ClInclude Include="include\DataManager\IUICacheAcquisition.h" />
@@ -238,9 +240,12 @@
     <ClInclude Include="include\AI\RunPlayerNode.h" />
     <ClInclude Include="include\AI\ReactiveSelector.h" />
     <ClInclude Include="include\AI\AI.h" />
+    <ClInclude Include="include\DataManager\EffectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\DataManager\AssimpModelLorder.cpp" />
+    <ClCompile Include="Source\DataManager\EffectCache.cpp" />
+    <ClCompile Include="Source\DataManager\EffectManager.cpp" />
     <ClCompile Include="Source\DataManager\IModelLoader.cpp" />
     <ClCompile Include="Source\DataManager\ModelCache.cpp" />
     <ClCompile Include="Source\DataManager\SoundCache.cpp" />

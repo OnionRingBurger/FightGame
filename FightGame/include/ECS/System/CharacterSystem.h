@@ -57,3 +57,5 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response, AIManager& a_aiManager);
 
 void AttackHitRecordCleanupSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void EntryActionSystem(Chunk& a_chunk, const SystemContext& a_context);

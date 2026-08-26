@@ -16,10 +16,13 @@ public:
 	LoadScene(std::function<void(std::string)> a_sceneChange,
 		ThreadSafeQueue<ModelLoadJob>& a_modelJobQueue, 
 		ThreadSafeQueue<TextureLoadJob>& a_textureJobQueue,
+		ThreadSafeQueue<EffectLoadJob>& a_effectJobQueue,
 		std::vector<modelLoadData> a_modelDatas,
 		std::vector<std::string> a_textureDatas,
+		std::vector<effectLoadData> a_effectDatas,
 		IModelCacheAcquisition& a_modelCache,
 		IUICacheAcquisition& a_uiCache,
+		IEffectCacheAcquisition& effectCache,
 		Input& a_input,
 		ComponentsSerialize& a_serialize);
 
@@ -38,8 +41,10 @@ private:
 	int maxLoadCount;
 	ThreadSafeQueue<ModelLoadJob>& modelJobQueue;
 	ThreadSafeQueue<TextureLoadJob>& textureJobQueue;
+	ThreadSafeQueue<EffectLoadJob>& effectJobQueue;
 	std::vector<modelLoadData> modelDatas;
 	std::vector<std::string> textureDatas;
+	std::vector<effectLoadData> effectDatas;
 
 	void RemoveIfFlaged(std::vector<std::shared_ptr<std::atomic_bool>>& loadEndFlags);
 };

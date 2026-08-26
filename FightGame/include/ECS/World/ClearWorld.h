@@ -5,6 +5,7 @@ class ClearWorld : public World
 public:
 	ClearWorld(IModelCacheAcquisition& a_modelCache,
 		IUICacheAcquisition& a_uiCache,
+		IEffectCacheAcquisition& a_effectCache,
 		std::function<void(int)> a_tutorialRequest,
 		std::function<void(std::string)> a_worldRequest,
 		Input& a_input,

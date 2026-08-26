@@ -712,6 +712,8 @@ namespace Component
 
 		// ・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽh・ｽﾌ抵ｿｽ・ｽS・ｽ・ｽ・ｽW
 		float3 center;
+		float3 oldCenter;
+		bool setOldCenter;
 
 		// x,y,z・ｽﾌ包ｿｽ・ｽ・ｽ・ｽx・ｽN・ｽg・ｽ・ｽ
 		std::array<float3, 3> axis;
@@ -725,8 +727,10 @@ namespace Component
 
 		OBBCollider(BitFlag a_flag = OBB_DEFAULT)
 			: center(0.0f, 0.0f, 0.0f)
+			, oldCenter(0.0f, 0.0f, 0.0f)
 			, half(0.0f, 0.0f, 0.0f)
 			, obbBitFlag(a_flag)
+			, setOldCenter(false)
 		{
 			for (int i = 0; i < 3; i++)
 			{
@@ -790,25 +794,40 @@ namespace Component
 		struct HitResult
 		{
 
-			// ・ｽﾔつゑｿｽ・ｽ・ｽ・ｽ・ｽEntity
+			// ぶつかった相手
 			Entity hitEntity;
 
-			// ・ｽ・ｽ・ｽ・ｽ・ｽﾟゑｿｽ・ｽ・ｽ・ｽ・ｽ
-			float3 normal;
-			// ・ｽ・ｽ・ｽ・ｽ・ｽﾟゑｿｽ・ｽ・ｽ
-			float depth;
+			bool isSweep;
 
+			// 法線移動
+			float3 normal;
+			// 深さ
+			float depth;
+			// スイープ用移動量
+			float3 sweepMotion;
+			// どのタイミングでヒットしたかを0~1の範囲で返す
+			float normalizeHitTime;
 			InfoColliderType otherType;
 
 			HitResult()
-				: HitResult(kInvalidEntity, float3(), 0.0f, DEFAULT)
+				: HitResult(kInvalidEntity, false, float3(), 0.0f, float3(), 0.0f, DEFAULT)
 			{
 			}
 
-			HitResult(Entity a_hitEntity, float3 a_normal, float a_depth, InfoColliderType a_otherType)
+			HitResult(
+				Entity a_hitEntity,
+				bool a_isSweep,
+				float3 a_normal,
+				float a_depth,
+				float3 a_sweepMotion,
+				float a_normalizeHitTime,
+				InfoColliderType a_otherType)
 				: hitEntity(a_hitEntity)
+				, isSweep(a_isSweep)
 				, normal(a_normal)
 				, depth(a_depth)
+				, sweepMotion(a_sweepMotion)
+				, normalizeHitTime(a_normalizeHitTime)
 				, otherType(a_otherType)
 			{
 			}
@@ -892,19 +911,23 @@ namespace Component
 		SPEEDLINEFADE,
 		SHOTFLASH,
 		DAMAGE_EFFECT,
-		DAMAGE_DIRECTION
+		DAMAGE_DIRECTION,
+		BATTLESTART
 	};
 	struct CreateEffect
 	{
 		static constexpr TypeID kTypeId = 34;
 		static constexpr const char* kTypeName = "CreateEffect";
-		static constexpr int kVersion = 0;
+		static constexpr int kVersion = 1;
 
 		EffectType type;
 
 
 		float2 posOffset;
 		float angleOffset;
+
+		float maxWaitTime;
+		float duration;
 
 		CreateEffect()
 			: CreateEffect(WHITEFADE_UP)
@@ -915,13 +938,17 @@ namespace Component
 			: type(a_type)
 			, posOffset()
 			, angleOffset()
+			, maxWaitTime(0.0f)
+			, duration(0.0f)
 		{
 		}
 
-		CreateEffect(EffectType a_type, float2 a_posOffset, float a_angleOffset)
+		CreateEffect(EffectType a_type, float2 a_posOffset, float a_angleOffset, float a_maxWaitTime = 0.0f)
 			: type(a_type)
 			, posOffset(a_posOffset)
 			, angleOffset(a_angleOffset)
+			, maxWaitTime(a_maxWaitTime)
+			, duration(0.0f)
 		{
 
 		}
@@ -2188,7 +2215,8 @@ namespace Component
 		ActionFlag_KnockBack = 1 << 5,
 		ActionFlag_LookMove = 1 << 6,
 		ActionFlag_RotChange = 1 << 7,
-		ActionFlag_All = ActionFlag_Move | ActionFlag_Aim | ActionFlag_Attack | ActionFlag_Jump | ActionFlag_Guard | ActionFlag_KnockBack | ActionFlag_LookMove | ActionFlag_RotChange,
+		ActionFlag_EntryDuration = 1 << 8,
+		ActionFlag_All = ActionFlag_Move | ActionFlag_Aim | ActionFlag_Attack | ActionFlag_Jump | ActionFlag_Guard | ActionFlag_KnockBack | ActionFlag_LookMove | ActionFlag_RotChange | ActionFlag_EntryDuration,
 	};
 
 
@@ -2960,6 +2988,136 @@ namespace Component
 			: spawnName(a_spawnName)
 			, size(a_spawnName.size())
 		{
+		}
+	};
+
+	struct EfkEffectKey
+	{
+		static constexpr TypeID kTypeId = 145;
+		static constexpr const char* kTypeName = "Effect";
+		static constexpr int kVersion = 0;
+
+		std::string handleId;
+		bool isLoop;
+
+		EfkEffectKey(std::string a_handleId, bool a_isLoop)
+			: handleId(a_handleId)
+			, isLoop(a_isLoop)
+		{
+		};
+
+		EfkEffectKey()
+			: EfkEffectKey("", false)
+		{
+
+		}
+	};
+
+	struct EfkEffectRuntime
+	{
+		static constexpr TypeID kTypeId = 146;
+		static constexpr const char* kTypeName = "EffectRuntime";
+		static constexpr int kVersion = 0;
+
+		Effekseer::Handle handle;
+
+		EfkEffectRuntime(Effekseer::Handle a_handle)
+			: handle(a_handle)
+		{
+		}
+
+		EfkEffectRuntime()
+			: handle()
+		{
+		}
+
+	};
+
+	struct EntryAction
+	{
+		static constexpr TypeID kTypeId = 147;
+		static constexpr const char* kTypeName = "EntryAction";
+		static constexpr int kVersion = 0;
+
+		float duration;
+		float maxDuration;
+		bool canPlayEffect;
+
+		EntryAction(float a_maxDuration)
+			: maxDuration(a_maxDuration)
+			, duration(0.0f)
+			, canPlayEffect(true)
+		{
+		}
+
+		EntryAction()
+			: EntryAction(0.0f)
+		{
+		}
+
+	};
+
+
+	struct UIScaleLerp
+	{
+		static constexpr TypeID kTypeId = 148;
+		static constexpr const char* kTypeName = "UIScaleLerp";
+		static constexpr int kVersion = 0;
+
+		float progress;
+		float maxLerpTime;
+		float2 targetScale;
+		float2 startScale;
+
+		UIScaleLerp(float2 a_startScale, float2 a_targetScale, float a_maxLerpTime)
+			: startScale(a_startScale)
+			, targetScale(a_targetScale)
+			, progress(0.0f)
+			, maxLerpTime(a_maxLerpTime)
+		{
+		}
+
+		UIScaleLerp()
+			: UIScaleLerp(float2(), float2(), 0.0f)
+		{
+		}
+	};
+
+	struct UIPosLerp
+	{
+		static constexpr TypeID kTypeId = 149;
+		static constexpr const char* kTypeName = "UIPosLerp";
+		static constexpr int kVersion = 0;
+
+		float progress;
+		float maxLerpTime;
+		float2 targetPos;
+		float2 startPos;
+
+		UIPosLerp(float2 a_startPos, float2 a_targetPos, float a_maxLerpTime)
+			: startPos(a_startPos)
+			, targetPos(a_targetPos)
+			, progress(0.0f)
+			, maxLerpTime(a_maxLerpTime)
+		{
+		}
+
+		UIPosLerp()
+			: UIPosLerp(float2(), float2(), 0.0f)
+		{
+		}
+
+	};
+
+	struct StartUITag
+	{
+		static constexpr TypeID kTypeId = 150;
+		static constexpr const char* kTypeName = "StartUITag";
+		static constexpr int kVersion = 0;
+
+		StartUITag()
+		{
+
 		}
 	};
 }

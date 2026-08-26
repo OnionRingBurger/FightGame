@@ -204,7 +204,7 @@ void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResp
 			a_chunk.AddComponent(camera, ShakeComponent(shakePower, shakeAmp, shakeTime));
 		}
 
-		PlaySound(LoadSound("Assets/Sound/kill.mp3"));
+		PlaySound(LoadSound("Assets/Sound/enemydead.mp3"));
 
 		ComponentHandle<LifeTime> lifeTime = a_chunk.GetComponent<LifeTime>(it);
 		if (lifeTime.IsValid())

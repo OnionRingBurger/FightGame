@@ -5,6 +5,7 @@ class CreateGameWorld : public World
 public:
 	CreateGameWorld(IModelCacheAcquisition& a_modelCache,
 		IUICacheAcquisition& a_uiCache,
+		IEffectCacheAcquisition& a_effectCache,
 		std::function<void(int)> a_tutorialRequest,
 		Input& a_input, 
 		ComponentsSerialize& a_serialize

@@ -22,12 +22,6 @@ void ResetSystem(Chunk& a_chunk, const SystemContext& a_context)
 		a_chunk.DeleteChunkComponent(it, RayInfomation::kTypeId);
 	}
 
-	ComponentView viewCreateEffect = a_chunk.GetView<ComponentTypes<CreateEffect>>();
-
-	for (auto it : viewCreateEffect)
-	{
-		a_chunk.DeleteChunkEntity(it);
-	}
 
 	ComponentView viewFixedResult = a_chunk.GetView<ComponentTypes<FixedResult>>();
 	for (auto it : viewFixedResult)

@@ -16,6 +16,7 @@
 #include "IScene.h"
 #include "IModelCacheAcquisition.h"
 #include "IUICacheAcquisition.h"
+#include "IEffectCacheAcquisition.h"
 #include "AI/AIManager.h"
 #include "ComponentsSerialize.h"
 
@@ -35,6 +36,7 @@ public:
 	World(
 		IModelCacheAcquisition& modelCache,
 		IUICacheAcquisition& uiCache,
+		IEffectCacheAcquisition& effectCache,
 		std::function<void(int)> tutorialRequest,
 		Input& a_input,
 		ComponentsSerialize& a_serialize);
