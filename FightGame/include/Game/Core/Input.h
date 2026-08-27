@@ -89,6 +89,10 @@ private:
 	BOOL isGetCursorPos;
 	BYTE g_keyTable[256];
 	BYTE g_oldTable[256];
+
+	WORD currentButton;
+	WORD oldButton;
+	WORD lastPacket;
 	
 };
 

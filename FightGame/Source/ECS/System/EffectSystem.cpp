@@ -90,7 +90,6 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 				FadeUI(FADE_UP, 0.006f)
 			);
 
-			PlaySound(LoadSound("Assets/Sound/goal.mp3"));
 
 			break;
 		}
@@ -120,7 +119,6 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 				FadeUI(FADE_UP, 0.015f)
 			);
 
-			PlaySound(LoadSound("Assets/Sound/minifade.mp3"));
 			break;
 		}
 

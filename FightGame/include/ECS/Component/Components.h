@@ -2490,6 +2490,11 @@ namespace Component
 		bool useJump;
 		bool useGuard;
 
+		// ÉJÉÅÉâëÄçÏ
+		bool moveCamera;
+		float2 cameraDir;
+		float cameraMagnitube;
+
 		MoveInputResult()
 			: moveDir()
 			, magnitube(0.0f)
@@ -2498,6 +2503,9 @@ namespace Component
 			, attackIndex(0)
 			, useJump(false)
 			, useGuard(false)
+			, moveCamera(false)
+			, cameraDir()
+			, cameraMagnitube(0.0f)
 		{
 		}
 	};
@@ -2513,20 +2521,23 @@ namespace Component
 		InputOrigin attack;
 		InputOrigin jump;
 		InputOrigin guard;
+		InputOrigin camera;
 
 		InputSource(InputOrigin a_origin = InputOrigin::Device)
 			: move(a_origin)
 			, attack(a_origin)
 			, jump(a_origin)
 			, guard(a_origin)
+			, camera(a_origin)
 		{
 		}
 
-		InputSource(InputOrigin a_move, InputOrigin a_attack, InputOrigin a_jump, InputOrigin a_guard)
+		InputSource(InputOrigin a_move, InputOrigin a_attack, InputOrigin a_jump, InputOrigin a_guard, InputOrigin a_camera)
 			: move(a_move)
 			, attack(a_attack)
 			, jump(a_jump)
 			, guard(a_guard)
+			, camera(a_camera)
 		{
 		}
 	};
@@ -2839,19 +2850,21 @@ namespace Component
 	{
 		static constexpr TypeID kTypeId = 135;
 		static constexpr const char* kTypeName = "LookOnAction";
-		static constexpr int kVersion = 0;
+		static constexpr int kVersion = 1;
 
 		Entity target;
 		float3 finalRot;
+		float targetCooltime;
 
 		LookOnAction()
-			: LookOnAction(kInvalidEntity)
+			: LookOnAction(kInvalidEntity, 0.0f)
 		{
 		}
 
-		LookOnAction(Entity a_target)
+		LookOnAction(Entity a_target, float a_targetCooltime)
 			: target(a_target)
 			, finalRot()
+			, targetCooltime(a_targetCooltime)
 		{
 		}
 	};

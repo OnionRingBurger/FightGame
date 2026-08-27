@@ -137,7 +137,7 @@ namespace
 		return !deadState.IsValid() || !deadState.Look().isDead;
 	}
 
-	// !!!New!!!
+	// ロックオン対象の状態が正常か確認
 	bool IsLookOnTargetValid(Chunk& a_chunk, Entity a_target)
 	{
 		if (a_target == kInvalidEntity) return false;
@@ -216,12 +216,11 @@ namespace
 			if (!IsEnemyAlive(a_chunk, enemyIt)) continue;
 
 			// 距離を比較して範囲外なら抜ける
-			// AIがアホ、座標は確定しているためPoseを取得する必要性が皆無
 			const float3 enemyPos = GetEntityWorldPos(a_chunk, enemyIt);
 			const float distSq = GetXZDistanceSq(a_playerPos, enemyPos);
 			if (distSq > a_radiusSq) continue;
 			//　カメラの範囲外かも判定
-			if (!IsWithinCameraHorizontalFOV(a_chunk, a_cameraEntity, a_playerPos, enemyPos, a_halfFovDeg)) continue;
+			// if (!IsWithinCameraHorizontalFOV(a_chunk, a_cameraEntity, a_playerPos, enemyPos, a_halfFovDeg)) continue;
 
 			// 一番近かった場合記録する
 			if (distSq < nearestDistSq)
@@ -243,8 +242,10 @@ namespace
 		float a_radiusSq,
 		Entity a_cameraEntity)
 	{
+		// 現在の対象が正常か確認、不正な場合は空のEntityを返す
 		if (a_direction == 0 || !IsLookOnTargetValid(a_chunk, a_currentTarget)) return kInvalidEntity;
 
+		// プレイヤーへの距離とベクトル、カメラ方向を取得
 		const float3 currentPos = GetEntityWorldPos(a_chunk, a_currentTarget);
 		const float2 toCurrent(currentPos.x - a_playerPos.x, currentPos.z - a_playerPos.z);
 		if (GetLengthSq(toCurrent) < 1e-8f) return kInvalidEntity;
@@ -260,16 +261,23 @@ namespace
 			if (enemyIt == a_currentTarget) continue;
 			if (!IsEnemyAlive(a_chunk, enemyIt)) continue;
 
+			// 範囲外だった場合抜ける
 			const float3 enemyPos = GetEntityWorldPos(a_chunk, enemyIt);
 			const float distSq = GetXZDistanceSq(a_playerPos, enemyPos);
 			if (distSq > a_radiusSq) continue;
 
-			const float2 toEnemy(enemyPos.x - a_playerPos.x, enemyPos.z - a_playerPos.z);
-			const float2 enemyDir = Normalize(toEnemy);
-			const float sideDot = enemyDir.x * cameraRight.x + enemyDir.y * cameraRight.y;
+			// 入力方向にいなかったら抜ける
+			const float2 targetToEnemy(enemyPos.x - currentPos.x, enemyPos.z - currentPos.z);
+			const float2 targetToEnemyDir = Normalize(targetToEnemy);
+			const float sideDot = targetToEnemy.x * cameraRight.x + targetToEnemy.y * cameraRight.y;
 			if (a_direction < 0 && sideDot >= 0.0f) continue;
 			if (a_direction > 0 && sideDot <= 0.0f) continue;
 
+			// 敵への方向を取得
+			const float2 toEnemy(enemyPos.x - a_playerPos.x, enemyPos.z - a_playerPos.z);
+			const float2 enemyDir = Normalize(toEnemy);
+
+			// 方向を決定
 			const float dirDot = currentDir.x * enemyDir.x + currentDir.y * enemyDir.y;
 			const float clampedDot = std::clamp(dirDot, -1.0f, 1.0f);
 			const float angle = acosf(clampedDot) * DEG;
@@ -725,15 +733,16 @@ void LookOnStateSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
 	const Entity cameraEntity = GetCamera(a_chunk);
 	const float halfFovDeg = GetCameraHorizontalHalfAngleDeg(a_chunk, cameraEntity);
-	const int switchDirection = ResolveLookOnSwitchDirection(a_context);
+	// const int switchDirection = ResolveLookOnSwitchDirection(a_context);
 	
 
 	// ロックオン継続管理
-	ComponentView actionView = a_chunk.GetView<ComponentTypes<LookOnState, LookOnAction>>();
+	ComponentView actionView = a_chunk.GetView<ComponentTypes<LookOnState, LookOnAction, MoveInputResult>>();
 	for (auto playerIt : actionView)
 	{
 		ComponentHandle<LookOnAction> action = a_chunk.GetComponent<LookOnAction>(playerIt);
 		ComponentHandle<LookOnState> state = a_chunk.GetComponent<LookOnState>(playerIt);
+		ComponentHandle<MoveInputResult> result = a_chunk.GetComponent<MoveInputResult>(playerIt);
 
 		
 		// 死亡込みでロックオン対象がいるか確認する
@@ -743,16 +752,24 @@ void LookOnStateSystem(Chunk& a_chunk, const SystemContext& a_context)
 			continue;
 		}
 
+		if (action.Look().targetCooltime > 0.0f)
+		{
+			float newCooltime = std::max(action.Look().targetCooltime - a_context.deltaTime, 0.0f);
+			action->targetCooltime = newCooltime;
+			continue;
+		}
+
+		if (!result.Look().moveCamera) continue;
 
 		// 対象への距離と座標を取得
 		const float3 playerPos = GetEntityWorldPos(a_chunk, playerIt);
 		const float releaseRadiusSq = state.Look().releaseRadius * state.Look().releaseRadius;
 		const float3 targetPos = GetEntityWorldPos(a_chunk, action.Look().target);
 		const float targetDistSq = GetXZDistanceSq(playerPos, targetPos);
+		int switchDirection = (int)Sign(result.Look().cameraDir.x * result.Look().cameraMagnitube);
 		// AIがアホ、勝手に既存フローに乗っていない方法で入力を取ってる
 		if (switchDirection != 0)
 		{
-			
 			// 切り替え方向に対象が存在するか確認
 			const Entity switchTarget = FindLookOnSwitchTarget(
 				a_chunk,
@@ -765,6 +782,7 @@ void LookOnStateSystem(Chunk& a_chunk, const SystemContext& a_context)
 			if (switchTarget != kInvalidEntity)
 			{
 				action->target = switchTarget;
+				action->targetCooltime = kLookOnChangeCooltime;
 				Entity targetMarker = GetLookOnMarker(a_chunk);
 				ComponentHandle<FollowPosition> markerFollow = a_chunk.GetComponent<FollowPosition>(targetMarker);
 				if (markerFollow.IsValid()) markerFollow->targetEntity = switchTarget;
@@ -797,7 +815,7 @@ void LookOnStateSystem(Chunk& a_chunk, const SystemContext& a_context)
 		if (nearestEnemy == kInvalidEntity) continue;
 
 		// 一番近い敵が範囲内だった場合Actionを追加し、登録する
-		a_chunk.AddComponent(playerIt, LookOnAction(nearestEnemy));
+		a_chunk.AddComponent(playerIt, LookOnAction(nearestEnemy, kLookOnChangeCooltime));
 		// Stateを変更
 		StateToLook(a_chunk, playerIt);
 		// マーカーを設定
@@ -825,6 +843,31 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 	const Axis& leftAxis = a_context.input.GetLeftAxis().magnitube >= a_context.input.GetKeyAxis().magnitube
 		? a_context.input.GetLeftAxis()
 		: a_context.input.GetKeyAxis();
+
+	const Axis& rightAxis = a_context.input.GetRightAxis();
+
+	float2 cameraMoveDir = float2(); 
+	float cameraMagnitube = 0.0f;
+	bool moveCamera = false;
+	if (rightAxis.magnitube > 0.0f)
+	{
+		cameraMoveDir.x = rightAxis.x;
+		cameraMoveDir.y = rightAxis.y;
+		cameraMagnitube = rightAxis.magnitube;
+		moveCamera = true;
+	}
+	else if(a_context.input.IsRegisterTrigger("LookOnLeft"))
+	{
+		cameraMoveDir.x = -1.0f;
+		cameraMagnitube = 1.0f;
+		moveCamera = true;
+	}
+	else if(a_context.input.IsRegisterTrigger("LookOnRight"))
+	{
+		cameraMoveDir.x = 1.0f;
+		cameraMagnitube = 1.0f;
+		moveCamera = true;
+	}
 	// !!!New!!!
 	const bool rightAttackTrigger = a_context.input.IsRegisterTrigger("RightAttack");
 	const bool leftAttackTrigger = a_context.input.IsRegisterTrigger("LeftAttack");
@@ -845,6 +888,9 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 		result->isInput = false;
 		result->useAttack = false;
 		result->attackIndex = 0;
+		result->cameraDir = float2();
+		result->moveCamera = true;
+		result->cameraMagnitube = 0.0f;
 
 		// !!!New!!!
 		switch (source.Look().move)
@@ -950,6 +996,22 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 			break;
 
 		default:
+			break;
+		}
+
+		switch (source.Look().camera)
+		{
+		case InputOrigin::Device:
+
+			result->moveCamera = moveCamera;
+			result->cameraDir = cameraMoveDir;
+			result->cameraMagnitube = cameraMagnitube;
+			break;
+
+		case InputOrigin::AI:
+			result->moveCamera = false;
+			result->cameraDir = float2();
+			result->cameraMagnitube = 0.0f;
 			break;
 		}
 	}

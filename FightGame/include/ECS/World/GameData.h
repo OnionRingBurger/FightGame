@@ -18,6 +18,8 @@ constexpr int kSectorVertexCount = 15;
 constexpr float kWallThickness = 0.02f;
 constexpr float kWallHitboxThickness = 0.2f;
 
+constexpr float kLookOnChangeCooltime = 15.0f;
+
 constexpr float2 kPlayerMoveSpeed = float2(0.09f, 0.09f);
 constexpr const char* kHitEffect = "IcicleBrokenChange.efkefc";
 constexpr const char* kSpawnEffect = "Spawn.efk";

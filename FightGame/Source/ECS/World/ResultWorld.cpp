@@ -16,7 +16,7 @@ ResultWorld::ResultWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisiti
 	, worldRequest(a_worldRequest)
 {
 	a_input.RegisterKey("ChunkChange", VK_LBUTTON);
-	a_input.RegisterButton("ChunkChange", VK_PAD_A);
+	a_input.RegisterButton("ChunkChange", XINPUT_GAMEPAD_A);
 }
 
 Chunk ResultWorld::CreateNewChunk(AIManager& a_aiManager)

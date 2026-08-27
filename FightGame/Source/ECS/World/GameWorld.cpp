@@ -19,7 +19,7 @@ GameWorld::GameWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& 
 	, worldRequest(a_worldRequest)
 {
 	a_input.RegisterKey("Shot", VK_LBUTTON);
-	a_input.RegisterButton("Shot", VK_PAD_RTRIGGER);
+	a_input.RegisterButton("Shot", XINPUT_GAMEPAD_RIGHT_THUMB);
 }
 
 Chunk GameWorld::CreateNewChunk(AIManager& a_aiManager)

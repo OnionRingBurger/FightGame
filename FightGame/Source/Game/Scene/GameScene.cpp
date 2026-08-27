@@ -36,9 +36,10 @@ GameScene::GameScene(
 	SetWorld(kStartWorld);
 
 	input.RegisterKey("GameEnd", VK_ESCAPE);
-	input.RegisterButton("GameEnd", VK_PAD_START);
+	input.RegisterButton("GameEnd", XINPUT_GAMEPAD_START);
 	input.RegisterKey("IMGUI", VK_F2);
 	input.RegisterKey("TutorialSkip", VK_RETURN);
+	setFixedCursor(false);
 }
 
 void GameScene::AdvanceUpdate(float dt)
@@ -83,7 +84,7 @@ void GameScene::ChangeState()
 		else if(input.IsRegisterTrigger("IMGUI"))
 		{
 #ifdef _DEBUG
-			setFixedCursor(false);
+			setFixedCursor(true);
 			state = GAMESCENE_IMGUI;
 			world->ChangeState(IMGUI);
 

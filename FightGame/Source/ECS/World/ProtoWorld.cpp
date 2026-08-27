@@ -29,13 +29,13 @@ ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 	a_input.RegisterKey("LeftAttack", MK_LBUTTON);
 	a_input.RegisterKey("Jump", VK_SPACE);
 	a_input.RegisterKey("Guard", VK_SHIFT);
-	a_input.RegisterKey("LookOnNext", 'E');
-	a_input.RegisterKey("LookOnPrev", 'Q');
+	a_input.RegisterKey("LookOnLeft", 'Q');
+	a_input.RegisterKey("LookOnRight", 'E');
 
-	a_input.RegisterButton("RightAttack", VK_PAD_RSHOULDER);
-	a_input.RegisterButton("LeftAttack", VK_PAD_LSHOULDER);
-	a_input.RegisterButton("Jump", VK_PAD_B);
-	a_input.RegisterButton("Guard", VK_PAD_B);
+	a_input.RegisterButton("RightAttack", XINPUT_GAMEPAD_B);
+	a_input.RegisterButton("LeftAttack", XINPUT_GAMEPAD_A);
+	a_input.RegisterButton("Jump", XINPUT_GAMEPAD_RIGHT_SHOULDER);
+	a_input.RegisterButton("Guard", XINPUT_GAMEPAD_LEFT_SHOULDER);
 
 	a_input.RegisterKey("TheWorld", 'E');
 
@@ -276,8 +276,88 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		AlphaBlendComponent("Red", "Purple"),
 		EntryAction(120.0f)
 		);
-		a_aiManager.RegisterAI(debugEnemy2, "Enemy");
-		Geometory::RegisterSector("Enemy2Attack1", 0.0f, 2.5f, 160.0f, 0.01f, 0.5f, kSectorVertexCount);
+
+	Entity debugEnemy3 = newChunk.CreateNewEntity(
+		// タグ 
+		Name("Enemy3"),
+		EnemyTag(),
+		ClearTarget(),
+		// 移動系
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(-5.0f, 90.5f, 3.0f) + kDefaultWorldPosition,
+			float3(0.0f, 180.0f, 0.0f),
+			float3(1.0f, 1.0f, 1.0f)
+		),
+		InputMove(float2(0.12f, 0.12f)),
+		MoveInputResult(),
+		InputSource(InputOrigin::AI),
+		LookMove(480.0f / 60.0f),
+		PoseRotState(POSE_ROT_LOOKMOVE),
+		Velocity(),
+		// 当たり判定
+		HitInfomation(),
+		BoxCollider(float3(0.0f, 2.0f, 0.0f), float3(1.0, 5.0f, 1.0f)),
+		OBBCollider(),
+		// AI、ステート
+		AIRole(50.0f, 3.0f, 300.0f, 1.0f),
+		GroundedState(),
+		DeadState(),
+		ActionMask(),
+		InterferenceResult(),
+		// ゲームルール
+		HitPoint(12.0f),
+		AttackStatus({
+		AttackPower(0.0f, 2.5f, 160.0f, 0.01f, 0.5f, 1.0f, 25.0f, 10.0f, float3(), 30.0f, 30.0f, "Enemy2Attack1")
+			}),
+		AttackHitRecord(),
+		// モデル
+		ModelKey("Box"),
+		GhostAreaComponent(2.0f),
+		AlphaBlendComponent("Red", "Purple"),
+		EntryAction(120.0f)
+	);
+
+	Entity debugEnemy4 = newChunk.CreateNewEntity(
+		// タグ 
+		Name("Enemy2"),
+		EnemyTag(),
+		ClearTarget(),
+		// 移動系
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, 90.5f, 3.0f) + kDefaultWorldPosition,
+			float3(0.0f, 180.0f, 0.0f),
+			float3(1.0f, 1.0f, 1.0f)
+		),
+		InputMove(float2(0.12f, 0.12f)),
+		MoveInputResult(),
+		InputSource(InputOrigin::AI),
+		LookMove(480.0f / 60.0f),
+		PoseRotState(POSE_ROT_LOOKMOVE),
+		Velocity(),
+		// 当たり判定
+		HitInfomation(),
+		BoxCollider(float3(0.0f, 2.0f, 0.0f), float3(1.0, 5.0f, 1.0f)),
+		OBBCollider(),
+		// AI、ステート
+		AIRole(50.0f, 3.0f, 300.0f, 1.0f),
+		GroundedState(),
+		DeadState(),
+		ActionMask(),
+		InterferenceResult(),
+		// ゲームルール
+		HitPoint(12.0f),
+		AttackStatus({
+		AttackPower(0.0f, 2.5f, 160.0f, 0.01f, 0.5f, 1.0f, 25.0f, 10.0f, float3(), 30.0f, 30.0f, "Enemy2Attack1")
+			}),
+		AttackHitRecord(),
+		// モデル
+		ModelKey("Box"),
+		GhostAreaComponent(2.0f),
+		AlphaBlendComponent("Red", "Purple"),
+		EntryAction(120.0f)
+	);
+		//a_aiManager.RegisterAI(debugEnemy2, "Enemy");
+		//Geometory::RegisterSector("Enemy2Attack1", 0.0f, 2.5f, 160.0f, 0.01f, 0.5f, kSectorVertexCount);
 
 
 		Entity spawnEffect = newChunk.CreateNewEntity(
@@ -311,6 +391,23 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 			UIComponent("UIGauge", float2(0.0f, 0.0f), float2(1.0f, 0.1f), 0.0f),
 			HPGaugeUI(debugEnemy2, float2(0.0f, 0.0f), float2(1.0f, 0.08f)),
 			SpriteComponent(float3(), float3(), true)
+		);
+
+		Entity ButtonUIA = newChunk.CreateNewEntity(
+			UIComponent("ButtonLB", float2(-0.93f, -0.88f), float2(0.15f * 0.8f, 0.275f * 0.8f), 0.0f)
+		);
+
+		Entity GuardUI = newChunk.CreateNewEntity(
+			UIComponent("GuardUI", float2(-0.75f, -0.88f), float2(0.28f * 0.8f, 0.22f * 0.8f), 0.0f)
+		);
+
+
+		Entity ButtonUIB = newChunk.CreateNewEntity(
+			UIComponent("ButtonRB", float2(-0.93f, -0.65f), float2(0.15f * 0.8f, 0.275f * 0.8f), 0.0f)
+		);
+
+		Entity JumpUI = newChunk.CreateNewEntity(
+			UIComponent("JumpUI", float2(-0.73f, -0.65f), float2(0.35f * 0.8f, 0.22f * 0.8f), 0.0f)
 		);
 
 	

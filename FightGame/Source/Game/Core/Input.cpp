@@ -1,5 +1,6 @@
 #include "Input.h"
 #include "Defines.h"
+#include "DebugConsole.h"
 
 //--- ÉOÉçÅ[ÉoÉãïœêî
 constexpr float InputDeadzone = 4000;
@@ -27,13 +28,19 @@ bool Input::IsKeyRepeat(BYTE key) const
 bool Input::IsButtonTrigger(WORD key) const
 {
 	if (!isGetController) return false;
-	return currentStroke.Flags & XINPUT_KEYSTROKE_KEYDOWN && currentStroke.VirtualKey == key;
+	return (currentButton & key) && !(oldButton & key);
 }
 
 bool Input::IsButtonPress(WORD key) const
 {
+	static int count = 0;
+	count++;
+	std::cout << "ButtonPressCount" << count << std::endl;
 	if (!isGetController) return false;
-	return currentStroke.Flags & XINPUT_KEYSTROKE_REPEAT && currentStroke.VirtualKey == key;
+	static int getcount = 0;
+	getcount++;
+	std::cout << "ButtonPressGetControllerCount" << getcount << std::endl;
+	return (currentButton & key) != 0;
 }
 
 Input::Input()
@@ -41,6 +48,9 @@ Input::Input()
 	, m_rightAxis(0.0f, 0.0f, 0.0f)
 	, m_mouseMove(0.0f, 0.0f)
 	, m_keyAxis(0.0f, 0.0f, 0.0f)
+	, oldButton(0)
+	, currentButton(0)
+	, lastPacket(0)
 {
 	// àÍî‘ç≈èâÇÃì¸óÕ
 	GetKeyboardState(g_keyTable);
@@ -115,13 +125,21 @@ bool Input::IsRegisterKeyTrigger(std::string a_type) const
 
 bool Input::IsRegisterButtonPress(std::string a_type) const
 {
-	if (buttonMap.find(a_type) == buttonMap.end()) return false;
+	static int count = 0;
+	DebugConsole::SetDrawPos(20, 11);
+	count++;
+	std::cout << "IsRegisterButtonPressCount" << count << std::endl;
+	if (buttonMap.find(a_type) == buttonMap.end())
+	{
+		return false;
+	}
 	return IsButtonPress(buttonMap.at(a_type));
 }
 
 bool Input::IsRegisterPress(std::string a_type) const
 {
-	return IsRegisterKeyPress(a_type) || IsRegisterButtonPress(a_type);
+	
+	return IsRegisterButtonPress(a_type) || IsRegisterKeyPress(a_type);
 }
 
 bool Input::IsRegisterKeyPress(std::string a_type) const
@@ -197,8 +215,8 @@ Axis Input::NormalizeKeyAxis(float2 a_keyMove)
 
 void Input::UpdateControllerInput()
 {
-	isGetController = XInputGetKeystroke(0, 0, &currentStroke) == ERROR_SUCCESS;
-
+	// isGetController = XInputGetKeystroke(0, 0, &currentStroke) == ERROR_SUCCESS;
+	isGetController = true;
 	std::optional<XINPUT_STATE> stateOpt = GetController();
 	if (stateOpt == std::nullopt)
 	{
@@ -208,7 +226,15 @@ void Input::UpdateControllerInput()
 		return;
 	}
 
+	oldButton = currentButton;
+
 	m_controllerState = stateOpt.value();
+	if (lastPacket != m_controllerState.dwPacketNumber)
+	{
+		currentButton = m_controllerState.Gamepad.wButtons;
+		lastPacket = m_controllerState.dwPacketNumber;
+	}
+
 
 	float LX = m_controllerState.Gamepad.sThumbLX;
 	float LY = m_controllerState.Gamepad.sThumbLY;

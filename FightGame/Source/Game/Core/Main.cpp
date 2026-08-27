@@ -120,7 +120,13 @@ void MainGame::Init()
 		"Sea",
 		"Ready",
 		"Fight",
-		"BattleStart"
+		"BattleStart",
+		"ButtonA",
+		"ButtonB",
+		"JumpUI",
+		"GuardUI",
+		"ButtonRB",
+		"ButtonLB"
 	};
 
 	effectDatas =

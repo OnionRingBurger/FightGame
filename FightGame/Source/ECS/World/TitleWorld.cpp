@@ -16,7 +16,7 @@ TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 	, worldRequest(a_worldRequest)
 {
 	a_input.RegisterKey("ChunkChange", VK_LBUTTON);
-	a_input.RegisterButton("ChunkChange", VK_PAD_A);
+	a_input.RegisterButton("ChunkChange", XINPUT_GAMEPAD_A);
 }
 
 Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
