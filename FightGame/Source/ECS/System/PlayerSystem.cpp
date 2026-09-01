@@ -41,12 +41,13 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRes
 		if (!dead.Look().isDead) continue;
 
 		a_chunk.DeleteChunkComponent(it, PlayerTag::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, InputMove::kTypeId);
+		a_chunk.DeleteChunkComponent(it, InputMove::kTypeId);
+		a_chunk.AddComponent(it, LifeTime(16.0f));
 		//a_chunk.DeleteChunkComponent(it, InputRotato::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, Velocity::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, ShooterComponent::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, ShakingComponent::kTypeId);
-		a_chunk.DeleteChunkComponent(it, OBBCollider::kTypeId);
+		// a_chunk.DeleteChunkComponent(it, OBBCollider::kTypeId);
 		//a_chunk.DeleteChunkComponent(it, RailFly::kTypeId);
 
 		//ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>>();
@@ -55,17 +56,34 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRes
 		//	a_chunk.DeleteChunkEntity(uiIt);
 		//}
 
-		Entity chunkChange = a_chunk.CreateNewEntity(
-			ChunkChange(true, "Result"),
-			DelayChunkChange(240.0f)
-		);
-		// PlaySound(LoadSound("Assets/Sound/dead.mp3"));
 
-		a_response.AddStopTime(200.0f, 200.0f, 0.3f);
 
-		Entity createEffect = a_chunk.CreateNewEntity(
-			CreateEffect(WHITEFADE_UP)
-		);
+		float3 shakePower = float3(0.02f, 0.02f, 0.02f);
+		float3 shakeAmp = float3(2.5f, 2.5f, 2.5f);
+		float shakeTime = 130.0f;
+		ComponentHandle<ShakeComponent> hitterShake = a_chunk.GetComponent<ShakeComponent>(it);
+		if (hitterShake.IsValid())
+		{
+			hitterShake->shakePower = shakePower;
+			hitterShake->shakeAmplitude = shakeAmp;
+			hitterShake->elapsedTime = 0.0f;
+			hitterShake->shakeTime = shakeTime;
+		}
+		else
+		{
+			a_chunk.AddComponent(it, ShakeComponent(shakePower, shakeAmp, shakeTime));
+		}
+
+
+		PlaySound(LoadSound("Assets/Sound/dead.mp3"));
+		PlaySound(LoadSound("Assets/Sound/dead2.mp3"));
+		PlaySound(LoadSound("Assets/Sound/enemydead.mp3"));
+
+		a_response.AddStopTime(160.0f, 160.0f, 0.03f);
+
+		//Entity createEffect = a_chunk.CreateNewEntity(
+		//	CreateEffect(WHITEFADE_UP)
+		//);
 
 		//ComponentView gunView = a_chunk.GetView<ComponentTypes<GunTag, ModelKey>>();
 		//// a_chunk.DeleteChunkComponent(it, DeadState::kTypeId);

@@ -52,37 +52,138 @@ void GoalSystem(Chunk& a_chunk, const SystemContext& a_context)
 }
 
 
+void ChunkChangeProceed(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_chunkRequest, Entity a_changeEntity)
+{
+	ComponentHandle<ChunkChange> chunkChange = a_chunk.GetComponent<ChunkChange>(a_changeEntity);
+	const ComponentHandle<KeyChunkChange> keyChunkChange = a_chunk.GetComponent<KeyChunkChange>(a_changeEntity);
+	ComponentHandle<DelayChunkChange> delayChunkChange = a_chunk.GetComponent<DelayChunkChange>(a_changeEntity);
+
+
+	if (keyChunkChange.IsValid() && a_context.input.IsRegisterTrigger(keyChunkChange.Look().key))
+	{
+		if (!delayChunkChange.IsValid()) a_chunk.AddComponent(a_changeEntity, DelayChunkChange(keyChunkChange.Look().waitTime));
+		a_chunk.AddComponent(a_changeEntity, OtherChunkChangeLock());
+	}
+
+	if (delayChunkChange.IsValid())
+	{
+		delayChunkChange->currentCount -= a_context.deltaTime;
+		if (delayChunkChange->currentCount < 0.0f)
+		{
+			chunkChange->isWait = false;
+		}
+	}
+
+	if (!chunkChange->isWait)
+	{
+		a_chunkRequest.CreateWorldRequest(chunkChange.Look().chunkType);
+	}
+}
 
 void ChunkChangeSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_chunkRequest)
 {
+
+	ComponentView lockView = a_chunk.GetView<ComponentTypes<ChunkChange, OtherChunkChangeLock>>();
+	for (auto it : lockView)
+	{
+		ChunkChangeProceed(a_chunk, a_context, a_chunkRequest, it);
+		return;
+	}
+
 	ComponentView view = a_chunk.GetView<ComponentTypes<ChunkChange>>();
 
 	for (auto it : view)
 	{
-		ComponentHandle<ChunkChange> chunkChange = a_chunk.GetComponent<ChunkChange>(it);
-		const ComponentHandle<KeyChunkChange> keyChunkChange = a_chunk.GetComponent<KeyChunkChange>(it);
-		ComponentHandle<DelayChunkChange> delayChunkChange = a_chunk.GetComponent<DelayChunkChange>(it);
-
-
-		if (keyChunkChange.IsValid() && a_context.input.IsRegisterTrigger(keyChunkChange.Look().key))
-		{
-			if (!delayChunkChange.IsValid()) a_chunk.AddComponent(it, DelayChunkChange(keyChunkChange.Look().waitTime));
-		}
-
-		if (delayChunkChange.IsValid())
-		{
-			delayChunkChange->currentCount -= a_context.deltaTime;
-			if (delayChunkChange->currentCount < 0.0f)
-			{
-				chunkChange->isWait = false;
-			}
-		}
-
-		if (!chunkChange->isWait)
-		{
-			a_chunkRequest.CreateWorldRequest(chunkChange.Look().chunkType);
-		}
+		ChunkChangeProceed(a_chunk, a_context, a_chunkRequest, it);
 	}
+}
+
+void CheckAliveTargetGameOverSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
+{
+	ComponentView targetView = a_chunk.GetView<ComponentTypes<GameOverTarget>>();
+	for (auto it : targetView)
+	{
+		// 対象が存在した場合関数を終了する
+		return;
+	}
+
+	// 既にチャンク変更待ちだった場合何もせず抜ける
+	ComponentView chunkChangeView = a_chunk.GetView<ComponentTypes<KeyChunkChange>>();
+	for (auto it : chunkChangeView)
+	{
+		return;
+	}
+
+	Entity back = a_chunk.CreateNewEntity(
+		UIComponent("RetryBack", float2(), float2(2.0f, 2.0f), 0.0f, 0.0f),
+		FadeUI(FADE_UP, 0.05f)
+	);
+
+	Entity backShadow = a_chunk.CreateNewEntity(
+		UIComponent("BackShadow", float2(0.0f, 0.3f), float2(3.35f, 3.92f), 0.0f, 0.0f),
+		FadeUI(FADE_UP, 0.035f / 7.0f),
+		FadeChange(FADE_CHANGE_FLICKER)
+	);
+
+	Entity retry = a_chunk.CreateNewEntity(
+		UIComponent("Retry", float2(0.0f, 0.3f), float2(1.15f, 0.8f), 0.0f, 0.0f),
+		FadeUI(FADE_UP, 0.035f)
+	);
+
+
+
+	Entity buttonA = a_chunk.CreateNewEntity(
+		UIComponent("ButtonA", float2(-0.55f, -0.8f), float2(0.1f, 0.2f), 0.0f, 0.0f),
+		FadeUI(FADE_UP, 0.035f),
+		FadeChange(FADE_CHANGE_FLICKER)
+	);
+
+
+	Entity buttonB = a_chunk.CreateNewEntity(
+		UIComponent("ButtonB", float2(0.2f, -0.8f), float2(0.1f, 0.2f), 0.0f, 0.0f),
+		FadeUI(FADE_UP, 0.035f),
+		FadeChange(FADE_CHANGE_FLICKER)
+	);
+
+	Entity yes = a_chunk.CreateNewEntity(
+		UIComponent("Yes", float2(-0.35f, -0.8f), float2(0.2f, 0.3f), 0.0f, 0.0f),
+		FadeUI(FADE_UP, 0.035f),
+		FadeChange(FADE_CHANGE_FLICKER)
+	);
+
+
+	Entity no = a_chunk.CreateNewEntity(
+		UIComponent("No", float2(0.4f, -0.8f), float2(0.15f, 0.2f), 0.0f, 0.0f),
+		FadeUI(FADE_UP, 0.035f),
+		FadeChange(FADE_CHANGE_FLICKER)
+	);
+
+
+
+
+
+	Entity chunkChangeButton = a_chunk.CreateNewEntity(
+		ChunkChange(true, "Result"),
+		KeyChunkChange("GameOver", 160.0f)
+	);
+
+	Entity chunkChangeButton2 = a_chunk.CreateNewEntity(
+		ChunkChange(true, "Proto"),
+		KeyChunkChange("Restart", 160.0f)
+	);
+
+	Entity effect = a_chunk.CreateNewEntity(
+		EffectKey(DARKFADE_UP, "GameOver")
+	);
+
+	Entity effect2 = a_chunk.CreateNewEntity(
+		EffectKey(WHITEMINIFADE_UP, "Restart")
+	);
+
+	//Entity chunkChange = a_chunk.CreateNewEntity(
+	//	ChunkChange(true, "Result"),
+	//	DelayChunkChange(600.0f)
+	//);
 }
 
 void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
@@ -93,10 +194,10 @@ void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context,
 		// クリア対象が存在した場合関数を終了する
 		return;
 	}
-
+	// まだ敵が残っている場合生成する
 	bool spawn = false;
 	ComponentView spawnerView = a_chunk.GetView<ComponentTypes<PhaseSpawner>>();
-	for (auto it : spawnerView)
+	for (auto it : spawnerView)	
 	{
 		ComponentHandle<PhaseSpawner> spawner = a_chunk.GetComponent<PhaseSpawner>(it);
 		if (spawner.Look().spawnName.empty()) continue;
@@ -113,21 +214,25 @@ void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context,
 	}
 
 	if (spawn) return;
-
+	// 既にチャンク変更待ちだった場合何もせず抜ける
 	ComponentView chunkChangeView = a_chunk.GetView<ComponentTypes<DelayChunkChange>>();
-
 	for (auto it : chunkChangeView)
 	{
 		return;
 	}
 
-	PlaySound(LoadSound("Shot"));
-	a_systemResponse.AddStopTime(200.0f, 200.0f, 0.3f);
+	ResetSound();
+
+	Entity battleClear = a_chunk.CreateNewEntity(
+		CreateEffect(GAMECLEAR, float2(0.0f, 0.0f), 0.0f, 0.0f)
+	);
+	a_systemResponse.AddStopTime(200.0f, 200.0f, 0.0f);
+
 
 	// クリアシーンに移行する
 	Entity chunkChange = a_chunk.CreateNewEntity(
 		ChunkChange(true, "Clear"),
-		DelayChunkChange(60.0f)
+		DelayChunkChange(10.0f)
 	);
 
 }

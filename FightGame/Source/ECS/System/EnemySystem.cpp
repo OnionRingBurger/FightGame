@@ -187,10 +187,10 @@ void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResp
 		a_chunk.DeleteChunkComponent(it, RailFly::kTypeId);
 		
 		// 画面エフェクトを出す
-		a_response.AddStopTime(2.0f, 2.0f, 0.01f);
-		float3 shakePower = float3(0.2f, 0.2f, 0.2f);
-		float3 shakeAmp = float3(0.1f, 0.1f, 0.1f);
-		float shakeTime = 5.0f;
+		a_response.AddStopTime(6.0f, 6.0f, 0.03f);
+		float3 shakePower = float3(0.12f, 0.12f, 0.00f);
+		float3 shakeAmp = float3(0.20f, 0.20f, 0.0f);
+		float shakeTime = 17.0f;
 		ComponentHandle<ShakeComponent> cameraShake = a_chunk.GetComponent<ShakeComponent>(camera);
 		if (cameraShake.IsValid())
 		{

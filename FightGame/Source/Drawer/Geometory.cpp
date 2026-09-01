@@ -128,13 +128,13 @@ void Geometory::DrawSphere()
 	m_pSphere->Draw();
 }
 
-void Geometory::DrawSector(std::string key, float progress)
+void Geometory::DrawSector(std::string key, float progress, float3 defaultColor)
 {
 	if (m_sectorBuffers.find(key) == m_sectorBuffers.end() || m_sectorBuffers.at(key) == nullptr) return;
 
 	m_sectorVS->WriteBuffer(0, m_WVP);
 	m_sectorVS->Bind();
-	float pixelBuff[4] = { progress, 0.0f, 0.0f, 0.0f };
+	float pixelBuff[4] = { progress, defaultColor.x, defaultColor.y, defaultColor.z };
 	m_sectorPS->WriteBuffer(0, pixelBuff);
 	m_sectorPS->Bind();
 	m_sectorBuffers.at(key)->Draw();
@@ -294,13 +294,15 @@ struct PS_IN {
 };
 cbuffer SectorInfo : register(b0){
 	float progress;
-	float3 dummy;
+	float3 defaultColor;
 };
 float4 main(PS_IN pin) : SV_TARGET0 {
 	float4 color = float4(1,1,1,1);
-	color.rgb = float3(0.8,0.7,0.3);
+	color.rgb = defaultColor;
 	// color.a = min(0.6f , progress * 0.6f + 0.05);
 	color.rgb *= 1.0f + max(progress - 0.6f, 0.0f) * 2.0f;
+
+	color.a = 0.5f;
 	
 	return color;
 })EOT";

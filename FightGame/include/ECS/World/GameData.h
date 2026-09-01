@@ -25,6 +25,7 @@ constexpr const char* kHitEffect = "IcicleBrokenChange.efkefc";
 constexpr const char* kSpawnEffect = "Spawn.efk";
 constexpr const char* kSnowEffect = "Snow.efkefc";
 constexpr const char* kEntryEffect = "Entry.efkefc";
+constexpr const char* kGuardEffectKey = "Guard.efk";
 
 
 ///////////////////////////////////////////////////////////////////////////

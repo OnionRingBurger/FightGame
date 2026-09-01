@@ -785,7 +785,7 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 			DrawMatrix::CreateWorldMatrix(world, floatPos, floatScale, floatRot, true);
 			Geometory::SetWorld(world);
 			float progress = startup.Look().elapsedTime / startup.Look().startupDuration;
-			Geometory::DrawSector(telegraph.Look().sectorKey, progress);
+			Geometory::DrawSector(telegraph.Look().sectorKey, progress, float3(0.8, 0.7, 0.3));
 		}
 	}
 }

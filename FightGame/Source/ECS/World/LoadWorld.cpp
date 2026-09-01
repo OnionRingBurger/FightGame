@@ -48,6 +48,7 @@ Chunk LoadWorld::CreateNewChunk(AIManager& a_aiManager)
 		UIComponent("LoadWind", float2(0.8f, -0.8f), float2(0.32f, 0.3f), 0.0f, 0.8f, float2(0.0f,0.0f), float2(0.3f, 1.0f)),
 		UVMove(float2(0.015f, 0.0f))
 	);
+
 	return newChunk;
 }
 

@@ -48,7 +48,24 @@
             "WaitTime":30.0,
             "StartupTime":40.0
         }
-    ,
+        ,
+    "Enemy2Attack1": 
+        {
+            "MinLength": 0.0,
+            "MaxLength": 2.5,
+            "Angle": 160.0,
+            "MaxHeight": 0.01,
+            "MaxLowness": 0.5,
+            "DamageValue": 1.0,
+            "MotionTime": 25.0,
+            "LifeTime": 10.0,
+            "FollowOffsetX": 0.0,
+            "FollowOffsetY": 0.0,
+            "FollowOffsetZ": 0.0,
+            "WaitTime": 30.0,
+            "StartupTime": 30.0
+        }
+        ,
     "Enemy3Attack1": 
         {
             "MinLength": 0.0,

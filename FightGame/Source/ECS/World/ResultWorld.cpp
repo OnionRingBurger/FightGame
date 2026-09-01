@@ -29,7 +29,7 @@ Chunk ResultWorld::CreateNewChunk(AIManager& a_aiManager)
 	PlaySound(LoadSound("Assets/Sound/gameoverback.mp3", false));
 
 	Entity gameOverLogo = newChunk.CreateNewEntity(
-		UIComponent("GameOver", float2(0.0f, 0.6f), float2(0.8f, 0.8f), 0.0f, 0.0f),
+		UIComponent("GameOver", float2(0.0f, 0.4f), float2(1.5f, 1.2f), 0.0f, 0.0f),
 		FadeUI(FADE_UP, 0.01f)
 	);
 

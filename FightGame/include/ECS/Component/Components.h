@@ -912,7 +912,8 @@ namespace Component
 		SHOTFLASH,
 		DAMAGE_EFFECT,
 		DAMAGE_DIRECTION,
-		BATTLESTART
+		BATTLESTART,
+		GAMECLEAR
 	};
 	struct CreateEffect
 	{
@@ -2697,16 +2698,19 @@ namespace Component
 
 		float currentGuardPower;
 		float knockbackRate;
+		Entity guardEffect;
 
-		GuardAction(float a_guardPower, float a_knockbackRate)
+		GuardAction(float a_guardPower, float a_knockbackRate, Entity a_guardEffect)
 			: currentGuardPower(a_guardPower)
 			, knockbackRate(a_knockbackRate)
+			, guardEffect(a_guardEffect)
 		{
 		}
 
 		GuardAction()
 			: currentGuardPower(0.0f)
 			, knockbackRate(1.0f)
+			, guardEffect(kInvalidEntity)
 		{
 
 		}
@@ -3122,16 +3126,37 @@ namespace Component
 
 	};
 
-	struct StartUITag
+	struct DropUI
 	{
 		static constexpr TypeID kTypeId = 150;
-		static constexpr const char* kTypeName = "StartUITag";
+		static constexpr const char* kTypeName = "StartUI";
 		static constexpr int kVersion = 0;
 
-		StartUITag()
-		{
+		std::vector<std::string> playSounds;
 
+		DropUI()
+			: DropUI(std::vector<std::string>())
+		{
 		}
+
+		DropUI(std::vector<std::string> a_playSounds)
+			: playSounds(a_playSounds)
+		{
+		}
+	};
+
+	struct OtherChunkChangeLock
+	{
+		static constexpr TypeID kTypeId = 151;
+		static constexpr const char* kTypeName = "OtherChunkChangeLock";
+		static constexpr int kVersion = 0;
+	};
+
+	struct GameOverTarget
+	{
+		static constexpr TypeID kTypeId = 152;
+		static constexpr const char* kTypeName = "GameOverTarget";
+		static constexpr int kVersion = 0;
 	};
 }
 

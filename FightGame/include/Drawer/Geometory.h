@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "MeshBuffer.h"
 #include <string>
+#include "MathAssist.h"
 
 class Geometory
 {
@@ -38,7 +39,7 @@ public:
 	// –‘O‚ÉF‚ñ‚ÈŒ`‚Ìî‚ğ“o˜^‚·‚é
 	static void RegisterSector(std::string key ,float minLength, float maxLength, float angle, float maxHeight, float maxLowness, int circumferenceCount);
 	// “o˜^‚³‚ê‚Ä‚¢‚éîŒ`‚ğ•`‰æ‚·‚é
-	static void DrawSector(std::string key, float progress);
+	static void DrawSector(std::string key, float progress, float3 defaultColor);
 
 private:
 	static void MakeVS();

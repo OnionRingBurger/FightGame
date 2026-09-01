@@ -592,11 +592,14 @@ void ShakeSystem(Chunk& a_chunk, const SystemContext& a_context)
 		// Šp“x‚ğ‚Á‚Ä‚¢‚éê‡‚ÍŒü‚¢‚Ä‚é•ûŒü‚Éi‚Ş‚æ‚¤‚É‚·‚é
 		ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(it);
 
+		float powerRate = 1.0f;
+		powerRate = Lerp(1.0f, 0.5f, shake.Look().elapsedTime / (shake.Look().elapsedTime + shake.Look().shakeTime));
+
 
 		matrix *= DirectX::XMMatrixTranslation(
-			Noise((shake.Look().elapsedTime + kNoiseXTimeOffsert) * shake.Look().shakeAmplitude.x) * shake.Look().shakePower.x,
-			Noise((shake.Look().elapsedTime + kNoiseYTimeOffsert) * shake.Look().shakeAmplitude.y) * shake.Look().shakePower.y,
-			Noise((shake.Look().elapsedTime + kNoiseZTimeOffsert) * shake.Look().shakeAmplitude.z) * shake.Look().shakePower.z
+			Noise((shake.Look().elapsedTime + kNoiseXTimeOffsert) * shake.Look().shakeAmplitude.x) * shake.Look().shakePower.x * powerRate,
+			Noise((shake.Look().elapsedTime + kNoiseYTimeOffsert) * shake.Look().shakeAmplitude.y) * shake.Look().shakePower.y * powerRate,
+			Noise((shake.Look().elapsedTime + kNoiseZTimeOffsert) * shake.Look().shakeAmplitude.z) * shake.Look().shakePower.z * powerRate
 		);
 
 		// ‰ñ“]‚ğ‚©‚¯‚é

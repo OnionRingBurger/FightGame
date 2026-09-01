@@ -76,7 +76,6 @@ void MainGame::Init()
 	{
 		{"Box", 1.0f},
 		{"Ball", 1.0f},
-		{"Light", 20.0f}
 	};
 
 	textureDatas =
@@ -85,7 +84,6 @@ void MainGame::Init()
 		"Shadow",
 		"Mask",
 		"DarkMask",
-		"Reticle",
 		"DarkGameOver",
 		"PleaseKey",
 		"WhiteFade",
@@ -126,7 +124,12 @@ void MainGame::Init()
 		"JumpUI",
 		"GuardUI",
 		"ButtonRB",
-		"ButtonLB"
+		"ButtonLB",
+		"RetryBack",
+		"Retry",
+		"Yes",
+		"No",
+		"BackShadow"
 	};
 
 	effectDatas =
@@ -135,7 +138,8 @@ void MainGame::Init()
 		{kHitEffect, 0.55f},
 		{kSpawnEffect, 0.45f},
 		{kSnowEffect, 3.0f},
-		{kEntryEffect, 1.5f}
+		{kEntryEffect, 1.5f},
+		{kGuardEffectKey, 0.6f}
 	};
 
 	ChangeScene("Load");

@@ -37,6 +37,9 @@ ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 	a_input.RegisterButton("Jump", XINPUT_GAMEPAD_RIGHT_SHOULDER);
 	a_input.RegisterButton("Guard", XINPUT_GAMEPAD_LEFT_SHOULDER);
 
+	a_input.RegisterButton("Restart", XINPUT_GAMEPAD_A);
+	a_input.RegisterButton("GameOver", XINPUT_GAMEPAD_B);
+
 	a_input.RegisterKey("TheWorld", 'E');
 
 	a_input.RegisterKey("Default", '0');
@@ -76,7 +79,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 	
 	Chunk newChunk;
 
-
+	RegisterAllAttackSectorsFromAttackData(kSectorVertexCount);
 
 	Entity player = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
@@ -116,8 +119,8 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		GhostAreaComponent(1.4f),
 		LookOnState(7.0f, 7.8f),
 		AlphaBlendComponent("Red", "Red"),
-		EntryAction(120.0f)
-
+		EntryAction(120.0f),
+		GameOverTarget()
 	);
 
 	Geometory::RegisterSector("Player1Attack1", 0.0f, 1.7f, 160.0f, 0.5f, 0.5f, kSectorVertexCount);
@@ -220,10 +223,6 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 	//);
 	// a_aiManager.RegisterAI(debugEnemy, "Enemy");
 
-	Geometory::RegisterSector("Enemy1Attack1", 0.0f, 2.5f, 360.0f, 0.01f, 0.5f, kSectorVertexCount);
-	Geometory::RegisterSector("Enemy1Attack2", 1.3f, 3.7f, 110.0f, 0.01f, 0.5f, kSectorVertexCount);
-	Geometory::RegisterSector("Enemy1Attack3", 3.5f, 7.5f, 30.0f, 0.01f, 0.5f, kSectorVertexCount);
-
 	//Entity enemyHp = newChunk.CreateNewEntity(
 	//	MOVE_AND_TRANSFORM_COMPONENT(
 	//		float3(0.0f, 1.0f, 0.0f),
@@ -266,9 +265,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		InterferenceResult(),
 		// ゲームルール
 		HitPoint(12.0f),
-		AttackStatus({
-		AttackPower(0.0f, 2.5f, 160.0f, 0.01f, 0.5f, 1.0f, 25.0f, 10.0f, float3(), 30.0f, 30.0f, "Enemy2Attack1")
-			}),
+		AttackKeyLoad({ "Enemy2Attack1" }),
 			AttackHitRecord(),
 			// モデル
 		ModelKey("Box"),
@@ -284,7 +281,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		ClearTarget(),
 		// 移動系
 		MOVE_AND_TRANSFORM_COMPONENT(
-			float3(-5.0f, 90.5f, 3.0f) + kDefaultWorldPosition,
+			float3(-5.0f, 90.5f, 2.0f) + kDefaultWorldPosition,
 			float3(0.0f, 180.0f, 0.0f),
 			float3(1.0f, 1.0f, 1.0f)
 		),
@@ -306,9 +303,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		InterferenceResult(),
 		// ゲームルール
 		HitPoint(12.0f),
-		AttackStatus({
-		AttackPower(0.0f, 2.5f, 160.0f, 0.01f, 0.5f, 1.0f, 25.0f, 10.0f, float3(), 30.0f, 30.0f, "Enemy2Attack1")
-			}),
+		AttackKeyLoad({ "Enemy2Attack1" }),
 		AttackHitRecord(),
 		// モデル
 		ModelKey("Box"),
@@ -324,7 +319,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		ClearTarget(),
 		// 移動系
 		MOVE_AND_TRANSFORM_COMPONENT(
-			float3(0.0f, 90.5f, 3.0f) + kDefaultWorldPosition,
+			float3(0.0f, 90.5f, 4.5f) + kDefaultWorldPosition,
 			float3(0.0f, 180.0f, 0.0f),
 			float3(1.0f, 1.0f, 1.0f)
 		),
@@ -346,9 +341,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		InterferenceResult(),
 		// ゲームルール
 		HitPoint(12.0f),
-		AttackStatus({
-		AttackPower(0.0f, 2.5f, 160.0f, 0.01f, 0.5f, 1.0f, 25.0f, 10.0f, float3(), 30.0f, 30.0f, "Enemy2Attack1")
-			}),
+		AttackKeyLoad({"Enemy2Attack1"}),
 		AttackHitRecord(),
 		// モデル
 		ModelKey("Box"),
@@ -356,8 +349,10 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		AlphaBlendComponent("Red", "Purple"),
 		EntryAction(120.0f)
 	);
-		//a_aiManager.RegisterAI(debugEnemy2, "Enemy");
+		a_aiManager.RegisterAI(debugEnemy2, "Enemy");
 		//Geometory::RegisterSector("Enemy2Attack1", 0.0f, 2.5f, 160.0f, 0.01f, 0.5f, kSectorVertexCount);
+		a_aiManager.RegisterAI(debugEnemy3, "Enemy");
+		a_aiManager.RegisterAI(debugEnemy4, "Enemy");
 
 
 		Entity spawnEffect = newChunk.CreateNewEntity(
@@ -592,10 +587,13 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		UIComponent("Ready", float2(0.0f, 0.15f), float2(0.499f * 0.8f, 0.132f * 0.8f), 0.0f)
 	);*/
 
-	Entity fight = newChunk.CreateNewEntity(
+	Entity battleStart = newChunk.CreateNewEntity(
 		CreateEffect(BATTLESTART, float2(0.0f, 0.4f), 0.0f, 120.0f)		
 	);
 
+	Entity white = newChunk.CreateNewEntity(
+		CreateEffect(WHITEMINIFADE_CLEAR, float2(0.0f, 0.0f), 0.0f, 0.0f)
+	);
 
 	PlaySound(LoadSound("Assets/Sound/gamestart.mp3"));
 
@@ -645,6 +643,8 @@ void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 	LatePoseSystem(a_chunk, a_context);
 	// Transform適用
 	TransformSystem(a_chunk, a_context);
+
+	EnemyAttackLoadSystem(a_chunk, a_context);
 
 	// リザルトなどをリセット
 	ResetSystem(a_chunk, a_context);
@@ -747,6 +747,7 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 
 	// 終了処理
 	LifeTimeSystem(a_chunk, a_context);
+	CheckAliveTargetGameOverSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 	CheckAliveTargetEnemySystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 	ResetSystem(a_chunk, a_context);
 	ChunkChangeSystem(a_chunk, a_context, a_response);

@@ -59,3 +59,5 @@ void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResp
 void AttackHitRecordCleanupSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void EntryActionSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void EnemyAttackLoadSystem(Chunk& a_chunk, const SystemContext& a_context);

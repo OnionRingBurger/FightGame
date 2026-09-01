@@ -171,6 +171,8 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 
 	for (int i = 0; i < 2; i++)
 	{
+		int outsideVertexProgress = i * outsideVertexCount;
+		int insideVertexProgress = i * insideVertexCount;
 		for (int j = 0; j < outsideVertexCount - 1; j++)
 		{
 			float currentIndexRatio = (float)(j + 1.0f) / (float)(outsideVertexCount - 1); 
@@ -184,9 +186,9 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 				insideIndex = k;
 				break;
 			}
-			float out0 = j + outsideVertexCount * i;
-			float out1 = j + 1 + outsideVertexCount * i;
-			float in0 = outsideVertexCount * 2 + insideIndex + insideVertexCount * i;
+			float out0 = j + outsideVertexProgress;
+			float out1 = j + 1 + outsideVertexProgress;
+			float in0 = insideIndex + (outsideVertexCount) * 2 + insideVertexProgress;
 
 			indexes[j * 3 + (outsideVertexCount - 1) * 3 * i] = out1;
 			indexes[j * 3 + 1 + (outsideVertexCount - 1) * 3 * i] = in0;
@@ -196,7 +198,7 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 
 	indexProgress += (outsideVertexCount - 1) * 2 * 3;
 
-	for(int i = 0; i < 2; i++)
+	for(int i = 0; i < 1; i++)
 	{
 		for(int j = 0; j < insideVertexCount - 1 ; j++)
 		{
@@ -217,9 +219,9 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 			int in1 = (j + 1) + insideVertexCount * i + outsideVertexCount * 2;
 			int out0 = outsideIndex + outsideVertexCount * i;
 
-			indexes[(j - 1) * 3 + (insideVertexCount - 1) * 3 * i + indexProgress] =  in0;
-			indexes[(j - 1) * 3 + 1 + (insideVertexCount - 1) * 3 * i + indexProgress] = out0;
-			indexes[(j - 1) * 3 + 2 + (insideVertexCount - 1) * 3 * i + indexProgress] = in1;
+			indexes[(j) * 3 + (insideVertexCount - 1) * 3 * i + indexProgress] =  in0;
+			indexes[(j) * 3 + 1 + (insideVertexCount - 1) * 3 * i + indexProgress] = out0;
+			indexes[(j) * 3 + 2 + (insideVertexCount - 1) * 3 * i + indexProgress] = in1;
 		}
 	}
 

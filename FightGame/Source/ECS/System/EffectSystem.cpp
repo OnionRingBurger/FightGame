@@ -198,7 +198,19 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 				UIPosLerp(float2(0.0f, 2.0f) + posOffset, posOffset, 18.0f),
 				UIScaleLerp(float2(0.6f * 5.8f, 0.48f * 5.8f), float2(0.6, 0.48f), 18.0f),
 				LifeTime(130.0f),
-				StartUITag()
+				DropUI({ "Assets/Sound/startui.mp3", "Assets/Sound/startui2.mp3" })
+
+			);
+
+			break;
+
+		case GAMECLEAR:
+			Entity gameClear = a_chunk.CreateNewEntity(
+				UIComponent("BattleStart", float2(0.0f, 4.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
+				UIPosLerp(float2(0.0f, 2.0f) + posOffset, posOffset, 24.0f),
+				UIScaleLerp(float2(0.6f * 5.8f, 0.48f * 5.8f), float2(0.6, 0.48f), 24.0f),
+				LifeTime(130.0f),
+				DropUI({ "Assets/Sound/gameclear.mp3", "Assets/Sound/shot.mp3" })
 			);
 
 			break;
@@ -235,7 +247,7 @@ void UIMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 		const ComponentHandle<UIAngularSpeed> angleSpeed = a_chunk.GetComponent<UIAngularSpeed>(it);
 		ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
 
-		ui->uiRotation += angleSpeed.Look().speed * a_context.deltaTime;
+		ui->uiRotation += angleSpeed.Look().speed * a_context.effectStepTime;
 	}
 }
 
@@ -382,7 +394,7 @@ void UILerpSystem(Chunk& a_chunk, const SystemContext& a_context)
 		ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
 		
 		// 進行度を更新
-		float newProgress = posLerp.Look().progress + a_context.deltaTime / posLerp.Look().maxLerpTime;
+		float newProgress = posLerp.Look().progress + a_context.effectStepTime / posLerp.Look().maxLerpTime;
 		posLerp->progress = std::clamp(newProgress, 0.0f, 1.0f);
 		// ui座標を更新
 		ui->uiPos.x = Lerp(posLerp.Look().startPos.x, posLerp.Look().targetPos.x, posLerp.Look().progress);
@@ -399,7 +411,7 @@ void UILerpSystem(Chunk& a_chunk, const SystemContext& a_context)
 		ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
 
 		// 進行度を更新
-		float newProgress = scaleLerp.Look().progress + a_context.deltaTime / scaleLerp.Look().maxLerpTime;
+		float newProgress = scaleLerp.Look().progress + a_context.effectStepTime / scaleLerp.Look().maxLerpTime;
 		scaleLerp->progress = std::clamp(newProgress, 0.0f, 1.0f);
 		// ui座標を更新
 		ui->uiScale.x = Lerp(scaleLerp.Look().startScale.x, scaleLerp.Look().targetScale.x, scaleLerp.Look().progress);
@@ -409,7 +421,7 @@ void UILerpSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 void StartUISystem(Chunk& a_chunk, const SystemContext& a_context)
 {
-	ComponentView view = a_chunk.GetView<ComponentTypes<StartUITag>>();
+	ComponentView view = a_chunk.GetView<ComponentTypes<DropUI>>();
 
 	for (auto it : view)
 	{
@@ -421,9 +433,13 @@ void StartUISystem(Chunk& a_chunk, const SystemContext& a_context)
 		a_chunk.DeleteChunkComponent(it, UIPosLerp::kTypeId);
 		a_chunk.DeleteChunkComponent(it, UIScaleLerp::kTypeId);
 
+		ComponentHandle<DropUI> drop = a_chunk.GetComponent<DropUI>(it);
 		a_chunk.AddComponent(it, Component::FadeUI(FADE_DOWN, 0.02f));
-		PlaySound(LoadSound("Assets/Sound/startui.mp3"));
-		PlaySound(LoadSound("Assets/Sound/startui2.mp3"));
+		for (auto soundKey : drop.Look().playSounds)
+		{
+			PlaySound(LoadSound(soundKey.c_str()));
+		}
+
 		
 	}
 

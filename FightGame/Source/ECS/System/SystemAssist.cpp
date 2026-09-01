@@ -4,6 +4,8 @@
 #include "Components.h"
 #include "GameData.h"
 #include "Defines.h"
+#include "Geometory.h"
+#include "json.hpp"
 
 using namespace Component;
 
@@ -73,7 +75,7 @@ Entity GetLookOnMarker(Chunk& a_chunk)
 Entity GetCamera(Chunk& a_chunk)
 {
 	// –‘O‚É“o˜^—pƒJƒƒ‰‚ğæ“¾
-	Entity cameraEntity;
+	Entity cameraEntity = kInvalidEntity;
 	ComponentHandle<Camera> cameraComponent;
 
 	ComponentView view = a_chunk.GetView<ComponentTypes<Camera>>();
@@ -123,6 +125,31 @@ void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity)
 
 	a_chunk.DeleteChunkComponent(a_entity, AttackAction::kTypeId);
 	a_chunk.DeleteChunkComponent(a_entity, AttackWaitAction::kTypeId);
+}
+
+void RegisterAllAttackSectorsFromAttackData(int a_circumferenceCount)
+{
+	std::ifstream stream(kAttackDataPath);
+	if (!stream.is_open()) return;
+
+	nlohmann::json json;
+	stream >> json;
+
+	for (auto it = json.begin(); it != json.end(); ++it)
+	{
+		const std::string key = it.key();
+		const nlohmann::json& entry = it.value();
+		if (!entry.is_object()) continue;
+
+		Geometory::RegisterSector(
+			key,
+			entry.value("MinLength", 0.0f),
+			entry.value("MaxLength", 0.0f),
+			entry.value("Angle", 0.0f),
+			entry.value("MaxHeight", 0.0f),
+			entry.value("MaxLowness", 0.0f),
+			a_circumferenceCount);
+	}
 }
 
 void NewEnemySpawn(ComponentsSerialize& a_serialize, Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName)

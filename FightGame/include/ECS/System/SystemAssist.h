@@ -43,3 +43,7 @@ bool IsActionAllowed(Chunk& a_chunk, Entity a_entity, Component::ActionFlag a_fl
 void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity);
 
 void NewEnemySpawn(ComponentsSerialize& a_serialize,Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName);
+
+void RegisterAllAttackSectorsFromAttackData(int a_circumferenceCount);
+
+void SafeDeleteEffectEntity(Chunk& a_chunk, Entity a_effect);
