@@ -129,7 +129,9 @@ void MainGame::Init()
 		"Retry",
 		"Yes",
 		"No",
-		"BackShadow"
+		"BackShadow",
+		"GameEnd",
+		"GameEndFrame"
 	};
 
 	effectDatas =

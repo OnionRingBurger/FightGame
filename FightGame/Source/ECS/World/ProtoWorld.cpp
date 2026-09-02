@@ -141,15 +141,15 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		RailFly(0.08f, 0.09f)
 	);
 
-	Entity spawner = newChunk.CreateNewEntity(
-		PhaseSpawner(
-			{
-				"Stage1Phase1",
-				"Stage1Phase1"
-			}
+	//Entity spawner = newChunk.CreateNewEntity(
+	//	PhaseSpawner(
+	//		{
+	//			"Stage1Phase1",
+	//			"Stage1Phase1"
+	//		}
 
-		)
-	);
+	//	)
+	//);
 
 	//Entity oldhpBack = newChunk.CreateNewEntity(
 	//	UIComponent("UIBack", float2(-0.58, 0.9f), float2(0.8f, 0.1f), 0.0f)

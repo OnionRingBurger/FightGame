@@ -205,10 +205,17 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 			break;
 
 		case GAMECLEAR:
-			Entity gameClear = a_chunk.CreateNewEntity(
-				UIComponent("BattleStart", float2(0.0f, 4.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
-				UIPosLerp(float2(0.0f, 2.0f) + posOffset, posOffset, 24.0f),
-				UIScaleLerp(float2(0.6f * 5.8f, 0.48f * 5.8f), float2(0.6, 0.48f), 24.0f),
+			/*Entity gameClear = a_chunk.CreateNewEntity(
+				UIComponent("GameEnd", float2(0.0f, 4.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
+				UIPosLerp(float2(0.0f, 2.0f) + posOffset, posOffset, 40.0f),
+				UIScaleLerp(float2(0.6f * 5.8f, 0.48f * 5.8f), float2(0.6, 0.48f), 40.0f),
+				LifeTime(130.0f),
+				DropUI({ "Assets/Sound/gameclear.mp3", "Assets/Sound/shot.mp3" })
+			);*/
+
+			Entity gameClearFream = a_chunk.CreateNewEntity(
+				UIComponent("GameEndFrame", float2(0.0f, 0.2f) + posOffset, float2(1.5f, 1.5f), 0.0f + angleOffset, 1.0f),
+				UIPosLerp(float2(0.0f, 0.2f) + posOffset, posOffset, 3.0f),
 				LifeTime(130.0f),
 				DropUI({ "Assets/Sound/gameclear.mp3", "Assets/Sound/shot.mp3" })
 			);
