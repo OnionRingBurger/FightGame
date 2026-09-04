@@ -39,6 +39,8 @@ ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 
 	a_input.RegisterButton("Restart", XINPUT_GAMEPAD_A);
 	a_input.RegisterButton("GameOver", XINPUT_GAMEPAD_B);
+	a_input.RegisterKey("Restart", MK_LBUTTON);
+	a_input.RegisterKey("GameOver", MK_RBUTTON);
 
 	a_input.RegisterKey("TheWorld", 'E');
 
@@ -64,8 +66,14 @@ void ProtoWorld::InitAI(AIManager& a_aiManager)
 	fightSelector->AddNode(std::make_unique<InAttackRangeDecorator>(std::make_unique<UseAttackAction>()));
 	fightSelector->AddNode(std::make_unique<ChasePlayerAction>());
 
+
+	std::unique_ptr<ReactiveSelector> runSelector = std::make_unique<ReactiveSelector>();
+	runSelector->AddNode(std::make_unique<InAttackRangeDecorator>(std::make_unique<UseAttackAction>()));
+	runSelector->AddNode(std::make_unique<RunPlayerNode>());
+
+
 	std::unique_ptr<StanceNode> stance = std::make_unique<StanceNode>(
-		std::make_unique<RunPlayerNode>(),
+		std::move(runSelector),
 		std::move(fightSelector),
 		std::make_unique<WaitAction>(100.0f)
 	);
@@ -105,10 +113,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		OBBCollider(),
 		HitInfomation(),
 		JumpPower(float3(0.0f, 20.0f / 60.0f, 0.0f)),
-		AttackStatus({
-			AttackPower(0.0f, 1.7f, 160.0f, 0.5f, 0.5f, 2.5f, 20.0f, 15.0f, float3(), 12.0f, 20.0f, "Player1Attack1"),
-			AttackPower(0.0f, 6.2f, 60.0f, 0.5f, 0.5f, 5.0f, 30.0f, 30.0f, float3(), 22.0f, 50.0f, "Player1Attack2")
-			}),
+		AttackKeyLoad({ "Player1Attack1", "Player1Attack2" }),
 		LookMove(800.0f / 60.0f),
 		PoseRotState(POSE_ROT_LOOKMOVE),
 		HitPoint(15.0f),
@@ -123,8 +128,8 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		GameOverTarget()
 	);
 
-	Geometory::RegisterSector("Player1Attack1", 0.0f, 1.7f, 160.0f, 0.5f, 0.5f, kSectorVertexCount);
-	Geometory::RegisterSector("Player1Attack2", 0.0f, 6.2f, 60.0f, 0.5f, 0.5f, kSectorVertexCount);
+	//Geometory::RegisterSector("Player1Attack1", 0.0f, 1.7f, 160.0f, 0.5f, 0.5f, kSectorVertexCount);
+	//Geometory::RegisterSector("Player1Attack2", 0.0f, 6.2f, 60.0f, 0.5f, 0.5f, kSectorVertexCount);
 
 	Entity targetMarker = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
@@ -141,15 +146,15 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		RailFly(0.08f, 0.09f)
 	);
 
-	//Entity spawner = newChunk.CreateNewEntity(
-	//	PhaseSpawner(
-	//		{
-	//			"Stage1Phase1",
-	//			"Stage1Phase1"
-	//		}
+	Entity spawner = newChunk.CreateNewEntity(
+		PhaseSpawner(
+			{
+				// "Stage1Phase1",
+				"Stage1Boss1"
+			}
 
-	//	)
-	//);
+		)
+	);
 
 	//Entity oldhpBack = newChunk.CreateNewEntity(
 	//	UIComponent("UIBack", float2(-0.58, 0.9f), float2(0.8f, 0.1f), 0.0f)
@@ -269,7 +274,6 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 			AttackHitRecord(),
 			// モデル
 		ModelKey("Box"),
-		GhostAreaComponent(2.0f),
 		AlphaBlendComponent("Red", "Purple"),
 		EntryAction(120.0f)
 		);
@@ -307,7 +311,6 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		AttackHitRecord(),
 		// モデル
 		ModelKey("Box"),
-		GhostAreaComponent(2.0f),
 		AlphaBlendComponent("Red", "Purple"),
 		EntryAction(120.0f)
 	);
@@ -345,7 +348,6 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		AttackHitRecord(),
 		// モデル
 		ModelKey("Box"),
-		GhostAreaComponent(2.0f),
 		AlphaBlendComponent("Red", "Purple"),
 		EntryAction(120.0f)
 	);
@@ -710,7 +712,6 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	// キャラクターのシステム
 
 	AttackHitSystem(a_chunk, a_context, a_response, a_aiManager);
-
 	CharacterAttackSystem(a_chunk, a_context);
 	PlayerJumpSystem(a_chunk, a_context);
 	AttackStartupSystem(a_chunk, a_context);
@@ -726,6 +727,7 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	EntryActionSystem(a_chunk, a_context);
 	PlayerDeadSystem(a_chunk, a_context, a_response);
 	EnemyDeadSystem(a_chunk, a_context, a_response);
+	BossDeadSystem(a_chunk, a_context, a_response);
 
 	KnockbackStateSystem(a_chunk, a_context);
 	LookOnStateSystem(a_chunk, a_context);
@@ -741,9 +743,10 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	TrailSystem(a_chunk, a_context);
 	SpriteAnimationSystem(a_chunk, a_context);
 	HPGaugeSystem(a_chunk, a_context);
-
+	SoundSystem(a_chunk, a_context);
 	SpawnEfkEffectSystem(a_chunk, a_context);
 	UpdateEfkEffectSystem(a_chunk, a_context);
+
 
 	// 終了処理
 	LifeTimeSystem(a_chunk, a_context);

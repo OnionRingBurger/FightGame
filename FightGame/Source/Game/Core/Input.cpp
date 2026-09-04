@@ -33,13 +33,9 @@ bool Input::IsButtonTrigger(WORD key) const
 
 bool Input::IsButtonPress(WORD key) const
 {
-	static int count = 0;
-	count++;
-	std::cout << "ButtonPressCount" << count << std::endl;
+
 	if (!isGetController) return false;
-	static int getcount = 0;
-	getcount++;
-	std::cout << "ButtonPressGetControllerCount" << getcount << std::endl;
+
 	return (currentButton & key) != 0;
 }
 

@@ -50,6 +50,11 @@ void Chunk::ImGuiInPut()
 		names.push_back(it.c_str());
 	}
 
+	static char nameBuffer[64] = "";
+	ImGui::InputText("ComponentSearch", nameBuffer, 64);
+	std::string searchName = nameBuffer;
+
+
 	ImGui::Combo("UseEntity", &useEntityCount, names.data(), names.size());
 	
 	Entity useEntity = entities.at(useEntityCount);
@@ -60,10 +65,12 @@ void Chunk::ImGuiInPut()
 	HasView view = storageManager.GetHasView(useEntity);
 	for (auto it : view)
 	{
-		// !!!New!!!
-		// ApplyToFields へはオーバーロード解決のためラムダで包んで渡す（Serialize の NewToJson と同じ形）
+		// ApplyToFields へはオーバーロード解決のためラムダで包んで渡す
 		#define IMGUI_COMPONENT_CASE(T) case T::kTypeId: { \
-		ComponentHandle<T> handle = this->GetComponent<T>(useEntity); \
+		ComponentHandle<T> handle = this->GetComponent<T>(useEntity);\
+		std::string selectedName = T::kTypeName; \
+		if(searchName.compare(0, searchName.size(), selectedName.substr(0, searchName.size())) != 0) break; \
+		ImGui::Text(T::kTypeName);\
 		auto imguiValue = [](std::string a_name, auto& a_value, const auto& a_defaultValue) \
 		{ \
 			CreateImGuiValue(a_name + "(" + T::kTypeName + ")", a_value, a_defaultValue); \
@@ -84,12 +91,63 @@ void Chunk::ImGuiInPut()
 	}
 	ImGui::EndChild();
 
-	TypeID addId;
+	static int selectedIdKey = 0;
+	std::map<int, TypeID> typeMap;
 
-	addId = Position::kTypeId;
+	std::vector<const char*> typeNames;
+
+#define IMGUI_SELECT_TYPEIDBOX(T) {auto boxFunc = [&](){\
+		std::string selectedName = T::kTypeName; \
+		if(searchName.compare(0, searchName.size(), selectedName.substr(0, searchName.size())) != 0) return; \
+		typeNames.push_back(T::kTypeName);\
+		typeMap.insert({typeNames.size() - 1, T::kTypeId});\
+	};\
+	boxFunc(); \
+	}
+
+
+	COMPONENT_TYPE_LIST(IMGUI_SELECT_TYPEIDBOX);
+
+
+	for (int i = 0; i < typeNames.size(); i++)
+	{
+
+		for (int j = 0; j < typeNames.size(); j++)
+		{
+			if (i == j) continue;
+			if(typeNames.at(i) == typeNames.at(j))
+			{
+				ImGui::Text("Duplicate TypeName : %s", typeNames.at(i));
+
+			}
+
+			if(typeMap.at(i) == typeMap.at(j))
+			{
+				ImGui::Text("Duplicate TypeID : %d", typeMap.at(i));
+			}
+		}
+
+		
+		//ImGui::Text(typeNames.at(i));
+		//ImGui::Text("%d",typeMap.at(i));
+
+	}
+
+	ImGui::Combo("SelectAddComponent", &selectedIdKey, typeNames.data(), typeNames.size());
+
+
+
+	TypeID addId;
+	if (typeMap.find(selectedIdKey) == typeMap.end()) return;
+	addId = typeMap.at(selectedIdKey);
+
 
 	#define IMGUI_ADDCOMPONENT_CASE(T) case T::kTypeId: {\
-		this->AddComponent(useEntity, T()); \
+		ComponentHandle<T> handle = this->GetComponent<T>(useEntity);\
+		if(!handle.IsValid())\
+		{\
+			this->AddComponent(useEntity, T()); \
+		}\
 	}\
 	break; \
 	
@@ -97,11 +155,25 @@ void Chunk::ImGuiInPut()
 	{
 		switch (addId)
 		{
+			std::cout << "AddComponent : " << addId << std::endl;
 			COMPONENT_TYPE_LIST(IMGUI_ADDCOMPONENT_CASE)
 		}
 	}
 
-	
+
+#define IMGUI_DELETECOMPONENT_CASE(T) case T::kTypeId: {\
+		this->DeleteChunkComponent(useEntity, T::kTypeId); \
+	}\
+	break; \
+
+	if (ImGui::Button("DeleteComponent", ImVec2(100.0f, 20.0f)))
+	{
+		switch (addId)
+		{
+			COMPONENT_TYPE_LIST(IMGUI_DELETECOMPONENT_CASE)
+		}
+	}
+
 	#undef IMGUI_ADDCOMPONENT_CASE
 }
 

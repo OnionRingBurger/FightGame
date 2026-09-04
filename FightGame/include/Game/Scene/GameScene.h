@@ -38,6 +38,7 @@ private:
 	GameSceneState state;
 	void ChangeState();
 	void ChangeWorld();
+	void ChangeScene();
 	bool isMouseLock;
 
 	std::queue<std::string> worldChangeRequests;

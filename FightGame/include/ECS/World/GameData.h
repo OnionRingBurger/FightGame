@@ -18,7 +18,9 @@ constexpr int kSectorVertexCount = 15;
 constexpr float kWallThickness = 0.02f;
 constexpr float kWallHitboxThickness = 0.2f;
 
-constexpr float kLookOnChangeCooltime = 15.0f;
+// constexpr float kLookOnChangeCooltime = 15.0f;
+constexpr float kLookOnChangeCooltime = 35.0f;
+constexpr float kLookOnChangeMouseLength = 15.0f;
 
 constexpr float kSectorScaleFlashTime = 15.0f;
 constexpr float3 kSectorDefaultColor = float3(0.0f, 0.0f, 0.0f);
@@ -31,7 +33,8 @@ constexpr const char* kSpawnEffect = "Spawn.efk";
 constexpr const char* kSnowEffect = "Snow.efkefc";
 constexpr const char* kEntryEffect = "Entry.efkefc";
 constexpr const char* kGuardEffectKey = "Guard.efk";
-
+constexpr const char* kRedBossEntryKey = "RedBossEntry.efkefc";
+constexpr const char* kDeadBrokenEffectKey = "DeadBroken.efkefc";
 
 ///////////////////////////////////////////////////////////////////////////
 // 

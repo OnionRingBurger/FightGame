@@ -127,6 +127,48 @@ void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity)
 	a_chunk.DeleteChunkComponent(a_entity, AttackWaitAction::kTypeId);
 }
 
+void ClearCharacterAttackOnDeath(Chunk& a_chunk, Entity a_entity)
+{
+	ComponentHandle<AttackStartupAction> startup = a_chunk.GetComponent<AttackStartupAction>(a_entity);
+	if (startup.IsValid())
+	{
+		const Entity telegraphEntity = startup.Look().telegraphEntity;
+		if (telegraphEntity != kInvalidEntity
+			&& a_chunk.GetComponent<AttackTelegraph>(telegraphEntity).IsValid())
+		{
+			a_chunk.DeleteChunkEntity(telegraphEntity);
+		}
+		a_chunk.DeleteChunkComponent(a_entity, AttackStartupAction::kTypeId);
+	}
+
+	ComponentHandle<AttackAction> attackAction = a_chunk.GetComponent<AttackAction>(a_entity);
+	if (attackAction.IsValid())
+	{
+		const Entity attackEntity = attackAction.Look().attackEntity;
+		if (attackEntity != kInvalidEntity
+			&& (a_chunk.GetComponent<PlayerAttackTag>(attackEntity).IsValid()
+				|| a_chunk.GetComponent<EnemyAttackTag>(attackEntity).IsValid()))
+		{
+			a_chunk.DeleteChunkEntity(attackEntity);
+		}
+		a_chunk.DeleteChunkComponent(a_entity, AttackAction::kTypeId);
+	}
+
+	if (a_chunk.GetComponent<AttackWaitAction>(a_entity).IsValid())
+	{
+		a_chunk.DeleteChunkComponent(a_entity, AttackWaitAction::kTypeId);
+	}
+
+	ComponentView view = a_chunk.GetView<ComponentTypes<AttackInstance>>();
+	for (auto it : view)
+	{
+		const ComponentHandle<AttackInstance> attackInstance = a_chunk.GetComponent<AttackInstance>(it);
+		if (attackInstance.Look().owner != a_entity) continue;
+
+		a_chunk.DeleteChunkEntity(it);
+	}
+}
+
 void RegisterAllAttackSectorsFromAttackData(int a_circumferenceCount)
 {
 	std::ifstream stream(kAttackDataPath);
@@ -151,6 +193,29 @@ void RegisterAllAttackSectorsFromAttackData(int a_circumferenceCount)
 			a_circumferenceCount);
 	}
 }
+
+void AddShakeEffect(Chunk& a_chunk, Entity a_entity, float3 a_power, float3 a_amp, float a_time, float a_rate)
+{
+	ComponentHandle<ShakeComponent> hitterShake = a_chunk.GetComponent<ShakeComponent>(a_entity);
+	if (hitterShake.IsValid())
+	{
+		hitterShake->shakePower = a_power;
+		hitterShake->shakeAmplitude = a_amp;
+		hitterShake->elapsedTime = 0.0f;
+		hitterShake->shakeTime = a_time;
+		hitterShake->decayRate = a_rate;
+	}
+	else
+	{
+		a_chunk.AddComponent(a_entity, ShakeComponent(a_power, a_amp, a_time, a_rate));
+	}
+}
+
+void SafeDeleteEffectEntity(Chunk& a_chunk, Entity a_effect)
+{
+	// TODO Œã‚Å‚â‚é
+}
+
 
 void NewEnemySpawn(ComponentsSerialize& a_serialize, Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName)
 {
@@ -192,7 +257,8 @@ void NewEnemySpawn(ComponentsSerialize& a_serialize, Chunk& a_chunk, AIManager& 
 						),
 						json[attackIt].value("WaitTime", 0.0f),
 						json[attackIt].value("StartupTime", 0.0f),
-						attackIt)
+						attackIt,
+						json[attackIt].value("EndWithOwnerAction", true))
 
 				);
 

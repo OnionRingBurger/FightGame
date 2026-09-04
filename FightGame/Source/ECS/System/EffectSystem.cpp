@@ -1,6 +1,7 @@
 #include "EffectSystem.h"
 #include "Components.h"
 #include "Sound.h"
+#include "Defines.h"
 
 using namespace Component;
 
@@ -348,6 +349,13 @@ void SpawnEfkEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 	for (auto it : view)
 	{
 		ComponentHandle<EfkEffectKey> key = a_chunk.GetComponent<EfkEffectKey>(it);
+		if (key.Look().waitTime > 0.0f)
+		{
+			key->waitTime -= a_context.deltaTime;
+			key->waitTime = std::max(key.Look().waitTime, 0.0f);
+			continue;
+		}
+
 		ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(it);
 		Effekseer::EffectRef ref;
 
@@ -450,4 +458,25 @@ void StartUISystem(Chunk& a_chunk, const SystemContext& a_context)
 		
 	}
 
+}
+
+
+void SoundSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<SoundKey>>();
+	for (auto it : view)
+	{
+		ComponentHandle<SoundKey> sound = a_chunk.GetComponent<SoundKey>(it);
+		std::string key = kSoundAssetPath + sound.Look().soundKey + ".mp3";
+
+		if (!sound.IsValid()) continue;
+		if(sound.Look().waitTime > 0.0f)
+		{
+			sound->waitTime -= a_context.deltaTime;
+			continue;
+		}
+
+		PlaySound(LoadSound(key.c_str(), sound.Look().isLoop));
+		a_chunk.DeleteChunkEntity(it);
+	}
 }

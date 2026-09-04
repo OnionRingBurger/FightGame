@@ -10,8 +10,6 @@
 
 using namespace Component;
 
-void CharacterKill(Chunk& a_chunk, Entity killEntity);
-
 namespace
 {
 	constexpr float kGroundNormalThreshold = 0.5f;
@@ -26,25 +24,77 @@ namespace
 		const bool isEnemy = a_chunk.GetComponent<EnemyTag>(a_attacker).IsValid();
 		if (!isPlayer && !isEnemy) return kInvalidEntity;
 
-		// 攻撃Entity生成
-		Entity attack = a_chunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(
-				float3(0.0f, 0.0f, 0.0f),
-				float3(0.0f, rotation.Look().yaw, 0.0f),
-				float3(1.0f, 1.0f, 1.0f)
-			),
-			SectorHitJudge(
+		const bool endWithOwnerAction = a_attackPower.endWithOwnerAction;
+
+		// !!!New!!!
+		const std::string& sectorKey = a_attackPower.sectorKey;
+		if (!sectorKey.empty())
+		{
+			Geometory::RegisterSector(
+				sectorKey,
 				a_attackPower.minLength,
 				a_attackPower.maxLength,
 				a_attackPower.angle,
 				a_attackPower.maxHeight,
-				a_attackPower.maxLowness
-			),
-			AddDamageComponent(a_attackPower.damageValue),
-			FollowPosition(a_attackPower.followOffset, a_attacker, FOLLOW_POS_LOCALOFFSET),
-			PosePosState(POSE_POS_FOLLOW),
-			AttackInstance(a_attacker, a_attackIndex, a_attackPower.lifeTime)
-		);
+				a_attackPower.maxLowness,
+				16);
+		}
+
+		// !!!New!!!
+		AttackTelegraph attackTelegraph(
+			a_attackPower.minLength,
+			a_attackPower.maxLength,
+			a_attackPower.angle,
+			a_attackPower.maxHeight,
+			a_attackPower.maxLowness,
+			sectorKey);
+
+		Entity attack = kInvalidEntity;
+		if (endWithOwnerAction)
+		{
+			attack = a_chunk.CreateNewEntity(
+				MOVE_AND_TRANSFORM_COMPONENT(
+					float3(0.0f, 0.0f, 0.0f),
+					float3(0.0f, rotation.Look().yaw, 0.0f),
+					float3(1.0f, 1.0f, 1.0f)
+				),
+				SectorHitJudge(
+					a_attackPower.minLength,
+					a_attackPower.maxLength,
+					a_attackPower.angle,
+					a_attackPower.maxHeight,
+					a_attackPower.maxLowness
+				),
+				AddDamageComponent(a_attackPower.damageValue),
+				FollowPosition(a_attackPower.followOffset, a_attacker, FOLLOW_POS_LOCALOFFSET),
+				PosePosState(POSE_POS_FOLLOW),
+				AttackInstance(a_attacker, a_attackIndex, a_attackPower.lifeTime, true),
+				attackTelegraph
+			);
+		}
+		else
+		{
+			const float3 spawnPos = GetEntityPosePos(a_chunk, a_attacker)
+				+ GetLocalOffset(a_attackPower.followOffset, GetEntityPoseRot(a_chunk, a_attacker));
+
+			attack = a_chunk.CreateNewEntity(
+				MOVE_AND_TRANSFORM_COMPONENT(
+					spawnPos,
+					float3(0.0f, rotation.Look().yaw, 0.0f),
+					float3(1.0f, 1.0f, 1.0f)
+				),
+				SectorHitJudge(
+					a_attackPower.minLength,
+					a_attackPower.maxLength,
+					a_attackPower.angle,
+					a_attackPower.maxHeight,
+					a_attackPower.maxLowness
+				),
+				AddDamageComponent(a_attackPower.damageValue),
+				AttackInstance(a_attacker, a_attackIndex, a_attackPower.lifeTime, false),
+				attackTelegraph
+			);
+		}
 	
 		// 生成者に応じて攻撃タイプを生成
 		if (isPlayer) a_chunk.AddComponent(attack, PlayerAttackTag());
@@ -703,6 +753,8 @@ void HitPointSystem(Chunk& a_chunk, SystemContext& a_context)
 
 void CharacterKill(Chunk& a_chunk, Entity killEntity)
 {
+	ClearCharacterAttackOnDeath(a_chunk, killEntity);
+
 	ComponentHandle<DeadState> deadState = a_chunk.GetComponent<DeadState>(killEntity);
 	if (deadState.IsValid()) deadState->isDead = true;
 }
@@ -883,6 +935,10 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 		: a_context.input.GetKeyAxis();
 
 	const Axis& rightAxis = a_context.input.GetRightAxis();
+	const MouseMove mouseAxis = a_context.input.GetMouseAxis();
+
+	DebugConsole::SetDrawPos(20, 19);
+	std::cout << "MouseLength" << GetLength(mouseAxis) << std::endl;
 
 	float2 cameraMoveDir = float2(); 
 	float cameraMagnitube = 0.0f;
@@ -894,18 +950,26 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 		cameraMagnitube = rightAxis.magnitube;
 		moveCamera = true;
 	}
-	else if(a_context.input.IsRegisterTrigger("LookOnLeft"))
+	else if (GetLength(mouseAxis) >= kLookOnChangeMouseLength)
 	{
-		cameraMoveDir.x = -1.0f;
+		float2 normalizeAxis = Normalize(mouseAxis);
+		cameraMoveDir.x = normalizeAxis.x;
+		cameraMoveDir.y = normalizeAxis.y * -1.0f;
 		cameraMagnitube = 1.0f;
 		moveCamera = true;
 	}
-	else if(a_context.input.IsRegisterTrigger("LookOnRight"))
-	{
-		cameraMoveDir.x = 1.0f;
-		cameraMagnitube = 1.0f;
-		moveCamera = true;
-	}
+	//else if(a_context.input.IsRegisterTrigger("LookOnLeft"))
+	//{
+	//	cameraMoveDir.x = -1.0f;
+	//	cameraMagnitube = 1.0f;
+	//	moveCamera = true;
+	//}
+	//else if(a_context.input.IsRegisterTrigger("LookOnRight"))
+	//{
+	//	cameraMoveDir.x = 1.0f;
+	//	cameraMagnitube = 1.0f;
+	//	moveCamera = true;
+	//}
 	// !!!New!!!
 	const bool rightAttackTrigger = a_context.input.IsRegisterTrigger("RightAttack");
 	const bool leftAttackTrigger = a_context.input.IsRegisterTrigger("LeftAttack");
@@ -1143,40 +1207,21 @@ void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResp
 
 			// 画面エフェクトを出す
 			float waitTime = isGuard ? 8.0f * 2.0f : 2.0f * 2.0f;
-			a_response.AddStopTime(waitTime, 10.0f, 0.05f); 
 			float cameraPowerRate = 1.0f + std::sqrt(damageValue);
 			float3 cameraShakePower = isGuard ? float3(0.15f, 0.15f, 0.0f) : float3(0.025f, 0.025f, 0.00f) * cameraPowerRate;
 			float3 cameraShakeAmp = float3(0.15f, 0.15f, 0.15f);
 			float cameraShakeTime = isGuard ? 4.0f : 6.0f;
-			ComponentHandle<ShakeComponent> cameraShake = a_chunk.GetComponent<ShakeComponent>(camera);
-			if (cameraShake.IsValid())
-			{
-				cameraShake->shakePower = cameraShakePower;
-				cameraShake->shakeAmplitude = cameraShakeAmp;
-				cameraShake->elapsedTime = 0.0f;
-				cameraShake->shakeTime = cameraShakeTime;
-			}
-			else
-			{
-				a_chunk.AddComponent(camera, ShakeComponent(cameraShakePower, cameraShakeAmp, cameraShakeTime));
-			}
+			AddShakeEffect(a_chunk, camera, cameraShakePower, cameraShakeAmp, cameraShakeTime, 0.5f);
 
 
 			float3 shakePower = isGuard ? float3(0.15f, 0.15f, 0.15f) : float3(0.05f, 0.05f, 0.05f);
 			float3 shakeAmp = float3(0.5f, 0.5f, 0.5f);
 			float shakeTime = isGuard ? 15.0f : 21.0f;
 			ComponentHandle<ShakeComponent> hitterShake = a_chunk.GetComponent<ShakeComponent>(it);
-			if (hitterShake.IsValid())
-			{
-				hitterShake->shakePower = shakePower;
-				hitterShake->shakeAmplitude = shakeAmp;
-				hitterShake->elapsedTime = 0.0f;
-				hitterShake->shakeTime = shakeTime;
-			}
-			else
-			{
-				a_chunk.AddComponent(it, ShakeComponent(shakePower, shakeAmp, shakeTime));
-			}
+			AddShakeEffect(a_chunk, it, shakePower, shakeAmp, shakeTime, 0.5f);
+
+
+			a_response.AddStopTime(waitTime, 10.0f, 0.05f);
 
 
 			// ダメージエフェクトを出す
@@ -1359,7 +1404,10 @@ void EnemyAttackLoadSystem(Chunk& a_chunk, const SystemContext& a_context)
 					),
 					attackData.value("WaitTime", 0.0f),
 					attackData.value("StartupTime", 0.0f),
-					attackKey));
+					attackKey,
+					attackData.value("EndWithOwnerAction", true)
+					)
+			);
 		}
 
 		a_chunk.AddComponent(it, status);

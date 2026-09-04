@@ -8,7 +8,7 @@ using namespace Component;
 void ImGuiSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
 	ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_Once);
-	ImGui::SetNextWindowSize(ImVec2(300.0f, 200.0f), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(300.0f, 350.0f), ImGuiCond_Once);
 	ImGui::Begin("ChunkWindow");
 
 	a_chunk.ImGuiInPut();

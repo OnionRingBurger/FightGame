@@ -74,7 +74,7 @@ Chunk GameWorld::CreateNewChunk(AIManager& a_aiManager)
 		),
 		PosePosState(POSE_POS_RAIL),
 		RailUser(mainRail),
-		ShakeComponent(float3(0.0f, 0.005f, 0.0f), float3(0.0f, 0.5f, 0.0f), 999999.0f),
+		ShakeComponent(float3(0.0f, 0.005f, 0.0f), float3(0.0f, 0.5f, 0.0f), 999999.0f, 0.5f),
 		ModelKey("Minecart")
 	);
 
@@ -172,7 +172,7 @@ Chunk GameWorld::CreateNewChunk(AIManager& a_aiManager)
 		PoseRotState(POSE_ROT_CAMERA),
 		ZoomComponent(1.0f, 1.2f),
 		ZoomMove(ZOOMMOVE_ZERORESET),
-		ShakeComponent(float3(0.1f, 0.05f, 0.0f), float3(0.5f, 0.5f, 0.0f))
+		ShakeComponent(float3(0.1f, 0.05f, 0.0f), float3(0.5f, 0.5f, 0.0f), 0.0f, 0.5f)
 	);
 
 

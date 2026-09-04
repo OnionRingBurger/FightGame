@@ -3,6 +3,7 @@
 #include "Components.h"
 #include "Sound.h"
 #include "SystemAssist.h"
+#include "CharacterSystem.h"
 #include "GameData.h"
 
 #include <cmath>
@@ -21,6 +22,7 @@ void SpawnGroupEnemy(Chunk& a_chunk, float3 a_targetPos, float3 a_spawnRailPosNo
 float3 RandomEnemyPick(int randomWidth, int randomHeight, int randomDepth);
 
 bool SpawnEnemyBullet(Chunk& a_chunk, float3 a_shooterPos, Entity a_player);
+
 
 PlayerHitViewInfo EvaluatePlayerHitView(Chunk& a_chunk, Entity a_player, Entity a_hitEntity, float a_minAngleDeg)
 {
@@ -94,7 +96,7 @@ void EnemyAttackSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRe
 			ComponentHandle<DeadState> enemyDead = a_chunk.GetComponent<DeadState>(hitIt.hitEntity);
 			if (enemyDead.IsValid())
 			{
-				enemyDead->isDead = true;
+				CharacterKill(a_chunk, hitIt.hitEntity);
 			}
 
 			PlayerHitViewInfo hitView = EvaluatePlayerHitView(a_chunk, it, hitEntity, kDamageDirectionMinAngleDeg);
@@ -157,27 +159,12 @@ void EnemyShooterSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response)
 {
-	ComponentView view = a_chunk.GetView<ComponentTypes<EnemyTag, DeadState>>();
+	ComponentView view = a_chunk.GetView<ComponentTypes<EnemyTag, DeadState>, ComponentTypes<BossTag>>();
 	Entity camera = GetCamera(a_chunk);
 	for (auto it : view)
 	{
 		ComponentHandle<DeadState> dead = a_chunk.GetComponent<DeadState>(it);
 		if (!dead.Look().isDead) continue;
-
-
-		ComponentHandle<MotionTransform> enemyMotion = a_chunk.GetComponent<MotionTransform>(it);
-		float3 areaPos;
-		if (enemyMotion.IsValid()) areaPos = enemyMotion.Look().motionPos;
-		
-
-		Entity rail = GetRail(a_chunk);
-		Entity area = a_chunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(areaPos.x, areaPos.y, areaPos.z), float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
-			GhostAreaComponent(5.0f),
-			LifeTime(20.0f),
-			PosePosState(POSE_POS_RAIL),
-			RailUser(rail)
-		);
 
 		a_chunk.DeleteChunkComponent(it, DeadState::kTypeId);
 		a_chunk.DeleteChunkComponent(it, BoxCollider::kTypeId);
@@ -201,10 +188,12 @@ void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResp
 		}
 		else
 		{
-			a_chunk.AddComponent(camera, ShakeComponent(shakePower, shakeAmp, shakeTime));
+			a_chunk.AddComponent(camera, ShakeComponent(shakePower, shakeAmp, shakeTime, 0.5f));
 		}
 
-		PlaySound(LoadSound("Assets/Sound/enemydead.mp3"));
+		Entity sound = a_chunk.CreateNewEntity(
+			SoundKey(false, 6.0f, "enemydead")
+		);
 
 		ComponentHandle<LifeTime> lifeTime = a_chunk.GetComponent<LifeTime>(it);
 		if (lifeTime.IsValid())
@@ -217,6 +206,58 @@ void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResp
 		}
 	}
 
+}
+
+void BossDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<EnemyTag, BossTag, DeadState>>();
+	Entity camera = GetCamera(a_chunk);
+	for (auto it : view)
+	{
+		ComponentHandle<DeadState> dead = a_chunk.GetComponent<DeadState>(it);
+		if (!dead.Look().isDead) continue;
+
+		a_chunk.DeleteChunkComponent(it, DeadState::kTypeId);
+		a_chunk.DeleteChunkComponent(it, BoxCollider::kTypeId);
+		a_chunk.DeleteChunkComponent(it, OBBCollider::kTypeId);
+		a_chunk.DeleteChunkComponent(it, MoveForward::kTypeId);
+		a_chunk.DeleteChunkComponent(it, RailFly::kTypeId);
+
+		// 画面エフェクトを出す
+		a_response.AddStopTime(6.0f, 6.0f, 0.03f);
+		float3 shakePower = float3(0.22f, 0.22f, 0.00f);
+		float3 shakeAmp = float3(0.20f, 0.20f, 0.0f);
+		float shakeTime = 30.0f;
+		
+		AddShakeEffect(a_chunk, camera, shakePower, shakeAmp, shakeTime, 0.5f);
+
+		Entity sound = a_chunk.CreateNewEntity(
+			SoundKey(false, 280.0f * 0.03f, "enemydead")
+		);
+
+		// 振動、一時停止を追加
+		a_response.AddStopTime(300.0f, 300.0f, 0.03f);
+		AddShakeEffect(a_chunk, it, float3(0.02f, 0.02f, 0.02f), float3(2.5f, 2.5f, 2.5f), 600.0f, 15.5f);
+
+
+		Entity effect = a_chunk.CreateNewEntity(
+			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
+			EfkEffectKey("bossdead", false, 300.0f * 0.03f),
+			PosePosState(POSE_POS_FOLLOW),
+			FollowPosition(0.0f, 0.0f, 0.0f, it)
+		);
+
+		// 生存時間を決定
+		ComponentHandle<LifeTime> lifeTime = a_chunk.GetComponent<LifeTime>(it);
+		if (lifeTime.IsValid())
+		{
+			lifeTime->time = 300.0f * 0.03f;
+		}
+		else
+		{
+			a_chunk.AddComponent(it, LifeTime(300.0f * 0.03f));
+		}
+	}
 }
 
 

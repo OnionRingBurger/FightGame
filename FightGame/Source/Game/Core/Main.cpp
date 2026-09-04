@@ -141,7 +141,9 @@ void MainGame::Init()
 		{kSpawnEffect, 0.45f},
 		{kSnowEffect, 3.0f},
 		{kEntryEffect, 1.5f},
-		{kGuardEffectKey, 0.6f}
+		{kGuardEffectKey, 0.6f},
+		{kRedBossEntryKey, 0.5f},
+		{kDeadBrokenEffectKey, 0.5f},
 	};
 
 	ChangeScene("Load");
@@ -505,6 +507,8 @@ bool MainGame::ChangeScene(std::string a_key)
 	bool ret = true;
 	if (a_key == "Load")
 	{
+
+
 		scene = make_unique<LoadScene>(
 			[this](std::string a_key)
 			{

@@ -21,7 +21,7 @@ GameScene::GameScene(
 	Input& a_input,
 	ComponentsSerialize& a_serialize)
 	: state(GAMESCENE_DEFAULT)
-	, isMouseLock(false)
+	, isMouseLock(true)
 	, sceneChangeRequest(a_sceneChangeRequest)
 	, modelCache(a_modelCache)
 	, uiCache(a_uiCache)
@@ -38,8 +38,9 @@ GameScene::GameScene(
 	input.RegisterKey("GameEnd", VK_ESCAPE);
 	input.RegisterButton("GameEnd", XINPUT_GAMEPAD_START);
 	input.RegisterKey("IMGUI", VK_F2);
+	input.RegisterKey("ToDebugScene", VK_F3);
 	input.RegisterKey("TutorialSkip", VK_RETURN);
-	setFixedCursor(false);
+	setFixedCursor(isMouseLock);
 }
 
 void GameScene::AdvanceUpdate(float dt)
@@ -65,6 +66,7 @@ void GameScene::PostFrameProcess()
 {
 	ChangeState();
 	ChangeWorld();
+	ChangeScene();
 }
 
 void GameScene::ChangeState()
@@ -135,6 +137,19 @@ void GameScene::ChangeWorld()
 			break;
 		}
 	}
+
+}
+
+void GameScene::ChangeScene()
+{
+
+#ifdef _DEBUG
+	if (input.IsRegisterTrigger("ToDebugScene"))
+	{
+		sceneChangeRequest("CreateGame");
+		setFixedCursor(false);
+	}
+#endif // _DEBUG
 
 }
 

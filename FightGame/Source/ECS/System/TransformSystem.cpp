@@ -216,6 +216,7 @@ void InputRotatoSystem(Chunk& a_chunk, const SystemContext& a_context)
 	// 
 	float rx = isMagnitube ? a_context.input.GetRightAxis().x : a_context.input.GetMouseAxis().x;
 	float ry = isMagnitube ? a_context.input.GetRightAxis().y : a_context.input.GetMouseAxis().y;
+
 	// RotatoâÒì]Çèàóù
 	for (auto it : rotatoView)
 	{
@@ -593,7 +594,7 @@ void ShakeSystem(Chunk& a_chunk, const SystemContext& a_context)
 		ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(it);
 
 		float powerRate = 1.0f;
-		powerRate = Lerp(1.0f, 0.5f, shake.Look().elapsedTime / (shake.Look().elapsedTime + shake.Look().shakeTime));
+		powerRate = Lerp(1.0f, shake.Look().decayRate, shake.Look().elapsedTime / (shake.Look().elapsedTime + shake.Look().shakeTime));
 
 
 		matrix *= DirectX::XMMatrixTranslation(

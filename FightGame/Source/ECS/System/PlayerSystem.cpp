@@ -43,36 +43,14 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRes
 		a_chunk.DeleteChunkComponent(it, PlayerTag::kTypeId);
 		a_chunk.DeleteChunkComponent(it, InputMove::kTypeId);
 		a_chunk.AddComponent(it, LifeTime(16.0f));
-		//a_chunk.DeleteChunkComponent(it, InputRotato::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, Velocity::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, ShooterComponent::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, ShakingComponent::kTypeId);
-		// a_chunk.DeleteChunkComponent(it, OBBCollider::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, RailFly::kTypeId);
-
-		//ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>>();
-		//for (auto uiIt : view)
-		//{
-		//	a_chunk.DeleteChunkEntity(uiIt);
-		//}
 
 
 
 		float3 shakePower = float3(0.02f, 0.02f, 0.02f);
 		float3 shakeAmp = float3(2.5f, 2.5f, 2.5f);
 		float shakeTime = 130.0f;
-		ComponentHandle<ShakeComponent> hitterShake = a_chunk.GetComponent<ShakeComponent>(it);
-		if (hitterShake.IsValid())
-		{
-			hitterShake->shakePower = shakePower;
-			hitterShake->shakeAmplitude = shakeAmp;
-			hitterShake->elapsedTime = 0.0f;
-			hitterShake->shakeTime = shakeTime;
-		}
-		else
-		{
-			a_chunk.AddComponent(it, ShakeComponent(shakePower, shakeAmp, shakeTime));
-		}
+		
+		AddShakeEffect(a_chunk, it, shakePower, shakeAmp, shakeTime, 0.5f);
 
 
 		PlaySound(LoadSound("Assets/Sound/dead.mp3"));

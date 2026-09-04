@@ -238,12 +238,12 @@ void SpawnObjectSystem(Chunk& a_chunk, const SystemContext& a_context)
 				// 振動
 				if(firework.Look().fireworkType & FIREWORK_SHAKE)
 				{
-					a_chunk.AddComponent(fire, ShakeComponent(float3(0.004f, 0.004f, 0.004f), float3(0.7f, 0.7f, 0.7f), 300.0f));
+					a_chunk.AddComponent(fire, ShakeComponent(float3(0.004f, 0.004f, 0.004f), float3(0.7f, 0.7f, 0.7f), 300.0f, 0.5f));
 				}
 				// レトロゲーム
 				else if (firework.Look().fireworkType & FIREWORK_RETRO)
 				{
-					a_chunk.AddComponent(fire, ShakeComponent(float3(0.025f, 0.025f, 0.025f), float3(0.05f, 0.05f, 0.05f), 300.0f));
+					a_chunk.AddComponent(fire, ShakeComponent(float3(0.025f, 0.025f, 0.025f), float3(0.05f, 0.05f, 0.05f), 300.0f, 0.5f));
 				}
 				// キーボード操作
 				if(firework.Look().fireworkType & FIREWORK_INPUT_MOVE)

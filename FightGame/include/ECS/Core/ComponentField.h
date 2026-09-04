@@ -616,6 +616,7 @@ namespace ComponentSystem
 		valueFunc("shakeAmplitudeY", component.shakeAmplitude.y, 0.0f);
 		valueFunc("shakeAmplitudeZ", component.shakeAmplitude.z, 0.0f);
 		valueFunc("elapsedTime", component.elapsedTime, 0.0f);
+		valueFunc("decayRate", component.decayRate, 0.5f);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -871,6 +872,8 @@ namespace ComponentSystem
 	inline void ApplyToFields(GuardAction& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
 		valueFunc("currentGuardPower", component.currentGuardPower, 0.0f);
+		valueFunc("knockbackRate", component.knockbackRate, 1.0f);
+		entityFunc("guardEffect", component.guardEffect);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -912,6 +915,24 @@ namespace ComponentSystem
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(LookOnState& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("captureRadius", component.captureRadius, 6.8f);
+		valueFunc("releaseRadius", component.releaseRadius, 7.8f);
+		valueFunc("stickSwitchLatch", component.stickSwitchLatch, false);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(LookOnAction& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		entityFunc("target", component.target);
+		valueFunc("finalRotX", component.finalRot.x, 0.0f);
+		valueFunc("finalRotY", component.finalRot.y, 0.0f);
+		valueFunc("finalRotZ", component.finalRot.z, 0.0f);
+		valueFunc("targetCooltime", component.targetCooltime, 0.0f);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
 	inline void ApplyToFields(AttackKeyLoad& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
 		valueFunc("size", component.size, 0);
@@ -920,5 +941,31 @@ namespace ComponentSystem
 		{
 			valueFunc("attack" + std::to_string(i), component.attackKeys[i], std::string(""));
 		}
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(PhaseSpawner& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("size", component.size, 0);
+		if (component.size != component.spawnName.size()) component.spawnName.resize(component.size);
+		for (int i = 0; i < component.size; i++)
+		{
+			valueFunc("spawn" + std::to_string(i), component.spawnName[i], std::string(""));
+		}
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(EfkEffectKey& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("handleId", component.handleId, std::string(""));
+		valueFunc("isLoop", component.isLoop, false);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(EntryAction& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("duration", component.duration, 0.0f);
+		valueFunc("maxDuration", component.maxDuration, 0.0f);
+		valueFunc("canPlayEffect", component.canPlayEffect, true);
 	}
 };

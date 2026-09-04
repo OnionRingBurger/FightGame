@@ -140,7 +140,11 @@
 	X(Name) \
 	X(LookOnState) \
 	X(LookOnAction)\
-	X(AttackKeyLoad)
+	X(AttackKeyLoad) \
+	X(PhaseSpawner) \
+	X(EfkEffectKey) \
+	X(EntryAction) \
+	X(BossTag)
 
 
 using BitFlag = unsigned int;
@@ -1542,7 +1546,7 @@ namespace Component
 	struct FlipComponent
 	{
 		static constexpr TypeID kTypeId = 57;
-		static constexpr const char* kTypeName = "LeapRotComponent";
+		static constexpr const char* kTypeName = "FlipComponent";
 		static constexpr int kVersion = 0;
 		FlipComponent() = default;
 	};
@@ -1907,16 +1911,19 @@ namespace Component
 		float3 shakeAmplitude;
 		//! ・ｽo・ｽﾟ趣ｿｽ・ｽ・ｽ
 		float elapsedTime;
+		// !!!New!!!
+		float decayRate;
 
-		ShakeComponent(float3 a_shakePower, float3 a_shakeAmplitude, float shakeTime = 0.0f)
+		ShakeComponent(float3 a_shakePower, float3 a_shakeAmplitude, float shakeTime, float a_decayRate)
 			: shakePower(a_shakePower)
 			, shakeAmplitude(a_shakeAmplitude)
 			, shakeTime(shakeTime)
 			, elapsedTime(0.0f)
+			, decayRate(a_decayRate)
 		{
 		}
 
-		ShakeComponent() : ShakeComponent(float3(1.0f, 1.0f, 1.0f), float3(1.0f, 1.0f, 1.0f), 0.0f)
+		ShakeComponent() : ShakeComponent(float3(1.0f, 1.0f, 1.0f), float3(1.0f, 1.0f, 1.0f), 0.0f, 0.5f)
 		{
 		}
 	};
@@ -2333,10 +2340,12 @@ namespace Component
 		float startupTime;
 		// !!!New!!!
 		std::string sectorKey;
+		// !!!New!!!
+		bool endWithOwnerAction;
 
 
 		AttackPower()
-			: AttackPower(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, float3(), 0.0f, 0.0f, "")
+			: AttackPower(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, float3(), 0.0f, 0.0f, "", true)
 		{
 		}
 
@@ -2352,7 +2361,8 @@ namespace Component
 			float3 a_followOffset = float3(),
 			float a_waitTime = 0.0f,
 			float a_startupTime = 0.0f,
-			std::string a_sectorKey = ""
+			std::string a_sectorKey = "",
+			bool a_endWithOwnerAction = true
 			)
 			: minLength(a_minLength)
 			, maxLength(a_maxLength)
@@ -2366,6 +2376,7 @@ namespace Component
 			, waitTime(a_waitTime)
 			, startupTime(a_startupTime)
 			, sectorKey(std::move(a_sectorKey))
+			, endWithOwnerAction(a_endWithOwnerAction)
 		{
 		}
 	};
@@ -3016,15 +3027,18 @@ namespace Component
 
 		std::string handleId;
 		bool isLoop;
+		float waitTime;
 
-		EfkEffectKey(std::string a_handleId, bool a_isLoop)
+
+		EfkEffectKey(std::string a_handleId, bool a_isLoop, float a_waitTime = 0.0f)
 			: handleId(a_handleId)
 			, isLoop(a_isLoop)
+			, waitTime(a_waitTime)
 		{
 		};
 
 		EfkEffectKey()
-			: EfkEffectKey("", false)
+			: EfkEffectKey("", false, 0.0f)
 		{
 
 		}
@@ -3157,6 +3171,36 @@ namespace Component
 		static constexpr TypeID kTypeId = 152;
 		static constexpr const char* kTypeName = "GameOverTarget";
 		static constexpr int kVersion = 0;
+	};
+
+	struct BossTag
+	{
+		static constexpr TypeID kTypeId = 153;
+		static constexpr const char* kTypeName = "BossTag";
+		static constexpr int kVersion = 0;
+
+		BossTag()
+		{
+		}
+	};
+
+	struct SoundKey
+	{
+		static constexpr TypeID kTypeId = 154;
+		static constexpr const char* kTypeName = "SoundEffect";
+		static constexpr int kVersion = 0;
+
+
+		bool isLoop;
+		float waitTime;
+		std::string soundKey;
+
+		SoundKey(bool a_isLoop,float a_waitTime, std::string a_soundKey)
+			: isLoop(a_isLoop)
+			, waitTime(a_waitTime)	
+			, soundKey(a_soundKey)
+		{
+		}
 	};
 }
 

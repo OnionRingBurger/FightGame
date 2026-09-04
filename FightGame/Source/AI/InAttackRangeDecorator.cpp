@@ -63,7 +63,7 @@ bool InAttackRangeDecorator::CheckCondition(AIContext& context, const AIBlackboa
 
 		// UŒ‚Šp‚æ‚èŠO‚É‚¢‚½ê‡ê‡”²‚¯‚é
 
-		if (halfAttackAngle / 5.0f < toPlayerAngle)
+		if (halfAttackAngle / 5.0f < toPlayerAngle && halfAttackAngle < 180.0f)
 		{
 			continue;
 		}

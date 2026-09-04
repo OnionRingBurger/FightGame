@@ -38,7 +38,9 @@ constexpr const char* kAttackDataPath = "Assets/Data/AttackData.json";
 
 constexpr const char* kTestEffect = "Freeze.efk";
 
-// #define CREATEGAME "Game"
+constexpr const char* kSoundAssetPath = "Assets/Sound/";
+
+// #define CREATEGAME
 
 // グリッドサイズ(デバッグ用
 static const int	DEBUG_GRID_NUM		= 10;			// グリッド中心から端までの線の本数

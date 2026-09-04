@@ -23,3 +23,5 @@ void UpdateEfkEffectSystem(Chunk& a_chunk, const SystemContext& a_context);
 void UILerpSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void StartUISystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void SoundSystem(Chunk& a_chunk, const SystemContext& a_context);

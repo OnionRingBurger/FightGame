@@ -732,6 +732,25 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		}
 	};
 
+	// !!!New!!!
+	auto drawSectorMesh = [&](Entity a_entity, float a_progress, float3 a_color)
+	{
+		const ComponentHandle<AttackTelegraph> telegraph = a_chunk.GetComponent<AttackTelegraph>(a_entity);
+		if (!telegraph.IsValid() || telegraph.Look().sectorKey.empty()) return;
+
+		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(a_entity);
+		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(a_entity);
+		if (!pos.IsValid() || !rot.IsValid()) return;
+
+		DirectX::XMFLOAT4X4 world;
+		const float3 floatPos(pos.Look().x, pos.Look().y, pos.Look().z);
+		const float3 floatScale(1.0f, 1.0f, 1.0f);
+		const float3 floatRot(rot.Look().pitch * RAD, rot.Look().yaw * RAD, rot.Look().roll * RAD);
+		DrawMatrix::CreateWorldMatrix(world, floatPos, floatScale, floatRot, true);
+		Geometory::SetWorld(world);
+		Geometory::DrawSector(telegraph.Look().sectorKey, a_progress, a_color);
+	};
+
 	// “–‚½‚è”»’è•`‰æ
 	ComponentView sectorView = a_chunk.GetView<ComponentTypes<SectorHitJudge, Position, Rotation>>();
 	for (auto sectorIt : sectorView)
@@ -751,6 +770,15 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 			pos.Look().z,
 			rot.Look().yaw,
 			attackColor);
+
+		// !!!New!!!
+		float progress = 1.0f;
+		const ComponentHandle<AttackInstance> attackInstance = a_chunk.GetComponent<AttackInstance>(sectorIt);
+		if (attackInstance.IsValid() && attackInstance.Look().maxDuration > 0.0f)
+		{
+			progress = attackInstance.Look().elapsedTime / attackInstance.Look().maxDuration;
+		}
+		drawSectorMesh(sectorIt, progress, float3(0.95, 0.2, 0.2));
 	}
 
 	// ”»’è•\Ž¦‚ð•`‰æ
@@ -762,6 +790,8 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		const ComponentHandle<AttackTelegraph> telegraph = a_chunk.GetComponent<AttackTelegraph>(telegraphEntity);
 		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(telegraphEntity);
 		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(telegraphEntity);
+
+		const ComponentHandle<AttackStatus> status = a_chunk.GetComponent<AttackStatus>(startupIt);
 
 		drawSectorLines(
 			telegraph.Look().minLength,
@@ -776,16 +806,17 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 			attackColor);
 
 		// !!!New!!!
-		if (!telegraph.Look().sectorKey.empty())
+		float progress = 0.0f;
+		if (startup.Look().startupDuration > 0.0f)
 		{
-			DirectX::XMFLOAT4X4 world;
-			const float3 floatPos(pos.Look().x, pos.Look().y, pos.Look().z);
-			const float3 floatScale(1.0f, 1.0f, 1.0f);
-			const float3 floatRot(rot.Look().pitch * RAD, rot.Look().yaw * RAD, rot.Look().roll * RAD);
-			DrawMatrix::CreateWorldMatrix(world, floatPos, floatScale, floatRot, true);
-			Geometory::SetWorld(world);
-			float progress = startup.Look().elapsedTime / startup.Look().startupDuration;
-			Geometory::DrawSector(telegraph.Look().sectorKey, progress, float3(0.8, 0.7, 0.3));
+			progress = startup.Look().elapsedTime / startup.Look().startupDuration;
 		}
+
+		float3 defaultColor = float3(0.6, 0.6, 0.3);
+		float3 attackPowerColor = float3(0.9, 0.4, 0.02);
+		float damageRate = status.Look().attackPowers.at(startup.Look().attackIndex).damageValue / 4.0f;
+		damageRate = std::clamp(damageRate, 0.0f, 1.0f);
+		float3 color = defaultColor * (1.0f - damageRate) + attackPowerColor * damageRate;
+		drawSectorMesh(telegraphEntity, progress, color);
 	}
 }

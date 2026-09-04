@@ -42,8 +42,12 @@ bool IsActionAllowed(Chunk& a_chunk, Entity a_entity, Component::ActionFlag a_fl
 
 void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity);
 
+void ClearCharacterAttackOnDeath(Chunk& a_chunk, Entity a_entity);
+
 void NewEnemySpawn(ComponentsSerialize& a_serialize,Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName);
 
 void RegisterAllAttackSectorsFromAttackData(int a_circumferenceCount);
+
+void AddShakeEffect(Chunk& a_chunk, Entity a_entity, float3 a_power, float3 a_amp, float a_time, float a_rate);
 
 void SafeDeleteEffectEntity(Chunk& a_chunk, Entity a_effect);

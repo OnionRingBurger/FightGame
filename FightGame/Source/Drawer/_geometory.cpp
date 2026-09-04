@@ -110,8 +110,9 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 	// ’¸“_”‚ğŒvZ
 	int vertexCount = 0;
 	int outsideVertexCount = circumferenceCount;
-	float insideRate = (maxLength - minLength) / maxLength;
-	int insideVertexCount = std::max((int)(circumferenceCount * insideRate), 1);
+	float insideRate = 1.0f - ((maxLength - minLength) / maxLength);
+	insideRate = 0.3f + (angle / 360.0f) * 0.7f;
+	int insideVertexCount = std::max((int)(circumferenceCount * insideRate), 2);
 	
 	maxLowness *= -1.0f;
 
@@ -169,7 +170,7 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 	const int innerTopBase = outsideVertexCount * 2;
 	const int innerBottomBase = outsideVertexCount * 2 + insideVertexCount;
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		int outsideVertexProgress = i * outsideVertexCount;
 		int insideVertexProgress = i * insideVertexCount;

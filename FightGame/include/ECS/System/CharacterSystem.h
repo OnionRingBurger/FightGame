@@ -9,6 +9,8 @@
 
 void HitPointSystem(Chunk& a_chunk, SystemContext& a_context);
 
+void CharacterKill(Chunk& a_chunk, Entity killEntity);
+
 // Ú’n”»’è
 void GroundedSystem(Chunk& a_chunk, const SystemContext& a_context);
 
