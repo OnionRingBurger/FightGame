@@ -22,8 +22,9 @@ CreateGameWorld::CreateGameWorld(IModelCacheAcquisition& a_modelCache,
 		a_input,
 		a_serialize
 	),
+	name(startWorld),
 	isSave(false),
-	name(startWorld)
+	isLoad(false)
 {
 	
 }
@@ -156,6 +157,15 @@ void CreateGameWorld::InitResponse(std::unique_ptr<SystemResponse>& response)
 
 void CreateGameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
+	// !!!New!!!
+	if (isLoad)
+	{
+		isLoad = false;
+		LoadJsonComponent(a_chunk, a_serialize, name);
+		CreateDebugComponent(a_chunk);
+		return;
+	}
+
 	if (isSave)
 	{
 		std::ifstream ifstream = std::ifstream(kDataPath);
@@ -174,6 +184,7 @@ void CreateGameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, Syst
 		{
 			of << json.dump(4);
 		}
+		isSave = false;
 		CreateDebugComponent(a_chunk);
 		return;
 	}
@@ -196,10 +207,18 @@ void CreateGameWorld::HandleSystemResponse(SystemResponse& a_response)
 {
 	DebugSystemResponse& response = dynamic_cast<DebugSystemResponse&>(a_response);
 	isSave = false;
+	isLoad = false;
 
 	if (response.IsSave())
 	{
 		isSave = true;
+	}
+
+	// !!!New!!!
+	if (response.IsLoad())
+	{
+		isLoad = true;
+		name = response.GetKey();
 	}
 }
 

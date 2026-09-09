@@ -14,10 +14,17 @@ public:
 
 	virtual void ResetRequest() override;
 
-	void SaveRequest();
+	void SaveRequest(std::string a_key);
 	bool IsSave();
+
+	// !!!New!!!
+	void LoadRequest(std::string a_key);
+	bool IsLoad();
+	const std::string& GetKey() const;
 
 private:
 	bool isSave;
-	
+	// !!!New!!!
+	bool isLoad;
+	std::string key;
 };

@@ -28,5 +28,7 @@ private:
 	std::string name;
 
 	bool isSave;
+	// !!!New!!!
+	bool isLoad;
 };
 

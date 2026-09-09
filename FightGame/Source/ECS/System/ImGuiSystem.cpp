@@ -2,6 +2,11 @@
 #include "Components.h"
 #include "DebugSystemResponse.h"
 #include "imGui/imgui.h"
+#include "Defines.h"
+#include "json.hpp"
+#include <fstream>
+#include <vector>
+#include <string>
 
 using namespace Component;
 
@@ -21,29 +26,69 @@ void ImGuiSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 void SaveWorldSystem(Chunk& a_chunk, const SystemContext& a_context, SystemResponse& response)
 {
-	
-
 	ImGui::SetNextWindowPos(ImVec2(50.0f, 600.0f), ImGuiCond_Once);
-	ImGui::SetNextWindowSize(ImVec2(200.0f, 200.0f), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(220.0f, 220.0f), ImGuiCond_Once);
 	ImGui::Begin("Test");
 
-	if (!ImGui::Button("SaveEntity", ImVec2(150.0f, 30.0f)))
+	// !!!New!!!
+	static int selectedKey = 0;
+	std::vector<std::string> keyStorage;
+	std::vector<const char*> keyPtrs;
 	{
-		ImGui::End();
-		return;
+		std::ifstream ifs(kDataPath);
+		if (ifs.is_open())
+		{
+			nlohmann::json json;
+			ifs >> json;
+			for (auto it = json.begin(); it != json.end(); ++it)
+			{
+				if (it.value().is_array())
+				{
+					keyStorage.push_back(it.key());
+				}
+			}
+		}
+	}
+	for (auto& key : keyStorage)
+	{
+		keyPtrs.push_back(key.c_str());
+	}
+	if (selectedKey < 0 || selectedKey >= (int)keyPtrs.size())
+	{
+		selectedKey = 0;
+	}
+	if (!keyPtrs.empty())
+	{
+		ImGui::Combo("DataKey", &selectedKey, keyPtrs.data(), (int)keyPtrs.size());
 	}
 
+	const std::string selectedName = keyPtrs.empty() ? std::string("Stage1Phase1") : keyStorage[(size_t)selectedKey];
 	DebugSystemResponse& debugSystemResponse = dynamic_cast<DebugSystemResponse&>(response);
-	debugSystemResponse.SaveRequest();
 
-	ComponentView view = a_chunk.GetView<ComponentTypes<DebugEntityTag>>();
-	for (auto it : view)
+	if (ImGui::Button("SaveEntity", ImVec2(150.0f, 30.0f)))
 	{
-		a_chunk.DeleteChunkEntity(it);
+		debugSystemResponse.SaveRequest(selectedName);
+
+		ComponentView view = a_chunk.GetView<ComponentTypes<DebugEntityTag>>();
+		for (auto it : view)
+		{
+			a_chunk.DeleteChunkEntity(it);
+		}
+	}
+
+	// !!!New!!!
+	if (ImGui::Button("LoadEntity", ImVec2(150.0f, 30.0f)))
+	{
+		debugSystemResponse.LoadRequest(selectedName);
+
+		std::vector<Entity> entities = a_chunk.GetAllEntity();
+		for (auto it : entities)
+		{
+			a_chunk.DeleteChunkEntity(it);
+		}
 	}
 
 	ImGui::End();
-	
 }
 
 void UndoWorldSystem(Chunk& a_chunk, const SystemContext& a_context)
