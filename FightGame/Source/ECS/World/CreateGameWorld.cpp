@@ -7,7 +7,7 @@
 #include "DebugSystemResponse.h"
 
 #include "Defines.h"
-constexpr const char* startWorld = "testEntities";
+constexpr const char* startWorld = "Stage1Phase2";
 
 CreateGameWorld::CreateGameWorld(IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
@@ -23,7 +23,7 @@ CreateGameWorld::CreateGameWorld(IModelCacheAcquisition& a_modelCache,
 		a_serialize
 	),
 	isSave(false),
-	name("Stage1Boss1")
+	name(startWorld)
 {
 	
 }
@@ -37,24 +37,24 @@ Chunk CreateGameWorld::CreateNewChunk(AIManager& a_aiManager)
 	std::unique_ptr<ComponentsSerialize> serialize = std::make_unique<ComponentsSerialize>();
 	TestRegisterComponentType(*serialize);
 
-	LoadJsonComponent(newChunk, *serialize, "Stage1Boss1");
+	LoadJsonComponent(newChunk, *serialize, startWorld);
 	
 
 	CreateDebugComponent(newChunk);
 
 
-	//Entity debugEnemy = newChunk.CreateNewEntity(
+	//Entity debugEnemy1 = newChunk.CreateNewEntity(
 	//	// タグ 
-	//	Name("Enemy1"),
+	//	Name("Enemy2"),
 	//	EnemyTag(),
 	//	ClearTarget(),
 	//	// 移動系
 	//	MOVE_AND_TRANSFORM_COMPONENT(
-	//		float3(0.0f, 0.0f, -3.0f),
-	//		float3(0.0f, 0.0f, 0.0f),
+	//		float3(5.0f, 90.5f, 3.0f) + kDefaultWorldPosition,
+	//		float3(0.0f, 180.0f, 0.0f),
 	//		float3(1.0f, 1.0f, 1.0f)
 	//	),
-	//	InputMove(float2(0.06f, 0.06f)),
+	//	InputMove(float2(0.12f, 0.12f)),
 	//	MoveInputResult(),
 	//	InputSource(InputOrigin::AI),
 	//	LookMove(480.0f / 60.0f),
@@ -65,35 +65,84 @@ Chunk CreateGameWorld::CreateNewChunk(AIManager& a_aiManager)
 	//	BoxCollider(float3(0.0f, 2.0f, 0.0f), float3(1.0, 5.0f, 1.0f)),
 	//	OBBCollider(),
 	//	// AI、ステート
-	//	AIRole(4.0f, 3.0f, 1.2f, 7.0f),
+	//	AIRole(50.0f, 3.0f, 300.0f, 1.0f),
 	//	GroundedState(),
 	//	DeadState(),
 	//	ActionMask(),
 	//	InterferenceResult(),
 	//	// ゲームルール
-	//	HitPoint(22.0f),
-	//	AttackKeyLoad({
-	//		"Boss1Attack1",
-	//		"Boss1Attack2"
-	//		}),
-	//		AttackHitRecord(),
-	//		// モデル
+	//	HitPoint(12.0f),
+	//	AttackKeyLoad({ "Enemy2Attack1" }),
+	//	AttackHitRecord(),
+	//	// モデル
 	//	ModelKey("Box"),
-	//	GhostAreaComponent(2.0f),
-	//	AlphaBlendComponent("White", "Green")
-	//	);
+	//	AlphaBlendComponent("Red", "Purple"),
+	//	EntryAction(120.0f)
+	//);
+
+	//Entity debugEnemy2 = newChunk.CreateNewEntity(
+	//	// タグ 
+	//	Name("Enemy3"),
+	//	EnemyTag(),
+	//	ClearTarget(),
+	//	// 移動系
+	//	MOVE_AND_TRANSFORM_COMPONENT(
+	//		float3(-5.0f, 90.5f, 2.0f) + kDefaultWorldPosition,
+	//		float3(0.0f, 180.0f, 0.0f),
+	//		float3(1.0f, 1.0f, 1.0f)
+	//	),
+	//	InputMove(float2(0.12f, 0.12f)),
+	//	MoveInputResult(),
+	//	InputSource(InputOrigin::AI),
+	//	LookMove(480.0f / 60.0f),
+	//	PoseRotState(POSE_ROT_LOOKMOVE),
+	//	Velocity(),
+	//	// 当たり判定
+	//	HitInfomation(),
+	//	BoxCollider(float3(0.0f, 2.0f, 0.0f), float3(1.0, 5.0f, 1.0f)),
+	//	OBBCollider(),
+	//	// AI、ステート
+	//	AIRole(50.0f, 3.0f, 300.0f, 1.0f),
+	//	GroundedState(),
+	//	DeadState(),
+	//	ActionMask(),
+	//	InterferenceResult(),
+	//	// ゲームルール
+	//	HitPoint(12.0f),
+	//	AttackKeyLoad({ "Enemy2Attack1" }),
+	//	AttackHitRecord(),
+	//	// モデル
+	//	ModelKey("Box"),
+	//	AlphaBlendComponent("Red", "Purple"),
+	//	EntryAction(120.0f)
+	//);
 
 
-	//Entity enemyHp = newChunk.CreateNewEntity(
+	//Entity enemyHp1 = newChunk.CreateNewEntity(
+	//	Name("EnemyHP1"),
 	//	MOVE_AND_TRANSFORM_COMPONENT(
 	//		float3(0.0f, 1.0f, 0.0f),
 	//		float3(0.0f, 0.0f, 0.0f),
 	//		float3(1.0f, 1.0f, 1.0f)
 	//	),
-	//	FollowPosition(float3(0.0f, 0.8f, 0.0f), debugEnemy, FOLLOW_POS_LOCALOFFSET),
+	//	FollowPosition(float3(0.0f, 0.8f, 0.0f), debugEnemy1, FOLLOW_POS_LOCALOFFSET),
 	//	PosePosState(POSE_POS_FOLLOW),
 	//	UIComponent("UIGauge", float2(0.0f, 0.0f), float2(1.0f, 0.1f), 0.0f),
-	//	HPGaugeUI(debugEnemy, float2(0.0f, 0.0f), float2(1.0f, 0.08f)),
+	//	HPGaugeUI(debugEnemy1, float2(0.0f, 0.0f), float2(1.0f, 0.08f)),
+	//	SpriteComponent(float3(), float3(), true)
+	//);
+
+	//Entity enemyHp2 = newChunk.CreateNewEntity(
+	//	Name("EnemyHP2"),
+	//	MOVE_AND_TRANSFORM_COMPONENT(
+	//		float3(0.0f, 1.0f, 0.0f),
+	//		float3(0.0f, 0.0f, 0.0f),
+	//		float3(1.0f, 1.0f, 1.0f)
+	//	),
+	//	FollowPosition(float3(0.0f, 0.8f, 0.0f), debugEnemy2, FOLLOW_POS_LOCALOFFSET),
+	//	PosePosState(POSE_POS_FOLLOW),
+	//	UIComponent("UIGauge", float2(0.0f, 0.0f), float2(1.0f, 0.1f), 0.0f),
+	//	HPGaugeUI(debugEnemy2, float2(0.0f, 0.0f), float2(1.0f, 0.08f)),
 	//	SpriteComponent(float3(), float3(), true)
 	//);
 

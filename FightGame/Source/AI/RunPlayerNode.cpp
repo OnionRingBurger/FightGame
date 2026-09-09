@@ -16,6 +16,8 @@ Node::Status RunPlayerNode::Tick(AIContext& context, const AIBlackboard& blackBo
 		result.IsMove = false;
 		result.UseAttack = false;
 		result.AttackIndex = 0;
+		result.Magnitube = 0.0f;
+		result.UseGuard = false;
 	
 		// ƒvƒŒƒCƒ„[‚ª€‚ñ‚Å‚¢‚½ê‡¸”s
 		if (blackBord.isPlayerDead)
@@ -47,6 +49,7 @@ Node::Status RunPlayerNode::Tick(AIContext& context, const AIBlackboard& blackBo
 		{
 			result.MoveDir = float2(dir.x * -1.0f, dir.y * -1.0f);
 			result.IsMove = true;
+			result.Magnitube = 1.0f;
 		}
 	
 		// ’ÇÕŒp‘±

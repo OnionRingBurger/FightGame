@@ -10,13 +10,33 @@
 #include "Sound.h"
 #include "Effekseer.h"
 #include "DebugConsole.h"
+// TODO ãÍì˜ÇÃçÙ
+#include "UICache.h"
+#include <wrl/client.h>
 
 using modelLoadData = std::pair<std::string, float>;
+using Microsoft::WRL::ComPtr;
 
 struct effectLoadData
 {
 	std::string key;
 	float magnificent;
+};
+
+struct textFormatData
+{
+	std::string key;
+	std::wstring font;
+	float size;
+};
+
+struct textUILoadData
+{
+	std::string key;
+	std::wstring text;
+	std::string formatKey;
+	float width;
+	float height;
 };
 
 struct ModelLoadJob
@@ -87,6 +107,55 @@ struct SoundLoadJob
 	};
 };
 
+struct TextFormatLoadJob
+{
+	std::shared_ptr<std::atomic_bool> const endFlagPointer;
+
+	std::string key;
+	std::wstring font;
+	float size;
+
+	TextFormatLoadJob(
+		std::string a_key,
+		std::wstring a_font,
+		float a_size,
+		std::shared_ptr<std::atomic_bool> const a_endFlagPointer)
+		: key(a_key)
+		, font(a_font)
+		, size(a_size)
+		, endFlagPointer(a_endFlagPointer)
+	{
+	};
+};
+
+struct TextUILoadJob
+{
+	std::shared_ptr<std::atomic_bool> const endFlagPointer;
+
+	std::string key;
+	std::wstring text;
+	std::string formatKey;
+	float width;
+	float height;
+
+	TextUILoadJob(
+		std::string a_key,
+		std::wstring a_text,
+		std::string a_formatKey,
+		float a_width,
+		float a_height,
+		std::shared_ptr<std::atomic_bool> const a_endFlagPointer
+	)
+		: key(a_key)
+		, text(a_text)
+		, formatKey(a_formatKey)
+		, width(a_width)
+		, height(a_height)
+		, endFlagPointer(a_endFlagPointer)
+	{
+	}
+};
+
 struct ModelLoadResult
 {
 	std::string key;
@@ -149,8 +218,50 @@ struct EffectLoadResult
 	}
 };
 
+struct TextFormatLoadResult
+{
+	std::string key;
+	ComPtr<IDWriteTextFormat> format;
+
+	TextFormatLoadResult()
+		: key("")
+		, format(nullptr)
+	{
+
+	}
+
+	TextFormatLoadResult(std::string a_key, ComPtr<IDWriteTextFormat> a_format)
+		: key(a_key)
+		, format(a_format)
+	{
+	}
+};
+
+
+// TextureLoadResultÇ∆ìØÇ∂ÇæÇ™ÅAïœçXÇµÇ‚Ç∑Ç¢ÇΩÇﬂï ç\ë¢ëÃÇ÷ï™ÇØÇƒÇÈ
+struct TextUILoadResult
+{
+	std::string key;
+	std::shared_ptr<Texture> data;
+
+	TextUILoadResult(std::string a_key, std::shared_ptr<Texture> a_data)
+		: key(a_key)
+		, data(a_data)
+	{
+	}
+
+	TextUILoadResult()
+		: key()
+		, data(nullptr)
+	{
+	}
+
+};
+
 void LoadSound();
 
 ModelLoadResult LoadModel(const ModelLoadJob& job);
 TextureLoadResult LoadTexture(const TextureLoadJob& job);
 EffectLoadResult LoadEffect(const EffectLoadJob& job);
+TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job);
+TextUILoadResult LoadTextUI(const TextUILoadJob& a_job, const IUICacheAcquisition& a_cache);

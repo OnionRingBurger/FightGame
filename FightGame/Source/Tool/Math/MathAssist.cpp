@@ -249,6 +249,15 @@ float NormalizeAngle(float radAngle)
 	return radAngle;
 }
 
+float3 NormalizeAngle(float3 radAngle)
+{
+	return float3(
+		NormalizeAngle(radAngle.x),
+		NormalizeAngle(radAngle.y),
+		NormalizeAngle(radAngle.z)
+	);
+}
+
 float DeltaDeg(float a_fromDeg, float a_toDeg)
 {
 	// !!!New!!!
@@ -383,6 +392,11 @@ float Noise(float a_time)
 float Lerp(float a_start, float a_end, float a_rate)
 {
 	return (a_end - a_start) * a_rate + a_start;
+}
+
+float3 Lerp(float3 start, float3 end, float rate)
+{
+	return float3(Lerp(start.x, end.x, rate), Lerp(start.y, end.y, rate), Lerp(start.z, end.z, rate));
 }
 
 float NormalizeLength(const float x, const float y, const float z)

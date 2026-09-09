@@ -2,35 +2,10 @@
 #include "Components.h"
 #include "SystemAssist.h"
 #include "Sound.h"
+#include "Defines.h"
 
 using namespace Component;
 
-void PlayerWalkSystem(Chunk& a_chunk, const SystemContext& a_context)
-{
-	//ComponentView view = a_chunk.GetView<ComponentTypes<PlayerTag, ShakingComponent, InputMove>>();
-
-	//for (auto it : view)
-	//{
-	//	ComponentHandle<ShakingComponent> shaking = a_chunk.GetComponent<ShakingComponent>(it);
-	//	const ComponentHandle<InputMove> inputMove = a_chunk.GetComponent<InputMove>(it);
-	//	ComponentHandle<PlayerWalkTimer> timer = a_chunk.GetComponent<PlayerWalkTimer>(it);
-	//	shaking->isWait = !inputMove.Look().isInput;
-	//	if (timer.IsValid())
-	//	{
-	//		timer->time = std::clamp(timer.Look().time - a_context.deltaTime, 0.0f, timer.Look().maxTime);
-
-	//		if ((inputMove.Look().isInput) &&
-	//			shaking.Look().shankingDegree <= -1.0f &&
-	//			timer.Look().time <= 0.0f)
-	//		{
-	//			timer->time = timer.Look().maxTime;
-	//			PlaySound(LoadSound("Assets/Sound/walk.mp3"));
-	//		}
-
-	//	}
-
-	//}
-}
 
 void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response)
 {
@@ -78,9 +53,7 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRes
 
 void PlayerJumpSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
-	if (!a_context.input.IsRegisterTrigger("Jump")) return;
-
-	ComponentView view = a_chunk.GetView<ComponentTypes<PlayerTag, ActionMask, JumpPower>>();
+	ComponentView view = a_chunk.GetView<ComponentTypes<PlayerTag, MoveInputResult, ActionMask, JumpPower>>();
 
 	for (auto it : view)
 	{
@@ -88,6 +61,9 @@ void PlayerJumpSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		const ComponentHandle<JumpAction> jump = a_chunk.GetComponent<JumpAction>(it);
 		if (jump.IsValid()) continue;
+
+		const ComponentHandle<MoveInputResult> result = a_chunk.GetComponent<MoveInputResult>(it);
+		if (!result.Look().useJump) continue;
 
 		// UŒ‚’†‚¾‚Á‚½ê‡ƒLƒƒƒ“ƒZƒ‹‚·‚é
 		CancelPlayerAttackIfAble(a_chunk, it);
@@ -104,5 +80,10 @@ void PlayerJumpSystem(Chunk& a_chunk, const SystemContext& a_context)
 		velocity->x = jumpPower.Look().initialVelocity.x;
 		velocity->y = jumpPower.Look().initialVelocity.y;
 		velocity->z = jumpPower.Look().initialVelocity.z;
+
+		std::string path = kSoundAssetPath;
+		path += "jump.mp3";
+
+		PlaySound(LoadSound(path.c_str()));
 	}
 }

@@ -86,7 +86,7 @@ void GameScene::ChangeState()
 		else if(input.IsRegisterTrigger("IMGUI"))
 		{
 #ifdef _DEBUG
-			setFixedCursor(true);
+			setFixedCursor(false);
 			state = GAMESCENE_IMGUI;
 			world->ChangeState(IMGUI);
 

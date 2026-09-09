@@ -167,11 +167,7 @@ void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResp
 		if (!dead.Look().isDead) continue;
 
 		a_chunk.DeleteChunkComponent(it, DeadState::kTypeId);
-		a_chunk.DeleteChunkComponent(it, BoxCollider::kTypeId);
-		a_chunk.DeleteChunkComponent(it, OBBCollider::kTypeId);
-		a_chunk.DeleteChunkComponent(it, EnemyShooter::kTypeId);
-		a_chunk.DeleteChunkComponent(it, MoveForward::kTypeId);
-		a_chunk.DeleteChunkComponent(it, RailFly::kTypeId);
+
 		
 		// 画面エフェクトを出す
 		a_response.AddStopTime(6.0f, 6.0f, 0.03f);
@@ -204,6 +200,15 @@ void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResp
 		{
 			a_chunk.AddComponent(it, LifeTime(6.0f));
 		}
+		
+
+		Entity finalEffectTime = a_chunk.CreateNewEntity(
+			ClearTarget(),
+			LifeTime(50.0f)
+		);
+
+		a_chunk.AddComponent(it, EfkEffectArea(std::vector<std::string>{kHitEffect}, std::vector<std::string>{"finalalive"}, 0.2f, 2.5f, 1.0f));
+		a_chunk.AddComponent(it, LifeTimeEndEffect(false, "", true, kDeadBrokenEffectKey));
 	}
 
 }
@@ -218,10 +223,7 @@ void BossDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRespo
 		if (!dead.Look().isDead) continue;
 
 		a_chunk.DeleteChunkComponent(it, DeadState::kTypeId);
-		a_chunk.DeleteChunkComponent(it, BoxCollider::kTypeId);
-		a_chunk.DeleteChunkComponent(it, OBBCollider::kTypeId);
-		a_chunk.DeleteChunkComponent(it, MoveForward::kTypeId);
-		a_chunk.DeleteChunkComponent(it, RailFly::kTypeId);
+
 
 		// 画面エフェクトを出す
 		a_response.AddStopTime(6.0f, 6.0f, 0.03f);
@@ -231,8 +233,18 @@ void BossDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRespo
 		
 		AddShakeEffect(a_chunk, camera, shakePower, shakeAmp, shakeTime, 0.5f);
 
+		// ResetSound();
+
 		Entity sound = a_chunk.CreateNewEntity(
-			SoundKey(false, 280.0f * 0.03f, "enemydead")
+			SoundKey(false, 300.0f * 0.03f, "bossdead")
+		);
+
+		Entity sound2 = a_chunk.CreateNewEntity(
+			SoundKey(false, 300.0f * 0.03f, "bossdead2")
+		);
+
+		Entity sound3 = a_chunk.CreateNewEntity(
+			SoundKey(false, 300.0f * 0.03f, "dead2")
 		);
 
 		// 振動、一時停止を追加
@@ -257,6 +269,16 @@ void BossDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRespo
 		{
 			a_chunk.AddComponent(it, LifeTime(300.0f * 0.03f));
 		}
+
+		Entity finalEffectTime = a_chunk.CreateNewEntity(
+			ClearTarget(),
+			LifeTime(360.0f * 0.03f + 60.0f)
+		);
+
+		// エフェクトを生成
+		a_chunk.AddComponent(it, EfkEffectArea({ kHitEffect }, std::vector<std::string>{"finalalive", "finalalive2", "finalalive3"}, 0.5f, 15.0f * 0.03f, 1.05f));
+		a_chunk.AddComponent(it, LifeTimeEndEffect(false, "", true, kBossDeadBrokenEffectKey));
+
 	}
 }
 

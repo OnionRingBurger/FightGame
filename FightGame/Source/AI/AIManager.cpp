@@ -85,8 +85,12 @@ void AIManager::WriteSystem(const AISystemInfo& a_systemInfo)
 	systemInfo = a_systemInfo;
 }
 
+
+// TODO 攻撃終了処理を時間がある時に良い感じにまとめる
+// 自身の攻撃終了結果を受け取る
 void AIManager::NotifyAttackResolved(Entity attacker, int attackIndex, bool connected)
 {
+
 	// !!!New!!!
 	const auto it = runtimeMap.find(attacker);
 	if (it == runtimeMap.end())
@@ -115,7 +119,8 @@ void AIManager::NotifyAttackResolved(Entity attacker, int attackIndex, bool conn
 	}
 }
 
-void AIManager::NotifyHitResolved(Entity hitEnemy)
+// 攻撃的中時用
+void AIManager::NotifyHitResolved(Entity hitEnemy, bool isGuard)
 {
 	auto it = runtimeMap.find(hitEnemy);
 	if (it == runtimeMap.end())
@@ -125,9 +130,14 @@ void AIManager::NotifyHitResolved(Entity hitEnemy)
 
 	AIMind& mind = it->second.mind;
 
-	mind.sameAttackStreak++;
-
+	mind.sameTakenCount++;
+	if (isGuard)
+	{
+		mind.sameGuardCount++;
+	}
 }
+
+
 
 void AIManager::TickAI()
 {
@@ -146,6 +156,7 @@ void AIManager::TickAI()
 
 		runtime.result.MoveDir = float2(0.0f, 0.0f);
 		runtime.result.UseAttack = false;
+		runtime.result.UseGuard = false;
 		runtime.result.AttackIndex = 0;
 
 		// 更新を行う

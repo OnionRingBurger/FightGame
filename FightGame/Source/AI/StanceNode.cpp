@@ -42,6 +42,8 @@ Node::Status StanceNode::Tick(AIContext& context, const AIBlackboard& blackBoard
 		mind.attackMissCount = 0;
 		mind.attackSuccessCount = 0;
 		mind.sameAttackStreak = 0;
+		mind.sameTakenCount = 0;
+		mind.sameGuardCount = 0;
 	}
 
 	// 方針が存在しない場合失敗を返す
@@ -68,7 +70,9 @@ float StanceNode::GetNewUpdatePoint(const AIBlackboard& blackBoard, const AIMind
 	float points = mind.updatePoints;
 	// 時間経過による増加
 	points += systemInfo.tickDelta;
-	// TODO 他にも書く
+
+	// ガード数に応じてより早く更新する
+	points += mind.sameGuardCount * systemInfo.tickDelta * 1.5f;
 
 	return points;
 
@@ -100,7 +104,7 @@ AIStance StanceNode::GetNewStance(const AIContext& context, const AIBlackboard& 
 	}
 
 	// Evidence 未配線のため仮値（0=被弾なし、成功も未計測）
-	const int hitTakenCount = mind.sameAttackStreak;
+	const int hitTakenCount = mind.sameTakenCount - mind.sameGuardCount;
 	const int attackSuccessCount = mind.attackSuccessCount;
 
 	// 各係数を作成
@@ -124,6 +128,11 @@ AIStance StanceNode::GetNewStance(const AIContext& context, const AIBlackboard& 
 	// 攻撃成功の多さ（未配線のため常に ScoreByHitCount(0)=1 寄り）
 	const float manySuccess = 1.0f - ScoreByHitCount(attackSuccessCount, hitCoeff);
 
+	// 様子見、攻撃、
+	const float probeContinuePowRate = 1.5f;
+	const float holdContinuePowRate = 0.6f;
+	const float escapeContinuePowRate = 2.5f;
+
 
 
 	// 各要素をかけてスコアを算出
@@ -143,13 +152,13 @@ AIStance StanceNode::GetNewStance(const AIContext& context, const AIBlackboard& 
 	switch (mind.stance)
 	{
 	case AIStance::NeutralProbe:
-		scoreProbe *= stanceContinue;
+		scoreProbe *= std::pow(stanceContinue, probeContinuePowRate);
 		break;
 	case AIStance::HoldAdvantage:
-		scoreHold *= stanceContinue;
+		scoreHold *= std::pow(stanceContinue, holdContinuePowRate);
 		break;
 	case AIStance::EscapeDisadvantage:
-		scoreEscape *= stanceContinue;
+		scoreEscape *= std::pow(stanceContinue, escapeContinuePowRate);
 		break;
 	case AIStance::NoneStance:
 	default:
@@ -177,6 +186,8 @@ AIStance StanceNode::GetNewStance(const AIContext& context, const AIBlackboard& 
 		newStance = AIStance::EscapeDisadvantage;
 	}
 
+	DebugConsole::SetDrawPos(15, 16);
+	std::cout << "スタンス" << (int)newStance << std::endl;
 	return newStance;
 }
 

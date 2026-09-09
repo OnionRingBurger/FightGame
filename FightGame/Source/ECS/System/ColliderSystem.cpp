@@ -392,7 +392,7 @@ void ColliderBackSystem(Chunk& a_chunk, const SystemContext& a_context)
 		if (info.Look().hitResults.size() >= 2)
 		{
 			int breakP;
-			breakP = info.Look().hitResults.size();
+			breakP = (int)info.Look().hitResults.size();
 		}
 
 		for (const auto& hitInfoIt : info.Look().hitResults)

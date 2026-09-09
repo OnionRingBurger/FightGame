@@ -5,7 +5,8 @@
 #include "MathAssist.h"
 
 // !!!New!!!
-ChasePlayerAction::ChasePlayerAction()
+ChasePlayerAction::ChasePlayerAction(float a_magnitube)
+	: magnitube(a_magnitube)
 {
 }
 
@@ -21,6 +22,8 @@ Node::Status ChasePlayerAction::Tick(AIContext& context, const AIBlackboard& bla
 	result.MoveDir = float2(0.0f, 0.0f);
 	result.IsMove = false;
 	result.UseAttack = false;
+	result.UseGuard = false;
+	result.Magnitube = 0.0f;
 	// !!!New!!!
 	result.AttackIndex = 0;
 
@@ -54,32 +57,8 @@ Node::Status ChasePlayerAction::Tick(AIContext& context, const AIBlackboard& bla
 	{
 		result.MoveDir = dir;
 		result.IsMove = true;
+		result.Magnitube = magnitube;
 	}
-
-	// UŒ‚ƒf[ƒ^‚ª–³‚¢ê‡‚ÍUŒ‚‚¹‚¸’ÇÕ‚Ì‚Ý
-	//if (!enemy.attackDatas.empty())
-	//{
-	//	// ‰¼: 0”Ô–Ú‚ÌUŒ‚ƒf[ƒ^‚ÅŽË’ö”»’è
-	//	const AIBlackboard::BBAttackData& attack0 = enemy.attackDatas[0];
-	//	const float minLen = attack0.minLength;
-	//	const float maxLen = attack0.maxLength;
-	//	const bool inRange = (dist >= minLen) && (dist <= maxLen);
-
-	//	const float targetYaw = std::atan2(toPlayer.x, toPlayer.y) * DEG;
-	//	const float yawDelta = std::fabs(DeltaDeg(enemy.rotation, targetYaw));
-	//	// angle ‚Íî‚Ì‘SŠp‘z’èB•Ð‘¤‚Í”¼•ª
-	//	const float halfAngle = attack0.angle * 0.5f;
-	//	const bool facingPlayer = yawDelta <= halfAngle;
-
-	//	if (enemy.canAttack && inRange && facingPlayer)
-	//	{
-	//		result.UseAttack = true;
-	//		result.AttackIndex = 0;
-	//		result.MoveDir = float2(0.0f, 0.0f);
-	//		result.IsMove = false;
-	//		return NODE_SUCCES;
-	//	}
-	//}
 
 	// ’ÇÕŒp‘±
 	if (!enemy.canMove && !enemy.canAttack)

@@ -1,9 +1,15 @@
-#ifndef __DIRECTX_H__
-#define __DIRECTX_H__
+#pragma once
+
 
 #include <d3d11.h>
+#include <d2d1.h>
+#include <dwrite.h>
+#include <wincodec.h>
 
 #pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "dwrite.lib")
+
 
 #include "Effekseer.h"
 #include "EffekseerRendererDX11.h"
@@ -48,6 +54,11 @@ RenderTarget* GetDefaultRTV();
 DepthStencil* GetDefaultDSV();
 Effekseer::ManagerRef GetEffectManager();
 EffekseerRenderer::RendererRef GetEffectRenderer();
+IDWriteFactory* GetDWriteFactory();
+ID2D1Factory* GetD2DFactory();
+IWICImagingFactory* GetWICFactory();
+
+
 
 HRESULT InitDirectX(HWND hWnd, UINT width, UINT height, bool fullscreen);
 void UninitDirectX();
@@ -59,5 +70,3 @@ void SetCullingMode(D3D11_CULL_MODE cull);
 void SetDepthTest(DepthMode);
 void SetBlendMode(BlendMode blend);
 void SetSamplerState(SamplerState state);
-
-#endif

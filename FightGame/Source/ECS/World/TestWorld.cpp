@@ -63,7 +63,7 @@ Chunk TestWorld::CreateNewChunk(AIManager& a_aiManager)
 		//ShakingComponent(false, 0.0f, 0.15f, 0.4f, SHAKING_POSITION),
 		//PlayerWalkTimer(20.0f),
 		GhostAreaComponent(15.0f),
-		CameraPoint(0.0f, 50.0f, 50.0f, float3(0.0f, 1.0f, 0.0f), float3()),
+		CameraPoint(0, 50.0f, 50.0f, float3(0.0f, 1.0f, 0.0f), float3()),
 		InputMove(float2(0.05f, 0.05f))
 	);
 
@@ -139,7 +139,6 @@ void TestWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 	EnemyDeadSystem(a_chunk, a_context, a_response);
 	EnemyBulletDeadSystem(a_chunk, a_context);
 	GoalSystem(a_chunk, a_context);
-	PlayerWalkSystem(a_chunk, a_context);
 	RailUpdateSystem(a_chunk, a_context);
 	HitPointSystem(a_chunk, a_context);
 

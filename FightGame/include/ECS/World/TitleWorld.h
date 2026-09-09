@@ -15,6 +15,8 @@ public:
 protected:
 	virtual Chunk CreateNewChunk(AIManager& a_aiManager) override;
 
+	virtual void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response) override;
+
 	virtual void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize) override;
 
 	virtual void HandleSystemResponse(SystemResponse& a_response) override;

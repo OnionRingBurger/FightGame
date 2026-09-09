@@ -13,6 +13,8 @@ int Geometory::m_lineCnt = 0;
 
 // 毎回忘れるStatic参照、複数ファイルに書くのもNG
 std::unordered_map<std::string, MeshBuffer*> Geometory::m_sectorBuffers;
+// !!!New!!!
+std::unordered_map<std::string, Geometory::SectorShape> Geometory::m_sectorShapes;
 std::unordered_map<std::string, Geometory::Vertex*> Geometory::m_dynamicVertexSource;
 std::unordered_map<std::string, int*> Geometory::m_dynamicIndexSource;
 Shader* Geometory::m_sectorVS;
@@ -50,6 +52,9 @@ void Geometory::Uninit()
 		SAFE_DELETE(it.second);
 	}
 	m_sectorBuffers.clear();
+
+	// !!!New!!!
+	m_sectorShapes.clear();
 
 	for (auto it : m_dynamicVertexSource)
 	{
@@ -128,13 +133,25 @@ void Geometory::DrawSphere()
 	m_pSphere->Draw();
 }
 
-void Geometory::DrawSector(std::string key, float progress, float3 defaultColor)
+void Geometory::DrawSector(std::string key, float progress, float maxTime, float highlightTime, float3 defaultColor)
 {
 	if (m_sectorBuffers.find(key) == m_sectorBuffers.end() || m_sectorBuffers.at(key) == nullptr) return;
 
+	// !!!New!!!
+	if (m_sectorShapes.find(key) == m_sectorShapes.end()) return;
+	const SectorShape& shape = m_sectorShapes.at(key);
+
 	m_sectorVS->WriteBuffer(0, m_WVP);
 	m_sectorVS->Bind();
-	float pixelBuff[4] = { progress, defaultColor.x, defaultColor.y, defaultColor.z };
+
+	// !!!New!!!
+	float pixelBuff[16] =
+	{
+		defaultColor.x, defaultColor.y, defaultColor.z, 0.0f,
+		progress, maxTime, highlightTime, 0.0f,
+		shape.minLength, shape.maxLength, shape.angle * 0.5f * RAD, 0.0f,
+		shape.maxHeight, shape.maxLowness, 0.0f, 0.0f,
+	};
 	m_sectorPS->WriteBuffer(0, pixelBuff);
 	m_sectorPS->Bind();
 	m_sectorBuffers.at(key)->Draw();
@@ -268,6 +285,7 @@ struct VS_IN {
 struct VS_OUT {
 	float4 pos : SV_POSITION;
 	float2 uv : TEXCOORD0;
+	float3 local : TEXCOORD1;
 };
 cbuffer Matrix : register(b0) {
 	float4x4 world;
@@ -281,6 +299,8 @@ VS_OUT main(VS_IN vin) {
 	vout.pos = mul(vout.pos, view);
 	vout.pos = mul(vout.pos, proj);
 	vout.uv = vin.uv;
+	// !!!New!!!
+	vout.local = vin.pos;
 	return vout;
 })EOT";
 
@@ -291,20 +311,76 @@ VS_OUT main(VS_IN vin) {
 struct PS_IN {
 	float4 pos : SV_POSITION;
 	float2 uv : TEXCOORD0;
+	float3 local : TEXCOORD1;
 };
 cbuffer SectorInfo : register(b0){
-	float progress;
-	float3 defaultColor;
+	float4 sectorColor;
+	float4 sectorTime;
+	float4 sectorShape;
+	float4 sectorHeight;
 };
+float EdgeLine(float dist, float width, float grad) {
+	if (grad <= 0.000001f) return 0.0f;
+	return 1.0f - smoothstep(0.0f, grad * width, dist);
+}
 float4 main(PS_IN pin) : SV_TARGET0 {
-	float4 color = float4(1,1,1,1);
-	color.rgb = defaultColor;
-	// color.a = min(0.6f , progress * 0.6f + 0.05);
-	color.rgb *= 1.0f + max(progress - 0.6f, 0.0f) * 2.0f;
+	// !!!New!!!
+	float minLength = sectorShape.x;
+	float maxLength = max(sectorShape.y, minLength + 0.0001f);
+	float halfAngle = max(sectorShape.z, 0.0001f);
+	float radius = length(pin.local.xz);
+	float radial = saturate((radius - minLength) / (maxLength - minLength));
+	float angular = clamp(atan2(pin.local.x, pin.local.z) / halfAngle, -1.0f, 1.0f);
+	float heightRange = max(sectorHeight.x + sectorHeight.y, 0.0001f);
+	float vertical = saturate((pin.local.y + sectorHeight.y) / heightRange);
 
-	color.a = 0.5f;
-	
-	return color;
+	// !!!New!!!
+	float radialGrad = fwidth(radial);
+	float angularGrad = fwidth(angular);
+	float verticalGrad = fwidth(vertical);
+	float radialLine = EdgeLine(min(radial, 1.0f - radial), 1.5f, radialGrad);
+	float angularLine = EdgeLine(1.0f - abs(angular), 1.5f, angularGrad);
+	float verticalLine = EdgeLine(min(vertical, 1.0f - vertical), 1.5f, verticalGrad);
+	float outline = saturate(max(max(radialLine, angularLine), verticalLine));
+
+	// !!!New!!!
+	float progress = saturate(sectorTime.x);
+	float remainTime = max(sectorTime.y, 0.0f) * (1.0f - progress);
+	float highlight = 0.0f;
+	if (sectorTime.z > 0.0f) highlight = saturate(1.0f - remainTime / sectorTime.z);
+	float blink = 0.5f + 0.5f * sin(remainTime * 30.0f);
+	float highlightPulse = highlight * (0.65f + 0.35f * blink);
+
+	// !!!New!!!
+	float sweepWidth = max(radialGrad * 2.0f, 0.015f);
+	float sweepLine = 1.0f - smoothstep(0.0f, sweepWidth, abs(radial - progress));
+	float trail = step(radial, progress) * saturate(1.0f - (progress - radial) / 0.4f);
+	float ringPhase = frac(radial * 3.0f - progress * 3.0f);
+	float echo = (1.0f - smoothstep(0.0f, 0.08f, ringPhase)) * 0.35f;
+	echo *= step(0.000001f, radialGrad);
+
+	// !!!New!!!
+	float angularFade = 1.0f - pow(abs(angular), 3.0f);
+	// color.a = min(0.6f , progress * 0.6f + 0.05); !!!Old!!!
+	float baseAlpha = lerp(0.22f, 0.5f, pow(radial, 1.5f)) * lerp(0.7f, 1.0f, angularFade);
+
+	// !!!New!!!
+	float3 highlightColor = float3(1.0f, 0.92f, 0.72f);
+	float3 baseColor = sectorColor.rgb;
+	float3 color = baseColor * (1.2f + 0.55f * radial) + 0.1f;
+	color += baseColor * trail * 0.8f;
+	color += baseColor * echo;
+	color = lerp(color, highlightColor, highlightPulse * 0.55f);
+	color += lerp(baseColor, highlightColor, highlightPulse) * sweepLine * 1.6f;
+	float3 outlineColor = lerp(saturate(baseColor * 2.0f + 0.35f), highlightColor, highlightPulse);
+	color = lerp(color, outlineColor, outline);
+
+	// !!!New!!!
+	float alpha = baseAlpha + trail * 0.16f + echo * 0.12f + sweepLine * 0.45f;
+	alpha = lerp(alpha, saturate(alpha + 0.28f), highlightPulse);
+	alpha = max(alpha, outline * lerp(0.7f, 1.0f, highlightPulse));
+
+	return float4(saturate(color), saturate(alpha));
 })EOT";
 
 	m_sectorPS = new PixelShader();

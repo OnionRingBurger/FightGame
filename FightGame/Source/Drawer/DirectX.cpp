@@ -1,6 +1,8 @@
 #include "DirectX.h"
 #include "GameTexture.h"
 
+
+
 //--- グローバル変数
 ID3D11Device*				g_pDevice;
 ID3D11DeviceContext*		g_pContext;
@@ -14,6 +16,33 @@ ID3D11SamplerState*			g_pSamplerState[SAMPLER_MAX];
 Effekseer::ManagerRef managerRef;
 EffekseerRendererDX11::RendererRef rendererRef;
 Effekseer::Backend::GraphicsDeviceRef graphicsRef;
+// 文字生成のインターフェース
+IDWriteFactory* g_pDWriteFactory;
+ID2D1Factory* g_pD2D1Factory;
+IWICImagingFactory* g_pWICFactory;
+
+HRESULT InitDirectWrite()
+{
+	return DWriteCreateFactory(
+		DWRITE_FACTORY_TYPE_SHARED,
+		__uuidof(IDWriteFactory),
+		reinterpret_cast<IUnknown**>(&g_pDWriteFactory));
+}
+
+HRESULT InitD2DFactory()
+{
+	return D2D1CreateFactory(
+		D2D1_FACTORY_TYPE_MULTI_THREADED,
+		__uuidof(ID2D1Factory),
+		reinterpret_cast<void**>(&g_pD2D1Factory)
+	);
+}
+
+HRESULT InitWICFactory()
+{
+	return CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&g_pWICFactory));
+}
 
 ID3D11Device* GetDevice()
 {
@@ -43,6 +72,21 @@ Effekseer::ManagerRef GetEffectManager()
 EffekseerRenderer::RendererRef GetEffectRenderer()
 {
 	return rendererRef;
+}
+
+IDWriteFactory* GetDWriteFactory()
+{
+	return g_pDWriteFactory;
+}
+
+ID2D1Factory* GetD2DFactory()
+{
+	return g_pD2D1Factory;
+}
+
+IWICImagingFactory* GetWICFactory()
+{
+	return g_pWICFactory;
 }
 
 HRESULT InitDirectX(HWND hWnd, UINT width, UINT height, bool fullscreen)
@@ -215,6 +259,24 @@ HRESULT InitDirectX(HWND hWnd, UINT width, UINT height, bool fullscreen)
 	}
 	SetSamplerState(SAMPLER_LINEAR);
 
+	hr = InitDirectWrite();
+	if (FAILED(hr)) 
+	{
+		return hr; 
+	}
+
+	hr = InitD2DFactory();
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+	hr = InitWICFactory();
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	// Effekseerの初期化
 	managerRef = Effekseer::Manager::Create(8000);
 
 	graphicsRef = EffekseerRendererDX11::CreateGraphicsDevice(GetDevice(), GetContext());

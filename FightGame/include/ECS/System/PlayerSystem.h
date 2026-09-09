@@ -7,8 +7,6 @@
 // プレイヤー制御を扱うシステム
 ////////////////////////////////////////////////////
 
-void PlayerWalkSystem(Chunk& a_chunk, const SystemContext& a_context);
-
 void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response);
 
 void PlayerJumpSystem(Chunk& a_chunk, const SystemContext& a_context);

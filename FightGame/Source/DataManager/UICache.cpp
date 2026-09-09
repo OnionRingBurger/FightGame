@@ -1,12 +1,13 @@
 #include "UICache.h"
 #include "Debug.h"
 
+
 UICache::UICache()
 {
 }
 
 
-void UICache::RegisterModel(std::string a_key, std::shared_ptr<Texture> a_texture)
+void UICache::RegisterTexture(std::string a_key, std::shared_ptr<Texture> a_texture)
 {
     if (!a_texture) return;
     // cache‚É“o˜^
@@ -26,5 +27,20 @@ std::shared_ptr<Texture> UICache::GetTexture(std::string a_key) const
     }
     // ‘Î‰ž‚·‚éModel‚ð•Ô‚·
     return m_textureCache.at(a_key);
+}
+
+ComPtr<IDWriteTextFormat> UICache::GetTextFormat(std::string a_key) const
+{
+    if (m_textFormatCache.find(a_key) == m_textFormatCache.end())
+    {
+        return nullptr;
+    }
+
+    return m_textFormatCache.at(a_key);
+}
+
+void UICache::RegisterTextFormat(std::string a_key, Microsoft::WRL::ComPtr<IDWriteTextFormat> a_format)
+{
+    m_textFormatCache.insert({ a_key, a_format });
 }
 

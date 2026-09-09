@@ -84,11 +84,16 @@ struct AIResult
 {
 	// 移動方向
 	float2 MoveDir = float2(0.0f, 0.0f);
+	float Magnitube = 1.0f;
 	bool IsMove = false;
+
 
 	// 使用する攻撃番号
 	int AttackIndex = 0;
 	bool UseAttack = false;
+
+	// ガード
+	bool UseGuard = false;
 };
 
 
@@ -109,19 +114,24 @@ enum class AIStance
 struct AIMind
 {
 	// 現在の方針
-	AIStance stance = AIStance::NeutralProbe;
+	AIStance stance = AIStance::HoldAdvantage;
 	// 方針再評価用ポイント、最大値を超えると方針の変更を検討する
 	float updatePoints = 0.0f;
 	// 方針再評価用点の最大値
 	float maxUpdatePoints = 120.0f;
 	// 方針連続使用回数
 	int stanceContinueCount = 0;
-	// 攻撃連続使用など
+	// 攻撃連続使用
 	int lastHitAttackIndex = 0;
+	// 連続的中回数
 	int sameAttackStreak = 0;
-	// 攻撃成功、失敗回数
+	// 現更新ループでの攻撃成功回数、失敗回数
 	int attackSuccessCount = 0;
 	int attackMissCount = 0;
+	// 被弾数、ガード数
+	int sameTakenCount = 0;
+	int sameGuardCount = 0;
+
 
 	// TODO Playerの無防備度とかも見る
 };

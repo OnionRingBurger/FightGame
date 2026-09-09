@@ -31,6 +31,8 @@ float3 GetEntityPoseRot(Chunk& a_chunk, Entity a_entity);
 
 void ResetFixedPosState(ComponentHandle<Component::FixedResult> fixedResult, ComponentHandle<Component::MotionResult> motionResult);
 
+void ResetFixedRotState(ComponentHandle<FixedResult> fixedResult, ComponentHandle<MotionResult> motionResult);
+
 float3 GetLocalOffset(float3 worldOffset, float3 rotation);
 
 float3 GetWorldOffset(float3 localOffset, float3 rotation);
@@ -44,7 +46,7 @@ void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity);
 
 void ClearCharacterAttackOnDeath(Chunk& a_chunk, Entity a_entity);
 
-void NewEnemySpawn(ComponentsSerialize& a_serialize,Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName);
+void NewSceneSpawn(ComponentsSerialize& a_serialize,Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName, float3 a_offset);
 
 void RegisterAllAttackSectorsFromAttackData(int a_circumferenceCount);
 

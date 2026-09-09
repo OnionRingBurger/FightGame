@@ -2,6 +2,7 @@
 #include "Components.h"
 #include "Sound.h"
 #include "SystemAssist.h"
+#include "GameData.h"
 
 using namespace Component;
 
@@ -158,7 +159,9 @@ void CheckAliveTargetGameOverSystem(Chunk& a_chunk, const SystemContext& a_conte
 		FadeChange(FADE_CHANGE_FLICKER)
 	);
 
-
+	Entity stopper = a_chunk.CreateNewEntity(
+		AllActionStopper()
+	);
 
 
 
@@ -188,7 +191,8 @@ void CheckAliveTargetGameOverSystem(Chunk& a_chunk, const SystemContext& a_conte
 
 void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
-	ComponentView enemyView = a_chunk.GetView<ComponentTypes<EnemyTag, ClearTarget>>();
+	
+	ComponentView enemyView = a_chunk.GetView<ComponentTypes<ClearTarget>>();
 	for(auto it : enemyView)
 	{
 		// クリア対象が存在した場合関数を終了する
@@ -202,8 +206,8 @@ void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context,
 		ComponentHandle<PhaseSpawner> spawner = a_chunk.GetComponent<PhaseSpawner>(it);
 		if (spawner.Look().spawnName.empty()) continue;
 		spawn = true;
-
-		NewEnemySpawn(a_serialize, a_chunk, a_aiManager, spawner.Look().spawnName.at(0));
+		
+		NewSceneSpawn(a_serialize, a_chunk, a_aiManager, spawner.Look().spawnName.at(0), kDefaultWorldPosition);
 		std::vector<std::string> tmp;
 		for (int i = 1; i < spawner.Look().spawnName.size(); i++)
 		{
@@ -221,18 +225,40 @@ void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context,
 		return;
 	}
 
+	ComponentView uiView = a_chunk.GetView<ComponentTypes<UIComponent>>();
+	for (auto it : uiView)
+	{
+		a_chunk.DeleteChunkEntity(it);
+	}
+
+
 	ResetSound();
 
 	Entity battleClear = a_chunk.CreateNewEntity(
 		CreateEffect(GAMECLEAR, float2(0.0f, 0.0f), 0.0f, 0.0f)
 	);
-	a_systemResponse.AddStopTime(200.0f, 200.0f, 0.0f);
+	// a_systemResponse.AddStopTime(200.0f, 200.0f, 0.0f);
 
+	//Entity backSound = a_chunk.CreateNewEntity(
+	//	SoundKey(false, 70.0f, "bassdrum")
+	//);
+
+	Entity sound = a_chunk.CreateNewEntity(
+		SoundKey(false, 70.0f, "clearbgm")
+	);
 
 	// クリアシーンに移行する
 	Entity chunkChange = a_chunk.CreateNewEntity(
 		ChunkChange(true, "Clear"),
-		DelayChunkChange(10.0f)
+		DelayChunkChange(560.0f)
+	);
+
+	Entity stopper = a_chunk.CreateNewEntity(
+		AllActionStopper()
+	);
+
+	Entity movieSpawn = a_chunk.CreateNewEntity(
+		SpawnJson("ClearMovie", 80.0f, kClearWorldPosition)
 	);
 
 }

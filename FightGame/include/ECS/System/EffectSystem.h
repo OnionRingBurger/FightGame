@@ -16,6 +16,8 @@ void HPGaugeSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void SpriteAnimationSystem(Chunk& a_chunk, const SystemContext& a_context);
 
+void SpawnEfkEffectAreaSystem(Chunk& a_chunk, const SystemContext& a_context);
+
 void SpawnEfkEffectSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void UpdateEfkEffectSystem(Chunk& a_chunk, const SystemContext& a_context);

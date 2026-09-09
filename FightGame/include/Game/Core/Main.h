@@ -76,6 +76,10 @@ private:
 	ThreadSafeQueue<EffectLoadResult> effectResultQueue;
 	ThreadSafeQueue<SoundLoadJob> soundJobQueue;
 	ThreadSafeQueue<SoundLoadResult> soundResultQueue;
+	ThreadSafeQueue<TextFormatLoadJob> textFormatJobQueue;
+	ThreadSafeQueue<TextFormatLoadResult> textFormatResultQueue;
+	ThreadSafeQueue<TextUILoadJob> textUIJobQueue;
+	ThreadSafeQueue<TextUILoadResult> textUIResultQueue;
 
 	//! ì«Ç›çûÇ›èàóùÇâÒÇµÇƒÇ¢ÇÈÇ©Ç«Ç§Ç© 
 	std::atomic<bool> runningLoadLoop = true;
@@ -89,6 +93,10 @@ private:
 		ThreadSafeQueue<EffectLoadResult>& a_effectResultQueue,
 		ThreadSafeQueue<SoundLoadJob>& a_soundJobQueue,
 		ThreadSafeQueue<SoundLoadResult>& a_soundResultQueue,
+		ThreadSafeQueue<TextFormatLoadJob>& a_textFormatJobQueue,
+		ThreadSafeQueue<TextFormatLoadResult>& a_textFormatResultQueue,
+		ThreadSafeQueue<TextUILoadJob>& a_textUIJobQueue,
+		ThreadSafeQueue<TextUILoadResult>& a_textUIResultQueue,
 		std::atomic<bool>& a_running);
 
 	bool ChangeScene(std::string);
@@ -106,6 +114,8 @@ private:
 	std::vector<modelLoadData> modelDatas;
 	std::vector<std::string> textureDatas;
 	std::vector<effectLoadData> effectDatas;
+	std::vector<textFormatData> textFormatDatas;
+	std::vector<textUILoadData> textUIDatas;
 
 	bool isFixedCursor;
 

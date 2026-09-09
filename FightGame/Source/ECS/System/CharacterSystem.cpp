@@ -40,7 +40,7 @@ namespace
 				16);
 		}
 
-		// !!!New!!!
+		// コンポーネントを事前に生成判定
 		AttackTelegraph attackTelegraph(
 			a_attackPower.minLength,
 			a_attackPower.maxLength,
@@ -311,7 +311,7 @@ namespace
 		Entity bestEnemy = kInvalidEntity;
 		float bestAngle = FLT_MAX;
 		float bestDot = FLT_MAX;
-		int direction;
+		float direction;
 		bool isUp = std::abs(a_input.x) < std::abs(a_input.y);
 		if (isUp)
 		{
@@ -343,8 +343,8 @@ namespace
 			const float2 targetToEnemy(enemyPos.x - currentPos.x, enemyPos.z - currentPos.z);
 			const float2 targetToEnemyDir = Normalize(targetToEnemy);
 			const float cameraDot = targetToEnemy.x * camera.x + targetToEnemy.y * camera.y;
-			if (direction < 0 && cameraDot >= 0.0f) continue;
-			if (direction > 0 && cameraDot <= 0.0f) continue;
+			if (direction < 0.0f && cameraDot >= 0.0f) continue;
+			if (direction > 0.0f && cameraDot <= 0.0f) continue;
 
 			// 方向を決定
 			const float dirDot = currentDir.x * enemyDir.x + currentDir.y * enemyDir.y;
@@ -386,6 +386,7 @@ namespace
 	{
 		// Actionを削除
 		a_chunk.DeleteChunkComponent(a_user, LookOnAction::kTypeId);
+
 		// Stateを変更
 		StateToMove(a_chunk, a_user);
 		// マーカーの対象を更新
@@ -427,6 +428,14 @@ void GroundedSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
+	bool isStopAll = false;
+	ComponentView stopperView = a_chunk.GetView<ComponentTypes<AllActionStopper>>();
+	for (auto it : stopperView)
+	{
+		isStopAll = true;
+		break;
+	}
+
 	ComponentView view = a_chunk.GetView<ComponentTypes<ActionMask>>();
 
 	for (auto it : view)
@@ -443,7 +452,7 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 		else
 		{
 			const ComponentHandle<EntryAction> entry = a_chunk.GetComponent<EntryAction>(it);
-			if(entry.IsValid())
+			if(entry.IsValid() || isStopAll)
 			{
 				allowed = 0 | ActionFlag_EntryDuration;
 			}
@@ -970,7 +979,7 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 	//	cameraMagnitube = 1.0f;
 	//	moveCamera = true;
 	//}
-	// !!!New!!!
+	// キー入力を取得
 	const bool rightAttackTrigger = a_context.input.IsRegisterTrigger("RightAttack");
 	const bool leftAttackTrigger = a_context.input.IsRegisterTrigger("LeftAttack");
 	const bool jumpTrigger = a_context.input.IsRegisterTrigger("Jump");
@@ -989,6 +998,7 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 		result->magnitube = 0.0f;
 		result->isInput = false;
 		result->useAttack = false;
+		result->useGuard = false;
 		result->attackIndex = 0;
 		result->cameraDir = float2();
 		result->moveCamera = true;
@@ -1034,7 +1044,7 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 		{
 			const AIResult aiResult = a_aiManager.ReadResult(it);
 			result->moveDir = aiResult.MoveDir;
-			result->magnitube = 1.0f;
+			result->magnitube = aiResult.Magnitube;
 			result->isInput = aiResult.IsMove;
 			break;
 		}
@@ -1082,6 +1092,10 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 			result->useJump = false;
 			break;
 
+		case InputOrigin::Title:
+			result->useJump = true;
+			break;
+
 		default:
 			break;
 		}
@@ -1094,8 +1108,11 @@ void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIMa
 			break;
 
 		case InputOrigin::AI:
-			result->useGuard = false;
+		{
+			const AIResult aiResult = a_aiManager.ReadResult(it);
+			result->useGuard = aiResult.UseGuard;
 			break;
+		}
 
 		default:
 			break;
@@ -1200,9 +1217,10 @@ void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResp
 				attackInstance->connected = true;
 			}
 
+			// 敵に命中していた場合AIに情報を送る
 			if (isPlayer)
 			{
-				a_aiManager.NotifyHitResolved(triggerIt.triggerEntity);
+				a_aiManager.NotifyHitResolved(triggerIt.triggerEntity, isGuard);
 			}
 
 			// 画面エフェクトを出す
@@ -1234,7 +1252,7 @@ void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResp
 				EfkEffectKey(kHitEffect, false)
 				);
 
-			if (isPlayer && isGuard)
+			if (isGuard)
 			{
 				PlaySound(LoadSound("Assets/Sound/guard.mp3"));
 			}
@@ -1270,6 +1288,7 @@ void AttackHitRecordCleanupSystem(Chunk& a_chunk, const SystemContext& a_context
 
 		for (auto entryIt = hitRecord->entries.begin(); entryIt != hitRecord->entries.end();)
 		{
+
 			// クールタイムを減らす
 			entryIt->second -= a_context.deltaTime;
 

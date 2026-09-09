@@ -36,7 +36,7 @@ Chunk LoadWorld::CreateNewChunk(AIManager& a_aiManager)
 	);
 
 	newChunk.CreateNewEntity(
-		UIComponent("LoadRail", float2(0.795f, -0.8f), float2(0.28, 0.35f), 0.0f, 1.0f, float2(0.5f, 0.0f), float2(1.0f, 1.0f)),
+		UIComponent("LoadRail", float2(0.795f, -0.8f), float2(0.28f, 0.35f), 0.0f, 1.0f, float2(0.5f, 0.0f), float2(1.0f, 1.0f)),
 		UVMove(float2(0.025f, 0.0f))
 	);
 

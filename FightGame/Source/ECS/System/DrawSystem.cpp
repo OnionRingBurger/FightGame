@@ -155,7 +155,7 @@ void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 			SetDepthTest(DEPTH_TEST_TRUE);
 		}
 		// ï`âÊèàóù
-		for (int i = 0; i < itModel->GetMeshNum(); i++)
+		for (unsigned int i = 0; i < itModel->GetMeshNum(); i++)
 		{
 			// ÉÅÉbÉVÉÖÇéÊìæ
 			Model::Mesh mesh = *itModel->GetMesh(i);
@@ -219,7 +219,7 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 
 		cameraHandle = itCamera;
 		cameraPosHandle = a_chunk.GetComponent<Position>(it);
-		currentPriority = itCamera.Look().cameraPriority;
+		currentPriority = (int)itCamera.Look().cameraPriority;
 
 
 	}
@@ -376,7 +376,6 @@ void UIDraw(Chunk& a_chunk, const SystemContext& a_context)
 
 void EffectDraw(Chunk& a_chunk, const SystemContext& a_context)
 {
-	DirectX::XMFLOAT4X4 wvp[3];
 	ComponentHandle<Camera> useCamera;
 	ComponentHandle<Position> cameraPosition;
 	ComponentHandle<Rotation> cameraRotation;
@@ -476,7 +475,7 @@ void PolylineDraw(Chunk& a_chunk, const SystemContext& a_context)
 	ComponentView cameraView = a_chunk.GetView<ComponentTypes<Camera>>();
 
 
-	int currentPriority = 0;
+	size_t currentPriority = 0;
 	for (auto it : cameraView)
 	{
 		const ComponentHandle<Camera> itCamera = a_chunk.GetComponent<Camera>(it);
@@ -662,6 +661,8 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 	DirectX::XMFLOAT4 attackColor(1.0f, 0.4f, 0.0f, 1.0f);
 	DirectX::XMFLOAT4 waitColor(0.0f, 0.4f, 1.0f, 1.0f);
 	constexpr int kArcSegments = 16;
+	// !!!New!!!
+	constexpr float kTelegraphHighlightSeconds = 12.0f;
 
 	// ï`âÊópÉâÉÄÉ_
 	auto drawSectorLines = [&](
@@ -733,7 +734,7 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 	};
 
 	// !!!New!!!
-	auto drawSectorMesh = [&](Entity a_entity, float a_progress, float3 a_color)
+	auto drawSectorMesh = [&](Entity a_entity, float a_progress, float a_maxTime, float a_highlightTime, float3 a_color)
 	{
 		const ComponentHandle<AttackTelegraph> telegraph = a_chunk.GetComponent<AttackTelegraph>(a_entity);
 		if (!telegraph.IsValid() || telegraph.Look().sectorKey.empty()) return;
@@ -748,7 +749,7 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		const float3 floatRot(rot.Look().pitch * RAD, rot.Look().yaw * RAD, rot.Look().roll * RAD);
 		DrawMatrix::CreateWorldMatrix(world, floatPos, floatScale, floatRot, true);
 		Geometory::SetWorld(world);
-		Geometory::DrawSector(telegraph.Look().sectorKey, a_progress, a_color);
+		Geometory::DrawSector(telegraph.Look().sectorKey, a_progress, a_maxTime, a_highlightTime, a_color);
 	};
 
 	// ìñÇΩÇËîªíËï`âÊ
@@ -773,15 +774,17 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 
 		// !!!New!!!
 		float progress = 1.0f;
+		float maxDuration = 0.0f;
 		const ComponentHandle<AttackInstance> attackInstance = a_chunk.GetComponent<AttackInstance>(sectorIt);
 		if (attackInstance.IsValid() && attackInstance.Look().maxDuration > 0.0f)
 		{
-			progress = attackInstance.Look().elapsedTime / attackInstance.Look().maxDuration;
+			progress = std::fmod((attackInstance.Look().elapsedTime / attackInstance.Look().maxDuration) * 3.0f, 1.0f);
+			maxDuration = attackInstance.Look().maxDuration;
 		}
-		drawSectorMesh(sectorIt, progress, float3(0.95, 0.2, 0.2));
+		drawSectorMesh(sectorIt, progress, maxDuration, maxDuration / 1.5f, float3(1.0f, 0.0f, 0.0f));
 	}
 
-	// îªíËï\é¶Çï`âÊ
+	// îªíËó\ë™ï\é¶Çï`âÊ
 	ComponentView telegraphView = a_chunk.GetView<ComponentTypes<AttackStartupAction>>();
 	for (auto startupIt : telegraphView)
 	{
@@ -812,11 +815,12 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 			progress = startup.Look().elapsedTime / startup.Look().startupDuration;
 		}
 
-		float3 defaultColor = float3(0.6, 0.6, 0.3);
-		float3 attackPowerColor = float3(0.9, 0.4, 0.02);
+		float3 defaultColor = float3(0.6f, 0.6f, 0.3f);
+		float3 attackPowerColor = float3(0.95f, 0.5f, 0.1f);
 		float damageRate = status.Look().attackPowers.at(startup.Look().attackIndex).damageValue / 4.0f;
 		damageRate = std::clamp(damageRate, 0.0f, 1.0f);
 		float3 color = defaultColor * (1.0f - damageRate) + attackPowerColor * damageRate;
-		drawSectorMesh(telegraphEntity, progress, color);
+
+		drawSectorMesh(telegraphEntity, progress, startup.Look().startupDuration, kTelegraphHighlightSeconds, color);
 	}
 }

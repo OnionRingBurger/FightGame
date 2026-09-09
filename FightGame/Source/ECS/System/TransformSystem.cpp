@@ -72,19 +72,13 @@ void InputMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		float3 move =
 		{
-			inputResult.Look().moveDir.x * (1 + inputResult.Look().magnitube / 2) * inputMove.Look().moveSpeed.x * a_context.deltaTime,
+			inputResult.Look().moveDir.x * (inputResult.Look().magnitube * 1.5f) * inputMove.Look().moveSpeed.x * a_context.deltaTime,
 			0.0f,
-			inputResult.Look().moveDir.y * (1 + inputResult.Look().magnitube / 2) * inputMove.Look().moveSpeed.y * a_context.deltaTime
+			inputResult.Look().moveDir.y * (inputResult.Look().magnitube * 1.5f) * inputMove.Look().moveSpeed.y * a_context.deltaTime
 		};
 		motionResult->posOffset.x += move.x;
 		motionResult->posOffset.y += move.y;
 		motionResult->posOffset.z += move.z;
-
-		//ComponentHandle<Force> force = a_chunk.GetComponent<Force>(it);
-		//if (!force.IsValid()) continue;
-		//force->force.x = move.x / a_context.deltaTime * 0.4f;
-		//force->force.z = move.z / a_context.deltaTime * 0.4f;
-		//force->attenuation = 0.8f;
 
 
 		// UŒ‚’†‚¾‚Á‚½ê‡UŒ‚‚ðƒLƒƒƒ“ƒZƒ‹‚·‚é
@@ -501,6 +495,10 @@ void LeapSystem(Chunk& a_chunk, const SystemContext& a_context)
 		if (leap.Look().leapTime == leap.Look().leapMaxTime)
 		{
 			leap->isActicv = false;
+			a_chunk.DeleteChunkComponent(it, PoseRotState::kTypeId);
+
+			ComponentHandle<MotionResult> motionResult = a_chunk.GetComponent<MotionResult>(it);
+			ResetFixedRotState(result, motionResult);
 		}
 	}
 }

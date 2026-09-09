@@ -24,6 +24,18 @@ void Chunk::ImGuiInPut()
 		this->AddComponent(entity, Name("NewEntity"));
 	}
 
+	if (ImGui::Button("Create Move Entity", ImVec2(150.0f, 30.0f)))
+	{
+		Entity entity = this->CreateNewEntity(
+			MOVE_AND_TRANSFORM_COMPONENT(
+				float3(0.0f, 0.0f, 0.0f),
+				float3(0.0f, 0.0f, 0.0f),
+				float3(1.0f, 1.0f, 1.0f)
+			)
+		);
+		this->AddComponent(entity, Name("NewEntity"));
+	}
+
 
 	static int useEntityCount = 0;
 
@@ -55,7 +67,7 @@ void Chunk::ImGuiInPut()
 	std::string searchName = nameBuffer;
 
 
-	ImGui::Combo("UseEntity", &useEntityCount, names.data(), names.size());
+	ImGui::Combo("UseEntity", &useEntityCount, names.data(), (int)names.size());
 	
 	Entity useEntity = entities.at(useEntityCount);
 
@@ -133,7 +145,7 @@ void Chunk::ImGuiInPut()
 
 	}
 
-	ImGui::Combo("SelectAddComponent", &selectedIdKey, typeNames.data(), typeNames.size());
+	ImGui::Combo("SelectAddComponent", &selectedIdKey, typeNames.data(), (int)typeNames.size());
 
 
 
@@ -172,6 +184,11 @@ void Chunk::ImGuiInPut()
 		{
 			COMPONENT_TYPE_LIST(IMGUI_DELETECOMPONENT_CASE)
 		}
+	}
+
+	if (ImGui::Button("DeleteEntity", ImVec2(100.0f, 20.0f)))
+	{
+		this->DeleteChunkEntity(useEntity);
 	}
 
 	#undef IMGUI_ADDCOMPONENT_CASE

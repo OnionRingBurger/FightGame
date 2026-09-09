@@ -144,7 +144,26 @@
 	X(PhaseSpawner) \
 	X(EfkEffectKey) \
 	X(EntryAction) \
-	X(BossTag)
+	X(BossTag) \
+	X(UseGhostShader) \
+	X(LookOnMarkerTag) \
+	X(NullTargetTag) \
+	X(SelectCursor) \
+	X(SelectBox) \
+	X(CameraRigTag) \
+	X(RigLookOn) \
+	X(FollowLeap) \
+	X(DebugEntityTag) \
+	X(EfkEffectRuntime) \
+	X(UIScaleLerp) \
+	X(UIPosLerp) \
+	X(DropUI) \
+	X(OtherChunkChangeLock) \
+	X(GameOverTarget) \
+	X(SoundKey) \
+	X(EfkEffectArea)\
+	X(AllActionStopper)\
+	X(CameraChangeEffect)
 
 
 using BitFlag = unsigned int;
@@ -917,7 +936,8 @@ namespace Component
 		DAMAGE_EFFECT,
 		DAMAGE_DIRECTION,
 		BATTLESTART,
-		GAMECLEAR
+		GAMECLEAR,
+		STAGE_CLEAR_MOVIE
 	};
 	struct CreateEffect
 	{
@@ -2482,6 +2502,7 @@ namespace Component
 		None = 0,
 		Device = 1,
 		AI = 2,
+		Title = 3
 	};
 
 	// !!!New!!!
@@ -2898,7 +2919,13 @@ namespace Component
 	// FollowPositionìôÇÇµÇƒÇ¢ÇÈç€ÅAí«è]ÇïtÇØäOÇµÇµÇΩÇ≠Ç»Ç¡ÇΩÇËÇµÇΩç€Ç…Ç¢ÇøÇ¢Çø
 	struct NullTargetTag
 	{
+		static constexpr TypeID kTypeId = 155;
+		static constexpr const char* kTypeName = "NullTargetTag";
+		static constexpr int kVersion = 0;
 
+		NullTargetTag()
+		{
+		}
 	};
 
 	struct SelectCursor
@@ -2909,6 +2936,18 @@ namespace Component
 
 		Entity selectEntity;
 		bool isActiv;
+
+		SelectCursor()
+			: selectEntity(kInvalidEntity)
+			, isActiv(false)
+		{
+		}
+
+		SelectCursor(Entity a_selectEntity, bool a_isActiv)
+			: selectEntity(a_selectEntity)
+			, isActiv(a_isActiv)
+		{
+		}
 	};
 
 	struct SelectBox
@@ -2919,6 +2958,11 @@ namespace Component
 
 		float2 pos;
 		float2 cursorScale;
+
+		SelectBox()
+			: SelectBox(float2(), float2())
+		{
+		}
 
 		SelectBox(float2 a_pos, float2 a_cursorScale)
 			: pos(a_pos)
@@ -2956,6 +3000,11 @@ namespace Component
 		static constexpr int kVersion = 0;
 		float3 followLeap;
 
+		FollowLeap()
+			: followLeap()
+		{
+		}
+
 		FollowLeap(float3 a_followLeap)
 			:followLeap(a_followLeap)
 		{
@@ -2991,7 +3040,7 @@ namespace Component
 
 		AttackKeyLoad(std::vector<std::string> a_attackKeys)
 			: attackKeys(a_attackKeys)
-			, size(a_attackKeys.size())
+			, size((int)a_attackKeys.size())
 		{
 		}
 	};
@@ -3014,7 +3063,7 @@ namespace Component
 
 		PhaseSpawner(std::vector<std::string> a_spawnName)
 			: spawnName(a_spawnName)
-			, size(a_spawnName.size())
+			, size((int)a_spawnName.size())
 		{
 		}
 	};
@@ -3051,14 +3100,16 @@ namespace Component
 		static constexpr int kVersion = 0;
 
 		Effekseer::Handle handle;
+		bool isLoop;
 
-		EfkEffectRuntime(Effekseer::Handle a_handle)
+		EfkEffectRuntime(Effekseer::Handle a_handle, bool a_isLoop)
 			: handle(a_handle)
+			, isLoop(a_isLoop)
 		{
 		}
 
 		EfkEffectRuntime()
-			: handle()
+			: EfkEffectRuntime(Effekseer::Handle(), false)
 		{
 		}
 
@@ -3195,6 +3246,11 @@ namespace Component
 		float waitTime;
 		std::string soundKey;
 
+		SoundKey()
+			: SoundKey(false, 0.0f, "")
+		{
+		}
+
 		SoundKey(bool a_isLoop,float a_waitTime, std::string a_soundKey)
 			: isLoop(a_isLoop)
 			, waitTime(a_waitTime)	
@@ -3202,7 +3258,146 @@ namespace Component
 		{
 		}
 	};
-}
+
+	struct EfkEffectArea
+	{
+		static constexpr TypeID kTypeId = 156;
+		static constexpr const char* kTypeName = "EfkEffectArea";
+		static constexpr int kVersion = 0;
+
+		std::vector<std::string> spawnEffectKeys;
+		std::vector<std::string> spawnSoundKeys;
+		float spawnRadius;
+
+		float spawnInteval;
+		float currentDuration;
+		float spawnSpeedupRate;
+
+
+		EfkEffectArea(std::vector<std::string> a_spawnEffectKeys, std::vector<std::string> a_spawnSoundKeys,float a_spawnRadius, float a_spawnInteval, float a_spawnSpeedupRate)
+			: spawnEffectKeys(a_spawnEffectKeys)
+			, spawnSoundKeys(a_spawnSoundKeys)
+			, spawnRadius(a_spawnRadius)
+			, spawnInteval(a_spawnInteval)
+			, currentDuration(0.0f) 
+			, spawnSpeedupRate(a_spawnSpeedupRate)
+		{
+		}
+
+		EfkEffectArea()
+			: spawnRadius(0.0f)
+			, spawnInteval(0.0f)
+			, currentDuration(0.0f)
+			, spawnSpeedupRate(0.0f)
+		{
+		}
+	};
+
+	struct LifeTimeEndEffect
+	{
+		static constexpr TypeID kTypeId = 157;
+		static constexpr const char* kTypeName = "LifeTimeEndEffect";
+		static constexpr int kVersion = 0;
+
+		bool useSound;
+		std::string soundKey;
+		bool useEfkEffect;
+		std::string efkEffectKey;
+
+		LifeTimeEndEffect(bool a_useSound, std::string a_soundKey, bool a_useEfkEffect, std::string a_efkEffectKey)
+			: useSound(a_useSound)
+			, soundKey(a_soundKey)
+			, useEfkEffect(a_useEfkEffect)
+			, efkEffectKey(a_efkEffectKey)
+		{
+		}
+
+		LifeTimeEndEffect()
+			: LifeTimeEndEffect(false, "", false, "")
+		{
+		}
+	};
+
+	struct CameraMover
+	{
+		static constexpr TypeID kTypeId = 158;
+		static constexpr const char* kTypeName = "CameraMover";
+		static constexpr int kVersion = 0;
+
+		Entity targetPoint;
+		bool leapEnd;
+		float leapProgress;
+		float3 finalTargetPos;
+		float3 finalTargetRot;
+
+		CameraMover(Entity a_targetPoint)
+			: targetPoint(a_targetPoint)
+			, leapEnd(true)
+			, leapProgress(1.0f)
+			, finalTargetPos()
+			, finalTargetRot()
+		{
+
+		}
+	};
+
+	struct AllActionStopper
+	{
+		static constexpr TypeID kTypeId = 159;
+		static constexpr const char* kTypeName = "AllActionStopper";
+		static constexpr int kVersion = 0;
+
+		AllActionStopper()
+		{
+		}
+
+	};
+
+	struct CameraChangeEffect
+	{
+		static constexpr TypeID kTypeId = 160;
+		static constexpr const char* kTypeName = "CameraChangeEffect";
+		static constexpr int kVersion = 0;
+
+		std::string effectKey;
+
+		CameraChangeEffect(std::string a_effectKey)
+			: effectKey(a_effectKey)
+		{
+		}
+
+		CameraChangeEffect()
+			: CameraChangeEffect("")
+		{
+		}
+	};
+
+	struct SpawnJson
+	{
+		static constexpr TypeID kTypeId = 161;
+		static constexpr const char* kTypeName = "SpawnJson";
+		static constexpr int kVersion = 0;
+		std::string spawnKey;
+		float currentDuration;
+		float maxSpawnTime;
+		float3 offset;
+
+
+		SpawnJson(std::string a_spawnKey, float a_maxSpawnTime, float3 a_offset)
+			: spawnKey(a_spawnKey)
+			, currentDuration(0.0f)
+			, maxSpawnTime(a_maxSpawnTime)
+			, offset(a_offset)
+		{
+		}
+
+		SpawnJson()
+			: SpawnJson("", 0.0f, float3())
+		{
+		}
+	};
+
+};
 
 
 using namespace Component;
@@ -3265,13 +3460,17 @@ inline void CreateImGuiValue(std::string name, int& value, const int& valueDefau
 
 inline void CreateImGuiValue(std::string name, size_t& value, const size_t& valueDefault)
 {
-	ImGui::Text(name.c_str());
+	int input = (int)value;
+	ImGui::InputInt(name.c_str(), &input);
+	value = (size_t)input;
 }
 
 inline void CreateImGuiValue(std::string name, bool& value, const bool& valueDefault)
 {
 	ImGui::Checkbox(name.c_str(), &value);
 }
+
+
 
 
 

@@ -56,7 +56,7 @@ Chunk GameWorld::CreateNewChunk(AIManager& a_aiManager)
 		HitInfomation(),
 		PlayerWalkTimer(20.0f),
 		//GhostAreaComponent(15.0f),
-		CameraPoint(0.0f, 50.0f, 5000.0f, float3(0.0f, 1.0f, 0.0f), float3()),
+		CameraPoint(0, 50.0f, 5000.0f, float3(0.0f, 1.0f, 0.0f), float3()),
 		PosePosState(POSE_POS_RAIL),
 		RailUser(mainRail),
 		AngleLimitComponent(true, true, 70.0f, -70.0f, 30.0f, -70.0f),
@@ -79,7 +79,7 @@ Chunk GameWorld::CreateNewChunk(AIManager& a_aiManager)
 	);
 
 	Entity hpBack = newChunk.CreateNewEntity(
-		UIComponent("UIBack", float2(-0.58, 0.9f), float2(0.8f, 0.1f), 0.0f)
+		UIComponent("UIBack", float2(-0.58f, 0.9f), float2(0.8f, 0.1f), 0.0f)
 	);
 
 	Entity hpGauge = newChunk.CreateNewEntity(
@@ -88,7 +88,7 @@ Chunk GameWorld::CreateNewChunk(AIManager& a_aiManager)
 	);
 
 	Entity hpFrame = newChunk.CreateNewEntity(
-		UIComponent("UIFrame", float2(-0.58, 0.9f), float2(0.8f, 0.1f), 0.0f)
+		UIComponent("UIFrame", float2(-0.58f, 0.9f), float2(0.8f, 0.1f), 0.0f)
 	);
 
 
@@ -620,7 +620,6 @@ void GameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 	EnemyDeadSystem(a_chunk, a_context, a_response);
 	EnemyBulletDeadSystem(a_chunk, a_context);
 	GoalSystem(a_chunk, a_context);
-	PlayerWalkSystem(a_chunk, a_context);
 	RailUpdateSystem(a_chunk, a_context);
 	HitPointSystem(a_chunk, a_context);
 

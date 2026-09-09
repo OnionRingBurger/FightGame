@@ -2,6 +2,7 @@
 #include "Components.h"
 #include "Sound.h"
 #include "Defines.h"
+#include "GameData.h"
 
 using namespace Component;
 
@@ -197,7 +198,7 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 			Entity battleStart = a_chunk.CreateNewEntity(
 				UIComponent("BattleStart", float2(0.0f, 4.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
 				UIPosLerp(float2(0.0f, 2.0f) + posOffset, posOffset, 18.0f),
-				UIScaleLerp(float2(0.6f * 5.8f, 0.48f * 5.8f), float2(0.6, 0.48f), 18.0f),
+				UIScaleLerp(float2(0.6f * 5.8f, 0.48f * 5.8f), float2(0.6f, 0.48f), 18.0f),
 				LifeTime(130.0f),
 				DropUI({ "Assets/Sound/startui.mp3", "Assets/Sound/startui2.mp3" })
 
@@ -214,13 +215,53 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 				DropUI({ "Assets/Sound/gameclear.mp3", "Assets/Sound/shot.mp3" })
 			);*/
 
-			Entity gameClearFream = a_chunk.CreateNewEntity(
-				UIComponent("GameEndFrame", float2(0.0f, 0.2f) + posOffset, float2(1.5f, 1.5f), 0.0f + angleOffset, 1.0f),
-				UIPosLerp(float2(0.0f, 0.2f) + posOffset, posOffset, 3.0f),
-				LifeTime(130.0f),
-				DropUI({ "Assets/Sound/gameclear.mp3", "Assets/Sound/shot.mp3" })
+
+			Entity gameClearBack = a_chunk.CreateNewEntity(
+				UIComponent("ClearBack", float2(0.0f, 0.0f) + posOffset, float2(4.0f, 4.0f * (SCREEN_WIDTH / SCREEN_HEIGHT)), -10.0f + angleOffset, 0.3f, float2(), float2(7.0f, 7.0f)),
+				UVMove(float2(0.02f, 0.0f)),
+				LifeTime(100.0f)
 			);
 
+
+			Entity gameClearFream = a_chunk.CreateNewEntity(
+				UIComponent("GameEndFrame", float2(0.0f, 0.2f) + posOffset, float2(1.5f, 1.5f), 0.0f + angleOffset, 1.0f),
+				UIPosLerp(float2(0.0f, 2.0f) + posOffset, posOffset + 0.01f, 25.0f),
+				UIScaleLerp(float2(2.1f * 5.8f, 1.5f * 5.8f), float2(2.1f, 1.5f), 25.0f),
+				LifeTime(100.0f)
+			);
+
+			Entity gameClear = a_chunk.CreateNewEntity(
+				UIComponent("GameEnd", float2(0.0f, 4.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
+				UIPosLerp(float2(0.0f, 2.0f) + posOffset, posOffset, 25.0f),
+				UIScaleLerp(float2(1.0f * 5.8f, 0.66f * 5.8f), float2(1.0, 0.66f), 25.0f),
+				LifeTime(100.0f)
+			);
+
+			Entity clearSE = a_chunk.CreateNewEntity(
+				SoundKey(false, 0.0f, "stageclear")
+			);
+
+			Entity clearSE2 = a_chunk.CreateNewEntity(
+				SoundKey(false, 0.0f, "stageclear2")
+			);
+
+			break;
+
+		case STAGE_CLEAR_MOVIE:
+			Entity stageClear = a_chunk.CreateNewEntity(
+				Name("StageClear"),
+				MOVE_AND_TRANSFORM_COMPONENT(
+					float3(0.0f, 0.0f, 0.0f),
+					float3(-1.0f, 0.0f, 0.0f),
+					float3(1.0f, 1.0f, 1.0f)
+				),
+				UIComponent("StageClear",float2(), float2(3.35f, 1.0f), 0.0f),
+				SpriteComponent(float3(), float3(0.0f, 30.0f, 0.0f), true),
+				LeapPosComponent(true, float3(0.0f, 1.6f, 20.0f) + kClearWorldPosition, float3(0.0f, 1.7f, 2.0f) + kClearWorldPosition, 45.0f),
+				PosePosState(POSE_POS_LEAP),
+				RailFly(0.01f, 0.01f),
+				AngularVelocity(float3(0.1f, 0.0f, 0.0f))
+			);
 			break;
 
 		}
@@ -267,7 +308,7 @@ void UVMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 		const ComponentHandle<UVMove> uvMove = a_chunk.GetComponent<UVMove>(it);
 		ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
 
-		ui->uvPos += uvMove.Look().moveSpeed * a_context.deltaTime;
+		ui->uvPos += uvMove.Look().moveSpeed * a_context.effectStepTime;
 	}
 }
 
@@ -342,6 +383,63 @@ void SpriteAnimationSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 }
 
+void SpawnEfkEffectAreaSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<EfkEffectArea, Position>>();
+	for (auto it : view)
+	{
+		// コンポーネントを取得
+		ComponentHandle<EfkEffectArea> area = a_chunk.GetComponent<EfkEffectArea>(it);
+
+		// スポーン間隔を更新
+		area->currentDuration += a_context.deltaTime;
+
+		// スポーン間隔中だった場合は抜ける
+		if (area.Look().currentDuration < area.Look().spawnInteval)
+		{
+			continue;
+		}
+
+		// 自身座標から見たの範囲内にランダムにエフェクトを生成
+		if (area.Look().spawnEffectKeys.empty())
+		{
+			continue;
+		}
+
+		ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(it);
+		const float u1 = (float)(std::rand() % 10001) / 10000.0f;
+		const float u2 = (float)(std::rand() % 10001) / 10000.0f;
+		const float u3 = (float)(std::rand() % 10001) / 10000.0f;
+		const float r = area.Look().spawnRadius * powf(u1, 1.0f / 3.0f);
+		const float theta = 2.0f * PI * u2;
+		const float phi = acosf(2.0f * u3 - 1.0f);
+		const float offsetX = r * sinf(phi) * cosf(theta);
+		const float offsetY = r * cosf(phi);
+		const float offsetZ = r * sinf(phi) * sinf(theta);
+		const int effectKeyIndex = std::rand() % static_cast<int>(area.Look().spawnEffectKeys.size());
+		
+		const float3 spawnPos(
+			pos.Look().x + offsetX,
+			pos.Look().y + offsetY,
+			pos.Look().z + offsetZ
+		);
+		a_chunk.CreateNewEntity(
+			TRANSFORM_COMPONENT(spawnPos, float3(), float3(1.0f, 1.0f, 1.0f)),
+			EfkEffectKey(area.Look().spawnEffectKeys[effectKeyIndex], false)
+		);
+
+		if (!area.Look().spawnSoundKeys.empty())
+		{
+			const int soundKeyIndex = std::rand() % static_cast<int>(area.Look().spawnSoundKeys.size());
+			std::string key = kSoundAssetPath + area.Look().spawnSoundKeys.at(soundKeyIndex) + ".mp3";
+			PlaySound(LoadSound(key.c_str()));
+		}
+
+		area->currentDuration = 0.0f;
+		area->spawnInteval /= area.Look().spawnSpeedupRate;
+	}
+}
+
 void SpawnEfkEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
 	ComponentView view = a_chunk.GetView<ComponentTypes<EfkEffectKey, Position>, ComponentTypes<EfkEffectRuntime>>();
@@ -362,7 +460,7 @@ void SpawnEfkEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 		if (!a_context.effectCache.TryGetEffect(key.Look().handleId, ref)) continue;
 
 		if(!key.Look().isLoop) a_chunk.DeleteChunkComponent(it, EfkEffectKey::kTypeId);
-		a_chunk.AddComponent(it, EfkEffectRuntime(GetEffectManager()->Play(ref, pos.Look().x, pos.Look().y, pos.Look().z)));
+		a_chunk.AddComponent(it, EfkEffectRuntime(GetEffectManager()->Play(ref, pos.Look().x, pos.Look().y, pos.Look().z), key.Look().isLoop));
 	}
 }
 
@@ -378,7 +476,8 @@ void UpdateEfkEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		if (!GetEffectManager()->Exists(runtime.Look().handle))
 		{
-			a_chunk.DeleteChunkComponent(it, EfkEffectRuntime::kTypeId);
+			if (runtime.Look().isLoop) a_chunk.DeleteChunkComponent(it, EfkEffectRuntime::kTypeId);
+			else a_chunk.DeleteChunkEntity(it); 
 			continue;
 		}
 

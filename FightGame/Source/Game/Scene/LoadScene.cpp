@@ -4,14 +4,21 @@
 #include <unordered_set>
 #include "Defines.h"
 
+
+// TODO 流石にひっどいので構造体なりクラスなりにまとめる
+
 LoadScene::LoadScene(
 	std::function<void(std::string)> a_sceneChange,
 	ThreadSafeQueue<ModelLoadJob>& a_modelJobQueue,
 	ThreadSafeQueue<TextureLoadJob>& a_textureJobQueue,
 	ThreadSafeQueue<EffectLoadJob>& a_effectJobQueue,
+	ThreadSafeQueue<TextFormatLoadJob>& a_textFormatJobQueue,
+	ThreadSafeQueue<TextUILoadJob> & a_textUIJobQueue,
 	std::vector<modelLoadData> a_modelDatas,
 	std::vector<std::string> a_textureDatas,
 	std::vector<effectLoadData> a_effectDatas,
+	std::vector<textFormatData> a_textFormatDatas,
+	std::vector<textUILoadData> a_textUIDatas,
 	IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
 	IEffectCacheAcquisition& effectCache,
@@ -22,9 +29,13 @@ LoadScene::LoadScene(
 	, modelJobQueue(a_modelJobQueue)
 	, textureJobQueue(a_textureJobQueue)
 	, effectJobQueue(a_effectJobQueue)
+	, textFormatJobQueue(a_textFormatJobQueue)
+	, textUIJobQueue(a_textUIJobQueue)
 	, modelDatas(a_modelDatas)
 	, textureDatas(a_textureDatas)
 	, effectDatas(a_effectDatas)
+	, textFormatDatas(a_textFormatDatas)
+	, textUIDatas(a_textUIDatas)
 	
 {
 	// DebugConsole::ToggleConsole();
@@ -52,11 +63,17 @@ LoadScene::LoadScene(
 		useDataLoadEndFlags.push_back(endFlag);
 	}
 
+	for (auto it : textFormatDatas)
+	{
+		std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
+		textFormatJobQueue.Push(std::move(TextFormatLoadJob(it.key, it.font, it.size, endFlag)));
+		useDataLoadEndFlags.push_back(endFlag);
+	}
 
 	world = std::make_unique<LoadWorld>(a_modelCache, a_uiCache, effectCache, a_input, a_serialize);
 	world->InitWorld();
 	// ロード量を保持
-	maxLoadCount = loadEndFlags.size();
+	maxLoadCount = (int)loadEndFlags.size();
 
 }
 
@@ -94,6 +111,13 @@ void LoadScene::Update()
 			effectJobQueue.Push(std::move(EffectLoadJob(it.key, it.magnificent, endFlag)));
 			loadEndFlags.push_back(endFlag);
 		}
+
+		for (auto it : textUIDatas)
+		{
+			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
+			textUIJobQueue.Push(std::move(TextUILoadJob(it.key, it.text, it.formatKey, it.width, it.height, endFlag)));
+			loadEndFlags.push_back(endFlag);
+		}
 	}
 
 	if (!inited) return;
@@ -124,7 +148,7 @@ void LoadScene::PostFrameProcess()
 
 void LoadScene::RemoveIfFlaged(std::vector<std::shared_ptr<std::atomic_bool>>& loadEndFlags)
 {
-	for (int i = loadEndFlags.size() - 1; i >= 0; i--)
+	for (int i = (int)loadEndFlags.size() - 1; i >= 0; i--)
 	{
 		if (loadEndFlags.at(i)->load())
 		{

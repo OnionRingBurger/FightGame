@@ -113,7 +113,12 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 	float insideRate = 1.0f - ((maxLength - minLength) / maxLength);
 	insideRate = 0.3f + (angle / 360.0f) * 0.7f;
 	int insideVertexCount = std::max((int)(circumferenceCount * insideRate), 2);
-	
+
+	float randomHeightOffset = std::fmod(std::rand() * 0.3f, 1.0f) * 0.01f;
+
+	// !!!New!!!
+	m_sectorShapes.insert({ key, { minLength, maxLength, angle, maxHeight, maxLowness } });
+
 	maxLowness *= -1.0f;
 
 	vertexCount = (outsideVertexCount + insideVertexCount) * 2;
@@ -123,7 +128,7 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 	for (int i = 0; i < 2; i++)
 	{
 		bool heiVertex = i % 2 == 0;
-		float height = heiVertex ? maxHeight : maxLowness;
+		float height = heiVertex ? maxHeight + randomHeightOffset : maxLowness;
 		float uvHeight = heiVertex ? 0.0f : 1.0f;
 		for (int j = 0; j < outsideVertexCount; j++)
 		{
@@ -140,7 +145,7 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 	for (int i = 0; i < 2; i++)
 	{
 		bool heiVertex = i % 2 == 0;
-		float height = heiVertex ? maxHeight : maxLowness;
+		float height = heiVertex ? maxHeight + randomHeightOffset : maxLowness;
 		float uvHeight = heiVertex ? 0.0f : 1.0f;
 		for (int j = 0; j < insideVertexCount; j++)
 		{

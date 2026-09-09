@@ -11,7 +11,9 @@ UseAttackAction::~UseAttackAction()
 
 Node::Status UseAttackAction::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
 {
-	
+
+	result.UseGuard = false;
+
 		// ©g‚ÌBBî•ñ‚ğæ“¾‚·‚é
 		const auto enemyIt = blackBord.enemyDatas.find(context.agentEntity);
 		if (enemyIt == blackBord.enemyDatas.end())

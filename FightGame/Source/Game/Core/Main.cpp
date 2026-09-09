@@ -24,8 +24,8 @@ MainGame::MainGame()
 	: scene(nullptr)
 	, pRTV(nullptr)
 	, pDSV(nullptr)
-	, fpsOldTime(0.0f)
-	, preExecTime(0.0f)
+	, fpsOldTime(0)
+	, preExecTime(0)
 	, processingTime(0.0f)
 	, worstProcessingTime(0.0f)
 	, totalProcessingTime(0.0f)
@@ -69,6 +69,10 @@ void MainGame::Init()
 		std::ref(effectResultQueue),
 		std::ref(soundJobQueue),
 		std::ref(soundResultQueue),
+		std::ref(textFormatJobQueue),
+		std::ref(textFormatResultQueue),
+		std::ref(textUIJobQueue),
+		std::ref(textUIResultQueue),
 		std::ref(runningLoadLoop));
 	
 
@@ -131,7 +135,13 @@ void MainGame::Init()
 		"No",
 		"BackShadow",
 		"GameEnd",
-		"GameEndFrame"
+		"GameEndFrame",
+		"ClearBack",
+		"CameraChange",
+		"ClearCameraChange",
+		"ClearMovieBack",
+		"Kintoki",
+		"StageClear"
 	};
 
 	effectDatas =
@@ -142,8 +152,19 @@ void MainGame::Init()
 		{kSnowEffect, 3.0f},
 		{kEntryEffect, 1.5f},
 		{kGuardEffectKey, 0.6f},
-		{kRedBossEntryKey, 0.5f},
+		{kRedBossEntryKey, 0.3f},
 		{kDeadBrokenEffectKey, 0.5f},
+		{kBossDeadBrokenEffectKey, 0.8f}
+	};
+
+	textFormatDatas =
+	{
+		{"DefaultFormat", L"Meiryo", 48.0f}
+	};
+
+	textUIDatas =
+	{
+		{"StartText", L"Ç†Ç†Ç†Ç†Ç†Ç†Ç†Ç†Ç†Ç†Ç†Ç†Ç†Ç†aaaaaaaaaaaaaaa", "DefaultFormat", 48.0f * 20.0f, 48.0f * 5.0f}
 	};
 
 	ChangeScene("Load");
@@ -300,7 +321,7 @@ void MainGame::LoadLoopUpdate()
 	{
 		TextureLoadResult result;
 		if (textureResultQueue.TryPop(result))
-		uiCache.RegisterModel(result.key, result.data);
+		uiCache.RegisterTexture(result.key, result.data);
 	}
 
 	while (!effectResultQueue.IsEnpty())
@@ -308,6 +329,20 @@ void MainGame::LoadLoopUpdate()
 		EffectLoadResult result;
 		if (effectResultQueue.TryPop(result) && result.effect) 
 		effectCache.RegisterEffect(result.key, result.effect);
+	}
+
+	while (!textFormatResultQueue.IsEnpty())
+	{
+		TextFormatLoadResult result;
+		if (textFormatResultQueue.TryPop(result))
+		uiCache.RegisterTextFormat(result.key, result.format);
+	}
+
+	while (!textUIResultQueue.IsEnpty())
+	{
+		TextUILoadResult result;
+		if (textUIResultQueue.TryPop(result))
+			uiCache.RegisterTexture(result.key, result.data);
 	}
 
 	// TODO SoundÇì«Ç›çûÇﬂÇÈÇÊÇ§Ç…Ç∑ÇÈ
@@ -444,6 +479,10 @@ void MainGame::WorkerLoop(
 	ThreadSafeQueue<EffectLoadResult>& a_effectResultQueue,
 	ThreadSafeQueue<SoundLoadJob>& a_soundJobQueue,
 	ThreadSafeQueue<SoundLoadResult>& a_soundResultQueue,
+	ThreadSafeQueue<TextFormatLoadJob>& a_textFormatJobQueue,
+	ThreadSafeQueue<TextFormatLoadResult>& a_textFormatResultQueue,
+	ThreadSafeQueue<TextUILoadJob>& a_textUIJobQueue,
+	ThreadSafeQueue<TextUILoadResult>& a_textUIResultQueue,
 	std::atomic<bool>& a_running)
 {
 	if (FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)))
@@ -497,6 +536,30 @@ void MainGame::WorkerLoop(
 			}
 		}
 
+		while (!textFormatJobQueue.IsEnpty())
+		{
+			TextFormatLoadJob textFormatJob = a_textFormatJobQueue.Pop();
+
+			TextFormatLoadResult textFormatResult = LoadFormat(textFormatJob);
+			a_textFormatResultQueue.Push(std::move(textFormatResult));
+			if (textFormatJob.endFlagPointer)
+			{
+				textFormatJob.endFlagPointer->store(true);
+			}
+		}
+
+		while (!textUIJobQueue.IsEnpty())
+		{
+			TextUILoadJob textUIJob = a_textUIJobQueue.Pop();
+
+			TextUILoadResult textUIResult = LoadTextUI(textUIJob, uiCache);
+			a_textUIResultQueue.Push(std::move(textUIResult));
+			if (textUIJob.endFlagPointer)
+			{
+				textUIJob.endFlagPointer->store(true);
+			}
+		}
+
 	}
 
 	CoUninitialize();
@@ -517,9 +580,13 @@ bool MainGame::ChangeScene(std::string a_key)
 			modelJobQueue,
 			textureJobQueue,
 			effectJobQueue,
+			textFormatJobQueue,
+			textUIJobQueue,
 			modelDatas,
 			textureDatas,
 			effectDatas,
+			textFormatDatas,
+			textUIDatas,
 			modelCache,
 			uiCache,
 			effectCache,

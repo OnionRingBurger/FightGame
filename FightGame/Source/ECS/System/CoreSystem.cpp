@@ -1,5 +1,6 @@
 #include "CoreSystem.h"
 #include "Components.h"
+#include "SystemAssist.h"
 
 using namespace Component;
 
@@ -75,6 +76,34 @@ void ResetSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 }
 
+void CreateLifeEndEffect(Chunk& a_chunk, Entity a_entity)
+{
+	// コンポーネントを取得
+	ComponentHandle<LifeTimeEndEffect> endEffect = a_chunk.GetComponent<LifeTimeEndEffect>(a_entity);
+	ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(a_entity);
+	if(!endEffect.IsValid() || !pos.IsValid()) return;
+
+	// Effekseerのエフェクトを生成
+	if(endEffect.Look().useEfkEffect)
+	{
+		a_chunk.CreateNewEntity(
+			MOVE_AND_TRANSFORM_COMPONENT(
+				TOFLOAT3(pos.Look()),
+				float3(),
+				float3(1.0f, 1.0f, 1.0f)
+			),
+			EfkEffectKey(endEffect.Look().efkEffectKey, 0.0f, false)
+		);
+	}
+
+	// 音を鳴らす
+	if(endEffect.Look().useSound)
+	{
+		
+	}
+
+}
+
 void LifeTimeSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
 	ComponentView view = a_chunk.GetView<ComponentTypes<LifeTime>>();
@@ -86,9 +115,33 @@ void LifeTimeSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		if (time.Look().time <= 0.0f)
 		{
+			// 死亡時エフェクトを生成
+			CreateLifeEndEffect(a_chunk, it);
+			// コンポーネントを削除
 			a_chunk.DeleteChunkEntity(it);
 		}
 	}
+}
+
+void SpawnJsonSystem(Chunk& a_chunk, const SystemContext& a_context, ComponentsSerialize& a_serialize, AIManager& a_aimanager)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<SpawnJson>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<SpawnJson> spawn = a_chunk.GetComponent<SpawnJson>(it);
+
+		if (spawn.Look().currentDuration < spawn.Look().maxSpawnTime)
+		{
+			spawn->currentDuration += a_context.effectStepTime;
+			continue;
+		}
+
+		NewSceneSpawn(a_serialize, a_chunk, a_aimanager, spawn.Look().spawnKey, spawn.Look().offset);
+		a_chunk.DeleteChunkEntity(it);
+	}
+
+
 }
 
 void RaySystem(Chunk& a_chunk, const SystemContext& a_context)

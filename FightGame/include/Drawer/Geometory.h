@@ -21,6 +21,15 @@ private:
 		float pos[3];
 		float uv[2];
 	};
+	// !!!New!!!
+	struct SectorShape
+	{
+		float minLength;
+		float maxLength;
+		float angle;
+		float maxHeight;
+		float maxLowness;
+	};
 public:
 	static void Init();
 	static void Uninit();
@@ -39,7 +48,7 @@ public:
 	// –‘O‚ÉF‚ñ‚ÈŒ`‚Ìî‚ğ“o˜^‚·‚é
 	static void RegisterSector(std::string key ,float minLength, float maxLength, float angle, float maxHeight, float maxLowness, int circumferenceCount);
 	// “o˜^‚³‚ê‚Ä‚¢‚éîŒ`‚ğ•`‰æ‚·‚é
-	static void DrawSector(std::string key, float progress, float3 defaultColor);
+	static void DrawSector(std::string key, float progress, float maxTime, float highlightTime, float3 defaultColor);
 
 private:
 	static void MakeVS();
@@ -70,6 +79,8 @@ private:
 	static void* m_pLineVtx;
 	static int m_lineCnt;
 	static std::unordered_map<std::string, MeshBuffer*> m_sectorBuffers;
+	// !!!New!!!
+	static std::unordered_map<std::string, SectorShape> m_sectorShapes;
 	static std::unordered_map<std::string, Vertex*> m_dynamicVertexSource;
 	static std::unordered_map<std::string, int*> m_dynamicIndexSource;
 };

@@ -33,7 +33,7 @@ public:
 	// !!!New!!!
 	void NotifyAttackResolved(Entity attacker, int attackIndex, bool connected);
 
-	void NotifyHitResolved(Entity hitEnemy);
+	void NotifyHitResolved(Entity hitEnemy, bool isGuard);
 
 	// !!!New!!!
 	void TickAI();

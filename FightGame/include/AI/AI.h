@@ -18,4 +18,5 @@
 #include "ChasePlayerAction.h"
 #include "UseAttackAction.h"
 #include "RunPlayerNode.h"
+#include "GuardNode.h"
 #include "InAttackRangeDecorator.h"

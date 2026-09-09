@@ -70,6 +70,8 @@ Entity GetLookOnMarker(Chunk& a_chunk)
 	{
 		return it;
 	}
+
+	return kInvalidEntity;
 }
 
 Entity GetCamera(Chunk& a_chunk)
@@ -169,6 +171,7 @@ void ClearCharacterAttackOnDeath(Chunk& a_chunk, Entity a_entity)
 	}
 }
 
+
 void RegisterAllAttackSectorsFromAttackData(int a_circumferenceCount)
 {
 	std::ifstream stream(kAttackDataPath);
@@ -217,24 +220,32 @@ void SafeDeleteEffectEntity(Chunk& a_chunk, Entity a_effect)
 }
 
 
-void NewEnemySpawn(ComponentsSerialize& a_serialize, Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName)
+void NewSceneSpawn(ComponentsSerialize& a_serialize, Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName, float3 a_offset)
 {
 	std::vector<Entity> newEntity = LoadJsonComponent(a_chunk, a_serialize, a_newSceneName);
 	for (auto it : newEntity)
 	{
-		ComponentHandle<EnemyTag> enemyTag = a_chunk.GetComponent<EnemyTag>(it);
-		if (!enemyTag.IsValid()) continue;
+		ComponentHandle<LeapPosComponent> leap = a_chunk.GetComponent<LeapPosComponent>(it);
+		if (leap.IsValid())
+		{
+			leap->leapStartPos += a_offset;
+			leap->leapEndPos += a_offset;
+		}
 
 		ComponentHandle<MotionTransform> motion = a_chunk.GetComponent<MotionTransform>(it);
-		if (!motion.IsValid()) continue;
-		motion->motionPos += kDefaultWorldPosition;
+		ComponentHandle<PosePosState> posState = a_chunk.GetComponent<PosePosState>(it);
+		if (!motion.IsValid() || posState.IsValid()) continue;
+		motion->motionPos += a_offset;
+
+		ComponentHandle<EnemyTag> enemyTag = a_chunk.GetComponent<EnemyTag>(it);
+		if (!enemyTag.IsValid()) continue;
 
 
 		ComponentHandle<AttackKeyLoad> keyLoad = a_chunk.GetComponent<AttackKeyLoad>(it);
 		if (keyLoad.IsValid())
 		{
 			std::ifstream stream(kAttackDataPath);
-			if (!stream.is_open()) return;
+			if (!stream.is_open()) continue;
 			nlohmann::json json;
 			stream >> json;
 			AttackStatus status;
@@ -304,6 +315,13 @@ void ResetFixedPosState(ComponentHandle<FixedResult> fixedResult, ComponentHandl
 	motionResult->posOffset += fixedResult.Look().newPos;
 	fixedResult->newPos = float3(0.0f, 0.0f, 0.0f);
 }
+
+void ResetFixedRotState(ComponentHandle<FixedResult> fixedResult, ComponentHandle<MotionResult> motionResult)
+{
+	motionResult->rotOffset += fixedResult.Look().newRot;
+	fixedResult->newRot = float3(0.0f, 0.0f, 0.0f);
+}
+
 
 float3 GetLocalOffset(float3 worldOffset, float3 rotation)
 {
