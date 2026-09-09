@@ -62,7 +62,7 @@ void LoadSound()
 
 TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job)
 {
-	auto* factory = GetDWriteFactory();
+	IDWriteFactory* factory = GetDWriteFactory();
 
 	ComPtr<IDWriteTextFormat> textFormat;
 
@@ -76,6 +76,8 @@ TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job)
 		DebugMessage("テキストフォーマットの読み込みに失敗しました。");
 		return TextFormatLoadResult();
 	}
+
+	
 
 	HRESULT hr = factory->CreateTextFormat(
 		a_job.font.c_str(),

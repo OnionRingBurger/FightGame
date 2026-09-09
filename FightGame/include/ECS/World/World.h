@@ -80,7 +80,7 @@ protected:
 
 	virtual void InitResponse(std::unique_ptr<SystemResponse>& response);
 
-	virtual void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse);
+	virtual void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize);
 
 	// !!!New!!!
 	virtual void InitAI(AIManager& a_aiManager);

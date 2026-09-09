@@ -18,6 +18,10 @@ TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 {
 	a_input.RegisterKey("ChunkChange", VK_LBUTTON);
 	a_input.RegisterButton("ChunkChange", XINPUT_GAMEPAD_A);
+
+	a_input.RegisterKey("GoToTutorial", VK_RBUTTON);
+	a_input.RegisterButton("GoToTutorial", XINPUT_GAMEPAD_B);
+
 }
 
 Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
@@ -29,7 +33,7 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 
 
 	Entity titleLogo = newChunk.CreateNewEntity(
-		UIComponent("StartText", float2(0.0f, 0.4f), float2(1.0f, 1.0f), 0.0f)
+		UIComponent("TitleLogo", float2(0.0f, 0.4f), float2(1.0f, 1.0f), 0.0f)
 	);
 
 	Entity keyLogo = newChunk.CreateNewEntity(
@@ -72,18 +76,18 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		KeyChunkChange("ChunkChange", 240.0f)
 	);
 
+	Entity goToTutorial = newChunk.CreateNewEntity(
+		ChunkChange(true, "Tutorial"),
+		KeyChunkChange("GoToTutorial", 110.0f)
+	);
+
 	Entity character = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
-			float3(-2.0f, 20.5f, -6.0f),
+			float3(-2.0f, 65.5f, -6.0f),
 			float3(0.0f, 0.0f, 0.0f),
 			float3(1.0f, 1.0f, 1.0f)
 		),
 		ModelKey("Box"),
-		InputSource(InputOrigin::Title),
-		InputMove(kPlayerMoveSpeed),
-		MoveInputResult(),
-		PlayerTag(),
-		Firework(FIREWORK_NONE),
 		GroundedState(),
 		DeadState(),
 		ActionMask(),
@@ -92,18 +96,8 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
 		OBBCollider(),
 		HitInfomation(),
-		JumpPower(float3(0.0f, 20.0f / 60.0f, 0.0f)),
-		AttackKeyLoad({ "Player1Attack1", "Player1Attack2" }),
-		LookMove(800.0f / 60.0f),
-		PoseRotState(POSE_ROT_LOOKMOVE),
-		HitPoint(15.0f),
-		AttackHitRecord(),
-		GuardState(0.2f, 3.0f),
-		Name("Player"),
-		InterferenceResult(),
-		GhostAreaComponent(1.4f),
-		LookOnState(7.0f, 7.8f),
-		AlphaBlendComponent("Red", "Red")
+		AlphaBlendComponent("Red", "Red"),
+		EntryAction(0.1f)
 	);
 
 	Entity enemy1 = newChunk.CreateNewEntity(
@@ -115,7 +109,7 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		),
 		ModelKey("Box"),
 		AlphaBlendComponent("Red", "Purple"),
-		ShakeComponent(float3(0.005f, 0.005f, 0.005f), float3(1.1f, 1.1f, 1.1f), FLT_MAX, 1.0f)
+		ShakeComponent(float3(0.05f, 0.05f, 0.05f), float3(1.1f, 1.1f, 1.1f), FLT_MAX, 1.0f)
 	);
 
 	Entity enemy2 = newChunk.CreateNewEntity(
@@ -126,6 +120,26 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 			float3(1.0f, 1.0f, 1.0f)
 		),
 		ModelKey("Box"),
+		InputMove(kPlayerMoveSpeed),
+		MoveInputResult(),
+		PlayerTag(),
+		Firework(FIREWORK_NONE),
+		GroundedState(),
+		DeadState(),
+		ActionMask(),
+		Force(),
+		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
+		OBBCollider(),
+		HitInfomation(),
+		JumpPower(float3(0.0f, 20.0f / 60.0f, 0.0f)),
+		AttackKeyLoad({ "Player1Attack1", "Player1Attack2" }),
+		PoseRotState(POSE_ROT_LOOKMOVE),
+		HitPoint(15.0f),
+		AttackHitRecord(),
+		GuardState(0.2f, 3.0f),
+		Name("Player"),
+		InterferenceResult(),
+		GhostAreaComponent(1.4f),
 		AlphaBlendComponent("Blue", "Green"),
 		AngularVelocity(float3(0.0f, 12.0f, 0.0f))
 	);
@@ -170,7 +184,7 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 	return newChunk;
 }
 
-void TitleWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response)
+void TitleWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 	// 物理挙動の結果に基づいてキャラクターのステートを決定する
 	GroundedSystem(a_chunk, a_context);

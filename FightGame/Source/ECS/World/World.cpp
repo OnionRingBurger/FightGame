@@ -55,7 +55,7 @@ void World::InitWorld()
 	chunk = CreateNewChunk(aiManager);
 
 	ContextUpdate(0.01f);
-	InitChunk(chunk, context, *systemResponse);
+	InitChunk(chunk, context, *systemResponse, aiManager, serialize);
 }
 
 void World::InitResponse(std::unique_ptr<SystemResponse>& response)
@@ -63,7 +63,7 @@ void World::InitResponse(std::unique_ptr<SystemResponse>& response)
 	systemResponse = std::make_unique<SystemResponse>();
 }
 
-void World::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse)
+void World::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 
 }

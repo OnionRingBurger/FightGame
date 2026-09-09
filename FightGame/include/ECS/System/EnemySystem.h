@@ -6,14 +6,6 @@
 #include "MathAssist.h"
 #include "AIManager.h"
 
-void EnemySpawnSystem(Chunk& a_chunk, const SystemContext& a_context);
-
-void EnemyPlayerSearch(Chunk& a_chunk, const SystemContext& a_context);
-
-void EnemyFearSystem(Chunk& a_chunk, const SystemContext& a_context);
-
-void EnemyAttackSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_systemResponse);
-
 struct PlayerHitViewInfo
 {
 	bool isOffView = false;
@@ -21,12 +13,10 @@ struct PlayerHitViewInfo
 };
 
 // ”í’eŒ³‚ª‹ü‚©‚çŠO‚ê‚Ä‚¢‚é‚©‚ÆA‰æ–Ê‚©‚çŒ©‚½”í’eŒ³‚Ì•ûŒü‚ğ•Ô‚·
-PlayerHitViewInfo EvaluatePlayerHitView(Chunk& a_chunk, Entity a_player, Entity a_hitEntity, float a_minAngleDeg = kDamageDirectionMinAngleDeg);
+PlayerHitViewInfo EvaluatePlayerHitView(Chunk& a_chunk, Entity a_player, Entity a_hitEntity, float a_minAngleDeg);
 
 // ƒvƒŒƒCƒ„[‚Ì‹ü‚Æ”í’eŒ³‚Ö‚Ì•ûŒü‚Ì‚È‚·Šp‚ª a_minAngleDeg ˆÈã‚©
-bool IsPlayerHitFromOffView(Chunk& a_chunk, Entity a_player, Entity a_hitEntity, float a_minAngleDeg = kDamageDirectionMinAngleDeg);
-
-void EnemyShooterSystem(Chunk& a_chunk, const SystemContext& a_context);
+bool IsPlayerHitFromOffView(Chunk& a_chunk, Entity a_player, Entity a_hitEntity, float a_minAngleDeg);
 
 void EnemyDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response);
 

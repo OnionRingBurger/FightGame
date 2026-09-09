@@ -1,4 +1,4 @@
-#include "ProtoWorld.h"
+#include "TutorialWorld.h"
 #include "Components.h"
 #include "System.h"
 #include "Sound.h"
@@ -13,7 +13,7 @@
 
 #include <fstream>
 
-ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
+TutorialWorld::TutorialWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
 	: World(a_modelCache,
 		a_uiCache,
 		a_effectCache,
@@ -23,14 +23,10 @@ ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 	)
 	, worldRequest(a_worldRequest)
 {
-	//a_input.RegisterKey("RightAttack", VK_RIGHT);
-	//a_input.RegisterKey("LeftAttack", VK_LEFT);
 	a_input.RegisterKey("RightAttack", MK_RBUTTON);
 	a_input.RegisterKey("LeftAttack", MK_LBUTTON);
 	a_input.RegisterKey("Jump", 'E');
 	a_input.RegisterKey("Guard", 'Q');
-	//a_input.RegisterKey("LookOnLeft", 'Q');
-	//a_input.RegisterKey("LookOnRight", 'E');
 
 	a_input.RegisterButton("RightAttack", XINPUT_GAMEPAD_B);
 	a_input.RegisterButton("LeftAttack", XINPUT_GAMEPAD_A);
@@ -44,18 +40,9 @@ ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 
 	a_input.RegisterKey("TheWorld", 'E');
 
-	//a_input.RegisterKey("Default", '0');
-	//a_input.RegisterKey("Burn", '1');
-	//a_input.RegisterKey("Drop", '2');
-	//a_input.RegisterKey("Fly", '3');
-	//a_input.RegisterKey("Shake", '4');
-	//a_input.RegisterKey("Retro", '5');
-	//a_input.RegisterKey("InputMove", '6');
-	//a_input.RegisterKey("InputAngle", '7');
-	//a_input.RegisterKey("Fish", '8');
 }
 
-void ProtoWorld::InitAI(AIManager& a_aiManager)
+void TutorialWorld::InitAI(AIManager& a_aiManager)
 {
 	std::unique_ptr<BehaviorTree> bt = std::make_unique<BehaviorTree>();
 	RootNode& root = bt->GetRoot();
@@ -67,8 +54,8 @@ void ProtoWorld::InitAI(AIManager& a_aiManager)
 
 	std::unique_ptr<ReactiveSelector> neutralSelector = std::make_unique<ReactiveSelector>();
 	neutralSelector->AddNode(std::make_unique<InAttackRangeDecorator>(std::make_unique<UseAttackAction>()));
-	neutralSelector->AddNode(std::make_unique<ChasePlayerAction>(1.0f));
-	
+	neutralSelector->AddNode(std::make_unique<ChasePlayerAction>(0.6f));
+
 
 	std::unique_ptr<ReactiveSelector> guardSelector = std::make_unique<ReactiveSelector>();
 	guardSelector->AddNode(std::make_unique<GuardNode>());
@@ -85,9 +72,45 @@ void ProtoWorld::InitAI(AIManager& a_aiManager)
 	a_aiManager.RegisterTree("Enemy", std::move(bt));
 }
 
-Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
+void TutorialWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
-	
+	// 物理挙動の結果に基づいてキャラクターのステートを決定する
+	GroundedSystem(a_chunk, a_context);
+	CharacterActionMaskSystem(a_chunk, a_context);
+
+	// Pose系の処理を行う
+
+	InputMoveSystem(a_chunk, a_context); //oo
+	InputRotatoSystem(a_chunk, a_context);  //oo
+	FlipSystem(a_chunk, a_context); //oo
+	LookSystem(a_chunk, a_context); //oo
+	MoveForwardSystem(a_chunk, a_context); //oo
+	LeapSystem(a_chunk, a_context);//oo
+	ShakingSystem(a_chunk, a_context); //oo
+	TrackingWarpSystem(a_chunk, a_context);//oo
+	RailSystem(a_chunk, a_context);
+	FlySystem(a_chunk, a_context);
+	ShakeSystem(a_chunk, a_context);
+	PoseSystem(a_chunk, a_context);
+
+	ResetConsoleSystem(a_chunk, a_context);
+
+	// 追従などの遅延系処理
+	LookMoveSystem(a_chunk, a_context);
+	FollowTransformSystem(a_chunk, a_context);//o
+	CameraMoveSystem(a_chunk, a_context);//oo
+	LatePoseSystem(a_chunk, a_context);
+	// Transform適用
+	TransformSystem(a_chunk, a_context);
+
+	EnemyAttackLoadSystem(a_chunk, a_context);
+
+	// リザルトなどをリセット
+	ResetSystem(a_chunk, a_context);
+}
+
+Chunk TutorialWorld::CreateNewChunk(AIManager& a_aiManager)
+{
 	Chunk newChunk;
 
 	RegisterAllAttackSectorsFromAttackData(kSectorVertexCount);
@@ -128,6 +151,9 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		GameOverTarget()
 	);
 
+	//Geometory::RegisterSector("Player1Attack1", 0.0f, 1.7f, 160.0f, 0.5f, 0.5f, kSectorVertexCount);
+	//Geometory::RegisterSector("Player1Attack2", 0.0f, 6.2f, 60.0f, 0.5f, 0.5f, kSectorVertexCount);
+
 	Entity targetMarker = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
 			float3(0.0f, 0.0f, 0.0f),
@@ -144,15 +170,18 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 	);
 
 	Entity spawner = newChunk.CreateNewEntity(
-		PhaseSpawner(
+		TutorialSpawner(
 			{
-				"Stage1Phase1",
-				"Stage1Phase2",
-				"PhaseClear",
-				"Stage1Phase1",
-				"Stage1Phase3",
-				"PhaseClear",
-				"Stage1Boss1"
+				{true, "StartText", false, ""},
+				{true, "TutorialAttack", true, "Stage1Phase1"},
+				{true, "TutorialAttack2", false, ""},
+				{true, "TutorialAttack3", true, "Stage1Phase2"},
+				{true, "TutorialEnemy", false, ""},
+				{true, "TutorialEnemy2", false, ""},
+				{true, "TutorialEnemy3", true, "Stage1Phase3"},
+				{true, "Phase1", false, "PhaseClear"},
+				{true, "Phase2", true, "PhaseClear"},
+				{true, "TutorialClear", false}
 			}
 
 		)
@@ -169,56 +198,6 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 
 	);
 
-
-
-		//Entity ButtonUIA = newChunk.CreateNewEntity(
-		//	UIComponent("ButtonLB", float2(-0.93f, -0.88f), float2(0.15f * 0.8f, 0.275f * 0.8f), 0.0f)
-		//);
-
-		//Entity GuardUI = newChunk.CreateNewEntity(
-		//	UIComponent("GuardUI", float2(-0.75f, -0.88f), float2(0.28f * 0.8f, 0.22f * 0.8f), 0.0f)
-		//);
-
-
-		//Entity ButtonUIB = newChunk.CreateNewEntity(
-		//	UIComponent("ButtonRB", float2(-0.93f, -0.65f), float2(0.15f * 0.8f, 0.275f * 0.8f), 0.0f)
-		//);
-
-		//Entity JumpUI = newChunk.CreateNewEntity(
-		//	UIComponent("JumpUI", float2(-0.73f, -0.65f), float2(0.35f * 0.8f, 0.22f * 0.8f), 0.0f)
-		//);
-
-
-
-// #define CAMERA_3RD
-
-#ifdef CAMERA_3RD
-	Entity cameraRig = newChunk.CreateNewEntity(
-		MOVE_AND_TRANSFORM_COMPONENT(
-			float3(0.0f, 0.5f, 0.0f) + kDefaultWorldPosition,
-			float3(30.0f, 0.0f, 0.0f),
-			float3(1.0f, 1.0f, 1.0f)
-		),
-		CameraRigTag(),
-		FollowPosition(float3(0.0f, 0.0f, 0.0f), player, FOLLOW_POS_LOCALOFFSET | FOLLOW_POS_FIXED_Y),
-		FollowLeap(float3(kPlayerMoveSpeed.x, 0.0f, kPlayerMoveSpeed.y)),
-		PosePosState(POSE_POS_FOLLOW),
-		CameraPoint(100.0f, 100.0f, 100.0f, float3(0.0f, 0.0f, -10.5f))
-	);
-
-	Entity camera = newChunk.CreateNewEntity(
-		MOVE_AND_TRANSFORM_COMPONENT(
-			float3(0.0f, 0.0f, 0.0f),
-			float3(0.0f, 0.0f, 0.0f),
-			float3(1.0f, 1.0f, 1.0f)
-		),
-		Camera(100.0f, float3(0.0f, 0.0f, 0.0f), float3(0.0f, 1.0f, 0.0f), 60.0f, 1.77777f, 0.05f, 1000.0f),
-		CameraTag(),
-		PosePosState(POSE_POS_CAMERA),
-		PoseRotState(POSE_ROT_CAMERA)
-	);
-
-#else
 
 
 	Entity cameraRig = newChunk.CreateNewEntity(
@@ -247,7 +226,6 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		PoseRotState(POSE_ROT_CAMERA)
 	);
 
-#endif
 
 
 	Entity worldPower = newChunk.CreateNewEntity(
@@ -343,9 +321,9 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 	);
 
 
-	Entity battleStart = newChunk.CreateNewEntity(
-		CreateEffect(BATTLESTART, float2(0.0f, 0.4f), 0.0f, 120.0f)		
-	);
+	//Entity battleStart = newChunk.CreateNewEntity(
+	//	CreateEffect(BATTLESTART, float2(0.0f, 0.4f), 0.0f, 120.0f)
+	//);
 
 	Entity white = newChunk.CreateNewEntity(
 		CreateEffect(WHITEMINIFADE_CLEAR, float2(0.0f, 0.0f), 0.0f, 0.0f)
@@ -355,62 +333,10 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 	PlaySound(LoadSound("Assets/Sound/gamebgm.mp3", true));
 
 	return newChunk;
-
 }
 
-void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
+void TutorialWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
-	// 移動系の処理をあらかじめ行う
-	// Physics系の処理を行う
-	//WorldPowerSystem(a_chunk, a_context);
-	//VelocitySystem(a_chunk, a_context); //oo
-	//AngularVelocitySystem(a_chunk, a_context);
-	////ColliderSystem(a_chunk, a_context);
-	////ColliderCheckSystem(a_chunk, a_context);
-	//SectorCheckSystem(a_chunk, a_context);
-	//ColliderBackSystem(a_chunk, a_context);//o
-
-	// 物理挙動の結果に基づいてキャラクターのステートを決定する
-	GroundedSystem(a_chunk, a_context);
-	CharacterActionMaskSystem(a_chunk, a_context);
-
-	// Pose系の処理を行う
-
-	InputMoveSystem(a_chunk, a_context); //oo
-	InputRotatoSystem(a_chunk, a_context);  //oo
-	FlipSystem(a_chunk, a_context); //oo
-	LookSystem(a_chunk, a_context); //oo
-	MoveForwardSystem(a_chunk, a_context); //oo
-	LeapSystem(a_chunk, a_context);//oo
-	ShakingSystem(a_chunk, a_context); //oo
-	TrackingWarpSystem(a_chunk, a_context);//oo
-	RailSystem(a_chunk, a_context);
-	FlySystem(a_chunk, a_context);
-	ShakeSystem(a_chunk, a_context);
-	PoseSystem(a_chunk, a_context);
-
-	ResetConsoleSystem(a_chunk, a_context);
-
-	// 追従などの遅延系処理
-	LookMoveSystem(a_chunk, a_context);
-	FollowTransformSystem(a_chunk, a_context);//o
-	CameraMoveSystem(a_chunk, a_context);//oo
-	LatePoseSystem(a_chunk, a_context);
-	// Transform適用
-	TransformSystem(a_chunk, a_context);
-
-	EnemyAttackLoadSystem(a_chunk, a_context);
-
-	CheckAliveTargetEnemySystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
-
-	// リザルトなどをリセット
-	ResetSystem(a_chunk, a_context);
-}
-
-void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
-{
-	TestSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
-
 	// Physics系の処理を行う
 	WorldPowerSystem(a_chunk, a_context);
 	ForceSystem(a_chunk, a_context);
@@ -479,8 +405,8 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	AttackInstanceEndCheckSystem(a_chunk, a_context);
 	AttackInstanceResolveSystem(a_chunk, a_context, a_aiManager);
 	EntryActionSystem(a_chunk, a_context);
-	PlayerHealSystem(a_chunk, a_context);
 	PlayerDeadSystem(a_chunk, a_context, a_response);
+	PlayerHealSystem(a_chunk, a_context);
 	EnemyDeadSystem(a_chunk, a_context, a_response);
 	BossDeadSystem(a_chunk, a_context, a_response);
 
@@ -490,6 +416,7 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 
 	// Effect系統を処理
 	CreateEffectSystem(a_chunk, a_context);
+	CreateTutorialTextSystem(a_chunk, a_context);
 	UVMoveSystem(a_chunk, a_context);
 	UILerpSystem(a_chunk, a_context);
 	StartUISystem(a_chunk, a_context);
@@ -508,17 +435,14 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 
 	// 終了処理
 	LifeTimeSystem(a_chunk, a_context);
-	CheckAliveTargetGameOverSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
-	CheckAliveTargetEnemySystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
+	CheckClearTutorialSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 	ResetSystem(a_chunk, a_context);
 	ChunkChangeSystem(a_chunk, a_context, a_response);
 }
 
-void ProtoWorld::HandleSystemResponse(SystemResponse& a_response)
+void TutorialWorld::HandleSystemResponse(SystemResponse& a_response)
 {
 	if (!a_response.IsWorldRequest()) return;
 
 	worldRequest(a_response.GetWorldRequest());
 }
-
-

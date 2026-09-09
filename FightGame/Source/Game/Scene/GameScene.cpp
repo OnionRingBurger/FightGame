@@ -6,6 +6,7 @@
 #include "ResultWorld.h"
 #include "TestWorld.h"
 #include "ProtoWorld.h"
+#include "TutorialWorld.h"
 
 constexpr const char* kStartWorld = "Title";
 
@@ -230,6 +231,20 @@ bool GameScene::SetWorld(std::string a_key)
 	else if (a_key == "Proto")
 	{
 		world = std::make_unique<ProtoWorld>(
+			modelCache,
+			uiCache,
+			effectCache,
+			[this](int a_id) {TutorialRequest(a_id); },
+			[this](std::string a_key) {WorldRequest(a_key); },
+			input,
+			serialize
+		);
+
+		world->InitWorld();
+	}
+	else if (a_key == "Tutorial")
+	{
+		world = std::make_unique<TutorialWorld>(
 			modelCache,
 			uiCache,
 			effectCache,

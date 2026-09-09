@@ -66,7 +66,7 @@ LoadScene::LoadScene(
 	for (auto it : textFormatDatas)
 	{
 		std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-		textFormatJobQueue.Push(std::move(TextFormatLoadJob(it.key, it.font, it.size, endFlag)));
+		textFormatJobQueue.Push(std::move(TextFormatLoadJob(it.key, it.useFile, it.font, it.fontFile, it.size, endFlag)));
 		useDataLoadEndFlags.push_back(endFlag);
 	}
 

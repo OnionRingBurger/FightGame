@@ -7,7 +7,7 @@
 #include "DebugSystemResponse.h"
 
 #include "Defines.h"
-constexpr const char* startWorld = "Stage1Phase2";
+constexpr const char* startWorld = "Stage1Phase1";
 
 CreateGameWorld::CreateGameWorld(IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,

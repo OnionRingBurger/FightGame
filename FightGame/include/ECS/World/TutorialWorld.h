@@ -1,9 +1,10 @@
 #pragma once
+
 #include "World.h"
-class GameWorld : public World
+class TutorialWorld : public World
 {
 public:
-	GameWorld(IModelCacheAcquisition& a_modelCache,
+	TutorialWorld(IModelCacheAcquisition& a_modelCache,
 		IUICacheAcquisition& a_uiCache,
 		IEffectCacheAcquisition& a_effectCache,
 		std::function<void(int)> a_tutorialRequest,
@@ -12,6 +13,8 @@ public:
 		ComponentsSerialize& a_serialize);
 
 protected:
+	virtual void InitAI(AIManager& a_aiManager) override;
+
 	virtual void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize) override;
 
 	virtual Chunk CreateNewChunk(AIManager& a_aiManager) override;
@@ -22,4 +25,3 @@ protected:
 
 	std::function<void(std::string)> worldRequest;
 };
-

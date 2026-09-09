@@ -202,6 +202,7 @@
     <ClInclude Include="include\ECS\World\ResultWorld.h" />
     <ClInclude Include="include\ECS\World\TestWorld.h" />
     <ClInclude Include="include\ECS\World\TitleWorld.h" />
+    <ClInclude Include="include\ECS\World\TutorialWorld.h" />
     <ClInclude Include="include\ECS\World\World.h" />
     <ClInclude Include="include\Game\Core\Defines.h" />
     <ClInclude Include="include\Game\Core\Input.h" />
@@ -310,6 +311,7 @@
     <ClCompile Include="Source\ECS\World\ResultWorld.cpp" />
     <ClCompile Include="Source\ECS\World\TestWorld.cpp" />
     <ClCompile Include="Source\ECS\World\TitleWorld.cpp" />
+    <ClCompile Include="Source\ECS\World\TutorialWorld.cpp" />
     <ClCompile Include="Source\ECS\World\World.cpp" />
     <ClCompile Include="Source\Game\Core\Input.cpp" />
     <ClCompile Include="Source\Game\Core\Loading.cpp" />

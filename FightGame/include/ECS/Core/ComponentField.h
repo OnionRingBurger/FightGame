@@ -1125,4 +1125,11 @@ namespace ComponentSystem
 		valueFunc("effectKey", component.effectKey, "");
 	}
 
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(PlayerHeal& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("isHealEnd", component.isHealEnd, false);
+		valueFunc("healValue", component.healValue, 0.0f);
+	}
+
 };

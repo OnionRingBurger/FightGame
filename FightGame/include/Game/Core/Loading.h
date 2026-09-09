@@ -26,7 +26,9 @@ struct effectLoadData
 struct textFormatData
 {
 	std::string key;
+	bool useFile;
 	std::wstring font;
+	std::wstring fontFile;
 	float size;
 };
 
@@ -112,16 +114,22 @@ struct TextFormatLoadJob
 	std::shared_ptr<std::atomic_bool> const endFlagPointer;
 
 	std::string key;
+	bool useFile;
 	std::wstring font;
+	std::wstring fontFile;
 	float size;
 
 	TextFormatLoadJob(
 		std::string a_key,
+		bool a_useFile,
 		std::wstring a_font,
+		std::wstring a_fontFile,
 		float a_size,
 		std::shared_ptr<std::atomic_bool> const a_endFlagPointer)
 		: key(a_key)
+		, useFile(a_useFile)
 		, font(a_font)
+		, fontFile(a_fontFile)
 		, size(a_size)
 		, endFlagPointer(a_endFlagPointer)
 	{

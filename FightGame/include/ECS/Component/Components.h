@@ -163,7 +163,8 @@
 	X(SoundKey) \
 	X(EfkEffectArea)\
 	X(AllActionStopper)\
-	X(CameraChangeEffect)
+	X(CameraChangeEffect)\
+	X(PlayerHeal)
 
 
 using BitFlag = unsigned int;
@@ -3397,6 +3398,74 @@ namespace Component
 		}
 	};
 
+	struct PlayerHeal
+	{
+		static constexpr TypeID kTypeId = 162;
+		static constexpr const char* kTypeName = "PlayerHeal";
+		static constexpr int kVersion = 0;
+
+		bool isHealEnd;
+		float healValue;
+
+		PlayerHeal(float a_healValue)
+			: healValue(a_healValue)
+			, isHealEnd(false)
+		{
+		}
+
+		PlayerHeal()
+			: PlayerHeal(0.0f)
+		{
+		}
+	};
+
+
+	struct TutorialState
+	{
+		bool useStartMessage;
+		std::string startMessageKey;
+		bool useLoad;
+		std::string load;
+	};
+
+	struct TutorialSpawner
+	{
+		static constexpr TypeID kTypeId = 163;
+		static constexpr const char* kTypeName = "TutorialSpawner";
+		static constexpr int kVersion = 0;
+
+		int progress;
+		std::vector<TutorialState> state;
+
+		TutorialSpawner(std::vector<TutorialState> a_state)
+			: state(a_state)
+			, progress(0)
+		{
+		}
+
+		TutorialSpawner()
+			: TutorialSpawner(std::vector<TutorialState>{})
+		{
+		}
+
+
+	};
+
+	struct CreateTutorialWindow
+	{
+		static constexpr TypeID kTypeId = 164;
+		static constexpr const char* kTypeName = "CreateTutorialWindow";
+		static constexpr int kVersion = 0;
+
+		std::string textKey;
+		float waitTime;
+
+		CreateTutorialWindow(std::string a_textKey, float a_waitTime)
+			: textKey(a_textKey)
+			, waitTime(a_waitTime)
+		{
+		}
+	};
 };
 
 

@@ -3,6 +3,7 @@
 #include "SystemAssist.h"
 #include "Sound.h"
 #include "Defines.h"
+#include "GameData.h"
 
 using namespace Component;
 
@@ -53,7 +54,7 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRes
 
 void PlayerJumpSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
-	ComponentView view = a_chunk.GetView<ComponentTypes<PlayerTag, MoveInputResult, ActionMask, JumpPower>>();
+	ComponentView view = a_chunk.GetView<ComponentTypes<MoveInputResult, ActionMask, JumpPower>>();
 
 	for (auto it : view)
 	{
@@ -84,6 +85,38 @@ void PlayerJumpSystem(Chunk& a_chunk, const SystemContext& a_context)
 		std::string path = kSoundAssetPath;
 		path += "jump.mp3";
 
-		PlaySound(LoadSound(path.c_str()));
+		// タイトル画面じゃなかったら音を出す
+		ComponentHandle<InputSource> source = a_chunk.GetComponent<InputSource>(it);
+		if(source.Look().jump != InputOrigin::Title) PlaySound(LoadSound(path.c_str()));
+	}
+}
+
+void PlayerHealSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<PlayerHeal>>();
+
+	Entity player = GetPlayer(a_chunk, float3());
+	ComponentHandle<HitPoint> hp = a_chunk.GetComponent<HitPoint>(player);
+
+	for (auto it : view)
+	{
+		// HPを回復する
+		ComponentHandle<PlayerHeal> heal = a_chunk.GetComponent<PlayerHeal>(it);
+		float healedHP = hp.Look().currentHP + heal.Look().healValue;
+		hp->currentHP = std::min(healedHP, hp.Look().maxHP);
+		// 回復Effectを生成
+		a_chunk.CreateNewEntity(
+			MOVE_AND_TRANSFORM_COMPONENT(
+				float3(),
+				float3(),
+				float3(1.0f, 1.0f, 1.0f)
+			),
+			FollowPosition(float3(), player),
+			PosePosState(POSE_POS_FOLLOW),
+			EfkEffectKey(kRedBossEntryKey, false)
+		);
+
+		// 回復Entityを削除
+		a_chunk.DeleteChunkEntity(it);
 	}
 }

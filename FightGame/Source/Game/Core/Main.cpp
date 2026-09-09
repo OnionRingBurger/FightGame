@@ -141,7 +141,9 @@ void MainGame::Init()
 		"ClearCameraChange",
 		"ClearMovieBack",
 		"Kintoki",
-		"StageClear"
+		"StageClear",
+		"TutorialWindow"
+
 	};
 
 	effectDatas =
@@ -157,14 +159,30 @@ void MainGame::Init()
 		{kBossDeadBrokenEffectKey, 0.8f}
 	};
 
+
+
+
+
 	textFormatDatas =
 	{
-		{"DefaultFormat", L"Meiryo", 48.0f}
+		{ "DefaultFormat", false, L"Meiryo", L"", 96.0f },
+		{ "ShortFormat", false, L"Meiryo", L"", 80.0f },
+		//{ "SmartFormat", false, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 48.0f }
 	};
 
 	textUIDatas =
 	{
-		{"StartText", L"ああああああああああああああaaaaaaaaaaaaaaa", "DefaultFormat", 48.0f * 20.0f, 48.0f * 5.0f}
+		{ "StartText", L"上からくるぞ！\n気を付けろ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "TutorialAttack", L"まずは敵に攻撃を当ててダメージを与えよう！\n体力を削りきることで敵を倒せるぞ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "TutorialAttack2", L"攻撃には発生が早く、使い勝手の良い弱攻撃と\n火力が高く、範囲が広い強攻撃の二種類が存在する。", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "TutorialAttack3", L"一方的に攻撃できる距離では強攻撃が、お互いの攻撃が\n当たる距離では敵を弾く弱攻撃が有効だ！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "TutorialEnemy", L"敵の種類の攻撃はジャンプやガードで防げるぞ！\n隙をついて上手く反撃しよう！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "TutorialEnemy2", L"一部の敵は特定の間合いでガードやジャンプで\n防ぎきるのが難しい攻撃を放ってくる", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "TutorialEnemy3", L"そんな敵と戦うときは、相手の間合いを避け、有利な立ち位置で戦おう！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "Phase1", L"よくやった！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "Phase2", L"ある程度強い敵を倒すとHPが回復する。", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "TutorialClear", L"素晴らしい！実戦ではより強い敵が現れる、\n間合いを意識して戦うことを忘れるな！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+
 	};
 
 	ChangeScene("Load");

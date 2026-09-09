@@ -260,5 +260,84 @@ void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context,
 	Entity movieSpawn = a_chunk.CreateNewEntity(
 		SpawnJson("ClearMovie", 80.0f, kClearWorldPosition)
 	);
+}
 
+
+void CheckClearTutorialSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
+{
+
+	ComponentView enemyView = a_chunk.GetView<ComponentTypes<ClearTarget>>();
+	for (auto it : enemyView)
+	{
+		// クリア対象が存在した場合関数を終了する
+		return;
+	}
+
+	// まだ敵が残っている場合生成する
+	bool spawn = false;
+	ComponentView spawnerView = a_chunk.GetView<ComponentTypes<TutorialSpawner>>();
+	for (auto it : spawnerView)
+	{
+		ComponentHandle<TutorialSpawner> spawner = a_chunk.GetComponent<TutorialSpawner>(it);
+		if (spawner.Look().state.size() <= spawner.Look().progress) continue;
+		spawn = true;
+
+		const TutorialState& state = spawner.Look().state.at(spawner->progress);
+		if (state.useStartMessage)
+		{
+			a_chunk.CreateNewEntity(
+				CreateTutorialWindow(state.startMessageKey, 65.0f),
+				ClearTarget(),
+				AllActionStopper()
+			);
+
+		}
+
+		if(state.useLoad) NewSceneSpawn(a_serialize, a_chunk, a_aiManager, state.load, kDefaultWorldPosition);
+		spawner->progress += 1;
+	}
+
+	if (spawn) return;
+	// 既にチャンク変更待ちだった場合何もせず抜ける
+	ComponentView chunkChangeView = a_chunk.GetView<ComponentTypes<DelayChunkChange>>();
+	for (auto it : chunkChangeView)
+	{
+		return;
+	}
+
+	ComponentView uiView = a_chunk.GetView<ComponentTypes<UIComponent>>();
+	for (auto it : uiView)
+	{
+		a_chunk.DeleteChunkEntity(it);
+	}
+
+
+	ResetSound();
+
+	Entity battleClear = a_chunk.CreateNewEntity(
+		CreateEffect(GAMECLEAR, float2(0.0f, 0.0f), 0.0f, 0.0f)
+	);
+	// a_systemResponse.AddStopTime(200.0f, 200.0f, 0.0f);
+
+	//Entity backSound = a_chunk.CreateNewEntity(
+	//	SoundKey(false, 70.0f, "bassdrum")
+	//);
+
+	Entity sound = a_chunk.CreateNewEntity(
+		SoundKey(false, 70.0f, "clearbgm")
+	);
+
+	// クリアシーンに移行する
+	Entity chunkChange = a_chunk.CreateNewEntity(
+		ChunkChange(true, "Clear"),
+		DelayChunkChange(560.0f)
+	);
+
+	Entity stopper = a_chunk.CreateNewEntity(
+		AllActionStopper()
+	);
+
+	Entity movieSpawn = a_chunk.CreateNewEntity(
+		SpawnJson("ClearMovie", 80.0f, kClearWorldPosition)
+	);
 }

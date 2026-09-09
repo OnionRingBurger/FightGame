@@ -39,6 +39,7 @@ constexpr const char* kAttackDataPath = "Assets/Data/AttackData.json";
 constexpr const char* kTestEffect = "Freeze.efk";
 
 constexpr const char* kSoundAssetPath = "Assets/Sound/";
+constexpr const char* kFontAssetPath = "Assets/Font/";
 
 // #define CREATEGAME
 

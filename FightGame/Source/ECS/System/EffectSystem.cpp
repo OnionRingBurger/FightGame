@@ -579,3 +579,38 @@ void SoundSystem(Chunk& a_chunk, const SystemContext& a_context)
 		a_chunk.DeleteChunkEntity(it);
 	}
 }
+
+void CreateTutorialTextSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView createView = a_chunk.GetView<ComponentTypes<CreateTutorialWindow>>();
+
+	for (auto it : createView)
+	{
+		ComponentHandle<CreateTutorialWindow> tutorial = a_chunk.GetComponent<CreateTutorialWindow>(it);
+		// 開始まで待機
+		if (tutorial.Look().waitTime > 0.0f)
+		{
+			tutorial->waitTime -= a_context.deltaTime;
+			continue;
+		}
+
+		// UIを生成
+		a_chunk.CreateNewEntity(
+			UIComponent("TutorialWindow", float2(0.0f, -0.6f), float2(1.95f, 0.8f), 0.0f),
+			LifeTime(130.0f),
+			ClearTarget(),
+			AllActionStopper()
+		);
+
+		a_chunk.DeleteChunkEntity(it);
+
+		// テキストを生成
+		a_chunk.CreateNewEntity(
+			UIComponent(tutorial.Look().textKey, float2(0.0f, -0.6f), float2(1.8f, 0.7f), 0.0f),
+			LifeTime(120.0f),
+			ClearTarget(),
+			AllActionStopper()
+		);
+	}
+
+}
