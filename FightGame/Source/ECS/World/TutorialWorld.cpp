@@ -329,6 +329,14 @@ Chunk TutorialWorld::CreateNewChunk(AIManager& a_aiManager)
 		CreateEffect(WHITEMINIFADE_CLEAR, float2(0.0f, 0.0f), 0.0f, 0.0f)
 	);
 
+	Entity snowEffect = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, 5.0f, -5.0f) + kDefaultWorldPosition,
+			float3(0.0f, 0.0f, 0.0f),
+			float3(1.0f, 1.0f, 1.0f)
+		),
+		EfkEffectKey(kSnowEffect, true)  // ÉãÅ[Évçƒê∂
+	);
 
 	PlaySound(LoadSound("Assets/Sound/gamebgm.mp3", true));
 
@@ -417,6 +425,7 @@ void TutorialWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, System
 	// EffectånìùÇèàóù
 	CreateEffectSystem(a_chunk, a_context);
 	CreateTutorialTextSystem(a_chunk, a_context);
+	UITextBoxCursorSystem(a_chunk, a_context);
 	UVMoveSystem(a_chunk, a_context);
 	UILerpSystem(a_chunk, a_context);
 	StartUISystem(a_chunk, a_context);
@@ -435,6 +444,7 @@ void TutorialWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, System
 
 	// èIóπèàóù
 	LifeTimeSystem(a_chunk, a_context);
+	DeleteOnInputSystem(a_chunk, a_context);
 	CheckClearTutorialSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 	ResetSystem(a_chunk, a_context);
 	ChunkChangeSystem(a_chunk, a_context, a_response);

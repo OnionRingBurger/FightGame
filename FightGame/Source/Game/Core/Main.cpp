@@ -97,7 +97,6 @@ void MainGame::Init()
 		"GameOver",
 		"GameClear",
 		"GameClearText",
-		"GameStart",
 		"Speedline",
 		"UIGauge",
 		"UIFrame",
@@ -142,7 +141,9 @@ void MainGame::Init()
 		"ClearMovieBack",
 		"Kintoki",
 		"StageClear",
-		"TutorialWindow"
+		"TutorialWindow",
+		"TitleStart",
+		"TitleTutorial"
 
 	};
 
@@ -156,7 +157,8 @@ void MainGame::Init()
 		{kGuardEffectKey, 0.6f},
 		{kRedBossEntryKey, 0.3f},
 		{kDeadBrokenEffectKey, 0.5f},
-		{kBossDeadBrokenEffectKey, 0.8f}
+		{kBossDeadBrokenEffectKey, 0.8f},
+		{kPlayerHealKey, 0.8f}
 	};
 
 
@@ -182,6 +184,8 @@ void MainGame::Init()
 		{ "Phase1", L"‚æ‚­‚â‚Á‚½I", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "Phase2", L"‚ ‚é’ö“x‹­‚¢“G‚ğ“|‚·‚ÆHP‚ª‰ñ•œ‚·‚éB", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialClear", L"‘f°‚ç‚µ‚¢IÀí‚Å‚Í‚æ‚è‹­‚¢“G‚ªŒ»‚ê‚éA\nŠÔ‡‚¢‚ğˆÓ¯‚µ‚Äí‚¤‚±‚Æ‚ğ–Y‚ê‚é‚ÈI", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "GameStart", L"Start", "DefaultFormat", 96.0f * 5.0f, 96.0f},
+		{ "Tutorial", L"Tutorial", "DefaultFormat", 96.0f * 5.0f, 96.0f }
 
 	};
 

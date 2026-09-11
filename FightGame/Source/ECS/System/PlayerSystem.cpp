@@ -113,7 +113,7 @@ void PlayerHealSystem(Chunk& a_chunk, const SystemContext& a_context)
 			),
 			FollowPosition(float3(), player),
 			PosePosState(POSE_POS_FOLLOW),
-			EfkEffectKey(kRedBossEntryKey, false)
+			EfkEffectKey(kPlayerHealKey, false)
 		);
 
 		// ‰ñ•œEntity‚ğíœ

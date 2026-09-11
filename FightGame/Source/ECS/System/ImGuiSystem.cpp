@@ -26,6 +26,8 @@ void ImGuiSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 void SaveWorldSystem(Chunk& a_chunk, const SystemContext& a_context, SystemResponse& response)
 {
+	DebugSystemResponse& debugSystemResponse = dynamic_cast<DebugSystemResponse&>(response);
+
 	ImGui::SetNextWindowPos(ImVec2(50.0f, 600.0f), ImGuiCond_Once);
 	ImGui::SetNextWindowSize(ImVec2(220.0f, 220.0f), ImGuiCond_Once);
 	ImGui::Begin("Test");
@@ -63,18 +65,7 @@ void SaveWorldSystem(Chunk& a_chunk, const SystemContext& a_context, SystemRespo
 	}
 
 	const std::string selectedName = keyPtrs.empty() ? std::string("Stage1Phase1") : keyStorage[(size_t)selectedKey];
-	DebugSystemResponse& debugSystemResponse = dynamic_cast<DebugSystemResponse&>(response);
 
-	if (ImGui::Button("SaveEntity", ImVec2(150.0f, 30.0f)))
-	{
-		debugSystemResponse.SaveRequest(selectedName);
-
-		ComponentView view = a_chunk.GetView<ComponentTypes<DebugEntityTag>>();
-		for (auto it : view)
-		{
-			a_chunk.DeleteChunkEntity(it);
-		}
-	}
 
 	// !!!New!!!
 	if (ImGui::Button("LoadEntity", ImVec2(150.0f, 30.0f)))
@@ -83,6 +74,17 @@ void SaveWorldSystem(Chunk& a_chunk, const SystemContext& a_context, SystemRespo
 
 		std::vector<Entity> entities = a_chunk.GetAllEntity();
 		for (auto it : entities)
+		{
+			a_chunk.DeleteChunkEntity(it);
+		}
+	}
+
+	if (ImGui::Button("SaveEntity", ImVec2(150.0f, 30.0f)))
+	{
+		debugSystemResponse.SaveRequest();
+
+		ComponentView view = a_chunk.GetView<ComponentTypes<DebugEntityTag>>();
+		for (auto it : view)
 		{
 			a_chunk.DeleteChunkEntity(it);
 		}

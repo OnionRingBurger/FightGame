@@ -131,6 +131,40 @@
       "EndWithOwnerAction": true
     },
 
+    "Enemy4Attack1": {
+      "MinLength": 1.5,
+      "MaxLength": 4.0,
+      "Angle": 110.0,
+      "MaxHeight": 0.03,
+      "MaxLowness": 0.5,
+      "DamageValue": 1.5,
+      "MotionTime": 60.0,
+      "LifeTime": 10.0,
+      "FollowOffsetX": 0.0,
+      "FollowOffsetY": 0.0,
+      "FollowOffsetZ": 0.0,
+      "WaitTime": 50.0,
+      "StartupTime": 60.0,
+      "EndWithOwnerAction": true
+    },
+
+     "Enemy4Attack2": {
+      "MinLength": 0.0,
+      "MaxLength": 1.1,
+      "Angle": 110.0,
+      "MaxHeight": 0.03,
+      "MaxLowness": 0.5,
+      "DamageValue": 1.5,
+      "MotionTime": 80.0,
+      "LifeTime": 10.0,
+      "FollowOffsetX": 0.0,
+      "FollowOffsetY": 0.0,
+      "FollowOffsetZ": 0.0,
+      "WaitTime": 80.0,
+      "StartupTime": 70.0,
+      "EndWithOwnerAction": true
+     },
+
     "Boss1Attack1": {
       "MinLength": 0.0,
       "MaxLength": 2.2,

@@ -164,7 +164,9 @@
 	X(EfkEffectArea)\
 	X(AllActionStopper)\
 	X(CameraChangeEffect)\
-	X(PlayerHeal)
+	X(PlayerHeal) \
+	X(DeleteOnInput) \
+	X(UITextBoxCursor)
 
 
 using BitFlag = unsigned int;
@@ -938,7 +940,8 @@ namespace Component
 		DAMAGE_DIRECTION,
 		BATTLESTART,
 		GAMECLEAR,
-		STAGE_CLEAR_MOVIE
+		STAGE_CLEAR_MOVIE,
+		EFFECT_NONE,
 	};
 	struct CreateEffect
 	{
@@ -1092,14 +1095,21 @@ namespace Component
 		FadeType fadeType;
 		float fadeSpeed;
 
+		float progress;
+		float min;
+		float max;
+
 		FadeUI()
-			: FadeUI(FADE_UP, 0.0f)
+			: FadeUI(FADE_UP, 0.0f, 0.0f, 1.0f)
 		{
 		}
 
-		FadeUI(FadeType a_fadeType, float a_fadeSpeed)
+		FadeUI(FadeType a_fadeType, float a_fadeSpeed, float a_min = 0.0f, float a_max = 1.0f)
 			:fadeType(a_fadeType)
 			, fadeSpeed(a_fadeSpeed)
+			, progress(0.0f)
+			, min(a_min)
+			, max(a_max)
 		{
 		}
 
@@ -1821,7 +1831,7 @@ namespace Component
 		}
 	};
 
-	
+
 	struct EnemyShooter
 	{
 		static constexpr TypeID kTypeId = 90;
@@ -2937,16 +2947,22 @@ namespace Component
 
 		Entity selectEntity;
 		bool isActiv;
+		float coolTime;
+		float maxCoolTime;
 
 		SelectCursor()
 			: selectEntity(kInvalidEntity)
 			, isActiv(false)
+			, coolTime(0.0f)
+			, maxCoolTime(0.0f)
 		{
 		}
 
-		SelectCursor(Entity a_selectEntity, bool a_isActiv)
+		SelectCursor(Entity a_selectEntity, bool a_isActiv, float a_maxCoolTime)
 			: selectEntity(a_selectEntity)
 			, isActiv(a_isActiv)
+			, maxCoolTime(a_maxCoolTime)
+			, coolTime(0.0f)
 		{
 		}
 	};
@@ -3463,6 +3479,115 @@ namespace Component
 		CreateTutorialWindow(std::string a_textKey, float a_waitTime)
 			: textKey(a_textKey)
 			, waitTime(a_waitTime)
+		{
+		}
+	};
+
+	enum UseSelectCommand
+	{
+		SELECT_NONE = 0,
+		SELECT_CHANGESCENE = 1 << 0,
+		SELECT_CREATEEFFECT = 1 << 1,
+		SELECT_PLAYSOUND = 1 << 2,
+		SELECT_ALLSELECT_DELETE = 1 << 3,
+		SELECT_LOAD = 1 << 4,
+		SELECT_HPHEAL = 1 << 5,
+
+	};
+
+	struct SelectPlayCommand
+	{
+		static constexpr TypeID kTypeId = 165;
+		static constexpr const char* kTypeName = "SelectPlayCommand";
+		static constexpr int kVersion = 0;
+
+		BitFlag flag;
+
+		std::string sceneName;
+		float waitChangeScene;
+		EffectType effectType;
+		std::string soundName;
+		std::string loadName;
+		float healValue;
+
+		SelectPlayCommand(
+			BitFlag a_flag,
+			std::string a_sceneName,
+			float a_waitChangeScene,
+			EffectType a_effectType,
+			std::string a_soundName,
+			std::string a_loadName,
+			float a_healValue
+			)
+			: flag(a_flag)
+			, sceneName(a_sceneName)
+			, waitChangeScene(a_waitChangeScene)
+			, effectType(a_effectType)
+			, soundName(a_soundName)
+			, loadName(a_loadName)
+			, healValue(a_healValue)
+		{ }
+	};
+
+	struct DeleteOnInput
+	{
+		static constexpr TypeID kTypeId = 166;
+		static constexpr const char* kTypeName = "DeleteOnInput";
+		static constexpr int kVersion = 0;
+
+		std::string key;
+		float maxWaitTime;
+		float elapsedTime;
+
+		DeleteOnInput()
+			: DeleteOnInput("", 0.0f)
+		{
+		}
+
+		DeleteOnInput(std::string a_key, float a_maxWaitTime)
+			: key(a_key)
+			, maxWaitTime(a_maxWaitTime)
+			, elapsedTime(0.0f)
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct UITextBoxCursor
+	{
+		static constexpr TypeID kTypeId = 167;
+		static constexpr const char* kTypeName = "UITextBoxCursor";
+		static constexpr int kVersion = 0;
+
+		std::string uiKey;
+		float2 uiPos;
+		float2 uiScale;
+		float fadeSpeed;
+		float fadeMin;
+		float fadeMax;
+		std::string soundKey;
+
+		UITextBoxCursor()
+			: UITextBoxCursor("", float2(), float2(), 0.01f, 0.0f, 1.0f, "")
+		{
+		}
+
+		UITextBoxCursor(
+			std::string a_uiKey,
+			float2 a_uiPos,
+			float2 a_uiScale,
+			float a_fadeSpeed,
+			float a_fadeMin,
+			float a_fadeMax,
+			std::string a_soundKey
+		)
+			: uiKey(a_uiKey)
+			, uiPos(a_uiPos)
+			, uiScale(a_uiScale)
+			, fadeSpeed(a_fadeSpeed)
+			, fadeMin(a_fadeMin)
+			, fadeMax(a_fadeMax)
+			, soundKey(a_soundKey)
 		{
 		}
 	};

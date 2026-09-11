@@ -8,4 +8,6 @@ void ResetSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void LifeTimeSystem(Chunk& a_chunk, const SystemContext& a_context);
 
+void DeleteOnInputSystem(Chunk& a_chunk, const SystemContext& a_context);
+
 void SpawnJsonSystem(Chunk& a_chunk, const SystemContext& a_context, ComponentsSerialize& a_serialize, AIManager& a_aimanager);

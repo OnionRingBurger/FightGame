@@ -1132,4 +1132,26 @@ namespace ComponentSystem
 		valueFunc("healValue", component.healValue, 0.0f);
 	}
 
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(DeleteOnInput& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("key", component.key, std::string(""));
+		valueFunc("maxWaitTime", component.maxWaitTime, 0.0f);
+		valueFunc("elapsedTime", component.elapsedTime, 0.0f);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(UITextBoxCursor& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("uiKey", component.uiKey, std::string(""));
+		valueFunc("uiPosX", component.uiPos.x, 0.0f);
+		valueFunc("uiPosY", component.uiPos.y, 0.0f);
+		valueFunc("uiScaleX", component.uiScale.x, 0.0f);
+		valueFunc("uiScaleY", component.uiScale.y, 0.0f);
+		valueFunc("fadeSpeed", component.fadeSpeed, 0.01f);
+		valueFunc("fadeMin", component.fadeMin, 0.0f);
+		valueFunc("fadeMax", component.fadeMax, 1.0f);
+		valueFunc("soundKey", component.soundKey, std::string(""));
+	}
+
 };

@@ -152,7 +152,7 @@ Chunk CreateGameWorld::CreateNewChunk(AIManager& a_aiManager)
 
 void CreateGameWorld::InitResponse(std::unique_ptr<SystemResponse>& response)
 {
-	response = std::make_unique<DebugSystemResponse>();
+	response = std::make_unique<DebugSystemResponse>(name);
 }
 
 void CreateGameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)

@@ -19,6 +19,9 @@ std::unordered_map<std::string, Geometory::Vertex*> Geometory::m_dynamicVertexSo
 std::unordered_map<std::string, int*> Geometory::m_dynamicIndexSource;
 Shader* Geometory::m_sectorVS;
 Shader* Geometory::m_sectorPS;
+// !!!New!!!
+Shader* Geometory::m_attackSectorVS;
+Shader* Geometory::m_attackSectorPS;
 
 void Geometory::Init()
 {
@@ -32,6 +35,8 @@ void Geometory::Init()
 	MakeLineShader();
 	MakeLine();
 	MakeSectorShader();
+	// !!!New!!!
+	MakeAttackSectorShader();
 }
 void Geometory::Uninit()
 {
@@ -40,6 +45,10 @@ void Geometory::Uninit()
 	SAFE_DELETE(m_pLineShader[0]);
 	SAFE_DELETE(m_pPS);
 	SAFE_DELETE(m_pVS);
+	// !!!New!!!
+	SAFE_DELETE(m_attackSectorPS);
+	SAFE_DELETE(m_attackSectorVS);
+
 	SAFE_DELETE(m_sectorPS);
 	SAFE_DELETE(m_sectorVS);
 	SAFE_DELETE(m_pLines);
@@ -385,4 +394,57 @@ float4 main(PS_IN pin) : SV_TARGET0 {
 
 	m_sectorPS = new PixelShader();
 	m_sectorPS->Compile(PSCode);
+}
+
+// !!!New!!!
+void Geometory::MakeAttackSectorShader()
+{
+	const char* VSCode = R"EOT(
+struct VS_IN {
+	float3 pos : POSITION0;
+	float2 uv : TEXCOORD0;
+};
+struct VS_OUT {
+	float4 pos : SV_POSITION;
+	float2 uv : TEXCOORD0;
+	float3 local : TEXCOORD1;
+};
+cbuffer Matrix : register(b0) {
+	float4x4 world;
+	float4x4 view;
+	float4x4 proj;
+};
+VS_OUT main(VS_IN vin) {
+	VS_OUT vout;
+	vout.pos = float4(vin.pos, 1.0f);
+	vout.pos = mul(vout.pos, world);
+	vout.pos = mul(vout.pos, view);
+	vout.pos = mul(vout.pos, proj);
+	vout.uv = vin.uv;
+	vout.local = vin.pos;
+	return vout;
+})EOT";
+
+	m_attackSectorVS = new VertexShader();
+	m_attackSectorVS->Compile(VSCode);
+
+	const char* PSCode = R"EOT(
+struct PS_IN {
+	float4 pos : SV_POSITION;
+	float2 uv : TEXCOORD0;
+	float3 local : TEXCOORD1;
+};
+cbuffer SectorInfo : register(b0){
+	float4 sectorColor;
+	float4 sectorTime;
+	float4 sectorShape;
+	float4 sectorHeight;
+};
+float4 main(PS_IN pin) : SV_TARGET0 {
+	float4 color = float4(sectorColor.rgb, 0.5f);
+	return color;
+})EOT";
+
+	m_attackSectorPS = new PixelShader();
+	m_attackSectorPS->Compile(PSCode);
 }

@@ -19,4 +19,5 @@
 #include "UseAttackAction.h"
 #include "RunPlayerNode.h"
 #include "GuardNode.h"
+#include "RoleCurve.h"
 #include "InAttackRangeDecorator.h"

@@ -167,7 +167,6 @@
     <ClInclude Include="include\ECS\Core\IComponentStorage.h" />
     <ClInclude Include="include\ECS\Core\StorageManager.h" />
     <ClInclude Include="include\ECS\Core\ECSTypes.h" />
-    <ClInclude Include="include\ECS\System\BulletSystem.h" />
     <ClInclude Include="include\ECS\System\CameraSystem.h" />
     <ClInclude Include="include\ECS\System\CharacterSystem.h" />
     <ClInclude Include="include\ECS\System\ColliderSystem.h" />
@@ -190,9 +189,7 @@
     <ClInclude Include="include\ECS\System\SystemAssist.h" />
     <ClInclude Include="include\ECS\System\SystemContext.h" />
     <ClInclude Include="include\ECS\System\SystemResponse.h" />
-    <ClInclude Include="include\ECS\System\TestSystem.h" />
     <ClInclude Include="include\ECS\System\TransformSystem.h" />
-    <ClInclude Include="include\ECS\System\VelocitySystem.h" />
     <ClInclude Include="include\ECS\World\ClearWorld.h" />
     <ClInclude Include="include\ECS\World\CreateGameWorld.h" />
     <ClInclude Include="include\ECS\World\GameData.h" />
@@ -243,6 +240,7 @@
     <ClInclude Include="include\AI\ReactiveSelector.h" />
     <ClInclude Include="include\AI\AI.h" />
     <ClInclude Include="include\DataManager\EffectManager.h" />
+    <ClInclude Include="include\AI\RoleCurve.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\DataManager\AssimpModelLorder.cpp" />
@@ -279,7 +277,6 @@
     <ClCompile Include="Source\ECS\Core\HasView.cpp" />
     <ClCompile Include="Source\ECS\Core\StorageManager.cpp" />
     <ClCompile Include="Source\ECS\Core\ECSTypes.cpp" />
-    <ClCompile Include="Source\ECS\System\BulletSystem.cpp" />
     <ClCompile Include="Source\ECS\System\CameraSystem.cpp" />
     <ClCompile Include="Source\ECS\System\CharacterSystem.cpp" />
     <ClCompile Include="Source\ECS\System\ColliderSystem.cpp" />
@@ -300,9 +297,7 @@
     <ClCompile Include="Source\ECS\System\SoundSystem.cpp" />
     <ClCompile Include="Source\ECS\System\SystemAssist.cpp" />
     <ClCompile Include="Source\ECS\System\SystemResponse.cpp" />
-    <ClCompile Include="Source\ECS\System\TestSystem.cpp" />
     <ClCompile Include="Source\ECS\System\TransformSystem.cpp" />
-    <ClCompile Include="Source\ECS\System\VelocitySystem.cpp" />
     <ClCompile Include="Source\ECS\World\ClearWorld.cpp" />
     <ClCompile Include="Source\ECS\World\CreateGameWorld.cpp" />
     <ClCompile Include="Source\ECS\World\GameWorld.cpp" />
@@ -356,6 +351,7 @@
     <ClCompile Include="Source\AI\RunPlayerNode.cpp" />
     <ClCompile Include="Source\AI\ReactiveSelector.cpp" />
     <ClCompile Include="Source\AI\GuardNode.cpp" />
+    <ClCompile Include="Source\AI\RoleCurve.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

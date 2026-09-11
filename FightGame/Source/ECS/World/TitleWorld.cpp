@@ -16,11 +16,15 @@ TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 		a_serialize)
 	, worldRequest(a_worldRequest)
 {
-	a_input.RegisterKey("ChunkChange", VK_LBUTTON);
-	a_input.RegisterButton("ChunkChange", XINPUT_GAMEPAD_A);
+	//a_input.RegisterKey("ChunkChange", VK_LBUTTON);
+	//a_input.RegisterButton("ChunkChange", XINPUT_GAMEPAD_A);
 
-	a_input.RegisterKey("GoToTutorial", VK_RBUTTON);
-	a_input.RegisterButton("GoToTutorial", XINPUT_GAMEPAD_B);
+	//a_input.RegisterKey("GoToTutorial", VK_RBUTTON);
+	//a_input.RegisterButton("GoToTutorial", XINPUT_GAMEPAD_B);
+
+
+	a_input.RegisterButton("Select", XINPUT_GAMEPAD_A);
+	a_input.RegisterKey("Select", VK_SPACE);
 
 }
 
@@ -34,12 +38,6 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 
 	Entity titleLogo = newChunk.CreateNewEntity(
 		UIComponent("TitleLogo", float2(0.0f, 0.4f), float2(1.0f, 1.0f), 0.0f)
-	);
-
-	Entity keyLogo = newChunk.CreateNewEntity(
-		UIComponent("PleaseKey", float2(0.0f, -0.5f), float2(1.0f, 0.3f), 0.0f),
-		FadeUI(FADE_DOWN, 0.01f),
-		FadeChange(FADE_CHANGE_FLICKER)
 	);
 
 	//Entity titleMask = newChunk.CreateNewEntity(
@@ -180,6 +178,41 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		WorldPower(float3(0.0f, -1.2f / 60.0f, 0.0f), float3(0.5f, 1.0f, 0.5f))
 	);
 
+	Entity testCursor = newChunk.CreateNewEntity(
+		UIComponent("White", float2(0.0f, -0.3f), TitleButtonSize, 0.0f, 0.5f),
+		FadeUI(FADE_DOWN, 0.02f, 0.1f, 0.5f),
+		FadeChange(FadeChungeType::FADE_CHANGE_FLICKER)
+	);
+
+	Entity testBox1 = newChunk.CreateNewEntity(
+		UIComponent("TitleStart", float2(0.0f, -0.3f), TitleButtonSize, 0.0f),
+		SelectBox(float2(0.0f, -0.3f), TitleButtonSize),
+		SelectPlayCommand(SELECT_PLAYSOUND | SELECT_CHANGESCENE | SELECT_ALLSELECT_DELETE, "Proto", 80.0f, EFFECT_NONE, "stageclear", "", 0.0f)
+	);
+
+	Entity testBox2 = newChunk.CreateNewEntity(
+		UIComponent("TitleTutorial", float2(0.0f, -0.6f), TitleButtonSize, 0.0f),
+		SelectBox(float2(0.0f, -0.6f), TitleButtonSize),
+		SelectPlayCommand(SELECT_PLAYSOUND | SELECT_CHANGESCENE | SELECT_ALLSELECT_DELETE, "Tutorial", 80.0f, EFFECT_NONE, "stageclear", "", 0.0f)
+	);
+
+	newChunk.AddComponent(testCursor, SelectCursor(
+		testBox1,
+		true,
+		10.0f
+	));
+
+	//Entity titleUI = newChunk.CreateNewEntity(
+	//	UIComponent("TitleStart", float2(0.0f, -0.3f), TitleButtonSize, 0.0f)
+	//);
+
+	//Entity tutorialUI = newChunk.CreateNewEntity(
+	//	UIComponent("TitleTutorial", float2(0.0f, -0.6f), TitleButtonSize, 0.0f)
+	//);
+
+
+
+
 	PlaySound(LoadSound("Assets/Sound/title.mp3", true));
 	return newChunk;
 }
@@ -284,6 +317,9 @@ void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	PlayerDeadSystem(a_chunk, a_context, a_response);
 	EnemyDeadSystem(a_chunk, a_context, a_response);
 	BossDeadSystem(a_chunk, a_context, a_response);
+
+	CursorSelectSystem(a_chunk, a_context, a_aiManager, a_serialize);
+	SoundSystem(a_chunk, a_context);
 
 	CameraViewSystem(a_chunk, a_context);
 	CreateEffectSystem(a_chunk, a_context);

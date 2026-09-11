@@ -123,6 +123,28 @@ void LifeTimeSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 }
 
+void DeleteOnInputSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<DeleteOnInput>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<DeleteOnInput> deleteOnInput = a_chunk.GetComponent<DeleteOnInput>(it);
+
+		deleteOnInput->elapsedTime += a_context.deltaTime;
+
+		if (deleteOnInput.Look().elapsedTime < deleteOnInput.Look().maxWaitTime)
+		{
+			continue;
+		}
+
+		if (a_context.input.IsRegisterTrigger(deleteOnInput.Look().key))
+		{
+			a_chunk.DeleteChunkEntity(it);
+		}
+	}
+}
+
 void SpawnJsonSystem(Chunk& a_chunk, const SystemContext& a_context, ComponentsSerialize& a_serialize, AIManager& a_aimanager)
 {
 	ComponentView view = a_chunk.GetView<ComponentTypes<SpawnJson>>();

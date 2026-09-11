@@ -56,6 +56,8 @@ private:
 	static void MakeLineShader();
 	static void MakeLine();
 	static void MakeSectorShader();
+	// !!!New!!!
+	static void MakeAttackSectorShader();
 
 private:
 	static void MakeBox();
@@ -74,6 +76,9 @@ private:
 	static Shader* m_pPS;
 	static Shader* m_sectorVS;
 	static Shader* m_sectorPS;
+	// !!!New!!!
+	static Shader* m_attackSectorVS;
+	static Shader* m_attackSectorPS;
 	static Shader* m_pLineShader[2];
 	static DirectX::XMFLOAT4X4 m_WVP[3];
 	static void* m_pLineVtx;

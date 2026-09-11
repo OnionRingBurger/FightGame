@@ -3,6 +3,8 @@
 #include "Sound.h"
 #include "Defines.h"
 #include "GameData.h"
+#include "SystemAssist.h"
+#include "MathAssist.h"
 
 using namespace Component;
 
@@ -18,29 +20,38 @@ void FadeUISystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		float speed = fade.Look().fadeSpeed;
 
-		if (fade.Look().fadeType == FADE_DOWN)
+		fade->progress = std::clamp(fade.Look().progress + speed * a_context.effectStepTime, 0.0f, 1.0f);
+
+		float target = 1.0f;
+		float start = 0.0f;
+
+		if (fade.Look().fadeType == FadeType::FADE_UP)
 		{
-			speed *= -1.0f;
+			start = fade.Look().min;
+			target = fade.Look().max;
+		}
+		else if(fade.Look().fadeType == FadeType::FADE_DOWN)
+		{
+			start = fade.Look().max;
+			target = fade.Look().min;
 		}
 
-		if(ui.IsValid()) ui->alpha = std::clamp(ui.Look().alpha + speed * a_context.effectStepTime, 0.0f, 1.0f);
+		ui->alpha = Lerp(start, target, fade.Look().progress);
 
 		ComponentHandle<FadeChange> change = a_chunk.GetComponent<FadeChange>(it);
 		if (!change.IsValid()) continue;
 
 		if (change.Look().isWait) continue;
 
+		if (fade.Look().progress < 1.0f) continue;
+		fade->progress = 0.0f;
 		switch (change.Look().type)
 		{
 		case FadeChungeType::FADE_CHANGE_FLICKER:
-			if (ui.Look().alpha <= 0.0f)
-			{
-				fade->fadeType = FADE_UP;
-			}
-			else if (ui.Look().alpha >= 1.0f)
-			{
-				fade->fadeType = FADE_DOWN;
-			}
+			if (fade->fadeType == FADE_DOWN) fade->fadeType = FADE_UP;
+			else if (fade->fadeType == FADE_UP)	fade->fadeType = FADE_DOWN;
+			break;
+			
 		}
 	}
 }
@@ -580,6 +591,46 @@ void SoundSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 }
 
+// !!!New!!!
+void UITextBoxCursorSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<UITextBoxCursor, DeleteOnInput>>();
+
+	for (auto it : view)
+	{
+		const ComponentHandle<DeleteOnInput> deleteOnInput = a_chunk.GetComponent<DeleteOnInput>(it);
+
+		if (deleteOnInput.Look().elapsedTime + a_context.deltaTime < deleteOnInput.Look().maxWaitTime)
+		{
+			continue;
+		}
+
+		const ComponentHandle<UITextBoxCursor> cursor = a_chunk.GetComponent<UITextBoxCursor>(it);
+
+		a_chunk.AddComponent(it, UIComponent(
+			cursor.Look().uiKey,
+			cursor.Look().uiPos,
+			cursor.Look().uiScale,
+			0.0f
+		));
+		a_chunk.AddComponent(it, FadeUI(
+			FADE_DOWN,
+			cursor.Look().fadeSpeed,
+			cursor.Look().fadeMin,
+			cursor.Look().fadeMax
+		));
+		a_chunk.AddComponent(it, FadeChange(FADE_CHANGE_FLICKER));
+
+		if (!cursor.Look().soundKey.empty())
+		{
+			std::string soundPath = kSoundAssetPath + cursor.Look().soundKey + ".mp3";
+			PlaySound(LoadSound(soundPath.c_str()));
+		}
+
+		a_chunk.DeleteChunkComponent(it, UITextBoxCursor::kTypeId);
+	}
+}
+
 void CreateTutorialTextSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
 	ComponentView createView = a_chunk.GetView<ComponentTypes<CreateTutorialWindow>>();
@@ -597,9 +648,12 @@ void CreateTutorialTextSystem(Chunk& a_chunk, const SystemContext& a_context)
 		// UIを生成
 		a_chunk.CreateNewEntity(
 			UIComponent("TutorialWindow", float2(0.0f, -0.6f), float2(1.95f, 0.8f), 0.0f),
-			LifeTime(130.0f),
+			DeleteOnInput("Select", 120.0f),
 			ClearTarget(),
-			AllActionStopper()
+			AllActionStopper(),
+			FadeUI(FADE_DOWN, 0.02f, 0.85f, 1.0f),
+			FadeChange(FADE_CHANGE_FLICKER)
+
 		);
 
 		a_chunk.DeleteChunkEntity(it);
@@ -607,10 +661,185 @@ void CreateTutorialTextSystem(Chunk& a_chunk, const SystemContext& a_context)
 		// テキストを生成
 		a_chunk.CreateNewEntity(
 			UIComponent(tutorial.Look().textKey, float2(0.0f, -0.6f), float2(1.8f, 0.7f), 0.0f),
-			LifeTime(120.0f),
+			DeleteOnInput("Select", 120.0f),
+			ClearTarget(),
+			AllActionStopper(),
+			FadeUI(FADE_DOWN, 0.02f, 0.95f, 1.0f),
+			FadeChange(FADE_CHANGE_FLICKER)
+		);
+
+		a_chunk.CreateNewEntity(
+			UITextBoxCursor("LookOnMaker", float2(0.85f, -0.8f), float2(0.07f, 0.07f * 1.777f), 0.02f, 0.0f, 1.0f, ""),
+			DeleteOnInput("Select", 120.0f),
 			ClearTarget(),
 			AllActionStopper()
 		);
+
+		
 	}
+
+}
+
+bool IsTargetInInputDirection(int a_direction, float a_currentPos, float a_targetPos)
+{
+	if (a_direction == 0) return true;
+
+	int vectorSign = Sign(a_targetPos - a_currentPos);
+	if (vectorSign != a_direction) return false;
+	return true;
+}
+
+// 毎回View作るとちょっと重いだろうから引数で受け取る
+Entity GetNextTarget(Entity a_target, Chunk& a_chunk, ComponentView a_cursorView ,float2 a_direction)
+{
+
+	Entity bestEntity = a_target;
+	ComponentHandle<SelectBox> bestBox = a_chunk.GetComponent<SelectBox>(a_target);
+	if (std::abs(a_direction.x) < 0.3f)
+	{
+		a_direction.x = 0.0f;
+	}
+	if (std::abs(a_direction.y) < 0.3f)
+	{
+		a_direction.y = 0.0f;
+	}
+
+	int2 signDirection(Sign(a_direction.x), Sign(a_direction.y));
+
+	for (auto it : a_cursorView)
+	{
+		if (it == a_target) continue;
+
+		ComponentHandle<SelectBox> targetBox = a_chunk.GetComponent<SelectBox>(it);
+
+		if (!IsTargetInInputDirection(signDirection.x, bestBox.Look().pos.x, targetBox.Look().pos.x))
+		{
+			continue;
+		}
+
+		if (!IsTargetInInputDirection(signDirection.y, bestBox.Look().pos.y, targetBox.Look().pos.y))
+		{
+			continue;
+		}
+		
+
+		// 代入
+		bestEntity = it;
+		bestBox = targetBox;
+	}
+	return bestEntity;
+}
+
+void PlayCursor(Entity a_target, Chunk& a_chunk, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
+{
+	// 選択先の選択時機能を取得する
+	ComponentHandle<SelectPlayCommand> command = a_chunk.GetComponent<SelectPlayCommand>(a_target);
+	// チャンクを変更する
+	if (command.Look().flag & SELECT_CHANGESCENE)
+	{
+		a_chunk.CreateNewEntity(
+			ChunkChange(true, command.Look().sceneName),
+			DelayChunkChange(command.Look().waitChangeScene)
+		);
+	}
+
+	// エフェクトを再生する
+	if (command.Look().flag & SELECT_CREATEEFFECT)
+	{
+		a_chunk.CreateNewEntity(
+			CreateEffect(command.Look().effectType)
+		);
+	}
+
+
+	// 音を鳴らす
+	if(command.Look().flag & SELECT_PLAYSOUND)
+	{
+		a_chunk.CreateNewEntity(
+			SoundKey(false, 0.0f, command.Look().soundName)
+		);
+	}
+
+	// 全てのカーソルや選択ボックスを削除
+	if (command.Look().flag & SELECT_ALLSELECT_DELETE)
+	{
+		ComponentView cursorView = a_chunk.GetView<ComponentTypes<SelectCursor>>();
+		for (auto it : cursorView)
+		{
+			a_chunk.DeleteChunkEntity(it);
+		}
+
+		ComponentView boxView = a_chunk.GetView<ComponentTypes<SelectBox>>();
+		for (auto it : boxView)
+		{
+			a_chunk.DeleteChunkEntity(it);
+		}
+	}
+
+	// Jsonを読み込む
+	if (command.Look().flag & SELECT_LOAD)
+	{
+		NewSceneSpawn(a_serialize, a_chunk, a_aiManager, command.Look().loadName, float3());
+	}
+
+	// 回復を生成する
+	if (command.Look().flag & SELECT_HPHEAL)
+	{
+
+	}
+	
+}
+
+void CursorSelectSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
+{
+	ComponentView cursorView = a_chunk.GetView<ComponentTypes<SelectCursor>>();
+	ComponentView targetView = a_chunk.GetView<ComponentTypes<SelectBox>>();
+
+
+	bool isUseleft = a_context.input.GetLeftAxis().magnitube >= a_context.input.GetKeyAxis().magnitube;
+	const Axis& leftAxis = isUseleft
+		? a_context.input.GetLeftAxis()
+		: a_context.input.GetKeyAxis();
+
+	if (isUseleft)
+	{
+		DebugConsole::SetDrawPos(15, 22);
+		std::cout << "left!!" << std::endl;
+	}
+
+	bool isPlay = a_context.input.IsRegisterTrigger("Select");
+	float2 direction = float2(leftAxis.x, leftAxis.y);
+
+	for (auto cursorIt : cursorView)
+	{
+		ComponentHandle<SelectCursor> cursor = a_chunk.GetComponent<SelectCursor>(cursorIt);
+		if (!cursor.Look().isActiv) continue;
+		
+		// カーソル選択
+		if (cursor.Look().coolTime > 0.0f)
+		{
+			float newCoolTime = cursor.Look().coolTime - a_context.deltaTime;
+			newCoolTime = std::max(newCoolTime, 0.0f);
+			cursor->coolTime = newCoolTime;
+		}
+		else if (leftAxis.magnitube != 0.0f)
+		{
+			// ターゲットを更新
+			Entity nextTarget = GetNextTarget(cursor.Look().selectEntity, a_chunk, targetView, direction);
+			if (nextTarget != cursor->selectEntity)
+			{
+				cursor->coolTime = cursor.Look().maxCoolTime;
+				cursor->selectEntity = nextTarget;
+			}
+
+			ComponentHandle<SelectBox> box = a_chunk.GetComponent<SelectBox>(nextTarget);
+			ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(cursorIt);
+			ui->uiPos = box.Look().pos;
+			ui->uiScale = box.Look().cursorScale;
+		}
+
+		if (isPlay) PlayCursor(cursor.Look().selectEntity, a_chunk, a_aiManager, a_serialize);
+	}
+
 
 }

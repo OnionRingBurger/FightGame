@@ -135,27 +135,27 @@ void CheckAliveTargetGameOverSystem(Chunk& a_chunk, const SystemContext& a_conte
 
 	Entity buttonA = a_chunk.CreateNewEntity(
 		UIComponent("ButtonA", float2(-0.55f, -0.8f), float2(0.1f, 0.2f), 0.0f, 0.0f),
-		FadeUI(FADE_UP, 0.035f),
+		FadeUI(FADE_UP, 0.035f, 0.3f, 1.0f),
 		FadeChange(FADE_CHANGE_FLICKER)
 	);
 
 
 	Entity buttonB = a_chunk.CreateNewEntity(
 		UIComponent("ButtonB", float2(0.2f, -0.8f), float2(0.1f, 0.2f), 0.0f, 0.0f),
-		FadeUI(FADE_UP, 0.035f),
+		FadeUI(FADE_UP, 0.035f, 0.3f, 1.0f),
 		FadeChange(FADE_CHANGE_FLICKER)
 	);
 
 	Entity yes = a_chunk.CreateNewEntity(
 		UIComponent("Yes", float2(-0.35f, -0.8f), float2(0.2f, 0.3f), 0.0f, 0.0f),
-		FadeUI(FADE_UP, 0.035f),
+		FadeUI(FADE_UP, 0.035f, 0.3f, 1.0f),
 		FadeChange(FADE_CHANGE_FLICKER)
 	);
 
 
 	Entity no = a_chunk.CreateNewEntity(
 		UIComponent("No", float2(0.4f, -0.8f), float2(0.15f, 0.2f), 0.0f, 0.0f),
-		FadeUI(FADE_UP, 0.035f),
+		FadeUI(FADE_UP, 0.035f, 0.3f, 1.0f),
 		FadeChange(FADE_CHANGE_FLICKER)
 	);
 

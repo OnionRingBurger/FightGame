@@ -1,9 +1,9 @@
 #include "DebugSystemResponse.h"
 
-DebugSystemResponse::DebugSystemResponse()
+DebugSystemResponse::DebugSystemResponse(std::string a_key)
 	:isSave(false)
 	,isLoad(false)
-	,key()
+	,key(a_key)
 {
 }
 
@@ -19,10 +19,9 @@ void DebugSystemResponse::ResetRequest()
 	key.clear();
 }
 
-void DebugSystemResponse::SaveRequest(std::string a_key)
+void DebugSystemResponse::SaveRequest()
 {
 	isSave = true;
-	key = std::move(a_key);
 }
 
 bool DebugSystemResponse::IsSave()

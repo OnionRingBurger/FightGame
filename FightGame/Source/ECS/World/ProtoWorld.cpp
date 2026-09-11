@@ -342,6 +342,14 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		AlphaBlendComponent("White", "Blue")
 	);
 
+	Entity snowEffect = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, 5.0f, -5.0f) + kDefaultWorldPosition,
+			float3(0.0f, 0.0f, 0.0f),
+			float3(1.0f, 1.0f, 1.0f)
+		),
+		EfkEffectKey(kSnowEffect, true)  // ƒ‹[ƒvÄ¶
+	);
 
 	Entity battleStart = newChunk.CreateNewEntity(
 		CreateEffect(BATTLESTART, float2(0.0f, 0.4f), 0.0f, 120.0f)		
@@ -409,7 +417,6 @@ void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 
 void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
-	TestSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 
 	// PhysicsŒn‚Ìˆ—‚ğs‚¤
 	WorldPowerSystem(a_chunk, a_context);

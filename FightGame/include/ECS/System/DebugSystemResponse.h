@@ -9,12 +9,12 @@
 class DebugSystemResponse : public SystemResponse
 {
 public:
-	DebugSystemResponse();
+	DebugSystemResponse(std::string key);
 	~DebugSystemResponse();
 
 	virtual void ResetRequest() override;
 
-	void SaveRequest(std::string a_key);
+	void SaveRequest();
 	bool IsSave();
 
 	// !!!New!!!
