@@ -64,6 +64,7 @@ void AISenseSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_
 			enemyAttackData.angle = power.angle;
 			enemyAttackData.waitTime = power.waitTime;
 			enemyAttackData.damageValue = power.damageValue;
+			enemyAttackData.endWithOwnerAction = power.endWithOwnerAction;
 			enemyData.attackDatas.push_back(enemyAttackData);
 		}
 		// ÉçÅ[Éãìoò^

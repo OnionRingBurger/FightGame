@@ -5,25 +5,7 @@
 #include "scene.h"
 #include "postprocess.h"
 
-#if _MSC_VER >= 1930
-#ifdef _DEBUG
-#pragma comment(lib, "assimp-vc143-mtd.lib")
-#else
-#pragma comment(lib, "assimp-vc143-mt.lib")
-#endif
-#elif _MSC_VER >= 1920
-#ifdef _DEBUG
-#pragma comment(lib, "assimp-vc142-mtd.lib")
-#else
-#pragma comment(lib, "assimp-vc142-mt.lib")
-#endif
-#elif _MSC_VER >= 1910
-#ifdef _DEBUG
-#pragma comment(lib, "assimp-vc141-mtd.lib")
-#else
-#pragma comment(lib, "assimp-vc141-mt.lib")
-#endif
-#endif
+
 
 // staticƒƒ“ƒo•Ï”’è‹`
 VertexShader*	Model::m_pDefVS		= nullptr;

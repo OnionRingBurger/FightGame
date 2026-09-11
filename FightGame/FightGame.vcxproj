@@ -110,7 +110,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>xinput.lib;EffekseerRendererDX11d.lib;Effekseerd.lib;EffekseerRendererCommond.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Lib\Release\xinput.lib;Lib\Debug\EffekseerRendererDX11d.lib;Lib\Debug\Effekseerd.lib;Lib\Debug\EffekseerRendererCommond.lib;Lib\Debug\assimp-vc143-mtd.lib;Lib\Debug\zlibstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -129,7 +129,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>xinput.lib;Effekseer.lib;EffekseerRendererDX11.lib;EffekseerRendererCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Lib\Release\xinput.lib;Lib\Release\Effekseer.lib;Lib\Release\EffekseerRendererDX11.lib;Lib\Release\EffekseerRendererCommon.lib;Lib\Release\assimp-vc143-mt.lib;Lib\Release\zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -241,6 +241,8 @@
     <ClInclude Include="include\AI\AI.h" />
     <ClInclude Include="include\DataManager\EffectManager.h" />
     <ClInclude Include="include\AI\RoleCurve.h" />
+    <ClInclude Include="include\AI\UseLingeringAttackAction.h" />
+    <ClInclude Include="include\ECS\World\StartupWorld.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\DataManager\AssimpModelLorder.cpp" />
@@ -352,6 +354,8 @@
     <ClCompile Include="Source\AI\ReactiveSelector.cpp" />
     <ClCompile Include="Source\AI\GuardNode.cpp" />
     <ClCompile Include="Source\AI\RoleCurve.cpp" />
+    <ClCompile Include="Source\AI\UseLingeringAttackAction.cpp" />
+    <ClCompile Include="Source\ECS\World\StartupWorld.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

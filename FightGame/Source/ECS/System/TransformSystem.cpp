@@ -138,7 +138,7 @@ void LookMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 void LookOnSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
-	ComponentView actionView = a_chunk.GetView<ComponentTypes<LookOnAction, FixedResult>>();
+	ComponentView actionView = a_chunk.GetView<ComponentTypes<LookOnAction, MotionResult>>();
 
 	Entity cameraTarget = kInvalidEntity;
 	bool usePlayer = false;
@@ -146,26 +146,38 @@ void LookOnSystem(Chunk& a_chunk, const SystemContext& a_context)
 	float3 finalRot;
 	for (auto it : actionView)
 	{
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_RotChange)) continue;
+
 		bool isPlayer = a_chunk.GetComponent<PlayerTag>(it).IsValid();
 
 		ComponentHandle<LookOnAction> look = a_chunk.GetComponent<LookOnAction>(it);
-		ComponentHandle<FixedResult> lookResult = a_chunk.GetComponent<FixedResult>(it);
-		if (!IsActionAllowed(a_chunk, it, ActionFlag_RotChange))
-		{
-			lookResult->newRot = look.Look().finalRot;
-			cameraTarget = look.Look().target;
-			usePlayer = true;
-			useFinelRot = true;
-			finalRot = look.Look().finalRot;
-			continue;
-		};
-		float3 finalRot = GetLookRot(a_chunk, it, look.Look().target);
 
-		lookResult->newRot.x = 0.0f;
-		lookResult->newRot.y = finalRot.y;
-		lookResult->newRot.z = 0.0f;
+		// äpìxÇ…ïœä∑
+		float3 targetRot = GetLookRot(a_chunk, it, look.Look().target);
+		float targetAngle = targetRot.y;
 
-		look->finalRot = lookResult.Look().newRot;
+
+		// åªç›äpìxÇéÊìæ
+		ComponentHandle<Pose> pose = a_chunk.GetComponent<Pose>(it);
+		float currentAngle = fmod(pose.Look().rot.y + 180.0f, 360.0f) - 180.0f;
+		while (currentAngle > 180.0f) currentAngle -= 360.0f;
+		while (currentAngle < -180.0f) currentAngle += 360.0f;
+
+		// äpìxç∑Ç©ÇÁâÒì]ï˚å¸ÇéÊìæ
+		float angleDiff = targetAngle - currentAngle;
+		while (angleDiff > 180.0f) angleDiff -= 360.0f;
+		while (angleDiff < -180.0f) angleDiff += 360.0f;
+
+		float sign = std::abs(angleDiff) < 180.0f ? Sign(angleDiff) : Sign(angleDiff) * -1.0f;
+		float speed = 1.0f;
+		// ë¨ìxÇéÊìæÇ∑ÇÈ
+		ComponentHandle<LookMove> move = a_chunk.GetComponent<LookMove>(it);
+		if (move.IsValid()) speed = move.Look().rotateSpeed * a_context.deltaTime < std::abs(angleDiff) ? move.Look().rotateSpeed * a_context.deltaTime : std::abs(angleDiff);
+
+
+		// ÉäÉUÉãÉgÇ…èëÇ´çûÇ›
+		ComponentHandle<MotionResult> result = a_chunk.GetComponent<MotionResult>(it);
+		result->rotOffset.y += sign * speed;
 
 		if (isPlayer)
 		{

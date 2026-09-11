@@ -1126,16 +1126,20 @@ namespace Component
 		static constexpr int kVersion = 0;
 
 		FadeChungeType type;
-		bool isWait;
+		bool isWait; 
+		float maxCoolTime;
+		float duration;
 
 		FadeChange()
-			: FadeChange(FADE_CHANGE_FLICKER, false)
+			: FadeChange(FADE_CHANGE_FLICKER, false, 0.0f, 0.0f)
 		{
 		}
 
-		FadeChange(FadeChungeType a_type, bool a_isWait = false)
+		FadeChange(FadeChungeType a_type, bool a_isWait = false, float a_maxCoolTime = 0.0f, float a_startDuration = 0.0f)
 			: type(a_type)
 			, isWait(a_isWait)
+			, maxCoolTime(a_maxCoolTime)
+			, duration(a_startDuration)
 		{
 		}
 	};

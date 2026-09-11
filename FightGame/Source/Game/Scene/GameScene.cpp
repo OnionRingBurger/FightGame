@@ -7,8 +7,9 @@
 #include "TestWorld.h"
 #include "ProtoWorld.h"
 #include "TutorialWorld.h"
+#include "StartupWorld.h"
 
-constexpr const char* kStartWorld = "Title";
+constexpr const char* kStartWorld = "Startup";
 
 GameScene::GameScene(
 	IModelCacheAcquisition& a_modelCache,
@@ -245,6 +246,20 @@ bool GameScene::SetWorld(std::string a_key)
 	else if (a_key == "Tutorial")
 	{
 		world = std::make_unique<TutorialWorld>(
+			modelCache,
+			uiCache,
+			effectCache,
+			[this](int a_id) {TutorialRequest(a_id); },
+			[this](std::string a_key) {WorldRequest(a_key); },
+			input,
+			serialize
+		);
+
+		world->InitWorld();
+	}
+	else if (a_key == "Startup")
+	{
+		world = std::make_unique<StartupWorld>(
 			modelCache,
 			uiCache,
 			effectCache,

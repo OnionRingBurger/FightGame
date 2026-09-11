@@ -250,7 +250,7 @@ void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context,
 	// クリアシーンに移行する
 	Entity chunkChange = a_chunk.CreateNewEntity(
 		ChunkChange(true, "Clear"),
-		DelayChunkChange(560.0f)
+		DelayChunkChange(530.0f)
 	);
 
 	Entity stopper = a_chunk.CreateNewEntity(
@@ -329,8 +329,8 @@ void CheckClearTutorialSystem(Chunk& a_chunk, const SystemContext& a_context, IS
 
 	// クリアシーンに移行する
 	Entity chunkChange = a_chunk.CreateNewEntity(
-		ChunkChange(true, "Clear"),
-		DelayChunkChange(560.0f)
+		ChunkChange(true, "Title"),
+		DelayChunkChange(530.0f)
 	);
 
 	Entity stopper = a_chunk.CreateNewEntity(

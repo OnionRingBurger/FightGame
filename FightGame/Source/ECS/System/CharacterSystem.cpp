@@ -289,6 +289,27 @@ namespace
 		return nearestEnemy;
 	}
 
+	Entity FindNearestLookOnPlayer(
+		Chunk& a_chunk,
+		const float3& a_enemyPos,
+		float a_radiusSq,
+		float a_halfFovDeg)
+	{
+		Entity nearestEnemy = kInvalidEntity;
+		float nearestDistSq = FLT_MAX;
+
+		Entity player = GetPlayer(a_chunk, float3());
+		
+		if (player == kInvalidEntity) return kInvalidEntity;
+
+		// 距離を比較して範囲外なら抜ける
+		const float3 playerPos = GetEntityWorldPos(a_chunk, player);
+		const float distSq = GetXZDistanceSq(a_enemyPos, playerPos);
+		if (distSq > a_radiusSq) return kInvalidEntity;
+
+		return player;
+	}
+
 	// ロックオン切り替え、現在はカメラから見た方向で取得している
 	Entity FindLookOnSwitchTarget(
 		Chunk& a_chunk,
@@ -364,12 +385,7 @@ namespace
 	{
 		// Stateを変更
 		ComponentHandle<PoseRotState> poseRot = a_chunk.GetComponent<PoseRotState>(a_entity);
-		if (poseRot.IsValid()) poseRot->state = POSE_ROT_LOOKMOVE;
-		// 固定座標を使わないためMotionに戻す
-		ComponentHandle<MotionTransform> transform = a_chunk.GetComponent<MotionTransform>(a_entity);
-		ComponentHandle<FixedResult> result = a_chunk.GetComponent<FixedResult>(a_entity);
-		transform->motionRot = result.Look().newRot;
-	}
+		if (poseRot.IsValid()) poseRot->state = POSE_ROT_LOOKMOVE;	}
 
 	void StateToLook(Chunk& a_chunk, Entity a_entity)
 	{
@@ -377,9 +393,6 @@ namespace
 		ComponentHandle<PoseRotState> poseRot = a_chunk.GetComponent<PoseRotState>(a_entity);
 		if (poseRot.IsValid()) poseRot->state = POSE_ROT_LOOK;
 		else a_chunk.AddComponent<PoseRotState>(a_entity, PoseRotState(POSE_ROT_LOOK));
-		// 座標を初期化
-		ComponentHandle<MotionTransform> transform = a_chunk.GetComponent<MotionTransform>(a_entity);
-		transform->motionRot = float3();
 	}
 
 	void CancelLookOn(Chunk& a_chunk, Entity a_user)
@@ -389,6 +402,10 @@ namespace
 
 		// Stateを変更
 		StateToMove(a_chunk, a_user);
+	}
+
+	void CancelLookOnPlayerUI(Chunk& a_chunk)
+	{
 		// マーカーの対象を更新
 		Entity targetMarker = GetLookOnMarker(a_chunk);
 		ComponentHandle<FollowPosition> markerFollow = a_chunk.GetComponent<FollowPosition>(targetMarker);
@@ -841,15 +858,21 @@ void LookOnStateSystem(Chunk& a_chunk, const SystemContext& a_context)
 	ComponentView actionView = a_chunk.GetView<ComponentTypes<LookOnState, LookOnAction, MoveInputResult>>();
 	for (auto playerIt : actionView)
 	{
+		bool isPlayer = a_chunk.GetComponent<PlayerTag>(playerIt).IsValid();
+
 		ComponentHandle<LookOnAction> action = a_chunk.GetComponent<LookOnAction>(playerIt);
 		ComponentHandle<LookOnState> state = a_chunk.GetComponent<LookOnState>(playerIt);
 		ComponentHandle<MoveInputResult> result = a_chunk.GetComponent<MoveInputResult>(playerIt);
 
 		
 		// 死亡込みでロックオン対象がいるか確認する
-		if (!IsLookOnTargetValid(a_chunk, action.Look().target))
+		bool targetAlive = false;
+		if (isPlayer) targetAlive = IsLookOnTargetValid(a_chunk, action.Look().target);
+		else targetAlive = GetPlayer(a_chunk, float3()) != kInvalidEntity;
+		if (!targetAlive)
 		{
 			CancelLookOn(a_chunk, playerIt);
+			if (isPlayer) CancelLookOnPlayerUI(a_chunk);
 			continue;
 		}
 
@@ -861,13 +884,14 @@ void LookOnStateSystem(Chunk& a_chunk, const SystemContext& a_context)
 		}
 
 
+
 		// 対象への距離と座標を取得
 		const float3 playerPos = GetEntityWorldPos(a_chunk, playerIt);
 		const float releaseRadiusSq = state.Look().releaseRadius * state.Look().releaseRadius;
 		const float3 targetPos = GetEntityWorldPos(a_chunk, action.Look().target);
 		const float targetDistSq = GetXZDistanceSq(playerPos, targetPos);
 		float2 lookOnInput(result.Look().cameraDir * result.Look().cameraMagnitube);
-		if ((lookOnInput.x != 0 || lookOnInput.y != 0) && result.Look().moveCamera)
+		if ((lookOnInput.x != 0 || lookOnInput.y != 0) && result.Look().moveCamera && isPlayer)
 		{
 			// 切り替え方向に対象が存在するか確認
 			const Entity switchTarget = FindLookOnSwitchTarget(
@@ -893,11 +917,12 @@ void LookOnStateSystem(Chunk& a_chunk, const SystemContext& a_context)
 		if (targetDistSq > releaseRadiusSq)
 		{
 			CancelLookOn(a_chunk, playerIt);
+			if (isPlayer) CancelLookOnPlayerUI(a_chunk);
 			continue;
 		}
 	}
 	// 一番近い敵を登録
-	ComponentView searchView = a_chunk.GetView<ComponentTypes<LookOnState>, ComponentTypes<LookOnAction>>();
+	ComponentView searchView = a_chunk.GetView<ComponentTypes<PlayerTag, LookOnState>, ComponentTypes<LookOnAction>>();
 	for (auto playerIt : searchView)
 	{
 		ComponentHandle<LookOnState> state = a_chunk.GetComponent<LookOnState>(playerIt);
@@ -931,7 +956,29 @@ void LookOnStateSystem(Chunk& a_chunk, const SystemContext& a_context)
 		}
 		else a_chunk.AddComponent(rig, PoseRotState(POSE_ROT_LOOK));
 		a_chunk.AddComponent(rig, RigLookOn());
+	}
 
+	// 一番近いプレイヤーを登録
+	ComponentView enemySearchView = a_chunk.GetView<ComponentTypes<LookOnState>, ComponentTypes<PlayerTag, LookOnAction>>();
+
+	for (auto it : enemySearchView)
+	{
+		ComponentHandle<LookOnState> state = a_chunk.GetComponent<LookOnState>(it);
+		const float3 enemyPos = GetEntityWorldPos(a_chunk, it);
+		const float captureRadiusSq = state.Look().captureRadius * state.Look().captureRadius;
+
+		// 一番近い敵を取得
+		const Entity nearestEnemy = FindNearestLookOnPlayer(
+			a_chunk,
+			enemyPos,
+			captureRadiusSq,
+			halfFovDeg);
+		if (nearestEnemy == kInvalidEntity) continue;
+
+		// 一番近い敵が範囲内だった場合Actionを追加し、登録する
+		a_chunk.AddComponent(it, LookOnAction(nearestEnemy, kLookOnChangeCooltime));
+
+		StateToLook(a_chunk, it);
 	}
 }
 

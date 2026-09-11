@@ -39,12 +39,24 @@ void FadeUISystem(Chunk& a_chunk, const SystemContext& a_context)
 		ui->alpha = Lerp(start, target, fade.Look().progress);
 
 		ComponentHandle<FadeChange> change = a_chunk.GetComponent<FadeChange>(it);
-		if (!change.IsValid()) continue;
-
+		if (!change.IsValid())
+		{
+			continue;
+		}
 		if (change.Look().isWait) continue;
 
 		if (fade.Look().progress < 1.0f) continue;
+		if (change.Look().maxCoolTime > change.Look().duration)
+		{
+			float newChangeDuration = change.Look().duration + a_context.effectStepTime;
+			change->duration = std::clamp(newChangeDuration, 0.0f, change.Look().maxCoolTime);
+			DebugConsole::SetDrawPos(20, 26);
+			std::cout << change.Look().duration << std::endl;
+			continue;
+		}
+
 		fade->progress = 0.0f;
+		change->duration = 0.0f;
 		switch (change.Look().type)
 		{
 		case FadeChungeType::FADE_CHANGE_FLICKER:
@@ -648,7 +660,7 @@ void CreateTutorialTextSystem(Chunk& a_chunk, const SystemContext& a_context)
 		// UIを生成
 		a_chunk.CreateNewEntity(
 			UIComponent("TutorialWindow", float2(0.0f, -0.6f), float2(1.95f, 0.8f), 0.0f),
-			DeleteOnInput("Select", 120.0f),
+			DeleteOnInput("Select", kTutorialTextTime),
 			ClearTarget(),
 			AllActionStopper(),
 			FadeUI(FADE_DOWN, 0.02f, 0.85f, 1.0f),
@@ -661,7 +673,7 @@ void CreateTutorialTextSystem(Chunk& a_chunk, const SystemContext& a_context)
 		// テキストを生成
 		a_chunk.CreateNewEntity(
 			UIComponent(tutorial.Look().textKey, float2(0.0f, -0.6f), float2(1.8f, 0.7f), 0.0f),
-			DeleteOnInput("Select", 120.0f),
+			DeleteOnInput("Select", kTutorialTextTime),
 			ClearTarget(),
 			AllActionStopper(),
 			FadeUI(FADE_DOWN, 0.02f, 0.95f, 1.0f),
@@ -670,7 +682,7 @@ void CreateTutorialTextSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		a_chunk.CreateNewEntity(
 			UITextBoxCursor("LookOnMaker", float2(0.85f, -0.8f), float2(0.07f, 0.07f * 1.777f), 0.02f, 0.0f, 1.0f, ""),
-			DeleteOnInput("Select", 120.0f),
+			DeleteOnInput("Select", kTutorialTextTime),
 			ClearTarget(),
 			AllActionStopper()
 		);
@@ -692,7 +704,6 @@ bool IsTargetInInputDirection(int a_direction, float a_currentPos, float a_targe
 // 毎回View作るとちょっと重いだろうから引数で受け取る
 Entity GetNextTarget(Entity a_target, Chunk& a_chunk, ComponentView a_cursorView ,float2 a_direction)
 {
-
 	Entity bestEntity = a_target;
 	ComponentHandle<SelectBox> bestBox = a_chunk.GetComponent<SelectBox>(a_target);
 	if (std::abs(a_direction.x) < 0.3f)

@@ -18,6 +18,7 @@ struct AIBlackboard
 		// ˆĞ—ÍAŒ„
 		float damageValue;
 		float waitTime;
+		bool endWithOwnerAction = true;
 	};
 
 	struct BBEnemyData

@@ -17,6 +17,7 @@
 #include "WaitAction.h"
 #include "ChasePlayerAction.h"
 #include "UseAttackAction.h"
+#include "UseLingeringAttackAction.h"
 #include "RunPlayerNode.h"
 #include "GuardNode.h"
 #include "RoleCurve.h"

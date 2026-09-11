@@ -16,11 +16,6 @@ TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 		a_serialize)
 	, worldRequest(a_worldRequest)
 {
-	//a_input.RegisterKey("ChunkChange", VK_LBUTTON);
-	//a_input.RegisterButton("ChunkChange", XINPUT_GAMEPAD_A);
-
-	//a_input.RegisterKey("GoToTutorial", VK_RBUTTON);
-	//a_input.RegisterButton("GoToTutorial", XINPUT_GAMEPAD_B);
 
 
 	a_input.RegisterButton("Select", XINPUT_GAMEPAD_A);
@@ -37,12 +32,8 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 
 
 	Entity titleLogo = newChunk.CreateNewEntity(
-		UIComponent("TitleLogo", float2(0.0f, 0.4f), float2(1.0f, 1.0f), 0.0f)
+		UIComponent("TitleLogo", float2(0.0f, 0.4f), float2(1.7f, 0.7f), 0.0f)
 	);
-
-	//Entity titleMask = newChunk.CreateNewEntity(
-	//	UIComponent("DarkMask", float2(0.0f, 0.0f), float2(2.0f, 2.0f), 0.0f)
-	//);
 
 	Entity createEffectKey = newChunk.CreateNewEntity(
 		EffectKey(WHITEFADE_UP, "ChunkChange")
@@ -69,15 +60,6 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		CameraTag()
 	);
 
-	Entity changeScene = newChunk.CreateNewEntity(
-		ChunkChange(true, "Proto"),
-		KeyChunkChange("ChunkChange", 240.0f)
-	);
-
-	Entity goToTutorial = newChunk.CreateNewEntity(
-		ChunkChange(true, "Tutorial"),
-		KeyChunkChange("GoToTutorial", 110.0f)
-	);
 
 	Entity character = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
@@ -201,14 +183,6 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		true,
 		10.0f
 	));
-
-	//Entity titleUI = newChunk.CreateNewEntity(
-	//	UIComponent("TitleStart", float2(0.0f, -0.3f), TitleButtonSize, 0.0f)
-	//);
-
-	//Entity tutorialUI = newChunk.CreateNewEntity(
-	//	UIComponent("TitleTutorial", float2(0.0f, -0.6f), TitleButtonSize, 0.0f)
-	//);
 
 
 

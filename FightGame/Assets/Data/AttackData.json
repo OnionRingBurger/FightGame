@@ -132,7 +132,7 @@
     },
 
     "Enemy4Attack1": {
-      "MinLength": 1.5,
+      "MinLength": 2.0,
       "MaxLength": 4.0,
       "Angle": 110.0,
       "MaxHeight": 0.03,

@@ -143,7 +143,8 @@ void MainGame::Init()
 		"StageClear",
 		"TutorialWindow",
 		"TitleStart",
-		"TitleTutorial"
+		"TitleTutorial",
+		"Controller"
 
 	};
 
@@ -169,11 +170,13 @@ void MainGame::Init()
 	{
 		{ "DefaultFormat", false, L"Meiryo", L"", 96.0f },
 		{ "ShortFormat", false, L"Meiryo", L"", 80.0f },
+		{ "BigFormat", false, L"Meiryo", L"", 120.0f },
 		//{ "SmartFormat", false, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 48.0f }
 	};
 
 	textUIDatas =
 	{
+		{ "ControllerText", L"本ゲームはキーボード操作でも遊べますが、\nコントローラーを使用すると、より楽しんでいただけます。", "BigFormat", 120.0f * 30.0f, 120.0f * 5.0f },
 		{ "StartText", L"上からくるぞ！\n気を付けろ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialAttack", L"まずは敵に攻撃を当ててダメージを与えよう！\n体力を削りきることで敵を倒せるぞ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialAttack2", L"攻撃には発生が早く、使い勝手の良い弱攻撃と\n火力が高く、範囲が広い強攻撃の二種類が存在する。", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },

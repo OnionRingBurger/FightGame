@@ -67,7 +67,7 @@ void ProtoWorld::InitAI(AIManager& a_aiManager)
 
 	std::unique_ptr<ReactiveSelector> neutralSelector = std::make_unique<ReactiveSelector>();
 	neutralSelector->AddNode(std::make_unique<InAttackRangeDecorator>(std::make_unique<UseAttackAction>()));
-	neutralSelector->AddNode(std::make_unique<ChasePlayerAction>(1.0f));
+	neutralSelector->AddNode(std::make_unique<ChasePlayerAction>(0.8f));
 	
 
 	std::unique_ptr<ReactiveSelector> guardSelector = std::make_unique<ReactiveSelector>();

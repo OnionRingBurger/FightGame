@@ -14,6 +14,16 @@
                     }
                 },
                 {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                },
+                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -27,26 +37,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "typeId": 13,
-                    "virsion": 1,
-                    "typeName": "Rotation",
-                    "data": {
-                        "pitch": 0.0,
-                        "yaw": 180.0,
-                        "roll": 0.0
-                    }
-                },
-                {
                     "typeId": 101,
                     "virsion": 0,
                     "typeName": "MotionTransform",
@@ -55,8 +45,31 @@
                         "motionPosY": 90.5,
                         "motionPosZ": 3.0,
                         "motionRotX": 0.0,
-                        "motionRotY": 180.0,
+                        "motionRotY": 0.0,
                         "motionRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 13,
+                    "virsion": 1,
+                    "typeName": "Rotation",
+                    "data": {
+                        "pitch": 0.0,
+                        "yaw": 0.0,
+                        "roll": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 90.5,
+                        "posZ": 3.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -74,19 +87,6 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 71,
-                    "virsion": 0,
-                    "typeName": "Pose",
-                    "data": {
-                        "posX": 0.0,
-                        "posY": 90.5,
-                        "posZ": 3.0,
-                        "rotX": 0.0,
-                        "rotY": 180.0,
-                        "rotZ": 0.0
                     }
                 },
                 {
@@ -257,7 +257,7 @@
                         "distCoefficient": 50.0,
                         "farnessCoefficient": 1.0,
                         "hitCoefficient": 3.0,
-                        "stanceCoefficient": 300.0
+                        "stanceCoefficient": 8.0
                     }
                 },
                 {
@@ -327,6 +327,16 @@
                         "guardPower": 0.800000011920929,
                         "knockbackRate": 1.2000000476837158
                     }
+                },
+                {
+                    "typeId": 134,
+                    "virsion": 0,
+                    "typeName": "LookOnState",
+                    "data": {
+                        "captureRadius": 6.800000190734863,
+                        "releaseRadius": 7.800000190734863,
+                        "stickSwitchLatch": false
+                    }
                 }
             ]
         },
@@ -344,6 +354,16 @@
                     }
                 },
                 {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                },
+                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -357,13 +377,16 @@
                     }
                 },
                 {
-                    "typeId": 14,
+                    "typeId": 101,
                     "virsion": 0,
-                    "typeName": "Scale",
+                    "typeName": "MotionTransform",
                     "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
+                        "motionPosX": 0.0,
+                        "motionPosY": 1.0,
+                        "motionPosZ": 0.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
                     }
                 },
                 {
@@ -377,16 +400,16 @@
                     }
                 },
                 {
-                    "typeId": 101,
+                    "typeId": 71,
                     "virsion": 0,
-                    "typeName": "MotionTransform",
+                    "typeName": "Pose",
                     "data": {
-                        "motionPosX": 0.0,
-                        "motionPosY": 1.0,
-                        "motionPosZ": 0.0,
-                        "motionRotX": 0.0,
-                        "motionRotY": 0.0,
-                        "motionRotZ": 0.0
+                        "posX": 0.0,
+                        "posY": 1.0,
+                        "posZ": 0.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -404,19 +427,6 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 71,
-                    "virsion": 0,
-                    "typeName": "Pose",
-                    "data": {
-                        "posX": 0.0,
-                        "posY": 1.0,
-                        "posZ": 0.0,
-                        "rotX": 0.0,
-                        "rotY": 0.0,
-                        "rotZ": 0.0
                     }
                 },
                 {
@@ -546,16 +556,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -569,16 +569,13 @@
                     }
                 },
                 {
-                    "typeId": 101,
+                    "typeId": 14,
                     "virsion": 0,
-                    "typeName": "MotionTransform",
+                    "typeName": "Scale",
                     "data": {
-                        "motionPosX": 5.0,
-                        "motionPosY": 65.5,
-                        "motionPosZ": 3.0,
-                        "motionRotX": 0.0,
-                        "motionRotY": 180.0,
-                        "motionRotZ": 0.0
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
                     }
                 },
                 {
@@ -592,16 +589,16 @@
                     }
                 },
                 {
-                    "typeId": 71,
+                    "typeId": 101,
                     "virsion": 0,
-                    "typeName": "Pose",
+                    "typeName": "MotionTransform",
                     "data": {
-                        "posX": 5.0,
-                        "posY": 65.5,
-                        "posZ": 3.0,
-                        "rotX": 0.0,
-                        "rotY": 180.0,
-                        "rotZ": 0.0
+                        "motionPosX": 5.0,
+                        "motionPosY": 65.5,
+                        "motionPosZ": 3.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 180.0,
+                        "motionRotZ": 0.0
                     }
                 },
                 {
@@ -619,6 +616,19 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 5.0,
+                        "posY": 65.5,
+                        "posZ": 3.0,
+                        "rotX": 0.0,
+                        "rotY": 180.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -859,6 +869,16 @@
                         "guardPower": 0.800000011920929,
                         "knockbackRate": 1.2000000476837158
                     }
+                },
+                {
+                    "typeId": 134,
+                    "virsion": 0,
+                    "typeName": "LookOnState",
+                    "data": {
+                        "captureRadius": 6.800000190734863,
+                        "releaseRadius": 7.800000190734863,
+                        "stickSwitchLatch": false
+                    }
                 }
             ]
         },
@@ -876,16 +896,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -899,16 +909,13 @@
                     }
                 },
                 {
-                    "typeId": 101,
+                    "typeId": 14,
                     "virsion": 0,
-                    "typeName": "MotionTransform",
+                    "typeName": "Scale",
                     "data": {
-                        "motionPosX": -5.0,
-                        "motionPosY": 85.5,
-                        "motionPosZ": 3.0,
-                        "motionRotX": 0.0,
-                        "motionRotY": 180.0,
-                        "motionRotZ": 0.0
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
                     }
                 },
                 {
@@ -922,16 +929,16 @@
                     }
                 },
                 {
-                    "typeId": 71,
+                    "typeId": 101,
                     "virsion": 0,
-                    "typeName": "Pose",
+                    "typeName": "MotionTransform",
                     "data": {
-                        "posX": -5.0,
-                        "posY": 85.5,
-                        "posZ": 3.0,
-                        "rotX": 0.0,
-                        "rotY": 180.0,
-                        "rotZ": 0.0
+                        "motionPosX": -5.0,
+                        "motionPosY": 85.5,
+                        "motionPosZ": 3.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 180.0,
+                        "motionRotZ": 0.0
                     }
                 },
                 {
@@ -949,6 +956,19 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": -5.0,
+                        "posY": 85.5,
+                        "posZ": 3.0,
+                        "rotX": 0.0,
+                        "rotY": 180.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -1190,6 +1210,16 @@
                         "guardPower": 0.8999999761581421,
                         "knockbackRate": 1.2000000476837158
                     }
+                },
+                {
+                    "typeId": 134,
+                    "virsion": 0,
+                    "typeName": "LookOnState",
+                    "data": {
+                        "captureRadius": 6.800000190734863,
+                        "releaseRadius": 7.800000190734863,
+                        "stickSwitchLatch": false
+                    }
                 }
             ]
         },
@@ -1207,16 +1237,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -1230,16 +1250,13 @@
                     }
                 },
                 {
-                    "typeId": 101,
+                    "typeId": 14,
                     "virsion": 0,
-                    "typeName": "MotionTransform",
+                    "typeName": "Scale",
                     "data": {
-                        "motionPosX": 0.0,
-                        "motionPosY": 1.0,
-                        "motionPosZ": 0.0,
-                        "motionRotX": 0.0,
-                        "motionRotY": 0.0,
-                        "motionRotZ": 0.0
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
                     }
                 },
                 {
@@ -1253,16 +1270,16 @@
                     }
                 },
                 {
-                    "typeId": 71,
+                    "typeId": 101,
                     "virsion": 0,
-                    "typeName": "Pose",
+                    "typeName": "MotionTransform",
                     "data": {
-                        "posX": 0.0,
-                        "posY": 1.0,
-                        "posZ": 0.0,
-                        "rotX": 0.0,
-                        "rotY": 0.0,
-                        "rotZ": 0.0
+                        "motionPosX": 0.0,
+                        "motionPosY": 1.0,
+                        "motionPosZ": 0.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
                     }
                 },
                 {
@@ -1280,6 +1297,19 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 1.0,
+                        "posZ": 0.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -1384,16 +1414,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -1407,16 +1427,13 @@
                     }
                 },
                 {
-                    "typeId": 101,
+                    "typeId": 14,
                     "virsion": 0,
-                    "typeName": "MotionTransform",
+                    "typeName": "Scale",
                     "data": {
-                        "motionPosX": 0.0,
-                        "motionPosY": 1.0,
-                        "motionPosZ": 0.0,
-                        "motionRotX": 0.0,
-                        "motionRotY": 0.0,
-                        "motionRotZ": 0.0
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
                     }
                 },
                 {
@@ -1430,16 +1447,16 @@
                     }
                 },
                 {
-                    "typeId": 71,
+                    "typeId": 101,
                     "virsion": 0,
-                    "typeName": "Pose",
+                    "typeName": "MotionTransform",
                     "data": {
-                        "posX": 0.0,
-                        "posY": 1.0,
-                        "posZ": 0.0,
-                        "rotX": 0.0,
-                        "rotY": 0.0,
-                        "rotZ": 0.0
+                        "motionPosX": 0.0,
+                        "motionPosY": 1.0,
+                        "motionPosZ": 0.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
                     }
                 },
                 {
@@ -1457,6 +1474,19 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 1.0,
+                        "posZ": 0.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -1586,16 +1616,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.2000000476837158,
-                        "y": 1.2000000476837158,
-                        "z": 1.2000000476837158
-                    }
-                },
-                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -1609,16 +1629,13 @@
                     }
                 },
                 {
-                    "typeId": 101,
+                    "typeId": 14,
                     "virsion": 0,
-                    "typeName": "MotionTransform",
+                    "typeName": "Scale",
                     "data": {
-                        "motionPosX": 0.0,
-                        "motionPosY": 65.5,
-                        "motionPosZ": 4.5,
-                        "motionRotX": 0.0,
-                        "motionRotY": 0.0,
-                        "motionRotZ": 0.0
+                        "x": 1.2000000476837158,
+                        "y": 1.2000000476837158,
+                        "z": 1.2000000476837158
                     }
                 },
                 {
@@ -1632,16 +1649,16 @@
                     }
                 },
                 {
-                    "typeId": 71,
+                    "typeId": 101,
                     "virsion": 0,
-                    "typeName": "Pose",
+                    "typeName": "MotionTransform",
                     "data": {
-                        "posX": 0.0,
-                        "posY": 65.5,
-                        "posZ": 4.5,
-                        "rotX": 0.0,
-                        "rotY": 0.0,
-                        "rotZ": 0.0
+                        "motionPosX": 0.0,
+                        "motionPosY": 65.5,
+                        "motionPosZ": 4.5,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
                     }
                 },
                 {
@@ -1659,6 +1676,19 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 65.5,
+                        "posZ": 4.5,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -1915,6 +1945,16 @@
                         "guardPower": 0.10000000149011612,
                         "knockbackRate": 0.699999988079071
                     }
+                },
+                {
+                    "typeId": 134,
+                    "virsion": 0,
+                    "typeName": "LookOnState",
+                    "data": {
+                        "captureRadius": 6.800000190734863,
+                        "releaseRadius": 7.800000190734863,
+                        "stickSwitchLatch": false
+                    }
                 }
             ]
         },
@@ -1973,16 +2013,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -1996,16 +2026,13 @@
                     }
                 },
                 {
-                    "typeId": 101,
+                    "typeId": 14,
                     "virsion": 0,
-                    "typeName": "MotionTransform",
+                    "typeName": "Scale",
                     "data": {
-                        "motionPosX": 0.0,
-                        "motionPosY": 1.0,
-                        "motionPosZ": 0.0,
-                        "motionRotX": 0.0,
-                        "motionRotY": 0.0,
-                        "motionRotZ": 0.0
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
                     }
                 },
                 {
@@ -2019,16 +2046,16 @@
                     }
                 },
                 {
-                    "typeId": 71,
+                    "typeId": 101,
                     "virsion": 0,
-                    "typeName": "Pose",
+                    "typeName": "MotionTransform",
                     "data": {
-                        "posX": 0.0,
-                        "posY": 1.0,
-                        "posZ": 0.0,
-                        "rotX": 0.0,
-                        "rotY": 0.0,
-                        "rotZ": 0.0
+                        "motionPosX": 0.0,
+                        "motionPosY": 1.0,
+                        "motionPosZ": 0.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
                     }
                 },
                 {
@@ -2055,6 +2082,19 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 1.0,
+                        "posZ": 0.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -2145,16 +2185,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -2168,16 +2198,13 @@
                     }
                 },
                 {
-                    "typeId": 101,
+                    "typeId": 14,
                     "virsion": 0,
-                    "typeName": "MotionTransform",
+                    "typeName": "Scale",
                     "data": {
-                        "motionPosX": 0.0,
-                        "motionPosY": 0.5,
-                        "motionPosZ": 4.0,
-                        "motionRotX": 62.0,
-                        "motionRotY": 0.0,
-                        "motionRotZ": 0.0
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
                     }
                 },
                 {
@@ -2191,16 +2218,16 @@
                     }
                 },
                 {
-                    "typeId": 71,
+                    "typeId": 101,
                     "virsion": 0,
-                    "typeName": "Pose",
+                    "typeName": "MotionTransform",
                     "data": {
-                        "posX": 0.0,
-                        "posY": 0.5,
-                        "posZ": 4.0,
-                        "rotX": 62.0,
-                        "rotY": 0.0,
-                        "rotZ": 0.0
+                        "motionPosX": 0.0,
+                        "motionPosY": 0.5,
+                        "motionPosZ": 4.0,
+                        "motionRotX": 62.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
                     }
                 },
                 {
@@ -2218,6 +2245,19 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 0.5,
+                        "posZ": 4.0,
+                        "rotX": 62.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -2297,16 +2337,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -2320,16 +2350,13 @@
                     }
                 },
                 {
-                    "typeId": 101,
+                    "typeId": 14,
                     "virsion": 0,
-                    "typeName": "MotionTransform",
+                    "typeName": "Scale",
                     "data": {
-                        "motionPosX": 0.0,
-                        "motionPosY": 0.0,
-                        "motionPosZ": 4.300000190734863,
-                        "motionRotX": 0.0,
-                        "motionRotY": 0.0,
-                        "motionRotZ": 0.0
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
                     }
                 },
                 {
@@ -2343,16 +2370,16 @@
                     }
                 },
                 {
-                    "typeId": 71,
+                    "typeId": 101,
                     "virsion": 0,
-                    "typeName": "Pose",
+                    "typeName": "MotionTransform",
                     "data": {
-                        "posX": 0.0,
-                        "posY": 0.0,
-                        "posZ": 4.300000190734863,
-                        "rotX": 0.0,
-                        "rotY": 0.0,
-                        "rotZ": 0.0
+                        "motionPosX": 0.0,
+                        "motionPosY": 0.0,
+                        "motionPosZ": 4.300000190734863,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
                     }
                 },
                 {
@@ -2370,6 +2397,19 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 0.0,
+                        "posZ": 4.300000190734863,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -3038,16 +3078,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -3061,16 +3091,13 @@
                     }
                 },
                 {
-                    "typeId": 101,
+                    "typeId": 14,
                     "virsion": 0,
-                    "typeName": "MotionTransform",
+                    "typeName": "Scale",
                     "data": {
-                        "motionPosX": 0.0,
-                        "motionPosY": 65.5,
-                        "motionPosZ": 3.0,
-                        "motionRotX": 0.0,
-                        "motionRotY": 0.0,
-                        "motionRotZ": 0.0
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
                     }
                 },
                 {
@@ -3084,16 +3111,16 @@
                     }
                 },
                 {
-                    "typeId": 71,
+                    "typeId": 101,
                     "virsion": 0,
-                    "typeName": "Pose",
+                    "typeName": "MotionTransform",
                     "data": {
-                        "posX": 0.0,
-                        "posY": 65.5,
-                        "posZ": 3.0,
-                        "rotX": 0.0,
-                        "rotY": 0.0,
-                        "rotZ": 0.0
+                        "motionPosX": 0.0,
+                        "motionPosY": 65.5,
+                        "motionPosZ": 3.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
                     }
                 },
                 {
@@ -3111,6 +3138,19 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 65.5,
+                        "posZ": 3.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -3311,20 +3351,20 @@
                     }
                 },
                 {
+                    "typeId": 28,
+                    "virsion": 0,
+                    "typeName": "GhostAreaComponent",
+                    "data": {
+                        "length": 2.0
+                    }
+                },
+                {
                     "typeId": 92,
                     "virsion": 0,
                     "typeName": "HitPoint",
                     "data": {
                         "maxHP": 22.0,
                         "currentHP": 22.0
-                    }
-                },
-                {
-                    "typeId": 28,
-                    "virsion": 0,
-                    "typeName": "GhostAreaComponent",
-                    "data": {
-                        "length": 2.0
                     }
                 },
                 {
@@ -3361,6 +3401,16 @@
                         "guardPower": 0.6000000238418579,
                         "knockbackRate": 1.100000023841858
                     }
+                },
+                {
+                    "typeId": 134,
+                    "virsion": 0,
+                    "typeName": "LookOnState",
+                    "data": {
+                        "captureRadius": 6.800000190734863,
+                        "releaseRadius": 7.800000190734863,
+                        "stickSwitchLatch": false
+                    }
                 }
             ]
         },
@@ -3378,16 +3428,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -3401,16 +3441,13 @@
                     }
                 },
                 {
-                    "typeId": 101,
+                    "typeId": 14,
                     "virsion": 0,
-                    "typeName": "MotionTransform",
+                    "typeName": "Scale",
                     "data": {
-                        "motionPosX": 0.0,
-                        "motionPosY": 1.0,
-                        "motionPosZ": 0.0,
-                        "motionRotX": 0.0,
-                        "motionRotY": 0.0,
-                        "motionRotZ": 0.0
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
                     }
                 },
                 {
@@ -3424,16 +3461,16 @@
                     }
                 },
                 {
-                    "typeId": 71,
+                    "typeId": 101,
                     "virsion": 0,
-                    "typeName": "Pose",
+                    "typeName": "MotionTransform",
                     "data": {
-                        "posX": 0.0,
-                        "posY": 1.0,
-                        "posZ": 0.0,
-                        "rotX": 0.0,
-                        "rotY": 0.0,
-                        "rotZ": 0.0
+                        "motionPosX": 0.0,
+                        "motionPosY": 1.0,
+                        "motionPosZ": 0.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
                     }
                 },
                 {
@@ -3451,6 +3488,19 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 1.0,
+                        "posZ": 0.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
