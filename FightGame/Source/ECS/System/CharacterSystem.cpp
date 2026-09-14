@@ -658,6 +658,7 @@ void CharacterAttackSystem(Chunk& a_chunk, const SystemContext& a_context)
 		{
 			BeginAttackTelegraphFromPower(a_chunk, it, attackPower, attackIndex);
 			if (isPlayer) PlaySound(LoadSound("Assets/Sound/startup.mp3"));
+			else if(attackPower.damageValue >= 3.5f) PlaySound(LoadSound("Assets/Sound/enemystartup2.mp3"));
 			else PlaySound(LoadSound("Assets/Sound/enemystartup.mp3"));
 
 			continue;

@@ -57,9 +57,19 @@ Chunk ResultWorld::CreateNewChunk(AIManager& a_aiManager)
 		CreateEffect(DARKFADE_CLEAR)
 	);
 
+	Entity back = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, 10.0f, 20.0f),
+			float3(0.0f, 00.0f, 0.0f),
+			float3(200.7f, 200.7f, 0.7f)
+		),
+		ModelKey("Box"),
+		AlphaBlendComponent("Blue", "Purple"),
+		AngularVelocity(float3(0.0f, 0.0f, 0.2f)),
+		RailFly(3.0f, 0.02f)
+	);
 
-
-	Entity tombstone = newChunk.CreateNewEntity(
+	Entity box = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
 			float3(0.0f, 10.0f, 0.0f),
 			float3(0.0f, 20.0f, 0.0f),
@@ -67,7 +77,8 @@ Chunk ResultWorld::CreateNewChunk(AIManager& a_aiManager)
 		),
 		ModelKey("Box"),
 		AlphaBlendComponent("Red", "Red"),
-		AngularVelocity(float3(0.7f, 0.0f, 0.0f))
+		AngularVelocity(float3(0.7f, 0.0f, 0.0f)),
+		RailFly(0.5f, 0.02f)
 	);
 	return newChunk;
 }

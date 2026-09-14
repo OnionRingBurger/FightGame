@@ -296,6 +296,25 @@ void SaveUnlockStage(int stageIndex, bool isUnlock)
 	out << json.dump(4);
 }
 
+void AddGameBind(Input& a_input)
+{
+	a_input.RegisterKey("RightAttack", MK_RBUTTON);
+	a_input.RegisterKey("LeftAttack", MK_LBUTTON);
+	a_input.RegisterKey("Jump", VK_SPACE);
+	a_input.RegisterKey("Guard", 'E');
+
+
+	a_input.RegisterButton("RightAttack", XINPUT_GAMEPAD_B);
+	a_input.RegisterButton("LeftAttack", XINPUT_GAMEPAD_A);
+	a_input.RegisterButton("Jump", XINPUT_GAMEPAD_RIGHT_SHOULDER);
+	a_input.RegisterButton("Guard", XINPUT_GAMEPAD_LEFT_SHOULDER);
+
+	a_input.RegisterButton("Restart", XINPUT_GAMEPAD_A);
+	a_input.RegisterButton("GameOver", XINPUT_GAMEPAD_B);
+	a_input.RegisterKey("Restart", MK_LBUTTON);
+	a_input.RegisterKey("GameOver", MK_RBUTTON);
+}
+
 
 void NewSceneSpawn(ComponentsSerialize& a_serialize, Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName, float3 a_offset)
 {

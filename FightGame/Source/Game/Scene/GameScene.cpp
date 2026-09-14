@@ -9,7 +9,7 @@
 #include "TutorialWorld.h"
 #include "StartupWorld.h"
 
-constexpr const char* kStartWorld = "Startup";
+constexpr const char* kStartWorld = "Result";
 
 GameScene::GameScene(
 	IModelCacheAcquisition& a_modelCache,

@@ -61,3 +61,7 @@ bool IsUnlockStage(int stageIndex);
 void SaveClearStage(int stageIndex, bool isClear);
 
 void SaveUnlockStage(int stageIndex, bool isUnlock);
+
+
+// キーバインド
+void AddGameBind(Input& a_input);

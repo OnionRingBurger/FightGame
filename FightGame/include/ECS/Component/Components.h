@@ -3674,6 +3674,13 @@ namespace Component
 		{
 		}
 	};
+
+	struct GameEndFlag
+	{
+		static constexpr TypeID kTypeId = 170;
+		static constexpr const char* kTypeName = "GameEndFlag";
+		static constexpr int kVersion = 0;
+	};
 };
 
 

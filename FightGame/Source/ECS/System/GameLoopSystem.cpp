@@ -125,85 +125,71 @@ void CheckAliveTargetGameOverSystem(Chunk& a_chunk, const SystemContext& a_conte
 		return;
 	}
 
-	// 既にチャンク変更待ちだった場合何もせず抜ける
-	ComponentView chunkChangeView = a_chunk.GetView<ComponentTypes<KeyChunkChange>>();
-	for (auto it : chunkChangeView)
+	// 既に終了状態だった場合何もせず抜ける
+	ComponentView gameEndView = a_chunk.GetView<ComponentTypes<GameEndFlag>>();
+	for (auto it : gameEndView)
 	{
 		return;
 	}
 
 	Entity back = a_chunk.CreateNewEntity(
-		UIComponent("RetryBack", float2(), float2(2.0f, 2.0f), 0.0f, 0.0f),
-		FadeUI(FADE_UP, 0.05f)
+		UIComponent("RetryBack", float2(), float2(2.0f, 2.0f), 0.9f, 0.0f),
+		FadeUI(FADE_UP, 0.035f / 7.0f, 0.9f, 1.0f),
+		FadeChange(FADE_CHANGE_FLICKER)
 	);
 
 	Entity backShadow = a_chunk.CreateNewEntity(
-		UIComponent("BackShadow", float2(0.0f, 0.3f), float2(3.35f, 3.92f), 0.0f, 0.0f),
+		UIComponent("BackShadow", float2(0.0f, 0.3f), float2(3.35f, 3.92f) * 1.05f, 0.0f, 0.0f),
 		FadeUI(FADE_UP, 0.035f / 7.0f),
 		FadeChange(FADE_CHANGE_FLICKER)
 	);
 
 	Entity retry = a_chunk.CreateNewEntity(
-		UIComponent("Retry", float2(0.0f, 0.3f), float2(1.15f, 0.8f), 0.0f, 0.0f),
+		UIComponent("Retry", float2(0.0f, 0.3f), float2(1.25f, 0.8f) * 1.2f, 0.0f, 0.0f),
 		FadeUI(FADE_UP, 0.035f)
 	);
 
 
 
-	Entity buttonA = a_chunk.CreateNewEntity(
-		UIComponent("ButtonA", float2(-0.55f, -0.8f), float2(0.1f, 0.2f), 0.0f, 0.0f),
-		FadeUI(FADE_UP, 0.035f, 0.3f, 1.0f),
-		FadeChange(FADE_CHANGE_FLICKER)
-	);
+	//Entity buttonA = a_chunk.CreateNewEntity(
+	//	UIComponent("ButtonA", float2(-0.55f, -0.8f), float2(0.1f, 0.2f), 0.0f, 0.0f),
+	//	FadeUI(FADE_UP, 0.035f, 0.3f, 1.0f),
+	//	FadeChange(FADE_CHANGE_FLICKER)
+	//);
 
 
-	Entity buttonB = a_chunk.CreateNewEntity(
-		UIComponent("ButtonB", float2(0.2f, -0.8f), float2(0.1f, 0.2f), 0.0f, 0.0f),
-		FadeUI(FADE_UP, 0.035f, 0.3f, 1.0f),
+	//Entity buttonB = a_chunk.CreateNewEntity(
+	//	UIComponent("ButtonB", float2(0.2f, -0.8f), float2(0.1f, 0.2f), 0.0f, 0.0f),
+	//	FadeUI(FADE_UP, 0.035f, 0.3f, 1.0f),
+	//	FadeChange(FADE_CHANGE_FLICKER)
+	//);
+
+	Entity cursor = a_chunk.CreateNewEntity(
+		UIComponent("SelectBack", float2(-0.4f, -0.8f), float2(0.3f, 0.25f) * 1.1f, 0.0f),
+		FadeUI(FADE_DOWN, 0.02f, 0.1f, 0.5f),
 		FadeChange(FADE_CHANGE_FLICKER)
 	);
 
 	Entity yes = a_chunk.CreateNewEntity(
-		UIComponent("Yes", float2(-0.35f, -0.8f), float2(0.2f, 0.3f), 0.0f, 0.0f),
-		FadeUI(FADE_UP, 0.035f, 0.3f, 1.0f),
-		FadeChange(FADE_CHANGE_FLICKER)
+		UIComponent("Yes", float2(-0.402f, -0.805f), float2(0.3f, 0.3f), 0.0f, 1.0f),
+		SelectBox(float2(-0.4f, -0.8f), float2(0.3f, 0.25f) * 1.1f),
+		SelectPlayCommand(SELECT_ALLSELECT_DELETE | SELECT_PLAYSOUND | SELECT_CREATEEFFECT | SELECT_CHANGESCENE, "Proto", 160.0f, WHITEMINIFADE_UP, "", "", 0.0f, 0)
 	);
 
 
 	Entity no = a_chunk.CreateNewEntity(
-		UIComponent("No", float2(0.4f, -0.8f), float2(0.15f, 0.2f), 0.0f, 0.0f),
-		FadeUI(FADE_UP, 0.035f, 0.3f, 1.0f),
-		FadeChange(FADE_CHANGE_FLICKER)
+		UIComponent("No", float2(0.4f, -0.8f), float2(0.25f, 0.22f), 0.0f, 1.0f),
+		SelectBox(float2(0.4f, -0.8f), float2(0.25f, 0.25f) * 1.1f),
+		SelectPlayCommand(SELECT_ALLSELECT_DELETE | SELECT_PLAYSOUND | SELECT_CREATEEFFECT | SELECT_CHANGESCENE, "Result", 160.0f, DARKFADE_UP, "", "", 0.0f, 0)
 	);
+
+	a_chunk.AddComponent(cursor, SelectCursor(yes, true, 0.1f));
 
 	Entity stopper = a_chunk.CreateNewEntity(
-		AllActionStopper()
+		AllActionStopper(),
+		GameEndFlag()
 	);
 
-
-
-	Entity chunkChangeButton = a_chunk.CreateNewEntity(
-		ChunkChange(true, "Result"),
-		KeyChunkChange("GameOver", 160.0f)
-	);
-
-	Entity chunkChangeButton2 = a_chunk.CreateNewEntity(
-		ChunkChange(true, "Proto"),
-		KeyChunkChange("Restart", 160.0f)
-	);
-
-	Entity effect = a_chunk.CreateNewEntity(
-		EffectKey(DARKFADE_UP, "GameOver")
-	);
-
-	Entity effect2 = a_chunk.CreateNewEntity(
-		EffectKey(WHITEMINIFADE_UP, "Restart")
-	);
-
-	//Entity chunkChange = a_chunk.CreateNewEntity(
-	//	ChunkChange(true, "Result"),
-	//	DelayChunkChange(600.0f)
-	//);
 }
 
 void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)

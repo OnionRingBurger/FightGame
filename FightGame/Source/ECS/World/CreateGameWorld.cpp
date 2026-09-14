@@ -7,7 +7,7 @@
 #include "DebugSystemResponse.h"
 
 #include "Defines.h"
-constexpr const char* startWorld = "Stage2Phase3";
+constexpr const char* startWorld = "Tutorial1Phase3";
 
 CreateGameWorld::CreateGameWorld(IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
@@ -43,7 +43,7 @@ Chunk CreateGameWorld::CreateNewChunk(AIManager& a_aiManager)
 	CreateDebugComponent(newChunk);
 
 	//newChunk.CreateNewEntity(
-	//	Component::SpawnJson("Stage2Phase1", 0.0f, float3())
+	//	Component::SpawnJson("Stage1Phase4", 0.0f, float3())
 	//);
 
 	return newChunk;

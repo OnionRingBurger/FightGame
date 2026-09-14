@@ -816,7 +816,7 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		}
 
 		float3 defaultColor = float3(0.6f, 0.6f, 0.3f);
-		float3 attackPowerColor = float3(0.95f, 0.5f, 0.1f);
+		float3 attackPowerColor = float3(0.7f, 0.3f, 0.1f);
 		float damageRate = status.Look().attackPowers.at(startup.Look().attackIndex).damageValue / 4.0f;
 		damageRate = std::clamp(damageRate, 0.0f, 1.0f);
 		float3 color = defaultColor * (1.0f - damageRate) + attackPowerColor * damageRate;

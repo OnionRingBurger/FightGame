@@ -23,23 +23,7 @@ TutorialWorld::TutorialWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcqui
 	)
 	, worldRequest(a_worldRequest)
 {
-	a_input.RegisterKey("RightAttack", MK_RBUTTON);
-	a_input.RegisterKey("LeftAttack", MK_LBUTTON);
-	a_input.RegisterKey("Jump", 'E');
-	a_input.RegisterKey("Guard", 'Q');
-
-	a_input.RegisterButton("RightAttack", XINPUT_GAMEPAD_B);
-	a_input.RegisterButton("LeftAttack", XINPUT_GAMEPAD_A);
-	a_input.RegisterButton("Jump", XINPUT_GAMEPAD_RIGHT_SHOULDER);
-	a_input.RegisterButton("Guard", XINPUT_GAMEPAD_LEFT_SHOULDER);
-
-	a_input.RegisterButton("Restart", XINPUT_GAMEPAD_A);
-	a_input.RegisterButton("GameOver", XINPUT_GAMEPAD_B);
-	a_input.RegisterKey("Restart", MK_LBUTTON);
-	a_input.RegisterKey("GameOver", MK_RBUTTON);
-
-	a_input.RegisterKey("TheWorld", 'E');
-
+	AddGameBind(a_input);
 }
 
 void TutorialWorld::InitAI(AIManager& a_aiManager)
@@ -173,13 +157,13 @@ Chunk TutorialWorld::CreateNewChunk(AIManager& a_aiManager)
 		TutorialSpawner(
 			{
 				{true, "StartText", false, ""},
-				{true, "TutorialAttack", true, "Stage1Phase1"},
+				{true, "TutorialAttack", true, "Tutorial1Phase1"},
 				{true, "TutorialClear1", false, ""},
 				{true, "TutorialAttack2", false, ""},
-				{true, "TutorialAttack3", true, "Stage1Phase2"},
+				{true, "TutorialAttack3", true, "Tutorial1Phase2"},
 				{true, "TutorialEnemy", false, ""},
 				{true, "TutorialEnemy2", false, ""},
-				{true, "TutorialEnemy3", true, "Stage1Phase3"},
+				{true, "TutorialEnemy3", true, "Tutorial1Phase3"},
 				{true, "Phase1", false, "PhaseClear"},
 				{true, "Phase2", true, "PhaseClear"},
 				{true, "TutorialClear", false}

@@ -27,36 +27,7 @@ ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 	, stageRequest(a_stageRequest)
 	, stage(a_stage)
 {
-	//a_input.RegisterKey("RightAttack", VK_RIGHT);
-	//a_input.RegisterKey("LeftAttack", VK_LEFT);
-	a_input.RegisterKey("RightAttack", MK_RBUTTON);
-	a_input.RegisterKey("LeftAttack", MK_LBUTTON);
-	a_input.RegisterKey("Jump", VK_SPACE);
-	a_input.RegisterKey("Guard", 'E');
-	//a_input.RegisterKey("LookOnLeft", 'Q');
-	//a_input.RegisterKey("LookOnRight", 'E');
-
-	a_input.RegisterButton("RightAttack", XINPUT_GAMEPAD_B);
-	a_input.RegisterButton("LeftAttack", XINPUT_GAMEPAD_A);
-	a_input.RegisterButton("Jump", XINPUT_GAMEPAD_RIGHT_SHOULDER);
-	a_input.RegisterButton("Guard", XINPUT_GAMEPAD_LEFT_SHOULDER);
-
-	a_input.RegisterButton("Restart", XINPUT_GAMEPAD_A);
-	a_input.RegisterButton("GameOver", XINPUT_GAMEPAD_B);
-	a_input.RegisterKey("Restart", MK_LBUTTON);
-	a_input.RegisterKey("GameOver", MK_RBUTTON);
-
-	a_input.RegisterKey("TheWorld", 'E');
-
-	//a_input.RegisterKey("Default", '0');
-	//a_input.RegisterKey("Burn", '1');
-	//a_input.RegisterKey("Drop", '2');
-	//a_input.RegisterKey("Fly", '3');
-	//a_input.RegisterKey("Shake", '4');
-	//a_input.RegisterKey("Retro", '5');
-	//a_input.RegisterKey("InputMove", '6');
-	//a_input.RegisterKey("InputAngle", '7');
-	//a_input.RegisterKey("Fish", '8');
+	AddGameBind(a_input);
 }
 
 void ProtoWorld::InitAI(AIManager& a_aiManager)
@@ -527,7 +498,6 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	AttackInstanceEndCheckSystem(a_chunk, a_context);
 	AttackInstanceResolveSystem(a_chunk, a_context, a_aiManager);
 	EntryActionSystem(a_chunk, a_context);
-	PlayerHealSystem(a_chunk, a_context);
 	PlayerDeadSystem(a_chunk, a_context, a_response);
 	EnemyDeadSystem(a_chunk, a_context, a_response);
 	BossDeadSystem(a_chunk, a_context, a_response);
@@ -535,6 +505,8 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	KnockbackStateSystem(a_chunk, a_context);
 	LookOnStateSystem(a_chunk, a_context);
 	KnockbackSystem(a_chunk, a_context);
+
+	CursorSelectSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 
 	// Effect系統を処理
 	CreateEffectSystem(a_chunk, a_context);
@@ -553,6 +525,7 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 
 	// ステージ読み込み
 	SpawnJsonSystem(a_chunk, a_context, a_serialize, a_aiManager);
+	PlayerHealSystem(a_chunk, a_context);
 
 	// 終了処理
 	LifeTimeSystem(a_chunk, a_context);
