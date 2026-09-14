@@ -243,6 +243,9 @@
     <ClInclude Include="include\AI\RoleCurve.h" />
     <ClInclude Include="include\AI\UseLingeringAttackAction.h" />
     <ClInclude Include="include\ECS\World\StartupWorld.h" />
+    <ClInclude Include="include\ECS\System\GameSystemResponse.h" />
+    <ClInclude Include="include\AI\AttackRangeCheck.h" />
+    <ClInclude Include="include\AI\UseBestDamageAttackAction.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\DataManager\AssimpModelLorder.cpp" />
@@ -356,6 +359,9 @@
     <ClCompile Include="Source\AI\RoleCurve.cpp" />
     <ClCompile Include="Source\AI\UseLingeringAttackAction.cpp" />
     <ClCompile Include="Source\ECS\World\StartupWorld.cpp" />
+    <ClCompile Include="Source\ECS\System\GameSystemResponse.cpp" />
+    <ClCompile Include="Source\AI\AttackRangeCheck.cpp" />
+    <ClCompile Include="Source\AI\UseBestDamageAttackAction.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

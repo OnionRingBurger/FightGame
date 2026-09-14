@@ -69,7 +69,7 @@ Chunk StartupWorld::CreateNewChunk(AIManager& a_aiManager)
 	);
 
 	newChunk.CreateNewEntity(
-		UIComponent("ControllerText", float2(0.0f, -0.4f), float2(1.15f, 0.5f), 0.0f, 0.0f),
+		UIComponent("ControllerText", float2(0.0f, -0.4f), float2(1.2f, 0.5f), 0.0f, 0.0f),
 		FadeUI(FADE_UP, 0.0125f, 0.0f, 1.0f),
 		FadeChange(FADE_CHANGE_FLICKER, false, 140.0f, 0.0f)
 	);

@@ -254,10 +254,10 @@
                     "virsion": 0,
                     "typeName": "AIRole",
                     "data": {
-                        "distCoefficient": 4.0,
-                        "farnessCoefficient": 7.0,
-                        "hitCoefficient": 3.0,
-                        "stanceCoefficient": 1.2000000476837158
+                        "distFocus": 0.8970000147819519,
+                        "farnessPref": 0.5519999861717224,
+                        "hitSensitivity": 0.7829999923706055,
+                        "stanceStickiness": 0.9779999852180481
                     }
                 },
                 {
@@ -746,10 +746,10 @@
                     "virsion": 0,
                     "typeName": "AIRole",
                     "data": {
-                        "distCoefficient": 4.0,
-                        "farnessCoefficient": 7.0,
-                        "hitCoefficient": 3.0,
-                        "stanceCoefficient": 1.2000000476837158
+                        "distFocus": 0.8970000147819519,
+                        "farnessPref": 0.5519999861717224,
+                        "hitSensitivity": 0.7829999923706055,
+                        "stanceStickiness": 0.9779999852180481
                     }
                 },
                 {

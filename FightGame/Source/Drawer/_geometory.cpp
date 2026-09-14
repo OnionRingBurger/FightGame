@@ -202,7 +202,7 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 		}
 	}
 
-	indexProgress += (outsideVertexCount - 1) * 2 * 3;
+	indexProgress += (outsideVertexCount - 1) * 3;
 
 	for(int i = 0; i < 1; i++)
 	{
@@ -231,7 +231,7 @@ void Geometory::RegisterSector(std::string key, float minLength, float maxLength
 		}
 	}
 
-	indexProgress += (insideVertexCount - 1) * 2 * 3;
+	indexProgress += (insideVertexCount - 1) * 3;
 
 	// î‚Ì‘OŒã‚ð‘ã“ü
 	for (int j = 0; j < outsideVertexCount - 1; j++)

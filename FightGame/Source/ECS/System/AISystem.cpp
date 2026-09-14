@@ -62,16 +62,20 @@ void AISenseSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_
 			enemyAttackData.maxLength = power.maxLength;
 			enemyAttackData.minLength = power.minLength;
 			enemyAttackData.angle = power.angle;
+			enemyAttackData.followOffset = power.followOffset;
 			enemyAttackData.waitTime = power.waitTime;
 			enemyAttackData.damageValue = power.damageValue;
 			enemyAttackData.endWithOwnerAction = power.endWithOwnerAction;
 			enemyData.attackDatas.push_back(enemyAttackData);
 		}
 		// ÉçÅ[Éãìoò^
-		enemyData.distCoefficient = enemyRole.Look().distCoefficient;
-		enemyData.farnessCoefficient = enemyRole.Look().farnessCoefficient;
-		enemyData.hitCoefficient = enemyRole.Look().hitCoefficient;
-		enemyData.stanceCoefficient = enemyRole.Look().stanceCoefficient;
+		enemyData.distFocus = enemyRole.Look().distFocus;
+		enemyData.farnessPref = enemyRole.Look().farnessPref;
+		enemyData.hitSensitivity = enemyRole.Look().hitSensitivity;
+		enemyData.stanceStickiness = enemyRole.Look().stanceStickiness;
+		enemyData.probeContinuePowRate = enemyRole.Look().probeContinuePowRate;
+		enemyData.holdContinuePowRate = enemyRole.Look().holdContinuePowRate;
+		enemyData.escapeContinuePowRate = enemyRole.Look().escapeContinuePowRate;
 
 		// ëŒâûÇ∑ÇÈà íuÇ…è„èëÇ´
 		senseFrame.enemyDatas[it] = enemyData;

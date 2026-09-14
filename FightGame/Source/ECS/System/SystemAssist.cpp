@@ -219,6 +219,83 @@ void SafeDeleteEffectEntity(Chunk& a_chunk, Entity a_effect)
 	// TODO 後でやる
 }
 
+bool IsClearStage(int stageIndex)
+{
+	std::ifstream stream(kSaveDataPath);
+	if (!stream.is_open()) return false;
+
+	nlohmann::json json;
+	stream >> json;
+
+	std::string stageKey = "Stage";
+	stageKey += std::to_string(stageIndex);
+
+	return json[stageKey].value("IsClear", false);
+
+}
+
+bool IsUnlockStage(int stageIndex)
+{
+	std::ifstream stream(kSaveDataPath);
+	if (!stream.is_open()) return false;
+
+	nlohmann::json json;
+	stream >> json;
+
+	std::string stageKey = "Stage";
+	stageKey += std::to_string(stageIndex);
+
+	return json[stageKey].value("IsUnlock", false);
+}
+
+void SaveClearStage(int stageIndex, bool isClear)
+{
+	// json読み込み
+	std::ifstream stream(kSaveDataPath);
+	if (!stream.is_open()) return;
+	nlohmann::ordered_json json;
+	stream >> json;
+
+	// Keyを作成
+	std::string stageKey = "Stage";
+	stageKey += std::to_string(stageIndex);
+
+	// データをクリアに変更
+	nlohmann::ordered_json newData = json[stageKey];
+	newData["IsClear"] = isClear;
+
+	// 上書きして保存
+	json[stageKey] = newData;
+	std::ofstream out(kSaveDataPath);
+	if (!out.is_open()) return;
+
+	out << json.dump(4);
+}
+
+void SaveUnlockStage(int stageIndex, bool isUnlock)
+{
+	// json読み込み
+	std::ifstream stream(kSaveDataPath);
+	if (!stream.is_open()) return;
+	nlohmann::ordered_json json;
+	stream >> json;
+
+	// Keyを作成
+	std::string stageKey = "Stage";
+	stageKey += std::to_string(stageIndex);
+
+	// データをクリアに変更
+	nlohmann::ordered_json newData = json[stageKey];
+	newData["IsUnlock"] = isUnlock;
+
+	// 上書きして保存
+	json[stageKey] = newData;
+	std::ofstream out(kSaveDataPath);
+	if (!out.is_open()) return;
+
+	out << json.dump(4);
+}
+
 
 void NewSceneSpawn(ComponentsSerialize& a_serialize, Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName, float3 a_offset)
 {

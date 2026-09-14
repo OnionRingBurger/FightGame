@@ -7,7 +7,7 @@
 #include "DebugSystemResponse.h"
 
 #include "Defines.h"
-constexpr const char* startWorld = "Stage1Phase1";
+constexpr const char* startWorld = "Stage2Phase3";
 
 CreateGameWorld::CreateGameWorld(IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
@@ -25,8 +25,7 @@ CreateGameWorld::CreateGameWorld(IModelCacheAcquisition& a_modelCache,
 	name(startWorld),
 	isSave(false),
 	isLoad(false)
-{
-	
+{	
 }
 
 
@@ -43,108 +42,8 @@ Chunk CreateGameWorld::CreateNewChunk(AIManager& a_aiManager)
 
 	CreateDebugComponent(newChunk);
 
-
-	//Entity debugEnemy1 = newChunk.CreateNewEntity(
-	//	// タグ 
-	//	Name("Enemy2"),
-	//	EnemyTag(),
-	//	ClearTarget(),
-	//	// 移動系
-	//	MOVE_AND_TRANSFORM_COMPONENT(
-	//		float3(5.0f, 90.5f, 3.0f) + kDefaultWorldPosition,
-	//		float3(0.0f, 180.0f, 0.0f),
-	//		float3(1.0f, 1.0f, 1.0f)
-	//	),
-	//	InputMove(float2(0.12f, 0.12f)),
-	//	MoveInputResult(),
-	//	InputSource(InputOrigin::AI),
-	//	LookMove(480.0f / 60.0f),
-	//	PoseRotState(POSE_ROT_LOOKMOVE),
-	//	Velocity(),
-	//	// 当たり判定
-	//	HitInfomation(),
-	//	BoxCollider(float3(0.0f, 2.0f, 0.0f), float3(1.0, 5.0f, 1.0f)),
-	//	OBBCollider(),
-	//	// AI、ステート
-	//	AIRole(50.0f, 3.0f, 300.0f, 1.0f),
-	//	GroundedState(),
-	//	DeadState(),
-	//	ActionMask(),
-	//	InterferenceResult(),
-	//	// ゲームルール
-	//	HitPoint(12.0f),
-	//	AttackKeyLoad({ "Enemy2Attack1" }),
-	//	AttackHitRecord(),
-	//	// モデル
-	//	ModelKey("Box"),
-	//	AlphaBlendComponent("Red", "Purple"),
-	//	EntryAction(120.0f)
-	//);
-
-	//Entity debugEnemy2 = newChunk.CreateNewEntity(
-	//	// タグ 
-	//	Name("Enemy3"),
-	//	EnemyTag(),
-	//	ClearTarget(),
-	//	// 移動系
-	//	MOVE_AND_TRANSFORM_COMPONENT(
-	//		float3(-5.0f, 90.5f, 2.0f) + kDefaultWorldPosition,
-	//		float3(0.0f, 180.0f, 0.0f),
-	//		float3(1.0f, 1.0f, 1.0f)
-	//	),
-	//	InputMove(float2(0.12f, 0.12f)),
-	//	MoveInputResult(),
-	//	InputSource(InputOrigin::AI),
-	//	LookMove(480.0f / 60.0f),
-	//	PoseRotState(POSE_ROT_LOOKMOVE),
-	//	Velocity(),
-	//	// 当たり判定
-	//	HitInfomation(),
-	//	BoxCollider(float3(0.0f, 2.0f, 0.0f), float3(1.0, 5.0f, 1.0f)),
-	//	OBBCollider(),
-	//	// AI、ステート
-	//	AIRole(50.0f, 3.0f, 300.0f, 1.0f),
-	//	GroundedState(),
-	//	DeadState(),
-	//	ActionMask(),
-	//	InterferenceResult(),
-	//	// ゲームルール
-	//	HitPoint(12.0f),
-	//	AttackKeyLoad({ "Enemy2Attack1" }),
-	//	AttackHitRecord(),
-	//	// モデル
-	//	ModelKey("Box"),
-	//	AlphaBlendComponent("Red", "Purple"),
-	//	EntryAction(120.0f)
-	//);
-
-
-	//Entity enemyHp1 = newChunk.CreateNewEntity(
-	//	Name("EnemyHP1"),
-	//	MOVE_AND_TRANSFORM_COMPONENT(
-	//		float3(0.0f, 1.0f, 0.0f),
-	//		float3(0.0f, 0.0f, 0.0f),
-	//		float3(1.0f, 1.0f, 1.0f)
-	//	),
-	//	FollowPosition(float3(0.0f, 0.8f, 0.0f), debugEnemy1, FOLLOW_POS_LOCALOFFSET),
-	//	PosePosState(POSE_POS_FOLLOW),
-	//	UIComponent("UIGauge", float2(0.0f, 0.0f), float2(1.0f, 0.1f), 0.0f),
-	//	HPGaugeUI(debugEnemy1, float2(0.0f, 0.0f), float2(1.0f, 0.08f)),
-	//	SpriteComponent(float3(), float3(), true)
-	//);
-
-	//Entity enemyHp2 = newChunk.CreateNewEntity(
-	//	Name("EnemyHP2"),
-	//	MOVE_AND_TRANSFORM_COMPONENT(
-	//		float3(0.0f, 1.0f, 0.0f),
-	//		float3(0.0f, 0.0f, 0.0f),
-	//		float3(1.0f, 1.0f, 1.0f)
-	//	),
-	//	FollowPosition(float3(0.0f, 0.8f, 0.0f), debugEnemy2, FOLLOW_POS_LOCALOFFSET),
-	//	PosePosState(POSE_POS_FOLLOW),
-	//	UIComponent("UIGauge", float2(0.0f, 0.0f), float2(1.0f, 0.1f), 0.0f),
-	//	HPGaugeUI(debugEnemy2, float2(0.0f, 0.0f), float2(1.0f, 0.08f)),
-	//	SpriteComponent(float3(), float3(), true)
+	//newChunk.CreateNewEntity(
+	//	Component::SpawnJson("Stage2Phase1", 0.0f, float3())
 	//);
 
 	return newChunk;
@@ -153,6 +52,11 @@ Chunk CreateGameWorld::CreateNewChunk(AIManager& a_aiManager)
 void CreateGameWorld::InitResponse(std::unique_ptr<SystemResponse>& response)
 {
 	response = std::make_unique<DebugSystemResponse>(name);
+}
+
+void CreateGameWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
+{
+	SpawnJsonSystem(a_chunk, a_context, a_serialize, a_aiManager);
 }
 
 void CreateGameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)

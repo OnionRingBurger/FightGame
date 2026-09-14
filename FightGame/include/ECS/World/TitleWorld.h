@@ -8,11 +8,14 @@ public:
 		IEffectCacheAcquisition& a_effectCache,
 		std::function<void(int)> a_tutorialRequest,
 		std::function<void(std::string)> a_worldRequest,
+		std::function<void(int)> a_stageRequest,
 		Input& a_input,
 		ComponentsSerialize& a_serialize
 	);
 
 protected:
+	virtual void InitResponse(std::unique_ptr<SystemResponse>& response) override;
+
 	virtual Chunk CreateNewChunk(AIManager& a_aiManager) override;
 
 	virtual void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize) override;
@@ -22,6 +25,7 @@ protected:
 	virtual void HandleSystemResponse(SystemResponse& a_response) override;
 
 	std::function<void(std::string)> worldRequest;
+	std::function<void(int)> stageRequest;
 
 };
 

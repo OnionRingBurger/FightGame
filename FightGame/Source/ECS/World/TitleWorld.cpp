@@ -4,10 +4,11 @@
 #include "Sound.h"
 #include "GameData.h"
 #include "Defines.h"
+#include "GameSystemResponse.h"
 
 using namespace Component;
 
-TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
+TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, std::function<void(int)> a_stageRequest, Input& a_input, ComponentsSerialize& a_serialize)
 	: World(a_modelCache,
 		a_uiCache,
 		a_effectCache,
@@ -15,6 +16,7 @@ TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 		a_input,
 		a_serialize)
 	, worldRequest(a_worldRequest)
+	, stageRequest(a_stageRequest)
 {
 
 
@@ -33,14 +35,6 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 
 	Entity titleLogo = newChunk.CreateNewEntity(
 		UIComponent("TitleLogo", float2(0.0f, 0.4f), float2(1.7f, 0.7f), 0.0f)
-	);
-
-	Entity createEffectKey = newChunk.CreateNewEntity(
-		EffectKey(WHITEFADE_UP, "ChunkChange")
-	);
-
-	Entity createEffect = newChunk.CreateNewEntity(
-		CreateEffect(WHITEMINIFADE_CLEAR)
 	);
 
 	Entity titleCameraPoint = newChunk.CreateNewEntity(
@@ -160,31 +154,9 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		WorldPower(float3(0.0f, -1.2f / 60.0f, 0.0f), float3(0.5f, 1.0f, 0.5f))
 	);
 
-	Entity testCursor = newChunk.CreateNewEntity(
-		UIComponent("White", float2(0.0f, -0.3f), TitleButtonSize, 0.0f, 0.5f),
-		FadeUI(FADE_DOWN, 0.02f, 0.1f, 0.5f),
-		FadeChange(FadeChungeType::FADE_CHANGE_FLICKER)
+	Entity title = newChunk.CreateNewEntity(
+		SpawnJson("TitleCursor", 0.0f, float3())
 	);
-
-	Entity testBox1 = newChunk.CreateNewEntity(
-		UIComponent("TitleStart", float2(0.0f, -0.3f), TitleButtonSize, 0.0f),
-		SelectBox(float2(0.0f, -0.3f), TitleButtonSize),
-		SelectPlayCommand(SELECT_PLAYSOUND | SELECT_CHANGESCENE | SELECT_ALLSELECT_DELETE, "Proto", 80.0f, EFFECT_NONE, "stageclear", "", 0.0f)
-	);
-
-	Entity testBox2 = newChunk.CreateNewEntity(
-		UIComponent("TitleTutorial", float2(0.0f, -0.6f), TitleButtonSize, 0.0f),
-		SelectBox(float2(0.0f, -0.6f), TitleButtonSize),
-		SelectPlayCommand(SELECT_PLAYSOUND | SELECT_CHANGESCENE | SELECT_ALLSELECT_DELETE, "Tutorial", 80.0f, EFFECT_NONE, "stageclear", "", 0.0f)
-	);
-
-	newChunk.AddComponent(testCursor, SelectCursor(
-		testBox1,
-		true,
-		10.0f
-	));
-
-
 
 
 	PlaySound(LoadSound("Assets/Sound/title.mp3", true));
@@ -222,6 +194,8 @@ void TitleWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 	// Transform適用
 	TransformSystem(a_chunk, a_context);
 
+	SpawnJsonSystem(a_chunk, a_context, a_serialize, a_aiManager);
+
 	EnemyAttackLoadSystem(a_chunk, a_context);
 
 	// リザルトなどをリセット
@@ -232,6 +206,9 @@ void TitleWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 
 void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
+
+	SpawnJsonSystem(a_chunk, a_context, a_serialize, a_aiManager);
+	UnlockStageEntitySystem(a_chunk, a_context);
 
 	// Physics系の処理を行う
 	WorldPowerSystem(a_chunk, a_context);
@@ -292,7 +269,10 @@ void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	EnemyDeadSystem(a_chunk, a_context, a_response);
 	BossDeadSystem(a_chunk, a_context, a_response);
 
-	CursorSelectSystem(a_chunk, a_context, a_aiManager, a_serialize);
+	UILerpSystem(a_chunk, a_context);
+	UVMoveSystem(a_chunk, a_context);
+
+	CursorSelectSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 	SoundSystem(a_chunk, a_context);
 
 	CameraViewSystem(a_chunk, a_context);
@@ -305,11 +285,24 @@ void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	ChunkChangeSystem(a_chunk, a_context, a_response);
 }
 
-void TitleWorld::HandleSystemResponse(SystemResponse& a_response)
+void TitleWorld::InitResponse(std::unique_ptr<SystemResponse>& response)
 {
-	if (!a_response.IsWorldRequest()) return;
+	response = std::make_unique<GameSystemResponse>();
+}
 
-	worldRequest(a_response.GetWorldRequest());
+void TitleWorld::HandleSystemResponse(SystemResponse& a_response)
+{;
+
+	GameSystemResponse& response = dynamic_cast<GameSystemResponse&>(a_response);
+
+	if (response.IsStageRequest())
+	{
+		stageRequest(response.GetStageIndex());
+	}
+
+	if (!response.IsWorldRequest()) return;
+
+	worldRequest(response.GetWorldRequest());
 }
 
 

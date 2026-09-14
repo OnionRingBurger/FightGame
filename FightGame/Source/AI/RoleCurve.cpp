@@ -13,11 +13,11 @@ namespace
 	constexpr float kDistCoeffTight = 1.0f;
 
 	// 近距離、遠距離判定の最大、最低数値
-	constexpr float kFarnessCoeffClose = 10.0f;
+	constexpr float kFarnessCoeffClose = 15.0f;
 	constexpr float kFarnessCoeffFar = 0.5f;
 
 	// 攻撃的中判定の最大、最低数値
-	constexpr float kHitCoeffSlow = 8.0f;
+	constexpr float kHitCoeffSlow = 12.0f;
 	constexpr float kHitCoeffFast = 0.5f;
 
 	// 方針連続継続の最大、最低数値

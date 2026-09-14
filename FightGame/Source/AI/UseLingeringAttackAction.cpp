@@ -1,8 +1,8 @@
 #include "AI/UseLingeringAttackAction.h"
 
-#include "MathAssist.h"
+#include "AI/AttackRangeCheck.h"
 
-// !!!New!!!
+// èÍÇ…écÇÈçUåÇÇégópÇ∑ÇÈ
 UseLingeringAttackAction::UseLingeringAttackAction()
 {
 }
@@ -44,15 +44,6 @@ Node::Status UseLingeringAttackAction::Tick(
 		return NODE_FAILURE;
 	}
 
-	const float2 toPlayer(
-		blackBord.playerPos.x - enemy.position.x,
-		blackBord.playerPos.y - enemy.position.y);
-	const float dist = GetLength(toPlayer);
-	const float2 nomalizeVec = Normalize(toPlayer);
-	const float2 enemyFrontVec = AngleToVector(-enemy.rotation + 90.0f);
-	const float dot = nomalizeVec.x * enemyFrontVec.x + nomalizeVec.y * enemyFrontVec.y;
-	const float toPlayerAngle = acosf(dot) * DEG;
-
 	int bestAttackIndex = -1;
 	float bestDamageValue = -1.0f;
 
@@ -65,13 +56,7 @@ Node::Status UseLingeringAttackAction::Tick(
 			continue;
 		}
 
-		if (dist < attack.minLength || dist > attack.maxLength)
-		{
-			continue;
-		}
-
-		const float halfAttackAngle = attack.angle * 0.5f;
-		if (halfAttackAngle < toPlayerAngle)
+		if (!IsTargetInAttackRange(blackBord.playerPos, enemy.position, enemy.rotation, attack))
 		{
 			continue;
 		}

@@ -734,7 +734,7 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 	};
 
 	// !!!New!!!
-	auto drawSectorMesh = [&](Entity a_entity, float a_progress, float a_maxTime, float a_highlightTime, float3 a_color)
+	auto drawSectorMesh = [&](Entity a_entity, float a_progress, float a_maxTime, float a_highlightTime, float3 a_color, Geometory::SectorShaderType a_shaderType)
 	{
 		const ComponentHandle<AttackTelegraph> telegraph = a_chunk.GetComponent<AttackTelegraph>(a_entity);
 		if (!telegraph.IsValid() || telegraph.Look().sectorKey.empty()) return;
@@ -749,7 +749,7 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		const float3 floatRot(rot.Look().pitch * RAD, rot.Look().yaw * RAD, rot.Look().roll * RAD);
 		DrawMatrix::CreateWorldMatrix(world, floatPos, floatScale, floatRot, true);
 		Geometory::SetWorld(world);
-		Geometory::DrawSector(telegraph.Look().sectorKey, a_progress, a_maxTime, a_highlightTime, a_color);
+		Geometory::DrawSector(telegraph.Look().sectorKey, a_progress, a_maxTime, a_highlightTime, a_color, a_shaderType);
 	};
 
 	// “–‚½‚è”»’è•`‰æ
@@ -778,10 +778,10 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		const ComponentHandle<AttackInstance> attackInstance = a_chunk.GetComponent<AttackInstance>(sectorIt);
 		if (attackInstance.IsValid() && attackInstance.Look().maxDuration > 0.0f)
 		{
-			progress = std::fmod((attackInstance.Look().elapsedTime / attackInstance.Look().maxDuration) * 3.0f, 1.0f);
+			progress = attackInstance.Look().elapsedTime / attackInstance.Look().maxDuration;
 			maxDuration = attackInstance.Look().maxDuration;
 		}
-		drawSectorMesh(sectorIt, progress, maxDuration, maxDuration / 1.5f, float3(1.0f, 0.0f, 0.0f));
+		drawSectorMesh(sectorIt, progress, maxDuration, maxDuration / 1.5f, float3(1.0, 0.12, 0.12), Geometory::SectorShaderType::Attack);
 	}
 
 	// ”»’è—\‘ª•\Ž¦‚ð•`‰æ
@@ -821,6 +821,6 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		damageRate = std::clamp(damageRate, 0.0f, 1.0f);
 		float3 color = defaultColor * (1.0f - damageRate) + attackPowerColor * damageRate;
 
-		drawSectorMesh(telegraphEntity, progress, startup.Look().startupDuration, kTelegraphHighlightSeconds, color);
+		drawSectorMesh(telegraphEntity, progress, startup.Look().startupDuration, kTelegraphHighlightSeconds, color, Geometory::SectorShaderType::Telegraph);
 	}
 }

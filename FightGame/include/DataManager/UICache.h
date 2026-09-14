@@ -16,18 +16,20 @@ public:
 	UICache();
 	~UICache() = default;
 
-	void RegisterTexture(std::string a_key, std::shared_ptr<Texture> a_texture);
+
 	std::shared_ptr<Texture> GetTexture(std::string a_key) const override;
 	ComPtr<IDWriteTextFormat> GetTextFormat(std::string a_key) const override;
+	virtual ComPtr<IDWriteFontFile> GetTextFontFile(std::wstring a_key) const override;
 
+	void RegisterTexture(std::string a_key, std::shared_ptr<Texture> a_texture);
 	void RegisterTextFormat(std::string a_key, Microsoft::WRL::ComPtr<IDWriteTextFormat> a_format);
-	
+	void RegisterTextFontFile(std::wstring a_key, ComPtr<IDWriteFontFile> font);
 
 private:
 	
 	std::unordered_map<std::string, std::shared_ptr<Texture>> m_textureCache;
 	std::unordered_map <std::string, ComPtr<IDWriteTextFormat>> m_textFormatCache;
-
+	std::unordered_map <std::wstring, ComPtr<IDWriteFontFile>> m_textFontFileCache;
 
 };
 

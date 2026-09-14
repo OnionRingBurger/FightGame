@@ -17,6 +17,8 @@ private:
 
 	void InitResponse(std::unique_ptr<SystemResponse>& response) override;
 
+	void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize) override;
+
 	void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize) override;
 
 	void UpdateIMGUI(Chunk& a_chunk, SystemContext& a_context) override;

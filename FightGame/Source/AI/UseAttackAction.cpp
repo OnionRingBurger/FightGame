@@ -1,5 +1,7 @@
 #include "AI/UseAttackAction.h"
 
+#include "AI/AttackRangeCheck.h"
+
 // !!!New!!!
 UseAttackAction::UseAttackAction()
 {
@@ -11,6 +13,8 @@ UseAttackAction::~UseAttackAction()
 
 Node::Status UseAttackAction::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
 {
+	(void)mind;
+	(void)systemInfo;
 
 	result.UseGuard = false;
 
@@ -40,15 +44,6 @@ Node::Status UseAttackAction::Tick(AIContext& context, const AIBlackboard& black
 			return NODE_FAILURE;
 		}
 
-		// Ž–‘O‚É—v‘f‚ðŒvŽZ‚·‚é
-		const float2 toPlayer(
-			blackBord.playerPos.x - enemy.position.x,
-			blackBord.playerPos.y - enemy.position.y);
-		const float dist = GetLength(toPlayer);
-		float2 nomalizeVec = Normalize(toPlayer);
-		float2 enemyFrontVec = AngleToVector(-enemy.rotation + 90.0f);
-		float dot = nomalizeVec.x * enemyFrontVec.x + nomalizeVec.y * enemyFrontVec.y;
-		float toPlayerAngle = acosf(dot) * DEG;
 		
 		bool isInAttackRange = false;
 
@@ -56,18 +51,11 @@ Node::Status UseAttackAction::Tick(AIContext& context, const AIBlackboard& black
 		for (int i = 0; i < enemy.attackDatas.size(); i++)
 		{
 			const AIBlackboard::BBAttackData& attack = enemy.attackDatas.at(i);
-			// ŽË’ö‹——£ŠO‚¾‚Á‚½ê‡”²‚¯‚é
-			if (!(dist >= attack.minLength) || !(dist <= attack.maxLength))
+
+			if (!IsTargetInAttackRange(blackBord.playerPos, enemy.position, enemy.rotation, attack))
 			{
 				continue;
 			}
-	
-			// UŒ‚Šp‚æ‚èŠO‚É‚¢‚½ê‡ê‡”²‚¯‚é
-			float halfAttackAngle = attack.angle * 0.5f;
-			if (halfAttackAngle < toPlayerAngle)
-			{
-				continue;
-			}		
 
 			// “G‚ªUŒ‚”ÍˆÍ“à‚É‚¢‚é‚½‚ßAŠÖ”‚ðI—¹‚µ¬Œ÷‚ð•Ô‚·
 			attackIndex = i;

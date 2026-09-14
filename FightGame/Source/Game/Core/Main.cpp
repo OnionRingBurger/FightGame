@@ -144,8 +144,15 @@ void MainGame::Init()
 		"TutorialWindow",
 		"TitleStart",
 		"TitleTutorial",
-		"Controller"
-
+		"Controller",
+		"SelectBack",
+		"Stage1",
+		"Stage2",
+		"Back",
+		"Azuki",
+		"Yellow",
+		"Mizore",
+		"WaveFadeMask_A"
 	};
 
 	effectDatas =
@@ -168,25 +175,26 @@ void MainGame::Init()
 
 	textFormatDatas =
 	{
-		{ "DefaultFormat", false, L"Meiryo", L"", 96.0f },
-		{ "ShortFormat", false, L"Meiryo", L"", 80.0f },
-		{ "BigFormat", false, L"Meiryo", L"", 120.0f },
-		//{ "SmartFormat", false, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 48.0f }
+		{ "DefaultFormat", true, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 96.0f },
+		{ "ShortFormat", true, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 80.0f },
+		{ "BigFormat", true, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 120.0f },
+		{ "SmartFormat", true, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 120.0f }
 	};
 
 	textUIDatas =
 	{
-		{ "ControllerText", L"本ゲームはキーボード操作でも遊べますが、\nコントローラーを使用すると、より楽しんでいただけます。", "BigFormat", 120.0f * 30.0f, 120.0f * 5.0f },
+		{ "ControllerText", L"本ゲームはキーボード操作でも遊べますが、\nコントローラーを使用すると、より楽しんでいただけます。", "SmartFormat", 120.0f * 30.0f, 120.0f * 5.0f },
 		{ "StartText", L"上からくるぞ！\n気を付けろ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialAttack", L"まずは敵に攻撃を当ててダメージを与えよう！\n体力を削りきることで敵を倒せるぞ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "TutorialClear1", L"よくやった！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialAttack2", L"攻撃には発生が早く、使い勝手の良い弱攻撃と\n火力が高く、範囲が広い強攻撃の二種類が存在する。", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialAttack3", L"一方的に攻撃できる距離では強攻撃が、お互いの攻撃が\n当たる距離では敵を弾く弱攻撃が有効だ！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialEnemy", L"敵の種類の攻撃はジャンプやガードで防げるぞ！\n隙をついて上手く反撃しよう！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialEnemy2", L"一部の敵は特定の間合いでガードやジャンプで\n防ぎきるのが難しい攻撃を放ってくる", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialEnemy3", L"そんな敵と戦うときは、相手の間合いを避け、有利な立ち位置で戦おう！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "Phase1", L"よくやった！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "Phase2", L"ある程度強い敵を倒すとHPが回復する。", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "TutorialClear", L"素晴らしい！実戦ではより強い敵が現れる、\n間合いを意識して戦うことを忘れるな！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "Phase2", L"ある程度強い敵を倒すとHPが回復するぞ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "TutorialClear", L"実戦ではより強い敵が現れる、\n間合いを意識して戦うことを忘れるな！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "GameStart", L"Start", "DefaultFormat", 96.0f * 5.0f, 96.0f},
 		{ "Tutorial", L"Tutorial", "DefaultFormat", 96.0f * 5.0f, 96.0f }
 
@@ -565,7 +573,7 @@ void MainGame::WorkerLoop(
 		{
 			TextFormatLoadJob textFormatJob = a_textFormatJobQueue.Pop();
 
-			TextFormatLoadResult textFormatResult = LoadFormat(textFormatJob);
+			TextFormatLoadResult textFormatResult = LoadFormat(textFormatJob, uiCache);
 			a_textFormatResultQueue.Push(std::move(textFormatResult));
 			if (textFormatJob.endFlagPointer)
 			{

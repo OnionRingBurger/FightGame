@@ -5,6 +5,7 @@
 
 #include "MathAssist.h"
 #include "DebugConsole.h"
+#include "AI/RoleCurve.h"
 
 // 不利脱出、優位維持、様子見ノード
 StanceNode::StanceNode(
@@ -35,15 +36,21 @@ Node::Status StanceNode::Tick(AIContext& context, const AIBlackboard& blackBoard
 		AIStance oldStance = mind.stance;
 		mind.stance = GetNewStance(context, blackBoard, mind);
 		// 連続数を更新
-		if (oldStance == mind.stance) mind.stanceContinueCount++;
-		else mind.stanceContinueCount = 0;
+		if (oldStance == mind.stance)
+		{
+			mind.stanceContinueCount++;
+		}
+		else 
+		{
+			mind.stanceContinueCount = 0;
+			mind.sameTakenCount = 0;
+			mind.sameGuardCount = 0;
+		}
 		std::cout << mind.stanceContinueCount << std::endl;
 		mind.updatePoints = 0.0f;
 		mind.attackMissCount = 0;
 		mind.attackSuccessCount = 0;
 		mind.sameAttackStreak = 0;
-		mind.sameTakenCount = 0;
-		mind.sameGuardCount = 0;
 	}
 
 	// 方針が存在しない場合失敗を返す
@@ -107,33 +114,43 @@ AIStance StanceNode::GetNewStance(const AIContext& context, const AIBlackboard& 
 	const int hitTakenCount = mind.sameTakenCount - mind.sameGuardCount;
 	const int attackSuccessCount = mind.attackSuccessCount;
 
+    // 各係数を作成
+    // const float distCoeff = enemyData.distCoefficient > 0.0f ? enemyData.distCoefficient : 1.0f;
+    // const float farnessCoeff = enemyData.farnessCoefficient > 0.0f ? enemyData.farnessCoefficient : 1.0f;
+    // const float hitCoeff = enemyData.hitCoefficient > 0.0f ? enemyData.hitCoefficient : 3.0f;
+    // const float stanceCoeff = enemyData.stanceCoefficient;
+
 	// 各係数を作成
-	const float distCoeff = enemyData.distCoefficient > 0.0f ? enemyData.distCoefficient : 1.0f;
-	const float farnessCoeff = enemyData.farnessCoefficient > 0.0f ? enemyData.farnessCoefficient : 1.0f;
-	const float hitCoeff = enemyData.hitCoefficient > 0.0f ? enemyData.hitCoefficient : 3.0f;
-	const float stanceCoeff = enemyData.stanceCoefficient;
+	RoleCurveKnobs roleKnobs;
+	roleKnobs.distFocus = enemyData.distFocus;
+	roleKnobs.farnessPref = enemyData.farnessPref;
+	roleKnobs.hitSensitivity = enemyData.hitSensitivity;
+	roleKnobs.stanceStickiness = enemyData.stanceStickiness;
+	const RoleCurveParams roleParams = MapRoleCurveKnobsToParams(roleKnobs);
+	const float distCoeff = roleParams.distCoefficient;
+	const float farnessCoeff = roleParams.farnessCoefficient;
+	const float hitCoeff = roleParams.hitCoefficient;
+	const float stanceCoeff = roleParams.stanceCoefficient;
 
 	// 有利位置: 得意距離に近いほど高い
 	const float advantagePos = ScoreByDistance(playerDistance, preferredMid, distCoeff);
 	// 不利位置: 得意距離から外れるほど高い
-	const float disadvantagePos = 1.0f - advantagePos;
+	const float disadvantagePos = ApplyScoreBase((1.0f - advantagePos), 0.7f);
 	// 距離の遠さ: 原点から離れるほど高い
 	const float farness = 1.0f - ScoreByDistance(playerDistance, 0.0f, farnessCoeff);
 
 	// 被弾の少なさ / 多さ
 	const float HitScore = ScoreByHitCount(hitTakenCount, hitCoeff);
-	const float manyHits = ApplyScoreBase(HitScore, 0.5f);
+	const float manyHits = ApplyScoreBase(HitScore, 0.3f);
 	const float fewHits = ApplyScoreBase(1.0f - HitScore, 0.5f);
 
 	// 攻撃成功の多さ（未配線のため常に ScoreByHitCount(0)=1 寄り）
-	const float manySuccess = 1.0f - ScoreByHitCount(attackSuccessCount, hitCoeff);
+	const float manySuccess = ApplyScoreBase(ScoreByHitCount(attackSuccessCount, hitCoeff), 0.7f);
 
-	// 様子見、攻撃、
-	const float probeContinuePowRate = 1.5f;
-	const float holdContinuePowRate = 0.6f;
-	const float escapeContinuePowRate = 2.5f;
-
-
+	// !!!New!!!
+	const float probeContinuePowRate = enemyData.probeContinuePowRate;
+	const float holdContinuePowRate = enemyData.holdContinuePowRate;
+	const float escapeContinuePowRate = enemyData.escapeContinuePowRate;
 
 	// 各要素をかけてスコアを算出
 	// 様子見: 被弾の少なさ * 距離の遠さ
@@ -187,7 +204,7 @@ AIStance StanceNode::GetNewStance(const AIContext& context, const AIBlackboard& 
 	}
 
 	DebugConsole::SetDrawPos(15, 16);
-	std::cout << "スタンス" << (int)newStance << std::endl;
+	std::cout << "被弾カウント" << hitTakenCount << std::endl;
 	return newStance;
 }
 

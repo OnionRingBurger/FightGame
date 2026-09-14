@@ -33,11 +33,12 @@ GameScene::GameScene(
 	, resetFPSRequest(a_resetFPSRequest)
 	, setFixedCursor(a_setFixedCursor)
 	, serialize(a_serialize)
+	, currentStage(1)
 {
 
 	SetWorld(kStartWorld);
 
-	input.RegisterKey("GameEnd", VK_ESCAPE);
+	input.RegisterKey("GameEnd", VK_DOWN);
 	input.RegisterButton("GameEnd", XINPUT_GAMEPAD_START);
 	input.RegisterKey("IMGUI", VK_F2);
 	input.RegisterKey("ToDebugScene", VK_F3);
@@ -166,6 +167,7 @@ bool GameScene::SetWorld(std::string a_key)
 			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
+			[this](int a_stage) {StageRequest(a_stage); },
 			input,
 			serialize
 		);
@@ -237,8 +239,10 @@ bool GameScene::SetWorld(std::string a_key)
 			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
+			[this](int a_stage) {StageRequest(a_stage); },
 			input,
-			serialize
+			serialize,
+			currentStage
 		);
 
 		world->InitWorld();
@@ -287,4 +291,9 @@ void GameScene::TutorialRequest(int a_id)
 void GameScene::WorldRequest(std::string a_key)
 {
 	worldChangeRequests.push(a_key);
+}
+
+void GameScene::StageRequest(int a_stage)
+{
+	currentStage = a_stage;
 }

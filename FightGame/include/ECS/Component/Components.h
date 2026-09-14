@@ -150,6 +150,7 @@
 	X(NullTargetTag) \
 	X(SelectCursor) \
 	X(SelectBox) \
+	X(SelectPlayCommand) \
 	X(CameraRigTag) \
 	X(RigLookOn) \
 	X(FollowLeap) \
@@ -166,7 +167,14 @@
 	X(CameraChangeEffect)\
 	X(PlayerHeal) \
 	X(DeleteOnInput) \
-	X(UITextBoxCursor)
+	X(LifeTimeEndEffect) \
+	X(CameraMover) \
+	X(SpawnJson) \
+	X(TutorialSpawner) \
+	X(CreateTutorialWindow) \
+	X(UITextBoxCursor) \
+	X(StageData) \
+	X(UnlockStageEntity)
 
 
 using BitFlag = unsigned int;
@@ -941,6 +949,8 @@ namespace Component
 		BATTLESTART,
 		GAMECLEAR,
 		STAGE_CLEAR_MOVIE,
+		WHITEWAVESTART,
+		WHITEWAVEEND,
 		EFFECT_NONE,
 	};
 	struct CreateEffect
@@ -1126,7 +1136,7 @@ namespace Component
 		static constexpr int kVersion = 0;
 
 		FadeChungeType type;
-		bool isWait; 
+		bool isWait;
 		float maxCoolTime;
 		float duration;
 
@@ -2714,25 +2724,33 @@ namespace Component
 		static constexpr int kVersion = 0;
 
 		// 距離による有利判定係数（得意間合い）
-		float distCoefficient = 1.0f;
+		float distFocus = 0.5f;
 		// 様子見用・距離の遠さ係数
-		float farnessCoefficient = 1.0f;
+		float farnessPref = 0.5f;
 		// 攻撃命中時の評価係数
-		float hitCoefficient = 3.0f;
+		float hitSensitivity = 0.5f;
 		// 方針連続時の減少係数、1.0f以下だと連続時に増加する
-		float stanceCoefficient = 1.2f;
+		float stanceStickiness = 0.5f;
+
+		// 各方針の継続時の累乗倍率
+		// !!!New!!!
+		float probeContinuePowRate = 1.5f;
+		// !!!New!!!
+		float holdContinuePowRate = 0.6f;
+		// !!!New!!!
+		float escapeContinuePowRate = 2.5f;
 
 		// 有利距離用係数、攻撃命中係数、方針連続使用係数、様子見距離用係数
-		AIRole(float a_distCoefficient, float a_hitCoefficient, float a_stanceCoefficient, float a_farnessCoefficient)
-			: distCoefficient(a_distCoefficient)
-			, farnessCoefficient(a_farnessCoefficient)
-			, hitCoefficient(a_hitCoefficient)
-			, stanceCoefficient(a_stanceCoefficient)
+		AIRole(float a_distFocus, float a_hitSensitivity, float a_stanceStickiness, float a_farnessPref)
+			: distFocus(a_distFocus)
+			, farnessPref(a_farnessPref)
+			, hitSensitivity(a_hitSensitivity)
+			, stanceStickiness(a_stanceStickiness)
 		{
 		}
 
 		AIRole()
-			: AIRole(1.0f, 3.0f, 1.2f, 1.0f)
+			: AIRole(0.5f, 0.5f, 0.5f, 0.5f)
 		{
 		}
 	};
@@ -3351,6 +3369,11 @@ namespace Component
 		float3 finalTargetPos;
 		float3 finalTargetRot;
 
+		CameraMover()
+			: CameraMover(kInvalidEntity)
+		{
+		}
+
 		CameraMover(Entity a_targetPoint)
 			: targetPoint(a_targetPoint)
 			, leapEnd(true)
@@ -3480,6 +3503,11 @@ namespace Component
 		std::string textKey;
 		float waitTime;
 
+		CreateTutorialWindow()
+			: CreateTutorialWindow("", 0.0f)
+		{
+		}
+
 		CreateTutorialWindow(std::string a_textKey, float a_waitTime)
 			: textKey(a_textKey)
 			, waitTime(a_waitTime)
@@ -3496,6 +3524,7 @@ namespace Component
 		SELECT_ALLSELECT_DELETE = 1 << 3,
 		SELECT_LOAD = 1 << 4,
 		SELECT_HPHEAL = 1 << 5,
+		SELECT_SETSTAGE = 1 << 6,
 
 	};
 
@@ -3503,7 +3532,7 @@ namespace Component
 	{
 		static constexpr TypeID kTypeId = 165;
 		static constexpr const char* kTypeName = "SelectPlayCommand";
-		static constexpr int kVersion = 0;
+		static constexpr int kVersion = 1;
 
 		BitFlag flag;
 
@@ -3513,6 +3542,12 @@ namespace Component
 		std::string soundName;
 		std::string loadName;
 		float healValue;
+		int stageIndex;
+
+		SelectPlayCommand()
+			: SelectPlayCommand(SELECT_NONE, "", 0.0f, EFFECT_NONE, "", "", 0.0f, 1)
+		{
+		}
 
 		SelectPlayCommand(
 			BitFlag a_flag,
@@ -3521,7 +3556,8 @@ namespace Component
 			EffectType a_effectType,
 			std::string a_soundName,
 			std::string a_loadName,
-			float a_healValue
+			float a_healValue,
+			int a_stageIndex
 			)
 			: flag(a_flag)
 			, sceneName(a_sceneName)
@@ -3530,6 +3566,7 @@ namespace Component
 			, soundName(a_soundName)
 			, loadName(a_loadName)
 			, healValue(a_healValue)
+			, stageIndex(a_stageIndex)
 		{ }
 	};
 
@@ -3592,6 +3629,48 @@ namespace Component
 			, fadeMin(a_fadeMin)
 			, fadeMax(a_fadeMax)
 			, soundKey(a_soundKey)
+		{
+		}
+	};
+
+	struct StageData
+	{
+		static constexpr TypeID kTypeId = 168;
+		static constexpr const char* kTypeName = "StageData";
+		static constexpr int kVersion = 0;
+		int currentStageIndex;
+		bool clearStageUnlock;
+		int unlockStageIndex;
+
+		StageData(int a_currentStageIndex, bool a_clearStageUnlock, int a_unlockStageIndex)
+			: currentStageIndex(a_currentStageIndex)
+			, clearStageUnlock(a_clearStageUnlock)
+			, unlockStageIndex(a_unlockStageIndex)
+		{
+		}
+
+		StageData()
+			: StageData(0, false, 0)
+		{
+		}
+	};
+
+	struct UnlockStageEntity
+	{
+		static constexpr TypeID kTypeId = 169;
+		static constexpr const char* kTypeName = "StageClear";
+		static constexpr int kVersion = 0;
+		// アンロックされている時用かどうか
+		bool isUnlock;
+		int stageIndex;
+		UnlockStageEntity(bool a_isUnlock, int a_stageIndex)
+			: isUnlock(a_isUnlock)
+			, stageIndex(a_stageIndex)
+		{
+		}
+
+		UnlockStageEntity()
+			: UnlockStageEntity(false, 0)
 		{
 		}
 	};

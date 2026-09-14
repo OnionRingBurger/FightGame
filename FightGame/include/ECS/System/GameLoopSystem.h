@@ -9,6 +9,8 @@ void GoalSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void ChunkChangeSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_chunkRequest);
 
+void UnlockStageEntitySystem(Chunk& a_chunk, const SystemContext& a_context);
+
 void CheckAliveTargetGameOverSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize);
 void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize);
 void CheckClearTutorialSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize);

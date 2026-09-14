@@ -99,6 +99,23 @@ void ChunkChangeSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRe
 	}
 }
 
+void UnlockStageEntitySystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+
+	ComponentView unlockView = a_chunk.GetView<ComponentTypes<UnlockStageEntity>>();
+	for (auto it : unlockView)
+	{
+		ComponentHandle<UnlockStageEntity> unlock = a_chunk.GetComponent<UnlockStageEntity>(it);
+		bool isUse = IsUnlockStage(unlock.Look().stageIndex) && unlock.Look().isUnlock;
+		a_chunk.DeleteChunkComponent(it, UnlockStageEntity::kTypeId);
+		// 使用する場合は消さない
+		if (isUse) continue;
+		// TODO 1f遅れで消えるため時間がある時に数値を変える方式に変更
+		a_chunk.DeleteChunkEntity(it);
+	}
+
+}
+
 void CheckAliveTargetGameOverSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 	ComponentView targetView = a_chunk.GetView<ComponentTypes<GameOverTarget>>();
@@ -231,6 +248,13 @@ void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context,
 		a_chunk.DeleteChunkEntity(it);
 	}
 
+	ComponentView stageView = a_chunk.GetView<ComponentTypes<StageData>>();
+	for (auto it : stageView)
+	{
+		ComponentHandle<StageData> data = a_chunk.GetComponent<StageData>(it);
+		SaveClearStage(data.Look().currentStageIndex, true);
+		if (data.Look().clearStageUnlock) SaveUnlockStage(data.Look().unlockStageIndex, true);
+	}
 
 	ResetSound();
 
@@ -247,9 +271,9 @@ void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context,
 		SoundKey(false, 70.0f, "clearbgm")
 	);
 
-	// クリアシーンに移行する
+	// タイトルシーンに移行する
 	Entity chunkChange = a_chunk.CreateNewEntity(
-		ChunkChange(true, "Clear"),
+		ChunkChange(true, "Title"),
 		DelayChunkChange(530.0f)
 	);
 

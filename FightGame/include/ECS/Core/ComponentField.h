@@ -189,6 +189,7 @@ namespace ComponentSystem
 	inline void ApplyToFields(MoveForward& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
 		valueFunc("speed", component.speed, 0.0f);
+		valueFunc("attenuation", component.attenuation, 1.0f);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -197,6 +198,7 @@ namespace ComponentSystem
 		valueFunc("shotSpeed", component.shotSpeed, 0.0f);
 		valueFunc("shotTimer", component.shotTimer, 0.0f);
 		valueFunc("maxShotTimer", component.maxShotTimer, 0.0f);
+		valueFunc("canShot", component.canShot, false);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -253,6 +255,11 @@ namespace ComponentSystem
 	inline void ApplyToFields(CreateEffect& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
 		valueFunc("type", component.type, static_cast<decltype(component.type)>(0));
+		valueFunc("posOffsetX", component.posOffset.x, 0.0f);
+		valueFunc("posOffsetY", component.posOffset.y, 0.0f);
+		valueFunc("angleOffset", component.angleOffset, 0.0f);
+		valueFunc("maxWaitTime", component.maxWaitTime, 0.0f);
+		valueFunc("duration", component.duration, 0.0f);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -291,6 +298,9 @@ namespace ComponentSystem
 	{
 		valueFunc("fadeType", component.fadeType, static_cast<decltype(component.fadeType)>(0));
 		valueFunc("fadeSpeed", component.fadeSpeed, 0.0f);
+		valueFunc("progress", component.progress, 0.0f);
+		valueFunc("min", component.min, 0.0f);
+		valueFunc("max", component.max, 1.0f);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -298,6 +308,8 @@ namespace ComponentSystem
 	{
 		valueFunc("type", component.type, static_cast<decltype(component.type)>(0));
 		valueFunc("isWait", component.isWait, false);
+		valueFunc("maxCoolTime", component.maxCoolTime, 0.0f);
+		valueFunc("duration", component.duration, 0.0f);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -387,6 +399,15 @@ namespace ComponentSystem
 	inline void ApplyToFields(LifeTime& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
 		valueFunc("time", component.time, 0.0f);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(LifeTimeEndEffect& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("useSound", component.useSound, false);
+		valueFunc("soundKey", component.soundKey, std::string(""));
+		valueFunc("useEfkEffect", component.useEfkEffect, false);
+		valueFunc("efkEffectKey", component.efkEffectKey, std::string(""));
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -779,9 +800,39 @@ namespace ComponentSystem
 		valueFunc("initialVelocityZ", component.initialVelocity.z, 0.0f);
 	}
 
+	template<typename ValueFunc>
+	inline void ApplyAttackPowerToFields(AttackPower& attackPower, ValueFunc&& valueFunc, const std::string& prefix)
+	{
+		valueFunc(prefix + "minLength", attackPower.minLength, 0.0f);
+		valueFunc(prefix + "maxLength", attackPower.maxLength, 0.0f);
+		valueFunc(prefix + "angle", attackPower.angle, 0.0f);
+		valueFunc(prefix + "maxHeight", attackPower.maxHeight, 0.0f);
+		valueFunc(prefix + "maxLowness", attackPower.maxLowness, 0.0f);
+		valueFunc(prefix + "damageValue", attackPower.damageValue, 0.0f);
+		valueFunc(prefix + "motionTime", attackPower.motionTime, 0.0f);
+		valueFunc(prefix + "lifeTime", attackPower.lifeTime, 0.0f);
+		valueFunc(prefix + "followOffsetX", attackPower.followOffset.x, 0.0f);
+		valueFunc(prefix + "followOffsetY", attackPower.followOffset.y, 0.0f);
+		valueFunc(prefix + "followOffsetZ", attackPower.followOffset.z, 0.0f);
+		valueFunc(prefix + "waitTime", attackPower.waitTime, 0.0f);
+		valueFunc(prefix + "startupTime", attackPower.startupTime, 0.0f);
+		valueFunc(prefix + "sectorKey", attackPower.sectorKey, std::string(""));
+		valueFunc(prefix + "endWithOwnerAction", attackPower.endWithOwnerAction, true);
+	}
+
 	template<typename ValueFunc, typename EntityFunc>
 	inline void ApplyToFields(AttackStatus& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
+		int size = static_cast<int>(component.attackPowers.size());
+		valueFunc("size", size, 0);
+		if (size != static_cast<int>(component.attackPowers.size()))
+		{
+			component.attackPowers.resize(size);
+		}
+		for (int i = 0; i < size; i++)
+		{
+			ApplyAttackPowerToFields(component.attackPowers[i], valueFunc, "attack" + std::to_string(i));
+		}
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -817,6 +868,10 @@ namespace ComponentSystem
 		valueFunc("attackIndex", component.attackIndex, 0);
 		valueFunc("useJump", component.useJump, false);
 		valueFunc("useGuard", component.useGuard, false);
+		valueFunc("moveCamera", component.moveCamera, false);
+		valueFunc("cameraDirX", component.cameraDir.x, 0.0f);
+		valueFunc("cameraDirY", component.cameraDir.y, 0.0f);
+		valueFunc("cameraMagnitube", component.cameraMagnitube, 0.0f);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -826,6 +881,7 @@ namespace ComponentSystem
 		valueFunc("attack", component.attack, static_cast<decltype(component.attack)>(0));
 		valueFunc("jump", component.jump, static_cast<decltype(component.jump)>(0));
 		valueFunc("guard", component.guard, static_cast<decltype(component.guard)>(0));
+		valueFunc("camera", component.camera, static_cast<decltype(component.camera)>(0));
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -868,10 +924,13 @@ namespace ComponentSystem
 	template<typename ValueFunc, typename EntityFunc>
 	inline void ApplyToFields(AIRole& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
-		valueFunc("distCoefficient", component.distCoefficient, 1.0f);
-		valueFunc("farnessCoefficient", component.farnessCoefficient, 1.0f);
-		valueFunc("hitCoefficient", component.hitCoefficient, 3.0f);
-		valueFunc("stanceCoefficient", component.stanceCoefficient, 1.2f);
+		valueFunc("distFocus", component.distFocus, 0.5f);
+		valueFunc("farnessPref", component.farnessPref, 0.5f);
+		valueFunc("hitSensitivity", component.hitSensitivity, 0.5f);
+		valueFunc("stanceStickiness", component.stanceStickiness, 0.5f);
+		valueFunc("probeContinuePowRate", component.probeContinuePowRate, 1.5f);
+		valueFunc("holdContinuePowRate", component.holdContinuePowRate, 0.6f);
+		valueFunc("escapeContinuePowRate", component.escapeContinuePowRate, 2.5f);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -912,6 +971,7 @@ namespace ComponentSystem
 		valueFunc("useKnockback", component.useKnockback, false);
 		valueFunc("knockBackDirX", component.knockBackDir.x, 0.0f);
 		valueFunc("knockBackDirY", component.knockBackDir.y, 0.0f);
+		valueFunc("knockbackTime", component.knockbackTime, 0.0f);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -1001,6 +1061,8 @@ namespace ComponentSystem
 	{
 		entityFunc("selectEntity", component.selectEntity);
 		valueFunc("isActiv", component.isActiv, false);
+		valueFunc("coolTime", component.coolTime, 0.0f);
+		valueFunc("maxCoolTime", component.maxCoolTime, 0.0f);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -1010,6 +1072,19 @@ namespace ComponentSystem
 		valueFunc("posY", component.pos.y, 0.0f);
 		valueFunc("cursorScaleX", component.cursorScale.x, 0.0f);
 		valueFunc("cursorScaleY", component.cursorScale.y, 0.0f);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(SelectPlayCommand& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("flag", component.flag, static_cast<decltype(component.flag)>(0));
+		valueFunc("sceneName", component.sceneName, std::string(""));
+		valueFunc("waitChangeScene", component.waitChangeScene, 0.0f);
+		valueFunc("effectType", component.effectType, static_cast<decltype(component.effectType)>(EFFECT_NONE));
+		valueFunc("soundName", component.soundName, std::string(""));
+		valueFunc("loadName", component.loadName, std::string(""));
+		valueFunc("healValue", component.healValue, 0.0f);
+		valueFunc("stageIndex", component.stageIndex, 1);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -1039,6 +1114,7 @@ namespace ComponentSystem
 	inline void ApplyToFields(EfkEffectRuntime& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
 		valueFunc("handle", component.handle, 0);
+		valueFunc("isLoop", component.isLoop, false);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -1109,9 +1185,20 @@ namespace ComponentSystem
 		{
 			valueFunc("spawnEffectKeys" + std::to_string(i), component.spawnEffectKeys[i], std::string(""));
 		}
+		int soundSize = static_cast<int>(component.spawnSoundKeys.size());
+		valueFunc("soundSize", soundSize, 0);
+		if (soundSize != static_cast<int>(component.spawnSoundKeys.size()))
+		{
+			component.spawnSoundKeys.resize(soundSize);
+		}
+		for (int i = 0; i < soundSize; i++)
+		{
+			valueFunc("spawnSoundKeys" + std::to_string(i), component.spawnSoundKeys[i], std::string(""));
+		}
 		valueFunc("spawnRadius", component.spawnRadius, 0.0f);
 		valueFunc("spawnInteval", component.spawnInteval, 0.0f);
 		valueFunc("currentDuration", component.currentDuration, 0.0f);
+		valueFunc("spawnSpeedupRate", component.spawnSpeedupRate, 0.0f);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -1123,6 +1210,57 @@ namespace ComponentSystem
 	inline void ApplyToFields(CameraChangeEffect& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
 		valueFunc("effectKey", component.effectKey, "");
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(CameraMover& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		entityFunc("targetPoint", component.targetPoint);
+		valueFunc("leapEnd", component.leapEnd, true);
+		valueFunc("leapProgress", component.leapProgress, 1.0f);
+		valueFunc("finalTargetPosX", component.finalTargetPos.x, 0.0f);
+		valueFunc("finalTargetPosY", component.finalTargetPos.y, 0.0f);
+		valueFunc("finalTargetPosZ", component.finalTargetPos.z, 0.0f);
+		valueFunc("finalTargetRotX", component.finalTargetRot.x, 0.0f);
+		valueFunc("finalTargetRotY", component.finalTargetRot.y, 0.0f);
+		valueFunc("finalTargetRotZ", component.finalTargetRot.z, 0.0f);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(SpawnJson& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("spawnKey", component.spawnKey, std::string(""));
+		valueFunc("currentDuration", component.currentDuration, 0.0f);
+		valueFunc("maxSpawnTime", component.maxSpawnTime, 0.0f);
+		valueFunc("offsetX", component.offset.x, 0.0f);
+		valueFunc("offsetY", component.offset.y, 0.0f);
+		valueFunc("offsetZ", component.offset.z, 0.0f);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(TutorialSpawner& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("progress", component.progress, 0);
+		int size = static_cast<int>(component.state.size());
+		valueFunc("size", size, 0);
+		if (size != static_cast<int>(component.state.size()))
+		{
+			component.state.resize(size);
+		}
+		for (int i = 0; i < size; i++)
+		{
+			valueFunc("useStartMessage" + std::to_string(i), component.state[i].useStartMessage, false);
+			valueFunc("startMessageKey" + std::to_string(i), component.state[i].startMessageKey, std::string(""));
+			valueFunc("useLoad" + std::to_string(i), component.state[i].useLoad, false);
+			valueFunc("load" + std::to_string(i), component.state[i].load, std::string(""));
+		}
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(CreateTutorialWindow& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("textKey", component.textKey, std::string(""));
+		valueFunc("waitTime", component.waitTime, 0.0f);
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
@@ -1152,6 +1290,23 @@ namespace ComponentSystem
 		valueFunc("fadeMin", component.fadeMin, 0.0f);
 		valueFunc("fadeMax", component.fadeMax, 1.0f);
 		valueFunc("soundKey", component.soundKey, std::string(""));
+	}
+
+	// !!!New!!!
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(StageData& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("currentStageIndex", component.currentStageIndex, 0);
+		valueFunc("clearStageUnlock", component.clearStageUnlock, false);
+		valueFunc("unlockStageIndex", component.unlockStageIndex, 0);
+	}
+
+	// !!!New!!!
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(UnlockStageEntity& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("isUnlock", component.isUnlock, false);
+		valueFunc("stageIndex", component.stageIndex, 0);
 	}
 
 };

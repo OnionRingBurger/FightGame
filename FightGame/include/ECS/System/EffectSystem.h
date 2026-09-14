@@ -3,6 +3,7 @@
 #include "SystemContext.h"
 #include "AIManager.h"
 #include "ComponentsSerialize.h"
+#include "SystemResponse.h"
 
 void FadeUISystem(Chunk& a_chunk, const SystemContext& a_context);
 
@@ -34,4 +35,4 @@ void CreateTutorialTextSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void UITextBoxCursorSystem(Chunk& a_chunk, const SystemContext& a_context);
 
-void CursorSelectSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager, ComponentsSerialize& a_serialize);
+void CursorSelectSystem(Chunk& a_chunk, const SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize);

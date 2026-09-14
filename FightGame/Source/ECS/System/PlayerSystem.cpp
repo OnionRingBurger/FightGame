@@ -18,34 +18,25 @@ void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemRes
 
 		a_chunk.DeleteChunkComponent(it, PlayerTag::kTypeId);
 		a_chunk.DeleteChunkComponent(it, InputMove::kTypeId);
-		a_chunk.AddComponent(it, LifeTime(16.0f));
+		a_chunk.AddComponent(it, LifeTime(2.5f));
+		a_chunk.AddComponent(it, LifeTimeEndEffect(false, "", true, kBossDeadBrokenEffectKey));
 
 
 
-		float3 shakePower = float3(0.02f, 0.02f, 0.02f);
+		float3 shakePower = float3(0.03f, 0.03f, 0.03f);
 		float3 shakeAmp = float3(2.5f, 2.5f, 2.5f);
-		float shakeTime = 130.0f;
+		float shakeTime = 300.0f;
 		
-		AddShakeEffect(a_chunk, it, shakePower, shakeAmp, shakeTime, 0.5f);
+		AddShakeEffect(a_chunk, it, shakePower, shakeAmp, shakeTime, 1.0f);
 
 
 		PlaySound(LoadSound("Assets/Sound/dead.mp3"));
 		PlaySound(LoadSound("Assets/Sound/dead2.mp3"));
 		PlaySound(LoadSound("Assets/Sound/enemydead.mp3"));
 
-		a_response.AddStopTime(160.0f, 160.0f, 0.03f);
+		a_response.AddStopTime(60.0f, 60.0f, 0.00f);
 
-		//Entity createEffect = a_chunk.CreateNewEntity(
-		//	CreateEffect(WHITEFADE_UP)
-		//);
 
-		//ComponentView gunView = a_chunk.GetView<ComponentTypes<GunTag, ModelKey>>();
-		//// a_chunk.DeleteChunkComponent(it, DeadState::kTypeId);
-
-		//for (auto gunIt : gunView)
-		//{
-		//	a_chunk.DeleteChunkComponent(gunIt, ModelKey::kTypeId);
-		//}
 
 	}
 }

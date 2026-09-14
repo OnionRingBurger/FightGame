@@ -49,6 +49,7 @@ private:
 
 	void TutorialRequest(int);
 	void WorldRequest(std::string);
+	void StageRequest(int);
 
 	IModelCacheAcquisition& modelCache;
 	IUICacheAcquisition& uiCache;
@@ -65,5 +66,7 @@ private:
 	std::function<void(void)> gameEnd;
 	//! カーソル固定状態の変更リクエスト
 	std::function<void(bool)> setFixedCursor;
+
+	int currentStage;
 };
 

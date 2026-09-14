@@ -5,6 +5,7 @@
 #include "GameData.h"
 #include "SystemAssist.h"
 #include "MathAssist.h"
+#include "GameSystemResponse.h"
 
 using namespace Component;
 
@@ -286,6 +287,33 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 				AngularVelocity(float3(0.1f, 0.0f, 0.0f))
 			);
 			break;
+
+		// !!!New!!!
+		case WHITEWAVESTART:
+		{
+			float2 startPos = float2(-3.0f, 0.0f) + posOffset;
+			float2 endPos = float2(0.0f, 0.0f) + posOffset;
+
+			Entity clearCameraWave = a_chunk.CreateNewEntity(
+				UIComponent("ClearCameraChange", startPos, float2(3.5f, 3.0f), 90.0f + angleOffset, 1.0f),
+				UIPosLerp(startPos, endPos, 15.00)
+			);
+
+			break;
+		}
+
+		case WHITEWAVEEND:
+		{
+			float2 startPos = float2(0.0f, 0.0f) + posOffset;
+			float2 endPos = float2(3.0f, 0.0f) + posOffset;
+
+			Entity clearCameraWave = a_chunk.CreateNewEntity(
+				UIComponent("ClearCameraChange", startPos, float2(3.5f, 3.0f), 90.0f + angleOffset, 1.0f, float2(1.0f, 0.0f)),
+				UIPosLerp(startPos, endPos, 15.00)
+			);
+
+			break;
+		}
 
 		}
 
@@ -692,12 +720,15 @@ void CreateTutorialTextSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 }
 
-bool IsTargetInInputDirection(int a_direction, float a_currentPos, float a_targetPos)
+bool IsTargetInInputDirection(int a_direction, float a_currentPos, float a_bestPos, float a_targetPos)
 {
 	if (a_direction == 0) return true;
+	if (a_currentPos == a_targetPos) return false;
 
 	int vectorSign = Sign(a_targetPos - a_currentPos);
 	if (vectorSign != a_direction) return false;
+	int bestSign = Sign(a_bestPos - a_targetPos);
+	if (bestSign != a_direction) return false;
 	return true;
 }
 
@@ -705,7 +736,7 @@ bool IsTargetInInputDirection(int a_direction, float a_currentPos, float a_targe
 Entity GetNextTarget(Entity a_target, Chunk& a_chunk, ComponentView a_cursorView ,float2 a_direction)
 {
 	Entity bestEntity = a_target;
-	ComponentHandle<SelectBox> bestBox = a_chunk.GetComponent<SelectBox>(a_target);
+	ComponentHandle<SelectBox> currentBox = a_chunk.GetComponent<SelectBox>(a_target);
 	if (std::abs(a_direction.x) < 0.3f)
 	{
 		a_direction.x = 0.0f;
@@ -715,20 +746,22 @@ Entity GetNextTarget(Entity a_target, Chunk& a_chunk, ComponentView a_cursorView
 		a_direction.y = 0.0f;
 	}
 
+
 	int2 signDirection(Sign(a_direction.x), Sign(a_direction.y));
 
+	float2 bestPos(100000.0f * signDirection.x, 100000.0f * signDirection.y);
 	for (auto it : a_cursorView)
 	{
 		if (it == a_target) continue;
 
 		ComponentHandle<SelectBox> targetBox = a_chunk.GetComponent<SelectBox>(it);
 
-		if (!IsTargetInInputDirection(signDirection.x, bestBox.Look().pos.x, targetBox.Look().pos.x))
+		if (!IsTargetInInputDirection(signDirection.x, currentBox.Look().pos.x, bestPos.x, targetBox.Look().pos.x))
 		{
 			continue;
 		}
 
-		if (!IsTargetInInputDirection(signDirection.y, bestBox.Look().pos.y, targetBox.Look().pos.y))
+		if (!IsTargetInInputDirection(signDirection.y, currentBox.Look().pos.y, bestPos.y, targetBox.Look().pos.y))
 		{
 			continue;
 		}
@@ -736,15 +769,21 @@ Entity GetNextTarget(Entity a_target, Chunk& a_chunk, ComponentView a_cursorView
 
 		// 代入
 		bestEntity = it;
-		bestBox = targetBox;
+		bestPos = targetBox.Look().pos;
 	}
 	return bestEntity;
 }
 
-void PlayCursor(Entity a_target, Chunk& a_chunk, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
+void PlayCursor(Entity a_target, Chunk& a_chunk, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 	// 選択先の選択時機能を取得する
 	ComponentHandle<SelectPlayCommand> command = a_chunk.GetComponent<SelectPlayCommand>(a_target);
+	// !!!New!!!
+	if (command.Look().flag & SELECT_SETSTAGE)
+	{
+		GameSystemResponse& gameResponse = dynamic_cast<GameSystemResponse&>(a_response);
+		gameResponse.StageRequest(command.Look().stageIndex);
+	}
 	// チャンクを変更する
 	if (command.Look().flag & SELECT_CHANGESCENE)
 	{
@@ -801,7 +840,7 @@ void PlayCursor(Entity a_target, Chunk& a_chunk, AIManager& a_aiManager, Compone
 	
 }
 
-void CursorSelectSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
+void CursorSelectSystem(Chunk& a_chunk, const SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 	ComponentView cursorView = a_chunk.GetView<ComponentTypes<SelectCursor>>();
 	ComponentView targetView = a_chunk.GetView<ComponentTypes<SelectBox>>();
@@ -841,15 +880,19 @@ void CursorSelectSystem(Chunk& a_chunk, const SystemContext& a_context, AIManage
 			{
 				cursor->coolTime = cursor.Look().maxCoolTime;
 				cursor->selectEntity = nextTarget;
-			}
 
-			ComponentHandle<SelectBox> box = a_chunk.GetComponent<SelectBox>(nextTarget);
-			ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(cursorIt);
-			ui->uiPos = box.Look().pos;
-			ui->uiScale = box.Look().cursorScale;
+				PlaySound(LoadSound("Assets/Sound/cursormove.mp3"));
+
+
+				ComponentHandle<SelectBox> box = a_chunk.GetComponent<SelectBox>(nextTarget);
+				ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(cursorIt);
+				ui->uiPos = box.Look().pos;
+				ui->uiScale = box.Look().cursorScale;
+
+			}
 		}
 
-		if (isPlay) PlayCursor(cursor.Look().selectEntity, a_chunk, a_aiManager, a_serialize);
+		if (isPlay) PlayCursor(cursor.Look().selectEntity, a_chunk, a_response, a_aiManager, a_serialize);
 	}
 
 

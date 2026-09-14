@@ -53,3 +53,11 @@ void RegisterAllAttackSectorsFromAttackData(int a_circumferenceCount);
 void AddShakeEffect(Chunk& a_chunk, Entity a_entity, float3 a_power, float3 a_amp, float a_time, float a_rate);
 
 void SafeDeleteEffectEntity(Chunk& a_chunk, Entity a_effect);
+
+bool IsClearStage(int stageIndex);
+
+bool IsUnlockStage(int stageIndex);
+
+void SaveClearStage(int stageIndex, bool isClear);
+
+void SaveUnlockStage(int stageIndex, bool isUnlock);

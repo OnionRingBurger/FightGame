@@ -5,7 +5,7 @@
 #include "Defines.h"
 
 
-// TODO 流石にひっどいので構造体なりクラスなりにまとめる
+// TODO 我ながらひどいので構造体なりクラスなりにまとめる
 
 LoadScene::LoadScene(
 	std::function<void(std::string)> a_sceneChange,
@@ -124,6 +124,7 @@ void LoadScene::Update()
 	RemoveIfFlaged(loadEndFlags);
 	if (loadEndFlags.empty())
 	{
+
 #ifdef CREATEGAME
 		sceneChange("CreateGame");
 #else

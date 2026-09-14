@@ -1265,9 +1265,9 @@ void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResp
 			}
 
 			// 敵に命中していた場合AIに情報を送る
-			if (isPlayer)
+			if (isEnemy)
 			{
-				a_aiManager.NotifyHitResolved(triggerIt.triggerEntity, isGuard);
+				a_aiManager.NotifyHitResolved(it, isGuard);
 			}
 
 			// 画面エフェクトを出す

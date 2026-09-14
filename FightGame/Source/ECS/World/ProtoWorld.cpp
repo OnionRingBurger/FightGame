@@ -10,10 +10,12 @@
 #include "Defines.h"
 #include "Geometory.h"
 #include "SystemAssist.h"
+#include "GameSystemResponse.h"
 
 #include <fstream>
+#include <vector>
 
-ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize)
+ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, std::function<void(int)> a_stageRequest, Input& a_input, ComponentsSerialize& a_serialize, int a_stage)
 	: World(a_modelCache,
 		a_uiCache,
 		a_effectCache,
@@ -22,13 +24,15 @@ ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 		a_serialize
 	)
 	, worldRequest(a_worldRequest)
+	, stageRequest(a_stageRequest)
+	, stage(a_stage)
 {
 	//a_input.RegisterKey("RightAttack", VK_RIGHT);
 	//a_input.RegisterKey("LeftAttack", VK_LEFT);
 	a_input.RegisterKey("RightAttack", MK_RBUTTON);
 	a_input.RegisterKey("LeftAttack", MK_LBUTTON);
-	a_input.RegisterKey("Jump", 'E');
-	a_input.RegisterKey("Guard", 'Q');
+	a_input.RegisterKey("Jump", VK_SPACE);
+	a_input.RegisterKey("Guard", 'E');
 	//a_input.RegisterKey("LookOnLeft", 'Q');
 	//a_input.RegisterKey("LookOnRight", 'E');
 
@@ -67,10 +71,11 @@ void ProtoWorld::InitAI(AIManager& a_aiManager)
 
 	std::unique_ptr<ReactiveSelector> neutralSelector = std::make_unique<ReactiveSelector>();
 	neutralSelector->AddNode(std::make_unique<InAttackRangeDecorator>(std::make_unique<UseAttackAction>()));
-	neutralSelector->AddNode(std::make_unique<ChasePlayerAction>(0.8f));
+	neutralSelector->AddNode(std::make_unique<ChasePlayerAction>(1.0f));
 	
 
 	std::unique_ptr<ReactiveSelector> guardSelector = std::make_unique<ReactiveSelector>();
+	guardSelector->AddNode(std::make_unique<UseBestDamageAttackAction>());
 	guardSelector->AddNode(std::make_unique<GuardNode>());
 
 
@@ -89,8 +94,6 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 {
 	
 	Chunk newChunk;
-
-	RegisterAllAttackSectorsFromAttackData(kSectorVertexCount);
 
 	Entity player = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
@@ -143,19 +146,60 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		RailFly(0.08f, 0.09f)
 	);
 
-	Entity spawner = newChunk.CreateNewEntity(
-		PhaseSpawner(
-			{
-				"Stage1Phase1",
-				"Stage1Phase2",
-				"PhaseClear",
-				"Stage1Phase1",
-				"Stage1Phase3",
-				"PhaseClear",
-				"Stage1Boss1"
-			}
+	// !!!New!!!
+	std::vector<std::string> phaseKeys;
 
-		)
+	StageData data;
+
+	AlphaBlendComponent floorColor;
+	AlphaBlendComponent seaColor;
+
+	switch (stage)
+	{
+	case 2:
+		phaseKeys =
+		{
+			"Stage2Phase1",
+			"Stage2Phase2",
+			"Stage2Phase3",
+			"PhaseClear",
+			"Stage2Boss1"
+		};
+
+		data = StageData(stage, false, 0);
+
+		PlaySound(LoadSound("Assets/Sound/gamebgm2.mp3", true));
+		floorColor = AlphaBlendComponent("Red", "Blue");
+		seaColor = AlphaBlendComponent("Purple", "WaveFadeMask_A");
+
+		break;
+	default:
+		phaseKeys =
+		{
+			"Stage1Phase1",
+			"Stage1Phase2",
+			"PhaseClear",
+			"Stage1Phase3",
+			"Stage1Phase4",
+			"PhaseClear",
+			"Stage1Boss1"
+		};
+
+		PlaySound(LoadSound("Assets/Sound/gamebgm.mp3", true));
+		floorColor = AlphaBlendComponent("Red", "Blue");
+		seaColor = AlphaBlendComponent("White", "Blue");
+		data = StageData(stage, true, 2);
+
+		break;
+	}
+
+	Entity spawner = newChunk.CreateNewEntity(
+		PhaseSpawner(phaseKeys)
+	);
+
+	Entity stageData = newChunk.CreateNewEntity(
+		Name("StageData"),
+		data
 	);
 
 	Entity hpBack = newChunk.CreateNewEntity(
@@ -264,7 +308,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		ModelKey("Box"),
 		BoxCollider(float3(0.0f, 30.0f, 0.0f), float3(kDebugWorldSize.x, 20.0f, kDebugWorldSize.z)),
 		OBBCollider(OBB_PushOutLocked),
-		AlphaBlendComponent("Red", "Blue")
+		floorColor
 	);
 
 
@@ -339,7 +383,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 			float3(kDebugWorldSize.x * 10.0f, 1.0, kDebugWorldSize.z * 6.0f)
 		),
 		ModelKey("Box"),
-		AlphaBlendComponent("White", "Blue")
+		seaColor
 	);
 
 	Entity snowEffect = newChunk.CreateNewEntity(
@@ -356,11 +400,8 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 	);
 
 	Entity white = newChunk.CreateNewEntity(
-		CreateEffect(WHITEMINIFADE_CLEAR, float2(0.0f, 0.0f), 0.0f, 0.0f)
+		CreateEffect(WHITEWAVEEND, float2(0.0f, 0.0f), 0.0f, 0.0f)
 	);
-
-
-	PlaySound(LoadSound("Assets/Sound/gamebgm.mp3", true));
 
 	return newChunk;
 
@@ -521,11 +562,23 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	ChunkChangeSystem(a_chunk, a_context, a_response);
 }
 
+void ProtoWorld::InitResponse(std::unique_ptr<SystemResponse>& response)
+{
+	response = std::make_unique<GameSystemResponse>();
+}
+
 void ProtoWorld::HandleSystemResponse(SystemResponse& a_response)
 {
-	if (!a_response.IsWorldRequest()) return;
+	GameSystemResponse& response = dynamic_cast<GameSystemResponse&>(a_response);
 
-	worldRequest(a_response.GetWorldRequest());
+	if (response.IsStageRequest())
+	{
+		stageRequest(response.GetStageIndex());
+	}
+
+	if (!response.IsWorldRequest()) return;
+
+	worldRequest(response.GetWorldRequest());
 }
 
 

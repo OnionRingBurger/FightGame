@@ -10,6 +10,14 @@
 
 class Geometory
 {
+public:
+	// !!!New!!!
+	enum class SectorShaderType
+	{
+		Telegraph,
+		Attack,
+	};
+
 private:
 	struct LineVertex
 	{
@@ -48,7 +56,7 @@ public:
 	// –‘O‚ÉF‚ñ‚ÈŒ`‚Ìî‚ğ“o˜^‚·‚é
 	static void RegisterSector(std::string key ,float minLength, float maxLength, float angle, float maxHeight, float maxLowness, int circumferenceCount);
 	// “o˜^‚³‚ê‚Ä‚¢‚éîŒ`‚ğ•`‰æ‚·‚é
-	static void DrawSector(std::string key, float progress, float maxTime, float highlightTime, float3 defaultColor);
+	static void DrawSector(std::string key, float progress, float maxTime, float highlightTime, float3 defaultColor, SectorShaderType shaderType);
 
 private:
 	static void MakeVS();

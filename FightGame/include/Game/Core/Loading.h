@@ -271,5 +271,5 @@ void LoadSound();
 ModelLoadResult LoadModel(const ModelLoadJob& job);
 TextureLoadResult LoadTexture(const TextureLoadJob& job);
 EffectLoadResult LoadEffect(const EffectLoadJob& job);
-TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job);
+TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job, const IUICacheAcquisition& a_cache);
 TextUILoadResult LoadTextUI(const TextUILoadJob& a_job, const IUICacheAcquisition& a_cache);

@@ -44,3 +44,18 @@ void UICache::RegisterTextFormat(std::string a_key, Microsoft::WRL::ComPtr<IDWri
     m_textFormatCache.insert({ a_key, a_format });
 }
 
+
+ComPtr<IDWriteFontFile> UICache::GetTextFontFile(std::wstring a_key) const
+{
+    if (m_textFontFileCache.find(a_key) == m_textFontFileCache.end())
+    {
+        return nullptr;
+    }
+
+    return  m_textFontFileCache.at(a_key);
+}
+
+void UICache::RegisterTextFontFile(std::wstring a_key, ComPtr<IDWriteFontFile> a_font)
+{
+    m_textFontFileCache.insert({a_key, a_font});
+}

@@ -1,7 +1,7 @@
 #include "AI/RunPlayerNode.h"
 
-// !!!New!!!
-RunPlayerNode::RunPlayerNode()
+RunPlayerNode::RunPlayerNode(float a_magnitube)
+	: magnitube(a_magnitube)
 {
 }
 
@@ -49,7 +49,7 @@ Node::Status RunPlayerNode::Tick(AIContext& context, const AIBlackboard& blackBo
 		{
 			result.MoveDir = float2(dir.x * -1.0f, dir.y * -1.0f);
 			result.IsMove = true;
-			result.Magnitube = 1.0f;
+			result.Magnitube = magnitube;
 		}
 	
 		// í«ê’åpë±

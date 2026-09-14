@@ -13,6 +13,8 @@ Chunk LoadWorld::CreateNewChunk(AIManager& a_aiManager)
 	(void)a_aiManager;
 	Chunk newChunk;
 
+	RegisterAllAttackSectorsFromAttackData(kSectorVertexCount);
+
 	newChunk.CreateNewEntity(
 		CameraTag(),
 		MOVE_AND_TRANSFORM_COMPONENT(

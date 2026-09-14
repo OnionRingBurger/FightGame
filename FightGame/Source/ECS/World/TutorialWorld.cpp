@@ -174,6 +174,7 @@ Chunk TutorialWorld::CreateNewChunk(AIManager& a_aiManager)
 			{
 				{true, "StartText", false, ""},
 				{true, "TutorialAttack", true, "Stage1Phase1"},
+				{true, "TutorialClear1", false, ""},
 				{true, "TutorialAttack2", false, ""},
 				{true, "TutorialAttack3", true, "Stage1Phase2"},
 				{true, "TutorialEnemy", false, ""},

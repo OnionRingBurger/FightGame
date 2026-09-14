@@ -5,8 +5,8 @@ constexpr float kTonnelHeight = 120.0f;
 constexpr float kTonnelColliderLength = 600.0f;
 constexpr float kTonnelLength = 10000.0f;
 
-
-constexpr float2 TitleButtonSize = { 0.5f, 0.2f };
+constexpr float2 kTitleButtonSize = { 0.5f, 0.2f };
+constexpr float2 kStageSelectButtonSize = { 0.5f * 0.8f, 0.2f * 0.8f };
 
 constexpr float kTutorialTextTime = 35.0f;
 
@@ -47,3 +47,4 @@ constexpr const char* kPlayerHealKey = "Heal.efkefc";
 
 // GhostShader: カメラからの距離フェード（exp(-d/L) の L）
 constexpr float kGhostFadeRange = 20.0f;
+

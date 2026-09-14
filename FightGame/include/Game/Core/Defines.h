@@ -35,6 +35,7 @@ constexpr int kMaxArea = 100;
 constexpr const char* kDataPath = "Assets/Data/EntityData.json";
 constexpr const char* kDataTestPath = "Assets/Data/EntityDataTest.json";
 constexpr const char* kAttackDataPath = "Assets/Data/AttackData.json";
+constexpr const char* kSaveDataPath = "Assets/Data/SaveData.json";
 
 constexpr const char* kTestEffect = "Freeze.efk";
 

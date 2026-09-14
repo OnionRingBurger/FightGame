@@ -15,6 +15,7 @@ struct AIBlackboard
 		float minLength;
 		float maxLength;
 		float angle;
+		float3 followOffset;
 		// 威力、隙
 		float damageValue;
 		float waitTime;
@@ -34,11 +35,16 @@ struct AIBlackboard
 		// 攻撃データ
 		std::vector<BBAttackData> attackDatas;
 
-		// Role（性質・カーブ係数）。技キットと同じ袋。モード変更時は一緒に書き換える
-		float distCoefficient = 1.0f;
-		float farnessCoefficient = 1.0f;
-		float hitCoefficient = 3.0f;
-		float stanceCoefficient = 1.2f;
+		// Role（性質・0?1つまみ）。技キットと同じ袋。モード変更時は一緒に書き換える
+		float distFocus = 0.5f;
+		float farnessPref = 0.5f;
+		float hitSensitivity = 0.5f;
+		float stanceStickiness = 0.5f;
+
+		// 各方針の継続時の累乗倍率
+		float probeContinuePowRate = 1.5f;
+		float holdContinuePowRate = 0.6f;
+		float escapeContinuePowRate = 2.5f;
 	};
 
 	float2 playerPos;
@@ -132,7 +138,6 @@ struct AIMind
 	// 被弾数、ガード数
 	int sameTakenCount = 0;
 	int sameGuardCount = 0;
-
 
 	// TODO Playerの無防備度とかも見る
 };
