@@ -9,7 +9,7 @@
 #include "TutorialWorld.h"
 #include "StartupWorld.h"
 
-constexpr const char* kStartWorld = "Result";
+constexpr const char* kStartWorld = "Title";
 
 GameScene::GameScene(
 	IModelCacheAcquisition& a_modelCache,
@@ -38,11 +38,10 @@ GameScene::GameScene(
 
 	SetWorld(kStartWorld);
 
-	input.RegisterKey("GameEnd", VK_DOWN);
+	input.RegisterKey("GameEnd", 'K');
 	input.RegisterButton("GameEnd", XINPUT_GAMEPAD_START);
 	input.RegisterKey("IMGUI", VK_F2);
 	input.RegisterKey("ToDebugScene", VK_F3);
-	input.RegisterKey("TutorialSkip", VK_RETURN);
 	setFixedCursor(isMouseLock);
 }
 

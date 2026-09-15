@@ -1,6 +1,7 @@
 #include "LoadWorld.h"
 #include "Components.h"
 #include "System.h"
+#include "Defines.h"
 
 using namespace Component;
 
@@ -28,28 +29,10 @@ Chunk LoadWorld::CreateNewChunk(AIManager& a_aiManager)
 	);
 
 	newChunk.CreateNewEntity(
-		UIComponent("LoadWind", float2(0.8f, -0.8f), float2(0.32f, 0.3f), 0.0f, 0.8f, float2(0.5f, 0.0f), float2(0.3f, 1.0f)),
-		UVMove(float2(0.01f, 0.0f))
+		UIComponent("LoadSprite", float2(0.9f, -0.9f), float2(0.1f, 0.1f * ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT)), 0.0f, 0.8f, float2(0.5f, 0.0f), float2(0.3f, 1.0f)),
+		SpriteAnimation(90, int2(10, 9), true, 1.0f)
 	);
 
-	newChunk.CreateNewEntity(
-		UIComponent("LoadRail", float2(0.795f, -0.8f), float2(0.28f, 0.35f), 0.0f),
-		UVMove(float2(0.025f, 0.0f))
-	);
-
-	newChunk.CreateNewEntity(
-		UIComponent("LoadRail", float2(0.795f, -0.8f), float2(0.28f, 0.35f), 0.0f, 1.0f, float2(0.5f, 0.0f), float2(1.0f, 1.0f)),
-		UVMove(float2(0.025f, 0.0f))
-	);
-
-	newChunk.CreateNewEntity(
-		UIComponent("LoadMainCar", float2(0.8f, -0.8f), float2(0.28f, 0.35f), 0.0f)
-	);
-
-	newChunk.CreateNewEntity(
-		UIComponent("LoadWind", float2(0.8f, -0.8f), float2(0.32f, 0.3f), 0.0f, 0.8f, float2(0.0f,0.0f), float2(0.3f, 1.0f)),
-		UVMove(float2(0.015f, 0.0f))
-	);
 
 	return newChunk;
 }
@@ -58,6 +41,8 @@ void LoadWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResp
 {
 	UIMoveSystem(a_chunk, a_context);
 	UVMoveSystem(a_chunk, a_context);
+
+	SpriteAnimationSystem(a_chunk, a_context);
 }
 
 

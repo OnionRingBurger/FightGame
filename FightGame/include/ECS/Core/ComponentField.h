@@ -1140,6 +1140,33 @@ namespace ComponentSystem
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(UIShake& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("basePosX", component.basePos.x, 0.0f);
+		valueFunc("basePosY", component.basePos.y, 0.0f);
+		valueFunc("shakePowerX", component.shakePower.x, 0.0f);
+		valueFunc("shakePowerY", component.shakePower.y, 0.0f);
+		valueFunc("shakeAmplitudeX", component.shakeAmplitude.x, 0.0f);
+		valueFunc("shakeAmplitudeY", component.shakeAmplitude.y, 0.0f);
+		valueFunc("maxShakeTime", component.maxShakeTime, 0.0f);
+		valueFunc("maxStopTime", component.maxStopTime, 0.0f);
+		valueFunc("phaseElapsed", component.phaseElapsed, 0.0f);
+		valueFunc("shakeElapsed", component.shakeElapsed, 0.0f);
+		valueFunc("isShaking", component.isShaking, false);
+		valueFunc("decayRate", component.decayRate, 0.5f);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(UIRailFly& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("basePosX", component.basePos.x, 0.0f);
+		valueFunc("basePosY", component.basePos.y, 0.0f);
+		valueFunc("flyPow", component.flyPow, 0.0f);
+		valueFunc("flyProgress", component.flyProgress, 0.0f);
+		valueFunc("flySpeed", component.flySpeed, 0.0f);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
 	inline void ApplyToFields(DropUI& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
 		int size = static_cast<int>(component.playSounds.size());

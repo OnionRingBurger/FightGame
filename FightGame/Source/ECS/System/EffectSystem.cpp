@@ -151,12 +151,12 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 		case WHITEMINIFADE_CLEAR:
 			Entity whiteMiniFadeClear = a_chunk.CreateNewEntity(
 				UIComponent("WhiteFade", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
-				FadeUI(FADE_DOWN, 0.03f)
+				FadeUI(FADE_DOWN, 0.08f)
 			);
 
 			Entity whiteMiniBackClear = a_chunk.CreateNewEntity(
 				UIComponent("WhiteFadeBack", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
-				FadeUI(FADE_DOWN, 0.04f)
+				FadeUI(FADE_DOWN, 0.12f)
 			);
 
 			break;
@@ -309,7 +309,12 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 			Entity clearCameraWave = a_chunk.CreateNewEntity(
 				UIComponent("ClearCameraChange", startPos, float2(3.5f, 3.0f), 90.0f + angleOffset, 1.0f, float2(1.0f, 0.0f)),
-				UIPosLerp(startPos, endPos, 15.00)
+				UIPosLerp(startPos, endPos, 9.00)
+			);
+
+			Entity whiteMiniBackClear = a_chunk.CreateNewEntity(
+				UIComponent("WhiteFadeBack", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
+				FadeUI(FADE_DOWN, 0.12f)
 			);
 
 			break;
@@ -397,6 +402,14 @@ void SpriteAnimationSystem(Chunk& a_chunk, const SystemContext& a_context)
 	for (auto it : view)
 	{
 		ComponentHandle<SpriteAnimation> spriteAnim = a_chunk.GetComponent<SpriteAnimation>(it);
+
+		if (spriteAnim.Look().countStepTime < spriteAnim.Look().maxCountStepTime)
+		{
+			spriteAnim->countStepTime += a_context.deltaTime;
+			continue;
+		}
+
+		spriteAnim->countStepTime = 0.0f;
 
 		int currentSprite = spriteAnim.Look().nextSprite;
 		if (currentSprite == spriteAnim.Look().maxSprite)
@@ -542,6 +555,82 @@ void UpdateEfkEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 	Effekseer::Manager::UpdateParameter updateParameter;
 	GetEffectManager()->Update(updateParameter);
+}
+
+namespace
+{
+	constexpr float kUINoiseXTimeOffset = 0.0f;
+	constexpr float kUINoiseYTimeOffset = 371.52f;
+}
+
+void UIShakeSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent, UIShake>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<UIShake> shake = a_chunk.GetComponent<UIShake>(it);
+		ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
+
+		shake->phaseElapsed += a_context.effectStepTime;
+
+		if (shake.Look().isShaking)
+		{
+			shake->shakeElapsed += a_context.effectStepTime;
+
+			float remaining = shake.Look().maxShakeTime - shake.Look().phaseElapsed;
+			float powerRate = Lerp(
+				1.0f,
+				shake.Look().decayRate,
+				shake.Look().shakeElapsed / (shake.Look().shakeElapsed + std::max(remaining, 0.0f))
+			);
+
+			float offsetX = Noise((shake.Look().shakeElapsed + kUINoiseXTimeOffset) * shake.Look().shakeAmplitude.x)
+				* shake.Look().shakePower.x * powerRate;
+			float offsetY = Noise((shake.Look().shakeElapsed + kUINoiseYTimeOffset) * shake.Look().shakeAmplitude.y)
+				* shake.Look().shakePower.y * powerRate;
+
+			ui->uiPos.x = shake.Look().basePos.x + offsetX;
+			ui->uiPos.y = shake.Look().basePos.y + offsetY;
+
+			if (shake.Look().phaseElapsed >= shake.Look().maxShakeTime)
+			{
+				shake->isShaking = false;
+				shake->phaseElapsed = 0.0f;
+				shake->shakeElapsed = 0.0f;
+				ui->uiPos.x = shake.Look().basePos.x;
+				ui->uiPos.y = shake.Look().basePos.y;
+			}
+		}
+		else
+		{
+			ui->uiPos.x = shake.Look().basePos.x;
+			ui->uiPos.y = shake.Look().basePos.y;
+
+			if (shake.Look().phaseElapsed >= shake.Look().maxStopTime)
+			{
+				shake->isShaking = true;
+				shake->phaseElapsed = 0.0f;
+				shake->shakeElapsed = 0.0f;
+			}
+		}
+	}
+}
+
+void UIRailFlySystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent, UIRailFly>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<UIRailFly> fly = a_chunk.GetComponent<UIRailFly>(it);
+		ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
+
+		fly->flyProgress += a_context.effectStepTime * fly.Look().flySpeed;
+
+		ui->uiPos.x = fly.Look().basePos.x;
+		ui->uiPos.y = fly.Look().basePos.y + std::sinf(fly.Look().flyProgress) * fly.Look().flyPow;
+	}
 }
 
 void UILerpSystem(Chunk& a_chunk, const SystemContext& a_context)
@@ -709,7 +798,7 @@ void CreateTutorialTextSystem(Chunk& a_chunk, const SystemContext& a_context)
 		);
 
 		a_chunk.CreateNewEntity(
-			UITextBoxCursor("LookOnMaker", float2(0.85f, -0.8f), float2(0.07f, 0.07f * 1.777f), 0.02f, 0.0f, 1.0f, ""),
+			UITextBoxCursor("LookOnMaker", float2(0.85f, -0.8f), float2(0.07f, 0.07f * 1.777f), 0.02f, 0.0f, 1.0f, "cursorselect"),
 			DeleteOnInput("Select", kTutorialTextTime),
 			ClearTarget(),
 			AllActionStopper()
@@ -831,13 +920,6 @@ void PlayCursor(Entity a_target, Chunk& a_chunk, SystemResponse& a_response, AIM
 	{
 		NewSceneSpawn(a_serialize, a_chunk, a_aiManager, command.Look().loadName, float3());
 	}
-
-	// âÒïúÇê∂ê¨Ç∑ÇÈ
-	if (command.Look().flag & SELECT_HPHEAL)
-	{
-
-	}
-	
 }
 
 void CursorSelectSystem(Chunk& a_chunk, const SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)

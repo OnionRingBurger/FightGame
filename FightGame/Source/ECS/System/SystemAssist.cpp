@@ -214,6 +214,27 @@ void AddShakeEffect(Chunk& a_chunk, Entity a_entity, float3 a_power, float3 a_am
 	}
 }
 
+void AddUIShakeEffect(Chunk& a_chunk, Entity a_entity, float2 a_basePos, float2 a_power, float2 a_amp, float a_maxShakeTime, float a_maxStopTime, float a_rate)
+{
+	ComponentHandle<UIShake> uiShake = a_chunk.GetComponent<UIShake>(a_entity);
+	if (uiShake.IsValid())
+	{
+		uiShake->basePos = a_basePos;
+		uiShake->shakePower = a_power;
+		uiShake->shakeAmplitude = a_amp;
+		uiShake->maxShakeTime = a_maxShakeTime;
+		uiShake->maxStopTime = a_maxStopTime;
+		uiShake->phaseElapsed = 0.0f;
+		uiShake->shakeElapsed = 0.0f;
+		uiShake->isShaking = true;
+		uiShake->decayRate = a_rate;
+	}
+	else
+	{
+		a_chunk.AddComponent(a_entity, UIShake(a_basePos, a_power, a_amp, a_maxShakeTime, a_maxStopTime, a_rate));
+	}
+}
+
 void SafeDeleteEffectEntity(Chunk& a_chunk, Entity a_effect)
 {
 	// TODO Œã‚Å‚â‚é

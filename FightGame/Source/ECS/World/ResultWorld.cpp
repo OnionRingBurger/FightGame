@@ -15,7 +15,7 @@ ResultWorld::ResultWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisiti
 		a_serialize)
 	, worldRequest(a_worldRequest)
 {
-	a_input.RegisterKey("ChunkChange", VK_LBUTTON);
+	a_input.RegisterKey("ChunkChange", VK_SPACE);
 	a_input.RegisterButton("ChunkChange", XINPUT_GAMEPAD_A);
 }
 
@@ -133,6 +133,8 @@ void ResultWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRe
 	CameraViewSystem(a_chunk, a_context);
 	CreateEffectSystem(a_chunk, a_context);
 	FadeUISystem(a_chunk, a_context);
+
+	UIRailFlySystem(a_chunk, a_context);
 
 	// èIóπèàóù
 	LifeTimeSystem(a_chunk, a_context);

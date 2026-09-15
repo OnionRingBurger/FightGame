@@ -166,7 +166,8 @@ void MainGame::Init()
 		{kRedBossEntryKey, 0.3f},
 		{kDeadBrokenEffectKey, 0.5f},
 		{kBossDeadBrokenEffectKey, 0.8f},
-		{kPlayerHealKey, 0.8f}
+		{kPlayerHealKey, 0.8f},
+		{kWhiteBossEntryKey, 1.4f}
 	};
 
 

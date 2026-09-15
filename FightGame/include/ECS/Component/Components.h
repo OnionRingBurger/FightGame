@@ -174,7 +174,9 @@
 	X(CreateTutorialWindow) \
 	X(UITextBoxCursor) \
 	X(StageData) \
-	X(UnlockStageEntity)
+	X(UnlockStageEntity) \
+	X(UIShake) \
+	X(UIRailFly)
 
 
 using BitFlag = unsigned int;
@@ -2004,17 +2006,21 @@ namespace Component
 		int nextSprite;
 		int2 spriteUVCount;
 		bool isLoop;
+		float countStepTime;
+		float maxCountStepTime;
 
-		SpriteAnimation(int a_maxSprite, int2 a_spriteUVCount, bool a_isLoop, int a_startSprite = 0)
+		SpriteAnimation(int a_maxSprite, int2 a_spriteUVCount, bool a_isLoop, float a_maxCountStepTime, int a_startSprite = 0)
 			: spriteUVCount(a_spriteUVCount)
 			, maxSprite(a_maxSprite)
 			, isLoop(a_isLoop)
+			, maxCountStepTime(a_maxCountStepTime)
+			, countStepTime(0)
 			, nextSprite(a_startSprite)
 		{
 		}
 
 		SpriteAnimation()
-			: SpriteAnimation(1, int2(1, 1), false, 0)
+			: SpriteAnimation(1, int2(1, 1), false, 0, 0)
 		{
 		}
 	};
@@ -3680,6 +3686,83 @@ namespace Component
 		static constexpr TypeID kTypeId = 170;
 		static constexpr const char* kTypeName = "GameEndFlag";
 		static constexpr int kVersion = 0;
+	};
+
+	struct UIShake
+	{
+		static constexpr TypeID kTypeId = 171;
+		static constexpr const char* kTypeName = "UIShake";
+		static constexpr int kVersion = 0;
+
+		// UIÇÃãKíËç¿ïW
+		float2 basePos;
+		// êUìÆó 
+		float2 shakePower;
+		// êUìÆÉoÉâÉoÉâìx
+		float2 shakeAmplitude;
+		// êUìÆéûä‘
+		float maxShakeTime;
+		// í‚é~éûä‘
+		float maxStopTime;
+		// êiçsìx
+		float phaseElapsed;
+		float shakeElapsed;
+		bool isShaking;
+		// !!!New!!!
+		float decayRate;
+
+		UIShake(
+			float2 a_basePos,
+			float2 a_shakePower,
+			float2 a_shakeAmplitude,
+			float a_maxShakeTime,
+			float a_maxStopTime,
+			float a_decayRate)
+			: basePos(a_basePos)
+			, shakePower(a_shakePower)
+			, shakeAmplitude(a_shakeAmplitude)
+			, maxShakeTime(a_maxShakeTime)
+			, maxStopTime(a_maxStopTime)
+			, phaseElapsed(0.0f)
+			, shakeElapsed(0.0f)
+			, isShaking(true)
+			, decayRate(a_decayRate)
+		{
+		}
+
+		UIShake()
+			: UIShake(float2(), float2(1.0f, 1.0f), float2(1.0f, 1.0f), 0.0f, 0.0f, 0.5f)
+		{
+		}
+	};
+
+	struct UIRailFly
+	{
+		static constexpr TypeID kTypeId = 172;
+		static constexpr const char* kTypeName = "UIRailFly";
+		static constexpr int kVersion = 0;
+
+		// !!!New!!!
+		float2 basePos;
+		// !!!New!!!
+		float flyPow;
+		// !!!New!!!
+		float flyProgress;
+		// !!!New!!!
+		float flySpeed;
+
+		UIRailFly(float2 a_basePos, float a_flyPow, float a_flySpeed)
+			: basePos(a_basePos)
+			, flyPow(a_flyPow)
+			, flyProgress(0.0f)
+			, flySpeed(a_flySpeed)
+		{
+		}
+
+		UIRailFly()
+			: UIRailFly(float2(), 0.0f, 0.0f)
+		{
+		}
 	};
 };
 

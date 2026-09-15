@@ -44,9 +44,8 @@ LoadScene::LoadScene(
 	};
 
 	std::vector<std::string> useTextureDatas = {
-		"LoadMainCar",
-		"LoadRail",
-		"LoadWind"
+		"LoadSprite",
+
 	};
 
 	for (auto it : useModelDatas)

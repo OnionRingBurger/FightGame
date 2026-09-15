@@ -34,7 +34,8 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 
 
 	Entity titleLogo = newChunk.CreateNewEntity(
-		UIComponent("TitleLogo", float2(0.0f, 0.4f), float2(1.7f, 0.7f), 0.0f)
+		UIComponent("TitleLogo", float2(0.0f, 0.4f), float2(1.7f, 0.7f), 0.0f),
+		UIShake(float2(0.0f, 0.4f), float2(0.0005f, 0.0005f), float2(0.5f, 0.5f), 15.0f, 180.0f, 10.0f)
 	);
 
 	Entity titleCameraPoint = newChunk.CreateNewEntity(
@@ -271,6 +272,7 @@ void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 
 	UILerpSystem(a_chunk, a_context);
 	UVMoveSystem(a_chunk, a_context);
+	UIShakeSystem(a_chunk, a_context);
 
 	CursorSelectSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 	SoundSystem(a_chunk, a_context);

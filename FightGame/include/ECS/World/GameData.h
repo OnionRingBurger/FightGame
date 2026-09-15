@@ -43,6 +43,7 @@ constexpr const char* kRedBossEntryKey = "RedBossEntry.efkefc";
 constexpr const char* kDeadBrokenEffectKey = "DeadBroken.efkefc";
 constexpr const char* kBossDeadBrokenEffectKey = "BossDeadBroken.efkefc";
 constexpr const char* kPlayerHealKey = "Heal.efkefc";
+constexpr const char* kWhiteBossEntryKey = "WhiteBossEntry.efkefc";
 
 
 // GhostShader: カメラからの距離フェード（exp(-d/L) の L）

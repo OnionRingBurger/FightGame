@@ -52,6 +52,8 @@ void RegisterAllAttackSectorsFromAttackData(int a_circumferenceCount);
 
 void AddShakeEffect(Chunk& a_chunk, Entity a_entity, float3 a_power, float3 a_amp, float a_time, float a_rate);
 
+void AddUIShakeEffect(Chunk& a_chunk, Entity a_entity, float2 a_basePos, float2 a_power, float2 a_amp, float a_maxShakeTime, float a_maxStopTime, float a_rate);
+
 void SafeDeleteEffectEntity(Chunk& a_chunk, Entity a_effect);
 
 bool IsClearStage(int stageIndex);

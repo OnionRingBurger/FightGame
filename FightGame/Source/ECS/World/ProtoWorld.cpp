@@ -509,7 +509,6 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	CursorSelectSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 
 	// Effect系統を処理
-	CreateEffectSystem(a_chunk, a_context);
 	UVMoveSystem(a_chunk, a_context);
 	UILerpSystem(a_chunk, a_context);
 	StartUISystem(a_chunk, a_context);
@@ -518,6 +517,7 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	TrailSystem(a_chunk, a_context);
 	SpriteAnimationSystem(a_chunk, a_context);
 	HPGaugeSystem(a_chunk, a_context);
+	UIShakeSystem(a_chunk, a_context);
 	SoundSystem(a_chunk, a_context);
 	SpawnEfkEffectAreaSystem(a_chunk, a_context);
 	SpawnEfkEffectSystem(a_chunk, a_context);
@@ -526,6 +526,7 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	// ステージ読み込み
 	SpawnJsonSystem(a_chunk, a_context, a_serialize, a_aiManager);
 	PlayerHealSystem(a_chunk, a_context);
+	CreateEffectSystem(a_chunk, a_context);
 
 	// 終了処理
 	LifeTimeSystem(a_chunk, a_context);
