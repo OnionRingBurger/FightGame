@@ -12812,16 +12812,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -12832,6 +12822,16 @@
                         "newRotX": 0.0,
                         "newRotY": 0.0,
                         "newRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
                     }
                 },
                 {
@@ -12978,6 +12978,19 @@
                         "uvScaleY": 1.0,
                         "isActiv": true
                     }
+                },
+                {
+                    "typeId": 173,
+                    "virsion": 0,
+                    "typeName": "ControllerInputUIReplace",
+                    "data": {
+                        "keyboardUIKey": "RightClickUI",
+                        "controllerUIKey": "ButtonB",
+                        "keyboardUIScaleX": 0.07999999821186066,
+                        "keyboardUIScaleY": 0.14000000059604645,
+                        "controllerUIScaleX": 0.07999999821186066,
+                        "controllerUIScaleY": 0.14000000059604645
+                    }
                 }
             ]
         },
@@ -13021,6 +13034,19 @@
                         "progress": 0.0,
                         "min": 0.0,
                         "max": 1.0
+                    }
+                },
+                {
+                    "typeId": 173,
+                    "virsion": 0,
+                    "typeName": "ControllerInputUIReplace",
+                    "data": {
+                        "keyboardUIKey": "LeftClickUI",
+                        "controllerUIKey": "ButtonA",
+                        "keyboardUIScaleX": 0.07999999821186066,
+                        "keyboardUIScaleY": 0.14000000059604645,
+                        "controllerUIScaleX": 0.07999999821186066,
+                        "controllerUIScaleY": 0.14000000059604645
                     }
                 }
             ]
@@ -13083,16 +13109,6 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -13103,6 +13119,16 @@
                         "newRotX": 0.0,
                         "newRotY": 0.0,
                         "newRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
                     }
                 },
                 {
@@ -13173,6 +13199,19 @@
                         "target": -1,
                         "flag": 8
                     }
+                },
+                {
+                    "typeId": 173,
+                    "virsion": 0,
+                    "typeName": "ControllerInputUIReplace",
+                    "data": {
+                        "keyboardUIKey": "SpaceKeyUI",
+                        "controllerUIKey": "ButtonRB",
+                        "keyboardUIScaleX": 0.15600000321865082,
+                        "keyboardUIScaleY": 0.23999999463558197,
+                        "controllerUIScaleX": 0.12999999523162842,
+                        "controllerUIScaleY": 0.20000000298023224
+                    }
                 }
             ]
         },
@@ -13216,6 +13255,108 @@
                         "progress": 0.0,
                         "min": 0.0,
                         "max": 1.0
+                    }
+                },
+                {
+                    "typeId": 173,
+                    "virsion": 0,
+                    "typeName": "ControllerInputUIReplace",
+                    "data": {
+                        "keyboardUIKey": "EKeyUI",
+                        "controllerUIKey": "ButtonLB",
+                        "keyboardUIScaleX": 0.09099999815225601,
+                        "keyboardUIScaleY": 0.14000000059604645,
+                        "controllerUIScaleX": 0.12999999523162842,
+                        "controllerUIScaleY": 0.20000000298023224
+                    }
+                }
+            ]
+        },
+        {
+            "number": 7,
+            "components": [
+                {
+                    "typeId": 130,
+                    "virsion": 0,
+                    "typeName": "Name",
+                    "data": {
+                        "name": "TargetUI"
+                    }
+                },
+                {
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
+                    "data": {
+                        "key": "TargetUI",
+                        "uiPosX": 0.6949999928474426,
+                        "uiPosY": 0.5,
+                        "uiScaleX": 0.25,
+                        "uiScaleY": 0.14000000059604645,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
+                    }
+                },
+                {
+                    "typeId": 39,
+                    "virsion": 0,
+                    "typeName": "FadeUI",
+                    "data": {
+                        "fadeType": 0,
+                        "fadeSpeed": 0.10000000149011612,
+                        "progress": 0.0,
+                        "min": 0.0,
+                        "max": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "number": 8,
+            "components": [
+                {
+                    "typeId": 130,
+                    "virsion": 0,
+                    "typeName": "Name",
+                    "data": {
+                        "name": "TargetKey"
+                    }
+                },
+                {
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
+                    "data": {
+                        "key": "RightStick",
+                        "uiPosX": 0.9020000100135803,
+                        "uiPosY": 0.5199999809265137,
+                        "uiScaleX": 0.12999999523162842,
+                        "uiScaleY": 0.20000000298023224,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
+                    }
+                },
+                {
+                    "typeId": 173,
+                    "virsion": 0,
+                    "typeName": "ControllerInputUIReplace",
+                    "data": {
+                        "keyboardUIKey": "MouseMove",
+                        "controllerUIKey": "RightStick",
+                        "keyboardUIScaleX": 0.12999999523162842,
+                        "keyboardUIScaleY": 0.20000000298023224,
+                        "controllerUIScaleX": 0.12999999523162842,
+                        "controllerUIScaleY": 0.20000000298023224
                     }
                 }
             ]

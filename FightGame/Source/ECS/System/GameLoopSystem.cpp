@@ -270,6 +270,10 @@ void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context,
 	Entity movieSpawn = a_chunk.CreateNewEntity(
 		SpawnJson("ClearMovie", 80.0f, kClearWorldPosition)
 	);
+
+	Entity fade = a_chunk.CreateNewEntity(
+		CreateEffect(WHITEWAVESTART, float2(), 0.0f, 500.0f)
+	);
 }
 
 
@@ -349,5 +353,9 @@ void CheckClearTutorialSystem(Chunk& a_chunk, const SystemContext& a_context, IS
 
 	Entity movieSpawn = a_chunk.CreateNewEntity(
 		SpawnJson("ClearMovie", 80.0f, kClearWorldPosition)
+	);
+
+	Entity fade = a_chunk.CreateNewEntity(
+		CreateEffect(WHITEWAVESTART, float2(), 0.0f, 500.0f)
 	);
 }

@@ -157,7 +157,10 @@ void MainGame::Init()
 		"SpaceKeyUI",
 		"EKeyUI",
 		"LeftClickUI",
-		"RightClickUI"
+		"RightClickUI",
+		"RightStick",
+		"MouseMove",
+		"TargetUI"
 	};
 
 	effectDatas =
