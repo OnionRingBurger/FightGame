@@ -134,7 +134,7 @@ bool Input::IsRegisterButtonPress(std::string a_type) const
 
 bool Input::IsUseController() const
 {
-	return true;
+	return isControllerConnected;
 }
 
 bool Input::IsRegisterPress(std::string a_type) const
@@ -219,6 +219,7 @@ void Input::UpdateControllerInput()
 	// isGetController = XInputGetKeystroke(0, 0, &currentStroke) == ERROR_SUCCESS;
 	isGetController = true;
 	std::optional<XINPUT_STATE> stateOpt = GetController();
+	isControllerConnected = stateOpt.has_value();
 	if (stateOpt == std::nullopt)
 	{
 		m_leftAxis = Axis(0.0f, 0.0f, 0.0f);

@@ -324,6 +324,10 @@ Chunk TutorialWorld::CreateNewChunk(AIManager& a_aiManager)
 		EfkEffectKey(kSnowEffect, true)  // ƒ‹[ƒvÄ¶
 	);
 
+	Entity configUI = newChunk.CreateNewEntity(
+		SpawnJson("GameControllerUI", 0.0f, float3())
+	);
+
 	PlaySound(LoadSound("Assets/Sound/gamebgm.mp3", true));
 
 	return newChunk;
@@ -410,6 +414,7 @@ void TutorialWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, System
 
 	// EffectŒn“‚ğˆ—
 	CreateTutorialTextSystem(a_chunk, a_context);
+	ControllerInputUISystem(a_chunk, a_context);
 	UITextBoxCursorSystem(a_chunk, a_context);
 	UVMoveSystem(a_chunk, a_context);
 	UILerpSystem(a_chunk, a_context);

@@ -10,6 +10,7 @@
 #include "PlayerSystem.h"
 #include "GameLoopSystem.h"
 #include "EffectSystem.h"
+#include "ControllerInputUISystem.h"
 #include "ImGuiSystem.h"
 #include "ItemSystem.h"
 #include "RailSystem.h"

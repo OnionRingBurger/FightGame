@@ -378,6 +378,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		SpawnJson("GameControllerUI", 0.0f, float3())
 	);
 
+
 	return newChunk;
 
 }
@@ -513,6 +514,7 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	CursorSelectSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 
 	// EffectŒn“‚ğˆ—
+	ControllerInputUISystem(a_chunk, a_context);
 	UVMoveSystem(a_chunk, a_context);
 	UILerpSystem(a_chunk, a_context);
 	StartUISystem(a_chunk, a_context);

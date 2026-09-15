@@ -153,7 +153,11 @@ void MainGame::Init()
 		"Yellow",
 		"Mizore",
 		"WaveFadeMask_A",
-		"AttackUI"
+		"AttackUI",
+		"SpaceKeyUI",
+		"EKeyUI",
+		"LeftClickUI",
+		"RightClickUI"
 	};
 
 	effectDatas =

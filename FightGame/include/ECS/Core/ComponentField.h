@@ -1167,6 +1167,17 @@ namespace ComponentSystem
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(ControllerInputUIReplace& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("keyboardUIKey", component.keyboardUIKey, std::string(""));
+		valueFunc("controllerUIKey", component.controllerUIKey, std::string(""));
+		valueFunc("keyboardUIScaleX", component.keyboardUIScale.x, 0.0f);
+		valueFunc("keyboardUIScaleY", component.keyboardUIScale.y, 0.0f);
+		valueFunc("controllerUIScaleX", component.controllerUIScale.x, 0.0f);
+		valueFunc("controllerUIScaleY", component.controllerUIScale.y, 0.0f);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
 	inline void ApplyToFields(DropUI& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
 		int size = static_cast<int>(component.playSounds.size());

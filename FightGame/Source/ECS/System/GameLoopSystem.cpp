@@ -173,7 +173,7 @@ void CheckAliveTargetGameOverSystem(Chunk& a_chunk, const SystemContext& a_conte
 	Entity yes = a_chunk.CreateNewEntity(
 		UIComponent("Yes", float2(-0.402f, -0.805f), float2(0.3f, 0.3f), 0.0f, 1.0f),
 		SelectBox(float2(-0.4f, -0.8f), float2(0.3f, 0.25f) * 1.1f),
-		SelectPlayCommand(SELECT_ALLSELECT_DELETE | SELECT_PLAYSOUND | SELECT_CREATEEFFECT | SELECT_CHANGESCENE, "Proto", 160.0f, WHITEMINIFADE_UP, "", "", 0.0f, 0)
+		SelectPlayCommand(SELECT_ALLSELECT_DELETE | SELECT_PLAYSOUND | SELECT_CREATEEFFECT | SELECT_CHANGESCENE, "Proto", 160.0f, WHITEMINIFADE_UP, "stageclear", "", 0.0f, 0)
 	);
 
 

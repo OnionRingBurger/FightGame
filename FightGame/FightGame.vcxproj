@@ -247,6 +247,7 @@
     <ClInclude Include="include\AI\AttackRangeCheck.h" />
     <ClInclude Include="include\AI\UseBestDamageAttackAction.h" />
     <ClInclude Include="include\DataManager\FontFileLoadCache.h" />
+    <ClInclude Include="include\ECS\System\ControllerInputUISystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\DataManager\AssimpModelLorder.cpp" />
@@ -364,6 +365,7 @@
     <ClCompile Include="Source\AI\AttackRangeCheck.cpp" />
     <ClCompile Include="Source\AI\UseBestDamageAttackAction.cpp" />
     <ClCompile Include="Source\DataManager\FontFileLoadCache.cpp" />
+    <ClCompile Include="Source\ECS\System\ControllerInputUISystem.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

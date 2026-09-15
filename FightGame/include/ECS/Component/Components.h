@@ -176,7 +176,8 @@
 	X(StageData) \
 	X(UnlockStageEntity) \
 	X(UIShake) \
-	X(UIRailFly)
+	X(UIRailFly) \
+	X(ControllerInputUIReplace)
 
 
 using BitFlag = unsigned int;
@@ -3761,6 +3762,36 @@ namespace Component
 
 		UIRailFly()
 			: UIRailFly(float2(), 0.0f, 0.0f)
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct ControllerInputUIReplace
+	{
+		static constexpr TypeID kTypeId = 173;
+		static constexpr const char* kTypeName = "ControllerInputUIReplace";
+		static constexpr int kVersion = 0;
+
+		std::string keyboardUIKey;
+		std::string controllerUIKey;
+		float2 keyboardUIScale;
+		float2 controllerUIScale;
+
+		ControllerInputUIReplace()
+			: ControllerInputUIReplace("", "", float2(), float2())
+		{
+		}
+
+		ControllerInputUIReplace(
+			std::string a_keyboardUIKey,
+			std::string a_controllerUIKey,
+			float2 a_keyboardUIScale,
+			float2 a_controllerUIScale)
+			: keyboardUIKey(a_keyboardUIKey)
+			, controllerUIKey(a_controllerUIKey)
+			, keyboardUIScale(a_keyboardUIScale)
+			, controllerUIScale(a_controllerUIScale)
 		{
 		}
 	};

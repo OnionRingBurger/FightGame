@@ -87,6 +87,7 @@ private:
 	float2 oldMousePos;
 	XINPUT_KEYSTROKE currentStroke;
 	bool isGetController;
+	bool isControllerConnected = false;
 
 	BOOL isGetCursorPos;
 	BYTE g_keyTable[256];
