@@ -152,7 +152,8 @@ void MainGame::Init()
 		"Azuki",
 		"Yellow",
 		"Mizore",
-		"WaveFadeMask_A"
+		"WaveFadeMask_A",
+		"AttackUI"
 	};
 
 	effectDatas =

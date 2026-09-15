@@ -132,6 +132,11 @@ bool Input::IsRegisterButtonPress(std::string a_type) const
 	return IsButtonPress(buttonMap.at(a_type));
 }
 
+bool Input::IsUseController() const
+{
+	return true;
+}
+
 bool Input::IsRegisterPress(std::string a_type) const
 {
 	

@@ -374,6 +374,10 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		CreateEffect(WHITEWAVEEND, float2(0.0f, 0.0f), 0.0f, 0.0f)
 	);
 
+	Entity configUI = newChunk.CreateNewEntity(
+		SpawnJson("GameControllerUI", 0.0f, float3())
+	);
+
 	return newChunk;
 
 }

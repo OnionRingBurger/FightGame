@@ -12708,5 +12708,517 @@
                 }
             ]
         }
+    ],
+    "GameControllerUI": [
+        {
+            "number": 0,
+            "components": [
+                {
+                    "typeId": 130,
+                    "virsion": 0,
+                    "typeName": "Name",
+                    "data": {
+                        "name": "AttackUI"
+                    }
+                },
+                {
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
+                    "data": {
+                        "key": "AttackUI",
+                        "uiPosX": 0.6949999928474426,
+                        "uiPosY": 0.699999988079071,
+                        "uiScaleX": 0.25,
+                        "uiScaleY": 0.14000000059604645,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
+                    }
+                },
+                {
+                    "typeId": 39,
+                    "virsion": 0,
+                    "typeName": "FadeUI",
+                    "data": {
+                        "fadeType": 0,
+                        "fadeSpeed": 0.10000000149011612,
+                        "progress": 0.0,
+                        "min": 0.0,
+                        "max": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "number": 1,
+            "components": [
+                {
+                    "typeId": 130,
+                    "virsion": 0,
+                    "typeName": "Name",
+                    "data": {
+                        "name": "JumpUI"
+                    }
+                },
+                {
+                    "typeId": 12,
+                    "virsion": 0,
+                    "typeName": "Position",
+                    "data": {
+                        "x": 0.0,
+                        "y": 1.0,
+                        "z": 0.0
+                    }
+                },
+                {
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
+                    "data": {
+                        "key": "JumpUI",
+                        "uiPosX": 0.7099999785423279,
+                        "uiPosY": 0.8999999761581421,
+                        "uiScaleX": 0.23000000417232513,
+                        "uiScaleY": 0.14000000059604645,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
+                    }
+                },
+                {
+                    "typeId": 103,
+                    "virsion": 0,
+                    "typeName": "MotionResult",
+                    "data": {
+                        "posOffsetX": 0.0,
+                        "posOffsetY": 0.0,
+                        "posOffsetZ": 0.0,
+                        "rotOffsetX": 0.0,
+                        "rotOffsetY": 0.0,
+                        "rotOffsetZ": 0.0,
+                        "isWarp": false,
+                        "warpPosX": 0.0,
+                        "warpPosY": 0.0,
+                        "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 102,
+                    "virsion": 0,
+                    "typeName": "FixedResult",
+                    "data": {
+                        "newPosX": 0.0,
+                        "newPosY": 0.0,
+                        "newPosZ": 0.0,
+                        "newRotX": 0.0,
+                        "newRotY": 0.0,
+                        "newRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                },
+                {
+                    "typeId": 13,
+                    "virsion": 1,
+                    "typeName": "Rotation",
+                    "data": {
+                        "pitch": 0.0,
+                        "yaw": 0.0,
+                        "roll": 0.0
+                    }
+                },
+                {
+                    "typeId": 101,
+                    "virsion": 0,
+                    "typeName": "MotionTransform",
+                    "data": {
+                        "motionPosX": 0.0,
+                        "motionPosY": 1.0,
+                        "motionPosZ": 0.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 1.0,
+                        "posZ": 0.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 104,
+                    "virsion": 0,
+                    "typeName": "EphemeralResult",
+                    "data": {
+                        "posOffsetX": 0.0,
+                        "posOffsetY": 0.0,
+                        "posOffsetZ": 0.0,
+                        "rotOffsetX": 0.0,
+                        "rotOffsetY": 0.0,
+                        "rotOffsetZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 72,
+                    "virsion": 0,
+                    "typeName": "PosePosState",
+                    "data": {
+                        "state": 3
+                    }
+                },
+                {
+                    "typeId": 45,
+                    "virsion": 0,
+                    "typeName": "FollowPosition",
+                    "data": {
+                        "offsetX": 0.0,
+                        "offsetY": 0.800000011920929,
+                        "offsetZ": 0.0,
+                        "target": -1,
+                        "flag": 8
+                    }
+                }
+            ]
+        },
+        {
+            "number": 2,
+            "components": [
+                {
+                    "typeId": 130,
+                    "virsion": 0,
+                    "typeName": "Name",
+                    "data": {
+                        "name": "GuardUI"
+                    }
+                },
+                {
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
+                    "data": {
+                        "key": "GuardUI",
+                        "uiPosX": 0.2800000011920929,
+                        "uiPosY": 0.8999999761581421,
+                        "uiScaleX": 0.25999999046325684,
+                        "uiScaleY": 0.14000000059604645,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
+                    }
+                },
+                {
+                    "typeId": 39,
+                    "virsion": 0,
+                    "typeName": "FadeUI",
+                    "data": {
+                        "fadeType": 0,
+                        "fadeSpeed": 0.10000000149011612,
+                        "progress": 0.0,
+                        "min": 0.0,
+                        "max": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "number": 3,
+            "components": [
+                {
+                    "typeId": 130,
+                    "virsion": 0,
+                    "typeName": "Name",
+                    "data": {
+                        "name": "AttackKey1"
+                    }
+                },
+                {
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
+                    "data": {
+                        "key": "ButtonB",
+                        "uiPosX": 0.8600000143051147,
+                        "uiPosY": 0.699999988079071,
+                        "uiScaleX": 0.07999999821186066,
+                        "uiScaleY": 0.14000000059604645,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
+                    }
+                }
+            ]
+        },
+        {
+            "number": 4,
+            "components": [
+                {
+                    "typeId": 130,
+                    "virsion": 0,
+                    "typeName": "Name",
+                    "data": {
+                        "name": "AttackKey2"
+                    }
+                },
+                {
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
+                    "data": {
+                        "key": "ButtonA",
+                        "uiPosX": 0.9399999976158142,
+                        "uiPosY": 0.699999988079071,
+                        "uiScaleX": 0.07999999821186066,
+                        "uiScaleY": 0.14000000059604645,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
+                    }
+                },
+                {
+                    "typeId": 39,
+                    "virsion": 0,
+                    "typeName": "FadeUI",
+                    "data": {
+                        "fadeType": 0,
+                        "fadeSpeed": 0.10000000149011612,
+                        "progress": 0.0,
+                        "min": 0.0,
+                        "max": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "number": 5,
+            "components": [
+                {
+                    "typeId": 130,
+                    "virsion": 0,
+                    "typeName": "Name",
+                    "data": {
+                        "name": "JumpKey"
+                    }
+                },
+                {
+                    "typeId": 12,
+                    "virsion": 0,
+                    "typeName": "Position",
+                    "data": {
+                        "x": 0.0,
+                        "y": 1.0,
+                        "z": 0.0
+                    }
+                },
+                {
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
+                    "data": {
+                        "key": "ButtonRB",
+                        "uiPosX": 0.9100000262260437,
+                        "uiPosY": 0.8999999761581421,
+                        "uiScaleX": 0.12999999523162842,
+                        "uiScaleY": 0.20000000298023224,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
+                    }
+                },
+                {
+                    "typeId": 103,
+                    "virsion": 0,
+                    "typeName": "MotionResult",
+                    "data": {
+                        "posOffsetX": 0.0,
+                        "posOffsetY": 0.0,
+                        "posOffsetZ": 0.0,
+                        "rotOffsetX": 0.0,
+                        "rotOffsetY": 0.0,
+                        "rotOffsetZ": 0.0,
+                        "isWarp": false,
+                        "warpPosX": 0.0,
+                        "warpPosY": 0.0,
+                        "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 102,
+                    "virsion": 0,
+                    "typeName": "FixedResult",
+                    "data": {
+                        "newPosX": 0.0,
+                        "newPosY": 0.0,
+                        "newPosZ": 0.0,
+                        "newRotX": 0.0,
+                        "newRotY": 0.0,
+                        "newRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                },
+                {
+                    "typeId": 13,
+                    "virsion": 1,
+                    "typeName": "Rotation",
+                    "data": {
+                        "pitch": 0.0,
+                        "yaw": 0.0,
+                        "roll": 0.0
+                    }
+                },
+                {
+                    "typeId": 101,
+                    "virsion": 0,
+                    "typeName": "MotionTransform",
+                    "data": {
+                        "motionPosX": 0.0,
+                        "motionPosY": 1.0,
+                        "motionPosZ": 0.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 1.0,
+                        "posZ": 0.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 104,
+                    "virsion": 0,
+                    "typeName": "EphemeralResult",
+                    "data": {
+                        "posOffsetX": 0.0,
+                        "posOffsetY": 0.0,
+                        "posOffsetZ": 0.0,
+                        "rotOffsetX": 0.0,
+                        "rotOffsetY": 0.0,
+                        "rotOffsetZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 72,
+                    "virsion": 0,
+                    "typeName": "PosePosState",
+                    "data": {
+                        "state": 3
+                    }
+                },
+                {
+                    "typeId": 45,
+                    "virsion": 0,
+                    "typeName": "FollowPosition",
+                    "data": {
+                        "offsetX": 0.0,
+                        "offsetY": 0.800000011920929,
+                        "offsetZ": 0.0,
+                        "target": -1,
+                        "flag": 8
+                    }
+                }
+            ]
+        },
+        {
+            "number": 6,
+            "components": [
+                {
+                    "typeId": 130,
+                    "virsion": 0,
+                    "typeName": "Name",
+                    "data": {
+                        "name": "GuardKey"
+                    }
+                },
+                {
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
+                    "data": {
+                        "key": "ButtonRB",
+                        "uiPosX": 0.5,
+                        "uiPosY": 0.8999999761581421,
+                        "uiScaleX": 0.12999999523162842,
+                        "uiScaleY": 0.20000000298023224,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
+                    }
+                },
+                {
+                    "typeId": 39,
+                    "virsion": 0,
+                    "typeName": "FadeUI",
+                    "data": {
+                        "fadeType": 0,
+                        "fadeSpeed": 0.10000000149011612,
+                        "progress": 0.0,
+                        "min": 0.0,
+                        "max": 1.0
+                    }
+                }
+            ]
+        }
     ]
 }

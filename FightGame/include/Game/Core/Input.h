@@ -54,6 +54,8 @@ public:
 	bool IsRegisterKeyPress(std::string) const;
 	bool IsRegisterButtonPress(std::string) const;
 
+	bool IsUseController() const;
+
 	
 private:
 	std::optional<XINPUT_STATE> GetController();
