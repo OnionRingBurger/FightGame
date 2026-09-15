@@ -123,12 +123,12 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 		case WHITEFADE_CLEAR:
 			Entity whiteFadeClear = a_chunk.CreateNewEntity(
 				UIComponent("WhiteFade", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
-				FadeUI(FADE_DOWN, 0.015f)
+				FadeUI(FADE_DOWN, 0.03f)
 			);
 
 			Entity whiteBackClear = a_chunk.CreateNewEntity(
 				UIComponent("WhiteFadeBack", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
-				FadeUI(FADE_DOWN, 0.009f)
+				FadeUI(FADE_DOWN, 0.0225f)
 			);
 
 			break;

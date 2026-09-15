@@ -159,6 +159,9 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		SpawnJson("TitleCursor", 0.0f, float3())
 	);
 
+	Entity effect = newChunk.CreateNewEntity(
+		CreateEffect(WHITEFADE_CLEAR)
+	);
 
 	PlaySound(LoadSound("Assets/Sound/title.mp3", true));
 	return newChunk;
@@ -278,8 +281,8 @@ void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	SoundSystem(a_chunk, a_context);
 
 	CameraViewSystem(a_chunk, a_context);
-	CreateEffectSystem(a_chunk, a_context);
 	FadeUISystem(a_chunk, a_context);
+	CreateEffectSystem(a_chunk, a_context);
 
 	// èIóπèàóù
 	LifeTimeSystem(a_chunk, a_context);
