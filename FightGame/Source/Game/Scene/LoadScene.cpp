@@ -31,6 +31,7 @@ LoadScene::LoadScene(
 	, effectJobQueue(a_effectJobQueue)
 	, textFormatJobQueue(a_textFormatJobQueue)
 	, textUIJobQueue(a_textUIJobQueue)
+	, uiCache(a_uiCache)
 	, modelDatas(a_modelDatas)
 	, textureDatas(a_textureDatas)
 	, effectDatas(a_effectDatas)
@@ -87,6 +88,15 @@ void LoadScene::Update()
 	RemoveIfFlaged(useDataLoadEndFlags);
 	if (useDataLoadEndFlags.empty() && !inited)
 	{
+		// !!!New!!!
+		for (const auto& it : textUIDatas)
+		{
+			if (uiCache.GetTextFormat(it.formatKey) == nullptr)
+			{
+				return;
+			}
+		}
+
 		inited = true;
 
 		// 各モデル、テクスチャをロード予約して終了フラグを保持
@@ -114,7 +124,9 @@ void LoadScene::Update()
 		for (auto it : textUIDatas)
 		{
 			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-			textUIJobQueue.Push(std::move(TextUILoadJob(it.key, it.text, it.formatKey, it.width, it.height, endFlag)));
+			// !!!New!!!
+			ComPtr<IDWriteTextFormat> format = uiCache.GetTextFormat(it.formatKey);
+			textUIJobQueue.Push(std::move(TextUILoadJob(it.key, it.text, it.formatKey, it.width, it.height, endFlag, format)));
 			loadEndFlags.push_back(endFlag);
 		}
 	}

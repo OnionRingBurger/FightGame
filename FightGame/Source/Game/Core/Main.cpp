@@ -190,12 +190,13 @@ void MainGame::Init()
 		{ "TutorialClear1", L"よくやった！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialAttack2", L"攻撃には発生が早く、使い勝手の良い弱攻撃と\n火力が高く、範囲が広い強攻撃の二種類が存在する。", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialAttack3", L"一方的に攻撃できる距離では強攻撃が、お互いの攻撃が\n当たる距離では敵を弾く弱攻撃が有効だ！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "TutorialCursor1", L"攻撃は狙っている敵の方向へ向かう。\n狙う敵をうまく選べば巻き込んで攻撃を当てられるぞ！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialEnemy", L"敵の種類の攻撃はジャンプやガードで防げるぞ！\n隙をついて上手く反撃しよう！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialEnemy2", L"一部の敵は特定の間合いでガードやジャンプで\n防ぎきるのが難しい攻撃を放ってくる", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "TutorialEnemy3", L"そんな敵と戦うときは、相手の間合いを避け、有利な立ち位置で戦おう！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "Phase1", L"よくやった！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "Phase2", L"ある程度強い敵を倒すとHPが回復するぞ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "TutorialClear", L"実戦ではより強い敵が現れる、\n間合いを意識して戦うことを忘れるな！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "Phase2", L"ある程度敵を倒し切るとHPが回復するぞ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
+		{ "TutorialClear", L"素晴らしい！実戦ではより強い敵が現れる、\n間合いを意識して戦うことを忘れるな！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
 		{ "GameStart", L"Start", "DefaultFormat", 96.0f * 5.0f, 96.0f},
 		{ "Tutorial", L"Tutorial", "DefaultFormat", 96.0f * 5.0f, 96.0f }
 
@@ -368,7 +369,7 @@ void MainGame::LoadLoopUpdate()
 	while (!textFormatResultQueue.IsEnpty())
 	{
 		TextFormatLoadResult result;
-		if (textFormatResultQueue.TryPop(result))
+		if (textFormatResultQueue.TryPop(result) && result.format)
 		uiCache.RegisterTextFormat(result.key, result.format);
 	}
 
@@ -574,7 +575,7 @@ void MainGame::WorkerLoop(
 		{
 			TextFormatLoadJob textFormatJob = a_textFormatJobQueue.Pop();
 
-			TextFormatLoadResult textFormatResult = LoadFormat(textFormatJob, uiCache);
+			TextFormatLoadResult textFormatResult = LoadFormat(textFormatJob, fontFileLoadCache);
 			a_textFormatResultQueue.Push(std::move(textFormatResult));
 			if (textFormatJob.endFlagPointer)
 			{
@@ -586,7 +587,7 @@ void MainGame::WorkerLoop(
 		{
 			TextUILoadJob textUIJob = a_textUIJobQueue.Pop();
 
-			TextUILoadResult textUIResult = LoadTextUI(textUIJob, uiCache);
+			TextUILoadResult textUIResult = LoadTextUI(textUIJob);
 			a_textUIResultQueue.Push(std::move(textUIResult));
 			if (textUIJob.endFlagPointer)
 			{

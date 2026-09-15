@@ -10,6 +10,7 @@
 #include <queue>
 #include <condition_variable>
 #include <mutex>
+#include <utility>
 
 template<typename QueueDataType>
 class ThreadSafeQueue
@@ -55,7 +56,9 @@ inline void ThreadSafeQueue<QueueDataType>::Push(QueueDataType&& a_data)
 {
 	// Queue‚ğƒƒbƒN‚µ‚Äpush
 	std::unique_lock<std::mutex> lock(mutex);
-	queue.push(a_data);
+	queue.push(std::move(a_data));
+	// !!!New!!!
+	cond.notify_one();
 }
 
 template<typename QueueDataType>
@@ -85,5 +88,7 @@ inline QueueDataType ThreadSafeQueue<QueueDataType>::Pop()
 template<typename QueueDataType>
 inline bool ThreadSafeQueue<QueueDataType>::IsEnpty()
 {
+	// !!!New!!!
+	std::unique_lock<std::mutex> lock(mutex);
 	return queue.empty();
 }

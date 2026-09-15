@@ -48,6 +48,8 @@ private:
 	ThreadSafeQueue<EffectLoadJob>& effectJobQueue;
 	ThreadSafeQueue<TextFormatLoadJob>& textFormatJobQueue;
 	ThreadSafeQueue<TextUILoadJob>& textUIJobQueue;
+	// !!!New!!!
+	IUICacheAcquisition& uiCache;
 	std::vector<modelLoadData> modelDatas;
 	std::vector<std::string> textureDatas;
 	std::vector<effectLoadData> effectDatas;

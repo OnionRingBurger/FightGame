@@ -12,6 +12,7 @@
 #include "DebugConsole.h"
 // TODO ãÍì˜ÇÃçÙ
 #include "UICache.h"
+#include "FontFileLoadCache.h"
 #include <wrl/client.h>
 
 using modelLoadData = std::pair<std::string, float>;
@@ -145,6 +146,8 @@ struct TextUILoadJob
 	std::string formatKey;
 	float width;
 	float height;
+	// !!!New!!!
+	ComPtr<IDWriteTextFormat> format;
 
 	TextUILoadJob(
 		std::string a_key,
@@ -152,7 +155,8 @@ struct TextUILoadJob
 		std::string a_formatKey,
 		float a_width,
 		float a_height,
-		std::shared_ptr<std::atomic_bool> const a_endFlagPointer
+		std::shared_ptr<std::atomic_bool> const a_endFlagPointer,
+		ComPtr<IDWriteTextFormat> a_format
 	)
 		: key(a_key)
 		, text(a_text)
@@ -160,6 +164,7 @@ struct TextUILoadJob
 		, width(a_width)
 		, height(a_height)
 		, endFlagPointer(a_endFlagPointer)
+		, format(a_format)
 	{
 	}
 };
@@ -271,5 +276,5 @@ void LoadSound();
 ModelLoadResult LoadModel(const ModelLoadJob& job);
 TextureLoadResult LoadTexture(const TextureLoadJob& job);
 EffectLoadResult LoadEffect(const EffectLoadJob& job);
-TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job, const IUICacheAcquisition& a_cache);
-TextUILoadResult LoadTextUI(const TextUILoadJob& a_job, const IUICacheAcquisition& a_cache);
+TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job, FontFileLoadCache& a_fontFileCache);
+TextUILoadResult LoadTextUI(const TextUILoadJob& a_job);

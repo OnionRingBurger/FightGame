@@ -30,7 +30,8 @@ Chunk ResultWorld::CreateNewChunk(AIManager& a_aiManager)
 
 	Entity gameOverLogo = newChunk.CreateNewEntity(
 		UIComponent("GameOver", float2(0.0f, 0.4f), float2(1.5f, 1.2f), 0.0f, 0.0f),
-		FadeUI(FADE_UP, 0.01f)
+		FadeUI(FADE_UP, 0.01f),
+		UIRailFly(float2(0.0f, 0.4f), 0.025f, 0.01f)
 	);
 
 	Entity gameOverKeyLogo = newChunk.CreateNewEntity(

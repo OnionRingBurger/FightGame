@@ -161,11 +161,12 @@ Chunk TutorialWorld::CreateNewChunk(AIManager& a_aiManager)
 				{true, "TutorialClear1", false, ""},
 				{true, "TutorialAttack2", false, ""},
 				{true, "TutorialAttack3", true, "Tutorial1Phase2"},
-				{true, "TutorialEnemy", false, ""},
-				{true, "TutorialEnemy2", false, ""},
-				{true, "TutorialEnemy3", true, "Tutorial1Phase3"},
+				{true, "TutorialCursor1", true, "Tutorial1Phase3"},
 				{true, "Phase1", false, "PhaseClear"},
 				{true, "Phase2", true, "PhaseClear"},
+				{true, "TutorialEnemy", false, ""},
+				{true, "TutorialEnemy2", false, ""},
+				{true, "TutorialEnemy3", true, "Tutorial1Phase4"},
 				{true, "TutorialClear", false}
 			}
 
@@ -408,7 +409,6 @@ void TutorialWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, System
 	KnockbackSystem(a_chunk, a_context);
 
 	// Effect系統を処理
-	CreateEffectSystem(a_chunk, a_context);
 	CreateTutorialTextSystem(a_chunk, a_context);
 	UITextBoxCursorSystem(a_chunk, a_context);
 	UVMoveSystem(a_chunk, a_context);
@@ -426,6 +426,7 @@ void TutorialWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, System
 
 	// ステージ読み込み
 	SpawnJsonSystem(a_chunk, a_context, a_serialize, a_aiManager);
+	CreateEffectSystem(a_chunk, a_context);
 
 	// 終了処理
 	LifeTimeSystem(a_chunk, a_context);

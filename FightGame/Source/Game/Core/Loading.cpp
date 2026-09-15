@@ -144,7 +144,7 @@ void LoadSound()
 {
 }
 
-TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job, const IUICacheAcquisition& a_cache)
+TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job, FontFileLoadCache& a_fontFileCache)
 {
 	IDWriteFactory* factory = GetDWriteFactory();
 
@@ -183,7 +183,7 @@ TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job, const IUICacheAc
 			return TextFormatLoadResult();
 		}
 
-		ComPtr<IDWriteFontFile> fontFile = a_cache.GetTextFontFile(a_job.fontFile);
+		ComPtr<IDWriteFontFile> fontFile = a_fontFileCache.GetFontFile(a_job.fontFile);
 		if (fontFile == nullptr)
 		{
 			if (!CanOpenFontFile(fullPath))
@@ -194,10 +194,11 @@ TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job, const IUICacheAc
 			{
 				return TextFormatLoadResult();
 			}
+			// !!!New!!!
+			a_fontFileCache.RegisterFontFile(a_job.fontFile, fontFile);
 		}
 		else
 		{
-			DebugMessage("FontLoad[Cache] hit");
 		}
 		if (!AddFontFileWithLog(builder1.Get(), fontFile.Get()))
 		{
@@ -274,10 +275,16 @@ TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job, const IUICacheAc
 	);
 }
 
-TextUILoadResult LoadTextUI(const TextUILoadJob& a_job, const IUICacheAcquisition& a_cache)
+TextUILoadResult LoadTextUI(const TextUILoadJob& a_job)
 {
 	auto* writeFactory = GetDWriteFactory();
-	ComPtr<IDWriteTextFormat> format = a_cache.GetTextFormat(a_job.formatKey).Get();
+	// !!!New!!!
+	ComPtr<IDWriteTextFormat> format = a_job.format;
+	if (format == nullptr)
+	{
+		DebugMessage("TextUILoad[Format] is null");
+		return TextUILoadResult();
+	}
 	HRESULT hr;
 
 	ComPtr<IDWriteTextLayout> textLayout;
@@ -355,8 +362,6 @@ TextUILoadResult LoadTextUI(const TextUILoadJob& a_job, const IUICacheAcquisitio
 	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
 	hr = texture->Create(DXGI_FORMAT_B8G8R8A8_UNORM, a_job.width, a_job.height, data);
 
-
-	lock->Release();
 
 	if (FAILED(hr))
 	{

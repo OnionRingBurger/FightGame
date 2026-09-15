@@ -10,6 +10,7 @@
 #include "World.h"
 #include "ModelCache.h"
 #include "UICache.h"
+#include "FontFileLoadCache.h"
 #include "EffectCache.h"
 #include "IScene.h"
 
@@ -105,6 +106,8 @@ private:
 
 	ModelCache modelCache;
 	UICache uiCache;
+	// !!!New!!!
+	FontFileLoadCache fontFileLoadCache;
 	EffectCache effectCache;
 	Input input;
 	ComponentsSerialize serialize;

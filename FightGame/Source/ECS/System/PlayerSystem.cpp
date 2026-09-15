@@ -107,6 +107,8 @@ void PlayerHealSystem(Chunk& a_chunk, const SystemContext& a_context)
 			EfkEffectKey(kPlayerHealKey, false)
 		);
 
+		PlaySound(LoadSound("Assets/Sound/heal.mp3"));
+
 		// ‰ñ•œEntity‚ğíœ
 		a_chunk.DeleteChunkEntity(it);
 	}
