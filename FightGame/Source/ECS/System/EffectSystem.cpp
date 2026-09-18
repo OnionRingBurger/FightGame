@@ -116,11 +116,11 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 				FadeUI(FADE_UP, 0.006f)
 			);
 
-
 			break;
 		}
 
 		case WHITEFADE_CLEAR:
+		{
 			Entity whiteFadeClear = a_chunk.CreateNewEntity(
 				UIComponent("WhiteFade", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
 				FadeUI(FADE_DOWN, 0.03f)
@@ -132,6 +132,7 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 			);
 
 			break;
+		}
 
 		case WHITEMINIFADE_UP:
 		{
@@ -147,8 +148,8 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 			break;
 		}
-
 		case WHITEMINIFADE_CLEAR:
+		{
 			Entity whiteMiniFadeClear = a_chunk.CreateNewEntity(
 				UIComponent("WhiteFade", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
 				FadeUI(FADE_DOWN, 0.08f)
@@ -160,9 +161,11 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 			);
 
 			break;
+		}
 
 
 		case DARKFADE_UP:
+		{
 			Entity darkFadeMini = a_chunk.CreateNewEntity(
 				UIComponent("DarkFadeMini", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 0.0f),
 				FadeUI(FADE_UP, 0.005f)
@@ -171,9 +174,12 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 				UIComponent("DarkFade", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 0.0f),
 				FadeUI(FADE_UP, 0.004f)
 			);
+
 			break;
+		}
 
 		case DARKFADE_CLEAR:
+		{
 			Entity darkFadeMiniClear = a_chunk.CreateNewEntity(
 				UIComponent("DarkFadeMini", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
 				FadeUI(FADE_DOWN, 0.02f)
@@ -182,23 +188,31 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 				UIComponent("DarkFade", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
 				FadeUI(FADE_DOWN, 0.006f)
 			);
-			break;
 
+			break;
+		}
 		case SPEEDLINEFADE:
+		{
 			Entity speedLine = a_chunk.CreateNewEntity(
 				UIComponent("Speedline", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
 				FadeUI(FADE_DOWN, 0.05f)
 			);
+
 			break;
+		}
 
 		case SHOTFLASH:
+		{
 			Entity shotFlash = a_chunk.CreateNewEntity(
 				UIComponent("WhiteFade", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
 				FadeUI(FADE_DOWN, 0.08f)
 			);
+
 			break;
+		}
 
 		case DAMAGE_EFFECT:
+		{
 			Entity damageEffect = a_chunk.CreateNewEntity(
 				UIComponent("DamageEffect", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
 				FadeUI(FADE_DOWN, 0.04f)
@@ -208,17 +222,22 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 				UIComponent("Speedline", float2(0.0f, 0.0f) + posOffset, float2(2.7f, 2.7f), 0.0f + angleOffset, 1.0f),
 				FadeUI(FADE_DOWN, 0.1f)
 			);
-			
+
 			break;
+		}
 
 		case DAMAGE_DIRECTION:
+		{
 			Entity damageDirEffect = a_chunk.CreateNewEntity(
 				UIComponent("DamageDirectionEffect", float2(0.0f, 0.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
 				FadeUI(FADE_DOWN, 0.04f)
 			);
+
 			break;
+		}
 
 		case BATTLESTART:
+		{
 			Entity battleStart = a_chunk.CreateNewEntity(
 				UIComponent("BattleStart", float2(0.0f, 4.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
 				UIPosLerp(float2(0.0f, 2.0f) + posOffset, posOffset, 18.0f),
@@ -229,8 +248,10 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 			);
 
 			break;
+		}
 
 		case GAMECLEAR:
+		{
 			/*Entity gameClear = a_chunk.CreateNewEntity(
 				UIComponent("GameEnd", float2(0.0f, 4.0f) + posOffset, float2(2.0f, 2.0f), 0.0f + angleOffset, 1.0f),
 				UIPosLerp(float2(0.0f, 2.0f) + posOffset, posOffset, 40.0f),
@@ -270,8 +291,10 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 			);
 
 			break;
+		}
 
 		case STAGE_CLEAR_MOVIE:
+		{
 			Entity stageClear = a_chunk.CreateNewEntity(
 				Name("StageClear"),
 				MOVE_AND_TRANSFORM_COMPONENT(
@@ -286,7 +309,9 @@ void CreateEffectSystem(Chunk& a_chunk, const SystemContext& a_context)
 				RailFly(0.01f, 0.01f),
 				AngularVelocity(float3(0.1f, 0.0f, 0.0f))
 			);
+
 			break;
+		}
 
 		// !!!New!!!
 		case WHITEWAVESTART:

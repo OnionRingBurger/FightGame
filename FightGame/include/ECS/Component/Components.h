@@ -182,8 +182,9 @@
 
 using BitFlag = unsigned int;
 constexpr Entity kInvalidEntity = {
-	-1,
-	-1
+	static_cast<EntityID>(-1),
+	static_cast<EntityID>(-1)
+
 };
 
 
@@ -3695,13 +3696,13 @@ namespace Component
 		static constexpr const char* kTypeName = "UIShake";
 		static constexpr int kVersion = 0;
 
-		// UI‚Ì‹K’èÀ•W
+		// UI‚Ì‹K’èˆÊ’u
 		float2 basePos;
-		// U“®—Ê
+		// —h‚ê•
 		float2 shakePower;
-		// U“®ƒoƒ‰ƒoƒ‰“x
+		// —h‚êo‚µo‚µ•
 		float2 shakeAmplitude;
-		// U“®ŠÔ
+		// —h‚êŠÔ
 		float maxShakeTime;
 		// ’â~ŠÔ
 		float maxStopTime;

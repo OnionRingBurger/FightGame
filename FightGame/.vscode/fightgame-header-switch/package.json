@@ -1,0 +1,22 @@
+{
+  "name": "fightgame-header-switch",
+  "displayName": "FightGame Header/Source Switch",
+  "description": "Alt+O for include/ and Source/ mirror paths (clangd cannot map these).",
+  "version": "0.0.1",
+  "publisher": "fightgame-local",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "fightgame.switchHeaderSource",
+        "title": "FightGame: Switch Header/Source"
+      }
+    ]
+  }
+}

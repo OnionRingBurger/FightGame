@@ -20,4 +20,3 @@ protected:
 
 	std::function<void(std::string)> worldRequest;
 };
-

@@ -1,0 +1,12 @@
+[
+  {
+    "key": "alt+o",
+    "command": "-clangd.switchheadersource",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+o",
+    "command": "fightgame.switchHeaderSource",
+    "when": "editorTextFocus && (resourceLangId == c || resourceLangId == cpp || resourceLangId == cuda-cpp || resourceLangId == objective-c || resourceLangId == objective-cpp)"
+  }
+]

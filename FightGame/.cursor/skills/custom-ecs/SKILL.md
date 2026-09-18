@@ -1,26 +1,29 @@
 ---
 name: custom-ecs
-description: 自作ECS(共通基盤)の仕様とSystemの書き方。Chunk/Entity/ComponentView/ComponentHandle/SystemContextを使うコードの読み書き、Systemの新規作成、移動系(TransformSystem・Pose・MotionResultなど)の変更を行うときに使う。ECS、System、Component、Entity、移動・回転、座標更新に関する依頼で参照する。
+description: 自作ECS(共通基盤)の仕様とSystemの書き方?��?Chunk/Entity/ComponentView/ComponentHandle/SystemContextを使?��?コード�??��読み書き、Systemの新規作�??��、移動系(TransformSystem・Pose・MotionResult?��?)の変更を行うときに使?��??��?ECS、System、Component、Entity、移動�??��?��?、座標更新に関する依�??��で参�??��する?��?
 ---
 
 # 自作ECS
 
-自作のECS共通基盤。ヘッダは `include/ECS/` 配下（`Core` / `Component` / `System` / `World`）、実装は `Source/ECS/` 配下に同じ構成で配置される。
+自作�??��ECS共通基盤。�??���?ダは `include/ECS/` 配�?(`Core` / `Component` / `System` / `World`)、実�?は `Source/ECS/` 配下に同じ構�??��で配置される�?
 
-## 基本構造
+## 基本構�?
 
-- **Entity**: ID。`Chunk::CreateNewEntity(components...)` で生成する
-  - 無効（空）の Entity は `Components.h` に `constexpr Entity kInvalidEntity`（-1, -1）として定義済み。無効値が必要なときは必ずこれを使い、新たに空の Entity 定数や `{-1, -1}` のような即値を作らない
-- **Component**: `include/ECS/Component/Components.h` の `namespace Component` 内に定義された純粋なデータ構造体。各 struct は `kTypeId` / `kTypeName` / `kVersion` を持つ
-  - **新規 Component の追加位置**: 関連タグの隣や途中には挿まない。`namespace Component` 内の**既存定義の最後尾**（名前空間を閉じる直前）に追加する
-- **System**: `void FooSystem(Chunk& a_chunk, const SystemContext& a_context)` 形式の関数。ヘッダは `include/ECS/System/`、実装は `Source/ECS/System/`
-- **Chunk**: Entity と Component の実体。System は Chunk を受け取り、ComponentView / ComponentHandle で走査・読み書きする
-- **World**: `UpdateChunk` 内で System の呼び出し順を決める。World ごとに順序が異なることがある
+- **Entity**: ID。`Chunk::CreateNewEntity(components...)` で生�??��す�?
+  - 無効(空)のEntityは `Components.h` に `constexpr Entity kInvalidEntity`(-1, -1)として定義済み。無効値が�?要なとき�??��?��?ずこれを使?��?、新たに空のEntity定数?��? `{-1, -1}` のような即値を作らな?��?
+- **Component**: `include/ECS/Component/Components.h` の `namespace Component` ?��?に定義された純粋な?��?ータ構�?体。各structは `kTypeId` / `kTypeName` / `kVersion` を持つ
+  - **新?��? Component の追?��?位置**: 関連タグの隣?��?途中には挿まな?��?。`namespace Component` ?��?の**既存定義の最後尾**??��?��名前空間を閉じ?��? `}` の直前）に追?��?する
+  - `kTypeId` は既存�??��最大値の次を使?��?。途中の空き番号を埋めな?��???��?��末尾追?��?と?��?える??��?
+- **System**: `void FooSystem(Chunk& a_chunk, const SystemContext& a_context)` 形式�??��自由関数。状態を持たな?��?
+- **Chunk**: EntityとComponentの管?��??��?。SystemはChunk経由でComponentにアクセスする
+- **World**(`include/ECS/World/`): ?��?シーン(GameWorld?��?)がUpdate?��?でSystemを呼び出し�??に実行する�?**Systemの実行�??はWorldの呼び出し�??がすべて**
 
-## System の書き方
+## Systemの書き方
 
 ```cpp
-void ExampleSystem(Chunk& a_chunk, const SystemContext& a_context)
+using namespace Component;
+
+void FooSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
     ComponentView view = a_chunk.GetView<ComponentTypes<Foo, Bar>>();
 
@@ -35,56 +38,64 @@ void ExampleSystem(Chunk& a_chunk, const SystemContext& a_context)
 }
 ```
 
-- 複数 Component を持つ Entity だけを対象にする場合は `GetView<ComponentTypes<...>>()` を使う
-- 単一 Component の列挙は `GetHaveEntities()` 等、既存 System の先例に合わせる
+- **ComponentHandle の使?��??��?けが最重�?**:
+  - `handle->member` = 書き込み用。`operator->` は変更フラグ(version)を立てる�??��で?��?**読み取り?��?けなら使わな?��?**
+  - `handle.Look().member` = 読み取り専用。読む?��?けなら�?ずこち?��?
+  - Viewに含まれないEntity(ターゲ?��?ト�?)から取得した�??��合�??�� `IsValid()` を確認す?��?
+- 除外条件付きView: `GetView<ComponentTypes<A>, ComponentTypes<B>>()`(Bを持つEntityを除?��?)
+- `SystemContext` は `input`(入?��?)、`deltaTime`、`effectStepTime`、`modelCache` / `uiCache` 等を持つ
+- 角度は**度数?��?**で保持し、行�??��計算時に `RAD` を掛けてラジアン化する。`Rotation` は pitch/yaw/roll
 
-## ComponentHandle の使い分け
+## 移動系パイプライン(TransformSystem周?��?)
 
-定義は `include/ECS/Core/ComponentStorage.h` の `ComponentHandle<T>`。
+座標�??��回転は直接 `Position` / `Rotation` を書き換えず?��?**Resultコンポ�??��ネントに書き込み、後段のPoseSystem系が合成す?��?**?��?
 
-| 操作 | 方法 | 用途 |
-|------|------|------|
-| 書き込み | `handle->member = ...` | 値を変更する（dirty フラグが立つ） |
-| 読み取り | `handle.Look().member` | 参照のみ（変更しない） |
-| 有効確認 | `handle.IsValid()` | 取得失敗時は必ず確認してから使う |
+### 3種のResult + ?��?積用Component
 
-- 読み取りだけなのに `->` を使わない（不要な dirty を避ける）
-- テンプレート経由の定義ジャンプは意図とずれることがある。実体は `ComponentStorage.h` を参照する
+| Component | 役割 | 書き込む?��? |
+|---|---|---|
+| `FixedResult` (newPos/newRot) | 絶対座標�??��絶対角度の決?��? | Follow、Leap、Look、Rail |
+| `MotionResult` (posOffset/rotOffset, isWarp/warpPos) | そ�??��フレー?��?の移動�??��回転の差?��?。ワープ指定も可 | InputMove、InputRotato、MoveForward |
+| `EphemeralResult` (posOffset/rotOffset) | 1フレー?��?限りのオフセ?��??��?(揺れ�?) | Shake、Shaking |
+| `MotionTransform` (motionPos/motionRot) | MotionResultの差?��??��?**フレー?��?を跨?��?で?��??��?**する | PoseSystem系が更新するため基本?��?に直接書きこまな?��? |
 
-## 移動系パイプライン
+### 合�??��?��??��流れ(Source/ECS/System/TransformSystem.cpp)
 
-座標・回転の更新は **Position / Rotation を直接書き換えない**。Result 系 Component にオフセットや確定値を書き、最後に `TransformSystem` が合成する。
+1. ?��?移動SystemがResultに書き込む
+2. `PoseSystem`: `Pose.pos = FixedResult.newPos + MotionTransform.motionPos(+= MotionResult.posOffset) + EphemeralResult.posOffset`。回転も同?��?(AngleLimitComponentによるクランプあ?��?)。`MotionResult.isWarp` 時�??�� warpPos との差?��??��? motionPos に反映
+3. `LatePoseSystem`: カメラ・追従系など後で確定させたいEntityのPoseを同じ式で決?��?
+4. `TransformSystem`: 全Entityの `Pose` ?��? `Position` / `Rotation` に反映(ApplyPoseToTransform)
+5. `ResetSystem`: Resultをリセ?��??��?
 
-| Component | 役割 |
-|-----------|------|
-| `FixedResult` | 確定位置・回転（`newPos` / `newRot` 等） |
-| `MotionResult` | フレーム内の移動・回転オフセット（`posOffset` / `rotOffset`） |
-| `EphemeralResult` | 一時的なオフセット（揺れ・演出など） |
-| `MotionTransform` | 合成結果の中間（Transform 系が参照） |
+早?��?/?��??��? の振り�??け�??�� `PosePosState` / `PoseRotState` のenum値で行う(RAIL・LEAP・NONEは先、CAMERA・FOLLOW・LOOK等�??��?��?延)?��?
 
-典型的な流れ:
+### Worldでの実行�??(GameWorld::UpdateChunk)
 
-1. 各 Move / Pose 系 System が `MotionResult` や `FixedResult` に書く
-2. `FollowTransformSystem` など遅延追従系が走る
-3. `TransformSystem` が Result を合成し、`Position` / `Rotation` / `MotionTransform` を更新する
+```text
+VelocitySystem ?��? Collider系
+?��? 移動系System群(InputMove, InputRotato, Flip, Look, MoveForward, Leap, Shaking, TrackingWarp, Rail, Fly, Shake)
+?��? PoseSystem
+?��? ?��?延系(FollowTransformSystem, CameraMoveSystem) ?��? LatePoseSystem
+?��? TransformSystem
+?��? Transform結果を使?��?System(Ray, Laser?��?) ?��? ResetSystem
+```
 
-World の `UpdateChunk` では、おおむね **Physics → Pose 入力 → 追従・Look → TransformSystem → Transform 依存 System** の順。具体順序は対象 World（`ProtoWorld.cpp` 等）を Read して合わせる。
+## 新しいSystemを追?��?すると?��?
 
-## 新しい System を追加するとき
+1. `include/ECS/System/FooSystem.h` と `Source/ECS/System/FooSystem.cpp` を作�??(cpp-file-pairスキルの規�?に従う)
+2. 移動に関わるSystemな?��? `Position` を直接書き換えず、上記�??��Resultコンポ�??��ネントに書き込む
+3. WorldのUpdate?��?の適?��?な位置(PoseSystemより前か後か)に呼び出しを追?��?する
+4. プロジェクト固有�??��追?��?手�??(System.hへのinclude追?��??��?)はプロジェクト�??��Rulesに従う
 
-1. `include/ECS/System/FooSystem.h` と `Source/ECS/System/FooSystem.cpp` をペアで作る（スキル `cpp-file-pair`）
-2. `System.h` に `#include "FooSystem.h"` を追記（Rule: `system-file-generation.mdc`）
-3. 対象 World の `UpdateChunk`（または `FixedUpdateChunk` 等）に呼び出しを追加 ? **World 編集は別途ユーザー承認が必要**
-4. `register-source.ps1` で vcxproj 登録
+## CreateNewEntity / Entity の Component ?��?
 
-## CreateNewEntity / Entity の Component 列
+- 既?��? Entity の Component 追?��?・削除・差し替え�??��、ユーザー?��? Component 名を明示したときだけ行う
+- 「AI登録」「World配線」「動くよ?��?にする」だけでは Component 列を変えな?��?。不足があれ�??��列挙して確認す?��?
+- プロジェク?��? Rules の `edit-approval`??��?Entity / CreateNewEntity 条?��???��?��に従う
 
-- `CreateNewEntity(...)` に渡す Component 列の追加・削除・差し替えは、ユーザーが **どの Component か名前で示したときだけ** 行う（Rule: `edit-approval`）
-- 「動くようにする」「登録する」だけでは Component 列の拡張許可にならない
-- マクロが `Components.h` 冒頭にあれば、個別列挙よりマクロを優先する（Rule: `component-macros.mdc`）
+## 新しい Component を追?��?すると?��?
 
-## 新しい Component を追加するとき
-
-1. `Components.h` の `namespace Component` **末尾**に struct を追加 ? **`Components.h` 編集は別途ユーザー承認が必要**
-2. シリアライズ等、既存の Component 追加先例（同種の Component）を Read して同じ経路で配線する
-3. System から `GetComponent` / `GetView` で参照する
+1. 定義は?��??��? [`include/ECS/Component/Components.h`](include/ECS/Component/Components.h) の `namespace Component` **末尾**に書く（類似 Component の隣への挿入はしな?��???��?
+2. `kTypeId` はファイル?��?の既存最大 TypeID の次番号を割り当て?��?
+3. `Components.h` は要承認ファイル。編?��?前に対象ファイル名と追?��? Component 名を出して承認を得る
+4. 新規まとまりにはユーザールールどおり `!!!New!!!` を残す。既存コメント�??��消さな?��?
