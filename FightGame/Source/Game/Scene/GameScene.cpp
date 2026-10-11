@@ -21,7 +21,8 @@ GameScene::GameScene(
 	// !!!New!!!
 	std::function<void(bool)> a_setFixedCursor,
 	Input& a_input,
-	ComponentsSerialize& a_serialize)
+	ComponentsSerialize& a_serialize,
+	PrefabManager& a_prefabManager)
 	: state(GAMESCENE_DEFAULT)
 	, isMouseLock(true)
 	, sceneChangeRequest(a_sceneChangeRequest)
@@ -33,6 +34,7 @@ GameScene::GameScene(
 	, resetFPSRequest(a_resetFPSRequest)
 	, setFixedCursor(a_setFixedCursor)
 	, serialize(a_serialize)
+	, prefabManager(a_prefabManager)
 	, currentStage(1)
 {
 
@@ -168,7 +170,8 @@ bool GameScene::SetWorld(std::string a_key)
 			[this](std::string a_key) {WorldRequest(a_key); },
 			[this](int a_stage) {StageRequest(a_stage); },
 			input,
-			serialize
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();
@@ -182,7 +185,8 @@ bool GameScene::SetWorld(std::string a_key)
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
 			input,
-			serialize
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();
@@ -197,7 +201,8 @@ bool GameScene::SetWorld(std::string a_key)
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key);},
 			input,
-			serialize
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();
@@ -211,7 +216,8 @@ bool GameScene::SetWorld(std::string a_key)
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
 			input,
-			serialize
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();
@@ -225,7 +231,8 @@ bool GameScene::SetWorld(std::string a_key)
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
 			input,
-			serialize
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();
@@ -241,6 +248,7 @@ bool GameScene::SetWorld(std::string a_key)
 			[this](int a_stage) {StageRequest(a_stage); },
 			input,
 			serialize,
+			prefabManager,
 			currentStage
 		);
 
@@ -255,7 +263,8 @@ bool GameScene::SetWorld(std::string a_key)
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
 			input,
-			serialize
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();
@@ -269,7 +278,8 @@ bool GameScene::SetWorld(std::string a_key)
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
 			input,
-			serialize
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();

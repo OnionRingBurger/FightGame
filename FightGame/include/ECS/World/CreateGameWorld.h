@@ -8,7 +8,8 @@ public:
 		IEffectCacheAcquisition& a_effectCache,
 		std::function<void(int)> a_tutorialRequest,
 		Input& a_input, 
-		ComponentsSerialize& a_serialize
+		ComponentsSerialize& a_serialize,
+		PrefabManager& a_prefabManager
 	);
 	~CreateGameWorld() = default;
 

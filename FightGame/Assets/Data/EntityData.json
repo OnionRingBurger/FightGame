@@ -12812,6 +12812,16 @@
                     }
                 },
                 {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                },
+                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -12822,16 +12832,6 @@
                         "newRotX": 0.0,
                         "newRotY": 0.0,
                         "newRotZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
                     }
                 },
                 {
@@ -12984,7 +12984,7 @@
                     "virsion": 0,
                     "typeName": "ControllerInputUIReplace",
                     "data": {
-                        "keyboardUIKey": "RightClickUI",
+                        "keyboardUIKey": "LeftClickUI",
                         "controllerUIKey": "ButtonB",
                         "keyboardUIScaleX": 0.07999999821186066,
                         "keyboardUIScaleY": 0.14000000059604645,
@@ -13041,7 +13041,7 @@
                     "virsion": 0,
                     "typeName": "ControllerInputUIReplace",
                     "data": {
-                        "keyboardUIKey": "LeftClickUI",
+                        "keyboardUIKey": "RightClickUI",
                         "controllerUIKey": "ButtonA",
                         "keyboardUIScaleX": 0.07999999821186066,
                         "keyboardUIScaleY": 0.14000000059604645,
@@ -13109,6 +13109,16 @@
                     }
                 },
                 {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                },
+                {
                     "typeId": 102,
                     "virsion": 0,
                     "typeName": "FixedResult",
@@ -13119,16 +13129,6 @@
                         "newRotX": 0.0,
                         "newRotY": 0.0,
                         "newRotZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
                     }
                 },
                 {

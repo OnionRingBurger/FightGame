@@ -8,13 +8,14 @@
 
 using namespace Component;
 
-TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, std::function<void(int)> a_stageRequest, Input& a_input, ComponentsSerialize& a_serialize)
+TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, std::function<void(int)> a_stageRequest, Input& a_input, ComponentsSerialize& a_serialize, PrefabManager& a_prefabManager)
 	: World(a_modelCache,
 		a_uiCache,
 		a_effectCache,
 		a_tutorialRequest,
 		a_input,
-		a_serialize)
+		a_serialize,
+		a_prefabManager)
 	, worldRequest(a_worldRequest)
 	, stageRequest(a_stageRequest)
 {

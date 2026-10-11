@@ -6,7 +6,8 @@ CreateGameScene::CreateGameScene(
 	IUICacheAcquisition& uiCache,
 	IEffectCacheAcquisition& effectCache,
 	Input& a_input,
-	ComponentsSerialize& a_serialize)
+	ComponentsSerialize& a_serialize,
+	PrefabManager& a_prefabManager)
 {
 
 
@@ -16,7 +17,8 @@ CreateGameScene::CreateGameScene(
 		effectCache,
 		[this](int a_id) {},
 		a_input,
-		a_serialize
+		a_serialize,
+		a_prefabManager
 		);
 
 

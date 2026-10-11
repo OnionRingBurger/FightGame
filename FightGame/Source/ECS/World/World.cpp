@@ -3,6 +3,10 @@
 #include "System.h"
 #include "Sound.h"
 #include "GameData.h"
+#include <unordered_map>
+
+#include "Defines.h"
+#include <fstream>
 
 
 ////////////////////////////////
@@ -17,8 +21,10 @@ World::World(
 	IEffectCacheAcquisition& effectCache,
 	std::function<void(int)> a_tutorialRequest,
 	Input& a_input, 
-	ComponentsSerialize& a_serialize)
-	: systemResponse()
+	ComponentsSerialize& a_serialize,
+	PrefabManager& a_prefabManager)
+	: prefabManager(a_prefabManager)
+	, systemResponse()
 	, m_state(USECHUNK)
 	, isMouseLock(true)
 	, context(a_modelCache, a_uiCache, effectCache, a_tutorialRequest, a_input) // TODO System側が勝手にリクエストを触れないようにする
@@ -56,6 +62,19 @@ void World::InitWorld()
 
 	ContextUpdate(0.01f);
 	InitChunk(chunk, context, *systemResponse, aiManager, serialize);
+
+	// ファイルを読み込む
+	std::ifstream stream(kDataPath);
+	nlohmann::json json;
+	stream >> json;
+
+	std::string name = "Stage1Phase1";
+	prefabManager.CreatePrefabScene(name);
+	std::vector<EntityPrefab> vec = LoadPrefab(json, serialize, name);
+	for (auto it : vec)
+	{
+		prefabManager.AddPrefab(name, it);
+	}
 }
 
 void World::InitResponse(std::unique_ptr<SystemResponse>& response)
@@ -129,17 +148,32 @@ void World::DrawWorld()
 	// System処理
 	DrawSystem(chunk, context);
 
-	chunk.CleanupFrame();
 	FrameEnd();
 
 }
 
 void World::FrameEnd()
 {
+	chunk.CleanupFrame();
+
 	if (systemResponse == nullptr) return;
 	HandleSystemResponse(*systemResponse);
 
+	RequestSpawn();
+
 	systemResponse->ResetRequest();
+}
+
+void World::RequestSpawn()
+{
+	for(auto incomingRequest : systemResponse->GetEntitySpawnRequests())
+	{	
+		EntitySpawnRequest requestData;
+		prefabManager.TryGetPrefabScene(incomingRequest.key, requestData);
+	
+		std::vector<Entity> entities = spawnPort.AddEntities(chunk, requestData);
+		SpawnPostProcessing(entities, chunk, aiManager, incomingRequest);
+	}
 }
 
 //////////////////////////////
@@ -188,6 +222,10 @@ void World::UpdateIMGUI(Chunk& a_chunk, SystemContext& a_context)
 void World::HandleSystemResponse(SystemResponse& a_response)
 {
 
+}
+
+void World::SpawnPostProcessing(const std::vector<Entity>& entities, Chunk& a_chunk, AIManager& a_aiManager, const SpawnRequest& a_request)
+{
 }
 
 

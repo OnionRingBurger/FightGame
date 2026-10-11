@@ -111,6 +111,8 @@ private:
 	EffectCache effectCache;
 	Input input;
 	ComponentsSerialize serialize;
+	// !!!New!!!
+	PrefabManager prefabManager;
 	std::queue<std::string> sceneChangeQueue;
 	std::thread loadWorker;
 

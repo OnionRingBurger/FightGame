@@ -57,6 +57,17 @@ void SystemResponse::ResetRequest()
 {
 	worldRequest = "";
 	isWorldRequest = false;
+	entitySpawnRequests.clear();
+}
+
+void SystemResponse::AddEntitySpawnRequest(SpawnRequest a_spawnRequest)
+{
+	entitySpawnRequests.push_back(std::move(a_spawnRequest));
+}
+
+const std::vector<SpawnRequest>& SystemResponse::GetEntitySpawnRequests() const
+{
+	return entitySpawnRequests;
 }
 
 bool SystemResponse::IsWorldRequest()

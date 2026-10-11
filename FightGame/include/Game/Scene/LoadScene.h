@@ -28,7 +28,8 @@ public:
 		IUICacheAcquisition& a_uiCache,
 		IEffectCacheAcquisition& effectCache,
 		Input& a_input,
-		ComponentsSerialize& a_serialize);
+		ComponentsSerialize& a_serialize,
+		PrefabManager& a_prefabManager);
 
 	~LoadScene() = default;
 	void AdvanceUpdate(float dt) override;

@@ -44,6 +44,7 @@ MainGame::MainGame()
 // TODO ランダムになっていないので修正
 void MainGame::Init()
 {
+	TestRegisterComponentType(serialize);
 
 	// DirectX初期化	
 	pRTV = GetDefaultRTV();
@@ -57,7 +58,7 @@ void MainGame::Init()
 
 	// TODO 処理中にMain側が終了しDirectXがUninitされると壊れるため修正する
 	runningLoadLoop = true;
-	// Load用ループを開始
+	// Load用ループを開始、内部で参照に対して右辺値を渡すことになるため、std::refを使用	
 	loadWorker = std::thread(
 		&MainGame::WorkerLoop,
 		this,
@@ -215,7 +216,6 @@ void MainGame::Init()
 	input.RegisterKey("GameEnd", VK_ESCAPE);
 	input.RegisterKey("DebugConsole", VK_F1);
 	
-	TestRegisterComponentType(serialize);
 	
 	// Soundの初期化
 	InitSound();
@@ -634,7 +634,8 @@ bool MainGame::ChangeScene(std::string a_key)
 			uiCache,
 			effectCache,
 			input,
-			serialize
+			serialize,
+			prefabManager
 		);
 
 		modelDatas.clear();
@@ -666,7 +667,8 @@ bool MainGame::ChangeScene(std::string a_key)
 				isFixedCursor = a_isFixed;
 			},
 			input,
-			serialize
+			serialize,
+			prefabManager
 		);
 	}
 	else if (a_key == "End")
@@ -686,7 +688,8 @@ bool MainGame::ChangeScene(std::string a_key)
 			uiCache,
 			effectCache,
 			input,
-			serialize
+			serialize,
+			prefabManager
 		);
 	}
 	else

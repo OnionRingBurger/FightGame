@@ -14,13 +14,15 @@ CreateGameWorld::CreateGameWorld(IModelCacheAcquisition& a_modelCache,
 	IEffectCacheAcquisition& a_effectCache,
 	std::function<void(int)> a_tutorialRequest,
 	Input& a_input,
-	ComponentsSerialize& a_serialize) :
+	ComponentsSerialize& a_serialize,
+	PrefabManager& a_prefabManager) :
 	World(a_modelCache,
 		a_uiCache,
 		a_effectCache,
 		a_tutorialRequest,
 		a_input,
-		a_serialize
+		a_serialize,
+		a_prefabManager
 	),
 	name(startWorld),
 	isSave(false),

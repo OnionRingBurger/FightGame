@@ -8,7 +8,7 @@ template<typename Component>
 void JsonAddComponent(Entity a_entity, Chunk& a_chunk, const nlohmann::json& a_json, const ComponentsSerialize& a_serialize, const EntityMap& a_entityMap);
 const void* GetIdComponent(TypeID a_id, Chunk& a_chunk, Entity a_entity);
 
-using ComponentData = std::any;
+using SerializeComponentData = std::any;
 
 
 // 渡されたコンポーネントIDに対応する型をSerializeに登録する
@@ -80,7 +80,7 @@ ComponentsSerialize::ComponentsSerialize()
 
 }
 
-ComponentData ComponentsSerialize::GetData(TypeID a_id, const nlohmann::json& a_json, const EntityMap& a_entityMap) const
+SerializeComponentData ComponentsSerialize::GetData(TypeID a_id, const nlohmann::json& a_json, const EntityMap& a_entityMap) const
 {
 	// Tag等のデータが存在しないコンポーネントがあるためデータが存在するか確認
 	if (a_json.contains(kJsonDataPath) && !a_json[kJsonDataPath].is_null())
@@ -172,6 +172,41 @@ template<typename Component>
 void JsonAddComponent(Entity a_entity, Chunk& a_chunk, const nlohmann::json& a_json, const ComponentsSerialize& a_serialize, const EntityMap& a_entityMap)
 {
 	a_chunk.AddComponent(a_entity, std::any_cast<Component>(a_serialize.GetData(a_json["typeId"], a_json, a_entityMap)));
+}
+
+std::vector<EntityPrefab> LoadPrefab(const nlohmann::json& a_json, const ComponentsSerialize& a_serialize, std::string a_key)
+{
+	std::vector<EntityPrefab> ret;
+
+	std::unordered_map<int, int> numberMap;
+
+	// 予めすべての	Entityを作成
+	EntityMap entityMap;
+	for (auto itEntity : a_json[a_key])
+	{
+		int number = itEntity["number"];
+		Entity newEntity = Entity{ (size_t)number, 0 };
+		entityMap[number] = newEntity;
+		numberMap.insert({number, ret.size()});
+		ret.push_back(EntityPrefab(newEntity, std::vector<ComponentData>()));
+
+	}
+
+
+	// 作成したエンティティにコンポーネントを追加
+	for (auto itEntity : a_json[a_key])
+	{
+		int number = itEntity["number"];
+		for (auto itComponents : itEntity["components"])
+		{
+			const TypeID typeId = static_cast<TypeID>(itComponents.value(kJsonTypeIdPath, static_cast<int>(kNotEntity)));
+			SerializeComponentData data = a_serialize.GetData(itComponents["typeId"], itComponents, entityMap);
+
+			ret.at(numberMap.at(number)).haveComponents.push_back(ComponentData(typeId,data));
+		}
+	}
+
+	return ret;
 }
 
 #undef COMPONENT_TYPE_LIST

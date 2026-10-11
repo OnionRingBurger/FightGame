@@ -248,6 +248,8 @@
     <ClInclude Include="include\AI\UseBestDamageAttackAction.h" />
     <ClInclude Include="include\DataManager\FontFileLoadCache.h" />
     <ClInclude Include="include\ECS\System\ControllerInputUISystem.h" />
+    <ClInclude Include="include\ECS\Core\EntitySpawnPort.h" />
+    <ClInclude Include="include\ECS\Core\PrefabManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\DataManager\AssimpModelLorder.cpp" />
@@ -366,6 +368,8 @@
     <ClCompile Include="Source\AI\UseBestDamageAttackAction.cpp" />
     <ClCompile Include="Source\DataManager\FontFileLoadCache.cpp" />
     <ClCompile Include="Source\ECS\System\ControllerInputUISystem.cpp" />
+    <ClCompile Include="Source\ECS\Core\EntitySpawnPort.cpp" />
+    <ClCompile Include="Source\ECS\Core\PrefabManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

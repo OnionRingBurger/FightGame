@@ -9,7 +9,8 @@ public:
 		std::function<void(int)> a_tutorialRequest,
 		std::function<void(std::string)> a_worldRequest,
 		Input& a_input,
-		ComponentsSerialize& a_serialize);
+		ComponentsSerialize& a_serialize,
+		PrefabManager& a_prefabManager);
 
 protected:
 	virtual Chunk CreateNewChunk(AIManager& a_aiManager) override;

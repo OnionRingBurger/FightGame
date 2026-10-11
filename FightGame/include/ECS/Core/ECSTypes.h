@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <map>
+#include <any>
 #include "MathAssist.h"
 
 using EntityID = size_t;
@@ -51,5 +52,41 @@ private:
 	float rotation[3][3];
 	float3 scale;
 };
+
+// Componentを保存するための構造体
+struct ComponentData
+{
+	TypeID id;
+	std::any componrnt;
+
+	ComponentData(TypeID a_id, std::any a_component)
+	: id( a_id)
+	, componrnt(a_component)
+	{
+	}
+};
+
+// Prefab本体
+struct EntityPrefab
+{
+	// データを保持し、Entity同士の対応を持たせるための仮想Entityデータ
+	Entity entity;
+	// 全ての保持コンポーネント
+	std::vector<ComponentData> haveComponents;
+
+	EntityPrefab(Entity a_entity, const std::vector<ComponentData>& a_haveComponents)
+	: entity(a_entity)
+	, haveComponents((a_haveComponents))
+	{
+	}
+
+};
+
+struct EntitySpawnRequest
+{
+	std::vector<EntityPrefab> prefabs;
+};
+
+
 
 using EntityMap = std::map<int, Entity>;

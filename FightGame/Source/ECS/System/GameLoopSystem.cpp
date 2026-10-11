@@ -210,7 +210,8 @@ void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context,
 		if (spawner.Look().spawnName.empty()) continue;
 		spawn = true;
 		
-		NewSceneSpawn(a_serialize, a_chunk, a_aiManager, spawner.Look().spawnName.at(0), kDefaultWorldPosition);
+		// NewSceneSpawn(a_serialize, a_chunk, a_aiManager, spawner.Look().spawnName.at(0), kDefaultWorldPosition);
+		a_systemResponse.AddEntitySpawnRequest(SpawnRequest("Stage1Phase1", kDefaultWorldPosition));
 		std::vector<std::string> tmp;
 		for (int i = 1; i < spawner.Look().spawnName.size(); i++)
 		{

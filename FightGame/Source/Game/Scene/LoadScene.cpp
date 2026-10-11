@@ -23,7 +23,8 @@ LoadScene::LoadScene(
 	IUICacheAcquisition& a_uiCache,
 	IEffectCacheAcquisition& effectCache,
 	Input& a_input,
-	ComponentsSerialize& a_serialize)
+	ComponentsSerialize& a_serialize,
+	PrefabManager& a_prefabManager)
 	: sceneChange(a_sceneChange)
 	, inited(false)
 	, modelJobQueue(a_modelJobQueue)
@@ -70,7 +71,7 @@ LoadScene::LoadScene(
 		useDataLoadEndFlags.push_back(endFlag);
 	}
 
-	world = std::make_unique<LoadWorld>(a_modelCache, a_uiCache, effectCache, a_input, a_serialize);
+	world = std::make_unique<LoadWorld>(a_modelCache, a_uiCache, effectCache, a_input, a_serialize, a_prefabManager);
 	world->InitWorld();
 	// ÉçÅ[Éhó Çï€éù
 	maxLoadCount = (int)loadEndFlags.size();

@@ -13,7 +13,8 @@ public:
 		IUICacheAcquisition& uiCache,
 		IEffectCacheAcquisition& a_effectCache,
 		Input& a_input,
-		ComponentsSerialize& a_serialize);
+		ComponentsSerialize& a_serialize,
+		PrefabManager& a_prefabManager);
 	void AdvanceUpdate(float dt) override;
 	void Update() override;
 	void Draw() override;

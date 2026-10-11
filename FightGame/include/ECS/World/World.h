@@ -19,6 +19,8 @@
 #include "IEffectCacheAcquisition.h"
 #include "AI/AIManager.h"
 #include "ComponentsSerialize.h"
+#include "EntitySpawnPort.h"
+#include "PrefabManager.h"
 
 enum WorldState
 {
@@ -39,7 +41,8 @@ public:
 		IEffectCacheAcquisition& effectCache,
 		std::function<void(int)> tutorialRequest,
 		Input& a_input,
-		ComponentsSerialize& a_serialize);
+		ComponentsSerialize& a_serialize,
+		PrefabManager& a_prefabManager);
 	~World();
 
 	void InitWorld();
@@ -59,17 +62,22 @@ private:
 	void InitContext();
 	void FrameEnd();
 
+	void RequestSpawn();
+
+	// Še‹@”\
 	Chunk chunk;
-	// !!!New!!!
 	AIManager aiManager;
+	EntitySpawnPort spawnPort;
+	PrefabManager& prefabManager;
 	std::unique_ptr<SystemResponse> systemResponse;
+	// World‚ÌState“™
 	WorldState m_state;
 	bool isMouseLock;
 	SystemContext context;
 	bool isGameEnd;
 	bool allLoadModel = false;
-	// !!!New!!!
 	float aiTickAccum = 0.0f;
+
 
 	ComponentsSerialize& serialize;
 
@@ -82,7 +90,6 @@ protected:
 
 	virtual void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize);
 
-	// !!!New!!!
 	virtual void InitAI(AIManager& a_aiManager);
 
 	virtual Chunk CreateNewChunk(AIManager& a_aiManager);
@@ -93,6 +100,7 @@ protected:
 
 	virtual void HandleSystemResponse(SystemResponse& a_response);
 
+	virtual void SpawnPostProcessing(const std::vector<Entity>& entities, Chunk& a_chunk, AIManager& a_aiManager, const SpawnRequest& a_request);
 };
 
 #endif // !

@@ -322,7 +322,7 @@ void AddGameBind(Input& a_input)
 	a_input.RegisterKey("RightAttack", MK_RBUTTON);
 	a_input.RegisterKey("LeftAttack", MK_LBUTTON);
 	a_input.RegisterKey("Jump", VK_SPACE);
-	a_input.RegisterKey("Guard", 'E');
+	a_input.RegisterKey("Guard", VK_SHIFT);
 
 
 	a_input.RegisterButton("RightAttack", XINPUT_GAMEPAD_B);

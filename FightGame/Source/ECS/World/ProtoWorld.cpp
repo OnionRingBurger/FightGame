@@ -15,13 +15,14 @@
 #include <fstream>
 #include <vector>
 
-ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, std::function<void(int)> a_stageRequest, Input& a_input, ComponentsSerialize& a_serialize, int a_stage)
+ProtoWorld::ProtoWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, std::function<void(int)> a_stageRequest, Input& a_input, ComponentsSerialize& a_serialize, PrefabManager& a_prefabManager, int a_stage)
 	: World(a_modelCache,
 		a_uiCache,
 		a_effectCache,
 		a_tutorialRequest,
 		a_input,
-		a_serialize
+		a_serialize,
+		a_prefabManager
 	)
 	, worldRequest(a_worldRequest)
 	, stageRequest(a_stageRequest)
@@ -185,27 +186,6 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 	);
 
 
-
-		//Entity ButtonUIA = newChunk.CreateNewEntity(
-		//	UIComponent("ButtonLB", float2(-0.93f, -0.88f), float2(0.15f * 0.8f, 0.275f * 0.8f), 0.0f)
-		//);
-
-		//Entity GuardUI = newChunk.CreateNewEntity(
-		//	UIComponent("GuardUI", float2(-0.75f, -0.88f), float2(0.28f * 0.8f, 0.22f * 0.8f), 0.0f)
-		//);
-
-
-		//Entity ButtonUIB = newChunk.CreateNewEntity(
-		//	UIComponent("ButtonRB", float2(-0.93f, -0.65f), float2(0.15f * 0.8f, 0.275f * 0.8f), 0.0f)
-		//);
-
-		//Entity JumpUI = newChunk.CreateNewEntity(
-		//	UIComponent("JumpUI", float2(-0.73f, -0.65f), float2(0.35f * 0.8f, 0.22f * 0.8f), 0.0f)
-		//);
-
-
-
-// #define CAMERA_3RD
 
 #ifdef CAMERA_3RD
 	Entity cameraRig = newChunk.CreateNewEntity(
@@ -395,6 +375,7 @@ void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 	//SectorCheckSystem(a_chunk, a_context);
 	//ColliderBackSystem(a_chunk, a_context);//o
 
+
 	// 物理挙動の結果に基づいてキャラクターのステートを決定する
 	GroundedSystem(a_chunk, a_context);
 	CharacterActionMaskSystem(a_chunk, a_context);
@@ -559,6 +540,68 @@ void ProtoWorld::HandleSystemResponse(SystemResponse& a_response)
 	if (!response.IsWorldRequest()) return;
 
 	worldRequest(response.GetWorldRequest());
+}
+
+void ProtoWorld::SpawnPostProcessing(const std::vector<Entity>& entities, Chunk& a_chunk, AIManager& a_aiManager, const SpawnRequest& a_request)
+{
+	for (auto it : entities)
+	{
+		ComponentHandle<LeapPosComponent> leap = a_chunk.GetComponent<LeapPosComponent>(it);
+		if (leap.IsValid())
+		{
+			leap->leapStartPos += a_request.offset;
+			leap->leapEndPos += a_request.offset;
+		}
+
+		ComponentHandle<MotionTransform> motion = a_chunk.GetComponent<MotionTransform>(it);
+		ComponentHandle<PosePosState> posState = a_chunk.GetComponent<PosePosState>(it);
+		if (!motion.IsValid() || posState.IsValid()) continue;
+		motion->motionPos += a_request.offset;
+
+		ComponentHandle<EnemyTag> enemyTag = a_chunk.GetComponent<EnemyTag>(it);
+		if (!enemyTag.IsValid()) continue;
+
+
+		ComponentHandle<AttackKeyLoad> keyLoad = a_chunk.GetComponent<AttackKeyLoad>(it);
+		if (keyLoad.IsValid())
+		{
+			std::ifstream stream(kAttackDataPath);
+			if (!stream.is_open()) continue;
+			nlohmann::json json;
+			stream >> json;
+			AttackStatus status;
+			for (auto attackIt : keyLoad.Look().attackKeys)
+			{
+				status.attackPowers.push_back(
+					AttackPower(
+						json[attackIt].value("MinLength", 0.0f),
+						json[attackIt].value("MaxLength", 0.0f),
+						json[attackIt].value("Angle", 0.0f),
+						json[attackIt].value("MaxHeight", 0.0f),
+						json[attackIt].value("MaxLowness", 0.0f),
+						json[attackIt].value("DamageValue", 0.0f),
+						json[attackIt].value("MotionTime", 0.0f),
+						json[attackIt].value("LifeTime", 0.0f),
+						float3(
+							json[attackIt].value("FollowOffsetX", 0.0f),
+							json[attackIt].value("FollowOffsetY", 0.0f),
+							json[attackIt].value("FollowOffsetZ", 0.0f)
+						),
+						json[attackIt].value("WaitTime", 0.0f),
+						json[attackIt].value("StartupTime", 0.0f),
+						attackIt,
+						json[attackIt].value("EndWithOwnerAction", true))
+
+				);
+
+			}
+
+			a_chunk.AddComponent(it, status);
+			a_chunk.DeleteChunkComponent(it, AttackKeyLoad::kTypeId);
+			a_aiManager.RegisterAI(it, "Enemy");
+
+		}
+	}
 }
 
 

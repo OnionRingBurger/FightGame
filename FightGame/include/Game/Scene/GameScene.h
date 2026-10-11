@@ -16,7 +16,8 @@ public:
 		std::function<void()> a_resetFPSRequest,
 		std::function<void(bool)> a_setFixedCursor,
 		Input& a_input,
-		ComponentsSerialize& a_serialize
+		ComponentsSerialize& a_serialize,
+		PrefabManager& a_prefabManager
 	);
 	~GameScene() = default;
 	void AdvanceUpdate(float dt) override;
@@ -57,6 +58,8 @@ private:
 
 	Input& input;
 	ComponentsSerialize& serialize;
+	// !!!New!!!
+	PrefabManager& prefabManager;
 
 	//! シーン切り替え用のリクエスト
 	std::function<void(std::string)> sceneChangeRequest;

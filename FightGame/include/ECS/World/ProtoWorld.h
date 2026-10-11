@@ -12,6 +12,7 @@ public:
 		std::function<void(int)> a_stageRequest,
 		Input& a_input,
 		ComponentsSerialize& a_serialize,
+		PrefabManager& a_prefabManager,
 		int a_stage);
 
 protected:
@@ -26,6 +27,8 @@ protected:
 	virtual void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize) override;
 
 	virtual void HandleSystemResponse(SystemResponse& a_response) override;
+
+	virtual void SpawnPostProcessing(const std::vector<Entity>& entities, Chunk& a_chunk, AIManager& a_aiManager, const SpawnRequest& a_request) override;
 
 	std::function<void(std::string)> worldRequest;
 	std::function<void(int)> stageRequest;

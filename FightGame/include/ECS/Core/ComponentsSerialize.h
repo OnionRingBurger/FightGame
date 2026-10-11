@@ -94,8 +94,8 @@ public:
 	ComponentsSerialize();
 	~ComponentsSerialize() = default;
 	// any_castで元に戻す
-	using ComponentData = std::any;
-	using DeserializeFunc = std::function<ComponentData(const nlohmann::json&, const EntityMap&)>;
+	using SerializeComponentData = std::any;
+	using DeserializeFunc = std::function<SerializeComponentData(const nlohmann::json&, const EntityMap&)>;
 	using SerializeFunc = std::function<nlohmann::ordered_json(const void*, const std::vector<Entity>&)>;
 
 	// TODO ここでセット側の情報を知らずに読み込んだファイルをセットしたい
@@ -104,7 +104,7 @@ public:
 		// 渡された型のidをキーとし、factoryにJsonとコンポーネント双方の切り替え機能を登録する
 
 		// Componentへ変換するラムダを登録
-		factory[a_id] = [](const nlohmann::json& a_json, const EntityMap& entityMap) -> ComponentData {
+		factory[a_id] = [](const nlohmann::json& a_json, const EntityMap& entityMap) -> SerializeComponentData {
 			return NewFromJson<T>(a_json, entityMap);
 			};
  
@@ -117,7 +117,7 @@ public:
 	}
 
 	// Jsonからコンポーネントを生成する。
-	ComponentData GetData(TypeID a_id, const nlohmann::json& a_json, const EntityMap& a_entityMap) const;
+	SerializeComponentData GetData(TypeID a_id, const nlohmann::json& a_json, const EntityMap& a_entityMap) const;
 	
 	// Component情報をJsonに保存して返す。
 	nlohmann::ordered_json CreateJson(TypeID a_id, const void* component, const std::vector<Entity>& entities) const;
@@ -132,3 +132,5 @@ void TestRegisterComponentType(ComponentsSerialize& a_serialize);
 std::vector<Entity> LoadJsonComponent(Chunk& a_chunk, const ComponentsSerialize& a_serialize, std::string a_key);
 
 nlohmann::ordered_json OutJsonComponents(Chunk& a_chunk, const ComponentsSerialize& a_serialize);
+
+std::vector<EntityPrefab> LoadPrefab(const nlohmann::json& a_json, const ComponentsSerialize& a_serialize, std::string a_key);
