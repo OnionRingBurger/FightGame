@@ -174,6 +174,25 @@ void JsonAddComponent(Entity a_entity, Chunk& a_chunk, const nlohmann::json& a_j
 	a_chunk.AddComponent(a_entity, std::any_cast<Component>(a_serialize.GetData(a_json["typeId"], a_json, a_entityMap)));
 }
 
+
+
+std::unordered_map<std::string, std::vector<EntityPrefab>> LoadAllPrefab(const nlohmann::json& a_json, const ComponentsSerialize& a_serialize)
+{
+	std::unordered_map<std::string, std::vector<EntityPrefab>> ret;
+
+	std::unordered_map<int, int> numberMap;
+
+	for (auto& [sceneName, entities] : a_json.items())
+	{
+		ret.insert({ sceneName, LoadPrefab(a_json, a_serialize, sceneName)});
+	}
+	
+	return ret;
+}
+
+
+
+
 std::vector<EntityPrefab> LoadPrefab(const nlohmann::json& a_json, const ComponentsSerialize& a_serialize, std::string a_key)
 {
 	std::vector<EntityPrefab> ret;

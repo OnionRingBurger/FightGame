@@ -407,7 +407,6 @@ void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 
 	EnemyAttackLoadSystem(a_chunk, a_context);
 
-	CheckAliveTargetEnemySystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 
 	// リザルトなどをリセット
 	ResetSystem(a_chunk, a_context);

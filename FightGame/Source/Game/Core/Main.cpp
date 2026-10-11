@@ -60,30 +60,21 @@ void MainGame::Init()
 	runningLoadLoop = true;
 	// Load用ループを開始、内部で参照に対して右辺値を渡すことになるため、std::refを使用	
 	loadWorker = std::thread(
-		&MainGame::WorkerLoop,
-		this,
-		std::ref(modelJobQueue),
-		std::ref(modelResultQueue),
-		std::ref(textureJobQueue),
-		std::ref(textureResultQueue),
-		std::ref(effectJobQueue),
-		std::ref(effectResultQueue),
-		std::ref(soundJobQueue),
-		std::ref(soundResultQueue),
-		std::ref(textFormatJobQueue),
-		std::ref(textFormatResultQueue),
-		std::ref(textUIJobQueue),
-		std::ref(textUIResultQueue),
+		WorkerLoop,
+		std::ref(loadJobQueues),
+		std::ref(loadResultQueues),
+		std::ref(fontFileLoadCache),
+		std::ref(serialize),
 		std::ref(runningLoadLoop));
 	
 
-	modelDatas =
+	loadDatas.model =
 	{
 		{"Box", 1.0f},
 		{"Ball", 1.0f},
 	};
 
-	textureDatas =
+	loadDatas.texture =
 	{
 		"TitleLogo",
 		"Shadow",
@@ -164,7 +155,7 @@ void MainGame::Init()
 		"TargetUI"
 	};
 
-	effectDatas =
+	loadDatas.effect =
 	{
 		{kTestEffect, 1.0f},
 		{kHitEffect, 0.55f},
@@ -183,7 +174,7 @@ void MainGame::Init()
 
 
 
-	textFormatDatas =
+	loadDatas.textFormat =
 	{
 		{ "DefaultFormat", true, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 96.0f },
 		{ "ShortFormat", true, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 80.0f },
@@ -191,7 +182,7 @@ void MainGame::Init()
 		{ "SmartFormat", true, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 120.0f }
 	};
 
-	textUIDatas =
+	loadDatas.textUI =
 	{
 		{ "ControllerText", L"本ゲームはキーボード操作でも遊べますが、\nコントローラーを使用すると、より楽しんでいただけます。", "SmartFormat", 120.0f * 30.0f, 120.0f * 5.0f },
 		{ "StartText", L"上からくるぞ！\n気を付けろ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
@@ -209,6 +200,11 @@ void MainGame::Init()
 		{ "GameStart", L"Start", "DefaultFormat", 96.0f * 5.0f, 96.0f},
 		{ "Tutorial", L"Tutorial", "DefaultFormat", 96.0f * 5.0f, 96.0f }
 
+	};
+
+	loadDatas.jsonPrefab =
+	{
+		{kDataPath}
 	};
 
 	ChangeScene("Load");
@@ -353,39 +349,57 @@ void MainGame::LoadLoopUpdate()
 {
 	// 各アセットの読み込み
 
-	while (!modelResultQueue.IsEnpty())
+	while (!loadResultQueues.model.IsEnpty())
 	{
 		ModelLoadResult result;
-		if (modelResultQueue.TryPop(result)) // ifが機能してなかったので修正
+		if (loadResultQueues.model.TryPop(result)) // ifが機能してなかったので修正
 		modelCache.RegisterModel(result.key, result.data);
 	}
 
-	while (!textureResultQueue.IsEnpty())
+	while (!loadResultQueues.texture.IsEnpty())
 	{
 		TextureLoadResult result;
-		if (textureResultQueue.TryPop(result))
+		if (loadResultQueues.texture.TryPop(result))
 		uiCache.RegisterTexture(result.key, result.data);
 	}
 
-	while (!effectResultQueue.IsEnpty())
+	while (!loadResultQueues.effect.IsEnpty())
 	{
 		EffectLoadResult result;
-		if (effectResultQueue.TryPop(result) && result.effect) 
+		if (loadResultQueues.effect.TryPop(result) && result.effect) 
 		effectCache.RegisterEffect(result.key, result.effect);
 	}
 
-	while (!textFormatResultQueue.IsEnpty())
+	while (!loadResultQueues.textFormat.IsEnpty())
 	{
 		TextFormatLoadResult result;
-		if (textFormatResultQueue.TryPop(result) && result.format)
+		if (loadResultQueues.textFormat.TryPop(result) && result.format)
 		uiCache.RegisterTextFormat(result.key, result.format);
 	}
 
-	while (!textUIResultQueue.IsEnpty())
+	while (!loadResultQueues.textUI.IsEnpty())
 	{
 		TextUILoadResult result;
-		if (textUIResultQueue.TryPop(result))
+		if (loadResultQueues.textUI.TryPop(result))
 			uiCache.RegisterTexture(result.key, result.data);
+	}
+
+	while (!loadResultQueues.jsonPrefab.IsEnpty())
+	{
+		JsonPrefabLoadResult result;
+		if (loadResultQueues.jsonPrefab.TryPop(result))
+		{
+			for (auto itScene : result.prefabScenes)
+			{
+				std::string sceneName = itScene.first;
+				prefabManager.CreatePrefabScene(sceneName);
+
+				for (auto itPrefab : itScene.second)
+				{
+					prefabManager.AddPrefab(sceneName, itPrefab);
+				}
+			}
+		}
 	}
 
 	// TODO Soundを読み込めるようにする
@@ -513,101 +527,6 @@ void MainGame::PostFrameProcess()
 }
 
 
-void MainGame::WorkerLoop(
-	ThreadSafeQueue<ModelLoadJob>& a_modelJobQueue,
-	ThreadSafeQueue<ModelLoadResult>& a_modelResultQueue,
-	ThreadSafeQueue<TextureLoadJob>& a_textureJobQueue,
-	ThreadSafeQueue<TextureLoadResult>& a_textureResultQueue,
-	ThreadSafeQueue<EffectLoadJob>& a_effectJobQueue,
-	ThreadSafeQueue<EffectLoadResult>& a_effectResultQueue,
-	ThreadSafeQueue<SoundLoadJob>& a_soundJobQueue,
-	ThreadSafeQueue<SoundLoadResult>& a_soundResultQueue,
-	ThreadSafeQueue<TextFormatLoadJob>& a_textFormatJobQueue,
-	ThreadSafeQueue<TextFormatLoadResult>& a_textFormatResultQueue,
-	ThreadSafeQueue<TextUILoadJob>& a_textUIJobQueue,
-	ThreadSafeQueue<TextUILoadResult>& a_textUIResultQueue,
-	std::atomic<bool>& a_running)
-{
-	if (FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)))
-	{
-#ifdef _DEBUG
-		DebugMessage("LoadLoopの初期化に失敗しました！");
-#endif // _DEBUG
-		
-		a_running = false;
-		return;
-	}
-	while (a_running)
-	{
-		while (!modelJobQueue.IsEnpty())
-		{
-			// 登録されているJobを受け取る
-			ModelLoadJob modelJob = a_modelJobQueue.Pop();
-
-			// Loadして終了フラグを立てる
-			ModelLoadResult modelResult = LoadModel(modelJob);
-			a_modelResultQueue.Push(std::move(modelResult));
-			if (modelJob.endFlagPointer)
-			{
-				modelJob.endFlagPointer->store(true);
-			}
-
-		}
-
-		while (!textureJobQueue.IsEnpty())
-		{
-			// 上と同じ
-			TextureLoadJob textureJob = a_textureJobQueue.Pop();
-
-			TextureLoadResult textureResult = LoadTexture(textureJob);
-			a_textureResultQueue.Push(std::move(textureResult));
-			if (textureJob.endFlagPointer)
-			{
-				textureJob.endFlagPointer->store(true);
-			}
-		}
-
-		while (!effectJobQueue.IsEnpty())
-		{
-			EffectLoadJob effectJob = a_effectJobQueue.Pop();
-
-			EffectLoadResult effectResult = LoadEffect(effectJob);
-			a_effectResultQueue.Push(std::move(effectResult));
-			if (effectJob.endFlagPointer)
-			{
-				effectJob.endFlagPointer->store(true);
-			}
-		}
-
-		while (!textFormatJobQueue.IsEnpty())
-		{
-			TextFormatLoadJob textFormatJob = a_textFormatJobQueue.Pop();
-
-			TextFormatLoadResult textFormatResult = LoadFormat(textFormatJob, fontFileLoadCache);
-			a_textFormatResultQueue.Push(std::move(textFormatResult));
-			if (textFormatJob.endFlagPointer)
-			{
-				textFormatJob.endFlagPointer->store(true);
-			}
-		}
-
-		while (!textUIJobQueue.IsEnpty())
-		{
-			TextUILoadJob textUIJob = a_textUIJobQueue.Pop();
-
-			TextUILoadResult textUIResult = LoadTextUI(textUIJob);
-			a_textUIResultQueue.Push(std::move(textUIResult));
-			if (textUIJob.endFlagPointer)
-			{
-				textUIJob.endFlagPointer->store(true);
-			}
-		}
-
-	}
-
-	CoUninitialize();
-}
-
 bool MainGame::ChangeScene(std::string a_key)
 {
 	bool ret = true;
@@ -620,16 +539,8 @@ bool MainGame::ChangeScene(std::string a_key)
 			{
 				sceneChangeQueue.push(a_key);
 			},
-			modelJobQueue,
-			textureJobQueue,
-			effectJobQueue,
-			textFormatJobQueue,
-			textUIJobQueue,
-			modelDatas,
-			textureDatas,
-			effectDatas,
-			textFormatDatas,
-			textUIDatas,
+			loadJobQueues,
+			std::move(loadDatas),
 			modelCache,
 			uiCache,
 			effectCache,
@@ -638,8 +549,6 @@ bool MainGame::ChangeScene(std::string a_key)
 			prefabManager
 		);
 
-		modelDatas.clear();
-		textureDatas.clear();
 	}
 	else if (a_key == "Game")
 	{

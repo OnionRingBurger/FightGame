@@ -69,58 +69,31 @@ private:
 	bool isEnd = false;
 
 	//! 読み込みリクエストとリザルト
-	ThreadSafeQueue<ModelLoadJob> modelJobQueue;
-	ThreadSafeQueue<ModelLoadResult> modelResultQueue;
-	ThreadSafeQueue<TextureLoadJob> textureJobQueue;
-	ThreadSafeQueue<TextureLoadResult> textureResultQueue;
-	ThreadSafeQueue<EffectLoadJob> effectJobQueue;
-	ThreadSafeQueue<EffectLoadResult> effectResultQueue;
-	ThreadSafeQueue<SoundLoadJob> soundJobQueue;
-	ThreadSafeQueue<SoundLoadResult> soundResultQueue;
-	ThreadSafeQueue<TextFormatLoadJob> textFormatJobQueue;
-	ThreadSafeQueue<TextFormatLoadResult> textFormatResultQueue;
-	ThreadSafeQueue<TextUILoadJob> textUIJobQueue;
-	ThreadSafeQueue<TextUILoadResult> textUIResultQueue;
+	// !!!New!!!
+	LoadJobQueues loadJobQueues;
+	// !!!New!!!
+	LoadResultQueues loadResultQueues;
 
 	//! 読み込み処理を回しているかどうか 
 	std::atomic<bool> runningLoadLoop = true;
 	
-	void WorkerLoop(
-		ThreadSafeQueue<ModelLoadJob>& a_modelJobQueue,
-		ThreadSafeQueue<ModelLoadResult>& a_modelResultQueue,
-		ThreadSafeQueue<TextureLoadJob>& a_textureJobQueue,
-		ThreadSafeQueue<TextureLoadResult>& a_textureResultQueue,
-		ThreadSafeQueue<EffectLoadJob>& a_effectJobQueue,
-		ThreadSafeQueue<EffectLoadResult>& a_effectResultQueue,
-		ThreadSafeQueue<SoundLoadJob>& a_soundJobQueue,
-		ThreadSafeQueue<SoundLoadResult>& a_soundResultQueue,
-		ThreadSafeQueue<TextFormatLoadJob>& a_textFormatJobQueue,
-		ThreadSafeQueue<TextFormatLoadResult>& a_textFormatResultQueue,
-		ThreadSafeQueue<TextUILoadJob>& a_textUIJobQueue,
-		ThreadSafeQueue<TextUILoadResult>& a_textUIResultQueue,
-		std::atomic<bool>& a_running);
-
 	bool ChangeScene(std::string);
 
 	void ResetFPS();
-
+	// 各種キャッシュ
 	ModelCache modelCache;
 	UICache uiCache;
-	// !!!New!!!
 	FontFileLoadCache fontFileLoadCache;
 	EffectCache effectCache;
+
 	Input input;
 	ComponentsSerialize serialize;
-	// !!!New!!!
 	PrefabManager prefabManager;
 	std::queue<std::string> sceneChangeQueue;
 	std::thread loadWorker;
 
-	std::vector<modelLoadData> modelDatas;
-	std::vector<std::string> textureDatas;
-	std::vector<effectLoadData> effectDatas;
-	std::vector<textFormatData> textFormatDatas;
-	std::vector<textUILoadData> textUIDatas;
+	// 将来的にSceneから要求を受けて登録することになるかもしれないのでメンバとして保持
+	LoadDatas loadDatas;
 
 	bool isFixedCursor;
 

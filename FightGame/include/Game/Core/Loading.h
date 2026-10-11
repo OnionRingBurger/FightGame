@@ -10,10 +10,14 @@
 #include "Sound.h"
 #include "Effekseer.h"
 #include "DebugConsole.h"
+#include "ECSTypes.h"
+#include "ComponentsSerialize.h"
 // TODO ãÍì˜ÇÃçÙ
 #include "UICache.h"
 #include "FontFileLoadCache.h"
 #include <wrl/client.h>
+// !!!New!!!
+#include "ThreadSafeQueue.h"
 
 using modelLoadData = std::pair<std::string, float>;
 using Microsoft::WRL::ComPtr;
@@ -40,6 +44,11 @@ struct textUILoadData
 	std::string formatKey;
 	float width;
 	float height;
+};
+
+struct JsonPrefabLoadData
+{
+	std::string key;
 };
 
 struct ModelLoadJob
@@ -169,6 +178,22 @@ struct TextUILoadJob
 	}
 };
 
+struct JsonPrefabLoadJob
+{
+	std::shared_ptr<std::atomic_bool> const endFlagPointer;
+
+	std::string fileName;
+
+	JsonPrefabLoadJob(
+		std::shared_ptr<std::atomic_bool> const a_endFlagPointer,
+		std::string a_fileName
+	)
+		: endFlagPointer(a_endFlagPointer)
+		, fileName(a_fileName)
+	{
+	}
+};
+
 struct ModelLoadResult
 {
 	std::string key;
@@ -271,6 +296,58 @@ struct TextUILoadResult
 
 };
 
+// JsonÇ≈PrefabÇì«Ç›çûÇﬁç€ÇÃÇ‡ÇÃ
+struct JsonPrefabLoadResult
+{
+	// ì«Ç›çûÇÒÇæSceneñàÇÃPrefab
+	std::unordered_map<std::string, std::vector<EntityPrefab>> prefabScenes;
+
+	JsonPrefabLoadResult()
+		: prefabScenes()
+	{
+	}
+
+	JsonPrefabLoadResult(std::unordered_map<std::string, std::vector<EntityPrefab>> a_prefabScenes)
+		: prefabScenes(a_prefabScenes)
+	{
+	}
+};
+
+// !!!New!!!
+struct LoadJobQueues
+{
+	ThreadSafeQueue<ModelLoadJob> model;
+	ThreadSafeQueue<TextureLoadJob> texture;
+	ThreadSafeQueue<EffectLoadJob> effect;
+	ThreadSafeQueue<SoundLoadJob> sound;
+	ThreadSafeQueue<TextFormatLoadJob> textFormat;
+	ThreadSafeQueue<TextUILoadJob> textUI;
+	ThreadSafeQueue<JsonPrefabLoadJob> jsonPrefab;
+};
+
+// !!!New!!!
+struct LoadResultQueues
+{
+	ThreadSafeQueue<ModelLoadResult> model;
+	ThreadSafeQueue<TextureLoadResult> texture;
+	ThreadSafeQueue<EffectLoadResult> effect;
+	ThreadSafeQueue<SoundLoadResult> sound;
+	ThreadSafeQueue<TextFormatLoadResult> textFormat;
+	ThreadSafeQueue<TextUILoadResult> textUI;
+	ThreadSafeQueue<JsonPrefabLoadResult> jsonPrefab;
+};
+
+// !!!New!!!
+struct LoadDatas
+{
+	std::vector<modelLoadData> model;
+	std::vector<std::string> texture;
+	std::vector<effectLoadData> effect;
+	std::vector<textFormatData> textFormat;
+	std::vector<textUILoadData> textUI;
+	std::vector<JsonPrefabLoadData> jsonPrefab;
+};
+
 void LoadSound();
 
 ModelLoadResult LoadModel(const ModelLoadJob& job);
@@ -278,3 +355,11 @@ TextureLoadResult LoadTexture(const TextureLoadJob& job);
 EffectLoadResult LoadEffect(const EffectLoadJob& job);
 TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job, FontFileLoadCache& a_fontFileCache);
 TextUILoadResult LoadTextUI(const TextUILoadJob& a_job);
+
+// !!!New!!!
+void WorkerLoop(
+	LoadJobQueues& a_jobQueues,
+	LoadResultQueues& a_resultQueues,
+	FontFileLoadCache& a_fontFileCache,
+	ComponentsSerialize& a_serialize,
+	std::atomic<bool>& a_running);

@@ -68,13 +68,13 @@ void World::InitWorld()
 	nlohmann::json json;
 	stream >> json;
 
-	std::string name = "Stage1Phase1";
-	prefabManager.CreatePrefabScene(name);
-	std::vector<EntityPrefab> vec = LoadPrefab(json, serialize, name);
-	for (auto it : vec)
-	{
-		prefabManager.AddPrefab(name, it);
-	}
+	
+	//prefabManager.CreatePrefabScene(name);
+	//std::vector<EntityPrefab> vec = LoadPrefab(json, serialize, name);
+	//for (auto it : vec)
+	//{
+	//	prefabManager.AddPrefab(name, it);
+	//}
 }
 
 void World::InitResponse(std::unique_ptr<SystemResponse>& response)

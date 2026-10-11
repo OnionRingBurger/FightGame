@@ -4,6 +4,7 @@
 #include <cstdio>
 #include "DirectX.h"
 #include <dwrite_3.h>
+#include <fstream>
 
 namespace
 {
@@ -372,4 +373,121 @@ TextUILoadResult LoadTextUI(const TextUILoadJob& a_job)
 		a_job.key,
 		texture
 	);
+}
+
+JsonPrefabLoadResult LoadJsonPrefab(const JsonPrefabLoadJob& a_job, const ComponentsSerialize& a_serialize)
+{
+	ifstream stream;
+	stream.open(a_job.fileName);
+	if(!stream.is_open())
+	{
+		return JsonPrefabLoadResult();
+	}
+	nlohmann::json json;
+	json << stream;
+
+	JsonPrefabLoadResult ret;
+	ret.prefabScenes = LoadAllPrefab(json, a_serialize);
+
+	return std::move(ret);
+}
+
+// !!!New!!!
+void WorkerLoop(
+	LoadJobQueues& a_jobQueues,
+	LoadResultQueues& a_resultQueues,
+	FontFileLoadCache& a_fontFileCache,
+	ComponentsSerialize& a_serialize,
+	std::atomic<bool>& a_running)
+{
+	if (FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)))
+	{
+#ifdef _DEBUG
+		DebugMessage("LoadLoop‚Ì‰Šú‰»‚ÉŽ¸”s‚µ‚Ü‚µ‚½I");
+#endif // _DEBUG
+		
+		a_running = false;
+		return;
+	}
+	while (a_running)
+	{
+		while (!a_jobQueues.model.IsEnpty())
+		{
+			// “o˜^‚³‚ê‚Ä‚¢‚éJob‚ðŽó‚¯Žæ‚é
+			ModelLoadJob modelJob = a_jobQueues.model.Pop();
+
+			// Load‚µ‚ÄI—¹ƒtƒ‰ƒO‚ð—§‚Ä‚é
+			ModelLoadResult modelResult = LoadModel(modelJob);
+			a_resultQueues.model.Push(std::move(modelResult));
+			if (modelJob.endFlagPointer)
+			{
+				modelJob.endFlagPointer->store(true);
+			}
+
+		}
+
+		while (!a_jobQueues.texture.IsEnpty())
+		{
+			// ã‚Æ“¯‚¶
+			TextureLoadJob textureJob = a_jobQueues.texture.Pop();
+
+			TextureLoadResult textureResult = LoadTexture(textureJob);
+			a_resultQueues.texture.Push(std::move(textureResult));
+			if (textureJob.endFlagPointer)
+			{
+				textureJob.endFlagPointer->store(true);
+			}
+		}
+
+		while (!a_jobQueues.effect.IsEnpty())
+		{
+			EffectLoadJob effectJob = a_jobQueues.effect.Pop();
+
+			EffectLoadResult effectResult = LoadEffect(effectJob);
+			a_resultQueues.effect.Push(std::move(effectResult));
+			if (effectJob.endFlagPointer)
+			{
+				effectJob.endFlagPointer->store(true);
+			}
+		}
+
+		while (!a_jobQueues.textFormat.IsEnpty())
+		{
+			TextFormatLoadJob textFormatJob = a_jobQueues.textFormat.Pop();
+
+			TextFormatLoadResult textFormatResult = LoadFormat(textFormatJob, a_fontFileCache);
+			a_resultQueues.textFormat.Push(std::move(textFormatResult));
+			if (textFormatJob.endFlagPointer)
+			{
+				textFormatJob.endFlagPointer->store(true);
+			}
+		}
+
+		while (!a_jobQueues.textUI.IsEnpty())
+		{
+			TextUILoadJob textUIJob = a_jobQueues.textUI.Pop();
+
+			TextUILoadResult textUIResult = LoadTextUI(textUIJob);
+			a_resultQueues.textUI.Push(std::move(textUIResult));
+			if (textUIJob.endFlagPointer)
+			{
+				textUIJob.endFlagPointer->store(true);
+			}
+		}
+
+		while (!a_jobQueues.jsonPrefab.IsEnpty())
+		{
+			JsonPrefabLoadJob jsonPrefabJob = a_jobQueues.jsonPrefab.Pop();
+
+			JsonPrefabLoadResult jsonPrefabResult = LoadJsonPrefab(jsonPrefabJob, a_serialize);
+			a_resultQueues.jsonPrefab.Push(std::move(jsonPrefabResult));
+			if (jsonPrefabJob.endFlagPointer)
+			{
+				jsonPrefabJob.endFlagPointer->store(true);
+			}
+		}
+
+	}
+
+	CoUninitialize();
 }

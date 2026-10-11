@@ -4,6 +4,7 @@
 #include "Chunk.h"
 #include "json.hpp"
 #include "ComponentField.h"
+#include "ComponentsSerialize.h"
 
 constexpr int kNotEntity = -1;
 constexpr const char* kJsonDataPath = "data";
@@ -132,5 +133,7 @@ void TestRegisterComponentType(ComponentsSerialize& a_serialize);
 std::vector<Entity> LoadJsonComponent(Chunk& a_chunk, const ComponentsSerialize& a_serialize, std::string a_key);
 
 nlohmann::ordered_json OutJsonComponents(Chunk& a_chunk, const ComponentsSerialize& a_serialize);
+
+std::unordered_map<std::string, std::vector<EntityPrefab>> LoadAllPrefab(const nlohmann::json& a_json, const ComponentsSerialize& a_serialize);
 
 std::vector<EntityPrefab> LoadPrefab(const nlohmann::json& a_json, const ComponentsSerialize& a_serialize, std::string a_key);

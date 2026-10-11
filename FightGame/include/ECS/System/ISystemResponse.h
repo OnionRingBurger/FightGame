@@ -7,7 +7,7 @@ struct SpawnRequest
 	std::string key;
 	float3 offset;
 
-	SpawnRequest(std::string a_key, float3 a_offset)
+	SpawnRequest(const std::string& a_key, float3 a_offset)
 		: key(a_key)
 		, offset(a_offset)
 	{

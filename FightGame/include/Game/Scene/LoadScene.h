@@ -14,16 +14,8 @@ class LoadScene : public IScene
 {
 public:
 	LoadScene(std::function<void(std::string)> a_sceneChange,
-		ThreadSafeQueue<ModelLoadJob>& a_modelJobQueue, 
-		ThreadSafeQueue<TextureLoadJob>& a_textureJobQueue,
-		ThreadSafeQueue<EffectLoadJob>& a_effectJobQueue,
-		ThreadSafeQueue<TextFormatLoadJob>& a_textFormatJobQueue,
-		ThreadSafeQueue<TextUILoadJob>& a_textUIJobQueue,
-		std::vector<modelLoadData> a_modelDatas,
-		std::vector<std::string> a_textureDatas,
-		std::vector<effectLoadData> a_effectDatas,
-		std::vector<textFormatData> a_textFormatDatas,
-		std::vector<textUILoadData> a_textUIData,
+		LoadJobQueues& a_jobQueues,
+		LoadDatas a_loadDatas,
 		IModelCacheAcquisition& a_modelCache,
 		IUICacheAcquisition& a_uiCache,
 		IEffectCacheAcquisition& effectCache,
@@ -44,18 +36,10 @@ private:
 	std::vector<std::shared_ptr<std::atomic_bool>> loadEndFlags;
 	std::unique_ptr<World> world;
 	int maxLoadCount;
-	ThreadSafeQueue<ModelLoadJob>& modelJobQueue;
-	ThreadSafeQueue<TextureLoadJob>& textureJobQueue;
-	ThreadSafeQueue<EffectLoadJob>& effectJobQueue;
-	ThreadSafeQueue<TextFormatLoadJob>& textFormatJobQueue;
-	ThreadSafeQueue<TextUILoadJob>& textUIJobQueue;
+	LoadJobQueues& jobQueues;
 	// !!!New!!!
 	IUICacheAcquisition& uiCache;
-	std::vector<modelLoadData> modelDatas;
-	std::vector<std::string> textureDatas;
-	std::vector<effectLoadData> effectDatas;
-	std::vector<textFormatData> textFormatDatas;
-	std::vector<textUILoadData> textUIDatas;
+	LoadDatas loadDatas;
 
 	void RemoveIfFlaged(std::vector<std::shared_ptr<std::atomic_bool>>& loadEndFlags);
 };

@@ -4,21 +4,10 @@
 #include <unordered_set>
 #include "Defines.h"
 
-
-// TODO 我ながらひどいので構造体なりクラスなりにまとめる
-
 LoadScene::LoadScene(
 	std::function<void(std::string)> a_sceneChange,
-	ThreadSafeQueue<ModelLoadJob>& a_modelJobQueue,
-	ThreadSafeQueue<TextureLoadJob>& a_textureJobQueue,
-	ThreadSafeQueue<EffectLoadJob>& a_effectJobQueue,
-	ThreadSafeQueue<TextFormatLoadJob>& a_textFormatJobQueue,
-	ThreadSafeQueue<TextUILoadJob> & a_textUIJobQueue,
-	std::vector<modelLoadData> a_modelDatas,
-	std::vector<std::string> a_textureDatas,
-	std::vector<effectLoadData> a_effectDatas,
-	std::vector<textFormatData> a_textFormatDatas,
-	std::vector<textUILoadData> a_textUIDatas,
+	LoadJobQueues& a_jobQueues,
+	LoadDatas a_loadDatas,
 	IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
 	IEffectCacheAcquisition& effectCache,
@@ -27,21 +16,11 @@ LoadScene::LoadScene(
 	PrefabManager& a_prefabManager)
 	: sceneChange(a_sceneChange)
 	, inited(false)
-	, modelJobQueue(a_modelJobQueue)
-	, textureJobQueue(a_textureJobQueue)
-	, effectJobQueue(a_effectJobQueue)
-	, textFormatJobQueue(a_textFormatJobQueue)
-	, textUIJobQueue(a_textUIJobQueue)
+	, jobQueues(a_jobQueues)
 	, uiCache(a_uiCache)
-	, modelDatas(a_modelDatas)
-	, textureDatas(a_textureDatas)
-	, effectDatas(a_effectDatas)
-	, textFormatDatas(a_textFormatDatas)
-	, textUIDatas(a_textUIDatas)
+	, loadDatas(std::move(a_loadDatas))
 	
 {
-	// DebugConsole::ToggleConsole();
-
 	std::vector<modelLoadData> useModelDatas = {
 	};
 
@@ -53,21 +32,21 @@ LoadScene::LoadScene(
 	for (auto it : useModelDatas)
 	{
 		std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-		a_modelJobQueue.Push(std::move(ModelLoadJob(it.first, it.second, endFlag)));
+		jobQueues.model.Push(std::move(ModelLoadJob(it.first, it.second, endFlag)));
 		useDataLoadEndFlags.push_back(endFlag);
 	}
 
 	for (auto it : useTextureDatas)
 	{
 		std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-		a_textureJobQueue.Push(std::move(TextureLoadJob(it, endFlag)));
+		jobQueues.texture.Push(std::move(TextureLoadJob(it, endFlag)));
 		useDataLoadEndFlags.push_back(endFlag);
 	}
 
-	for (auto it : textFormatDatas)
+	for (auto it : loadDatas.textFormat)
 	{
 		std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-		textFormatJobQueue.Push(std::move(TextFormatLoadJob(it.key, it.useFile, it.font, it.fontFile, it.size, endFlag)));
+		jobQueues.textFormat.Push(std::move(TextFormatLoadJob(it.key, it.useFile, it.font, it.fontFile, it.size, endFlag)));
 		useDataLoadEndFlags.push_back(endFlag);
 	}
 
@@ -90,7 +69,7 @@ void LoadScene::Update()
 	if (useDataLoadEndFlags.empty() && !inited)
 	{
 		// !!!New!!!
-		for (const auto& it : textUIDatas)
+		for (const auto& it : loadDatas.textUI)
 		{
 			if (uiCache.GetTextFormat(it.formatKey) == nullptr)
 			{
@@ -101,34 +80,41 @@ void LoadScene::Update()
 		inited = true;
 
 		// 各モデル、テクスチャをロード予約して終了フラグを保持
-		for (auto it : modelDatas)
+		for (auto it : loadDatas.model)
 		{
 			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-			modelJobQueue.Push(std::move(ModelLoadJob(it.first, it.second, endFlag)));
+			jobQueues.model.Push(std::move(ModelLoadJob(it.first, it.second, endFlag)));
 			loadEndFlags.push_back(endFlag);
 		}
 
-		for (auto it : textureDatas)
+		for (auto it : loadDatas.texture)
 		{
 			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-			textureJobQueue.Push(std::move(TextureLoadJob(it, endFlag)));
+			jobQueues.texture.Push(std::move(TextureLoadJob(it, endFlag)));
 			loadEndFlags.push_back(endFlag);
 		}
 
-		for (auto it : effectDatas)
+		for (auto it : loadDatas.effect)
 		{
 			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-			effectJobQueue.Push(std::move(EffectLoadJob(it.key, it.magnificent, endFlag)));
+			jobQueues.effect.Push(std::move(EffectLoadJob(it.key, it.magnificent, endFlag)));
 			loadEndFlags.push_back(endFlag);
 		}
 
-		for (auto it : textUIDatas)
+		for (auto it : loadDatas.textUI)
 		{
 			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
 			// !!!New!!!
 			ComPtr<IDWriteTextFormat> format = uiCache.GetTextFormat(it.formatKey);
-			textUIJobQueue.Push(std::move(TextUILoadJob(it.key, it.text, it.formatKey, it.width, it.height, endFlag, format)));
+			jobQueues.textUI.Push(std::move(TextUILoadJob(it.key, it.text, it.formatKey, it.width, it.height, endFlag, format)));
 			loadEndFlags.push_back(endFlag);
+		}
+
+		for (auto it : loadDatas.jsonPrefab)
+		{
+			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
+			jobQueues.jsonPrefab.Push(std::move(JsonPrefabLoadJob(endFlag, it.key)));
+			useDataLoadEndFlags.push_back(endFlag);
 		}
 	}
 
