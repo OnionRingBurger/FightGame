@@ -24,15 +24,18 @@ std::vector<Entity> EntitySpawnPort::AddEntities(Chunk& a_chunk, const EntitySpa
         Entity runtimeEntity = entitiesMap.at(prefab.entity);
         for(auto componentData : prefab.haveComponents)
         {
+            auto dummyFunc = [](std::string, auto&, const auto&) {};
+            auto toRuntimeFunc = [&](std::string name, Entity& entityRef)
+                {
+                    if (entityRef == kInvalidEntity) return;
+                    entityRef = entitiesMap.at(entityRef);
+                };
+
             switch (componentData.id) 
             {
                 // Entityへの参照を保持している場合はRuntimeへ置き換えしてコンポーネントを登録する
                 #define ADD_ANY_COMPONENT(T) case T::kTypeId: {\
                 T component = std::any_cast<T>(componentData.componrnt); \
-                auto dummyFunc = [](std::string, auto&, const auto&){};\
-                auto toRuntimeFunc = [&](std::string name, Entity& entityRef){\
-                entityRef = entitiesMap.at(entityRef);\
-                };\
                 ApplyToFields(component, dummyFunc, toRuntimeFunc);\
                 a_chunk.AddComponent(runtimeEntity, component);\
                 } break;
