@@ -204,7 +204,7 @@ void StartupWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemR
 	UpdateEfkEffectSystem(a_chunk, a_context);
 
 	// ステージ読み込み
-	SpawnJsonSystem(a_chunk, a_context, a_serialize, a_aiManager);
+	SpawnJsonSystem(a_chunk, a_context, a_response);
 
 	// 終了処理
 	LifeTimeSystem(a_chunk, a_context);

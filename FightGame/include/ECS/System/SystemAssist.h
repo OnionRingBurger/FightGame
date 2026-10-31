@@ -46,7 +46,7 @@ void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity);
 
 void ClearCharacterAttackOnDeath(Chunk& a_chunk, Entity a_entity);
 
-void NewSceneSpawn(ComponentsSerialize& a_serialize,Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName, float3 a_offset);
+// void NewSceneSpawn(ComponentsSerialize& a_serialize,Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName, float3 a_offset);
 
 void RegisterAllAttackSectorsFromAttackData(int a_circumferenceCount);
 

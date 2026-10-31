@@ -210,6 +210,7 @@ void CheckAliveTargetEnemySystem(Chunk& a_chunk, const SystemContext& a_context,
 		if (spawner.Look().spawnName.empty()) continue;
 		spawn = true;
 		
+
 		a_systemResponse.AddEntitySpawnRequest(SpawnRequest(spawner.Look().spawnName.at(0), kDefaultWorldPosition));
 		std::vector<std::string> tmp;
 		for (int i = 1; i < spawner.Look().spawnName.size(); i++)
@@ -307,7 +308,7 @@ void CheckClearTutorialSystem(Chunk& a_chunk, const SystemContext& a_context, IS
 
 		}
 
-		if(state.useLoad) NewSceneSpawn(a_serialize, a_chunk, a_aiManager, state.load, kDefaultWorldPosition);
+		if (state.useLoad) a_systemResponse.AddEntitySpawnRequest(SpawnRequest(state.load, kDefaultWorldPosition));
 		spawner->progress += 1;
 	}
 

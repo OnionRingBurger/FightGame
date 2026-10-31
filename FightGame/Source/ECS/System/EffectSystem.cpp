@@ -943,7 +943,7 @@ void PlayCursor(Entity a_target, Chunk& a_chunk, SystemResponse& a_response, AIM
 	// JsonÇì«Ç›çûÇﬁ
 	if (command.Look().flag & SELECT_LOAD)
 	{
-		NewSceneSpawn(a_serialize, a_chunk, a_aiManager, command.Look().loadName, float3());
+		a_response.AddEntitySpawnRequest(SpawnRequest(command.Look().loadName, float3()));
 	}
 }
 

@@ -58,7 +58,7 @@ void CreateGameWorld::InitResponse(std::unique_ptr<SystemResponse>& response)
 
 void CreateGameWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
-	SpawnJsonSystem(a_chunk, a_context, a_serialize, a_aiManager);
+	SpawnJsonSystem(a_chunk, a_context, a_systemResponse);
 }
 
 void CreateGameWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)

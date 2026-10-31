@@ -30,7 +30,9 @@ std::vector<Entity> EntitySpawnPort::AddEntities(Chunk& a_chunk, const EntitySpa
                 #define ADD_ANY_COMPONENT(T) case T::kTypeId: {\
                 T component = std::any_cast<T>(componentData.componrnt); \
                 auto dummyFunc = [](std::string, auto&, const auto&){};\
-                auto toRuntimeFunc = [&](std::string name, Entity& entityRef){entityRef = entitiesMap.at(entityRef);};\
+                auto toRuntimeFunc = [&](std::string name, Entity& entityRef){\
+                entityRef = entitiesMap.at(entityRef);\
+                };\
                 ApplyToFields(component, dummyFunc, toRuntimeFunc);\
                 a_chunk.AddComponent(runtimeEntity, component);\
                 } break;

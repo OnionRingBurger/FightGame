@@ -199,7 +199,7 @@ void TitleWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 	// Transform“K—p
 	TransformSystem(a_chunk, a_context);
 
-	SpawnJsonSystem(a_chunk, a_context, a_serialize, a_aiManager);
+	SpawnJsonSystem(a_chunk, a_context, a_response);
 
 	EnemyAttackLoadSystem(a_chunk, a_context);
 
@@ -212,7 +212,7 @@ void TitleWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 
-	SpawnJsonSystem(a_chunk, a_context, a_serialize, a_aiManager);
+	SpawnJsonSystem(a_chunk, a_context, a_response);
 	UnlockStageEntitySystem(a_chunk, a_context);
 
 	// PhysicsŒn‚Ìˆ—‚ğs‚¤

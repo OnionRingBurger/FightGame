@@ -145,7 +145,7 @@ void DeleteOnInputSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 }
 
-void SpawnJsonSystem(Chunk& a_chunk, const SystemContext& a_context, ComponentsSerialize& a_serialize, AIManager& a_aimanager)
+void SpawnJsonSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response)
 {
 	ComponentView view = a_chunk.GetView<ComponentTypes<SpawnJson>>();
 
@@ -159,7 +159,7 @@ void SpawnJsonSystem(Chunk& a_chunk, const SystemContext& a_context, ComponentsS
 			continue;
 		}
 
-		NewSceneSpawn(a_serialize, a_chunk, a_aimanager, spawn.Look().spawnKey, spawn.Look().offset);
+		a_response.AddEntitySpawnRequest(SpawnRequest(spawn.Look().spawnKey, spawn.Look().offset));
 		a_chunk.DeleteChunkEntity(it);
 	}
 

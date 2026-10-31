@@ -431,7 +431,7 @@ void TutorialWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, System
 	UpdateEfkEffectSystem(a_chunk, a_context);
 
 	// ステージ読み込み
-	SpawnJsonSystem(a_chunk, a_context, a_serialize, a_aiManager);
+	SpawnJsonSystem(a_chunk, a_context, a_response);
 	CreateEffectSystem(a_chunk, a_context);
 
 	// 終了処理
