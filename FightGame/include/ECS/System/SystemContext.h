@@ -17,16 +17,20 @@ struct SystemContext
 	std::unique_ptr<TrailEffect> trailEffect;
 	float deltaTime;
 	float effectStepTime;
-	// !!!New!!!
-	bool aiTickThisFrame;
+	// aiçXêVïpìx
+	bool aiBehaviorTickThisFrame;
+	bool aiMindTickThisFrame;
 	float aiDeltaTime;
+	float aiMindDeltaTime;
 	std::function<void(int)> tutorialRequest;
 
 	SystemContext(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, const Input& a_input)
 		: deltaTime(0.0f)
 		, effectStepTime(0.0f)
-		, aiTickThisFrame(false)
+		, aiBehaviorTickThisFrame(false)
+		, aiMindTickThisFrame(false)
 		, aiDeltaTime(0.0f)
+		, aiMindDeltaTime(0.0f)
 		, modelCache(a_modelCache)
 		, uiCache(a_uiCache)
 		, effectCache(a_effectCache)
@@ -34,5 +38,5 @@ struct SystemContext
 		, tutorialRequest(a_tutorialRequest)
 		, input(a_input)
 	{
-	}
+	};
 };

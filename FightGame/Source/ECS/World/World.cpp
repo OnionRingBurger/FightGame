@@ -55,7 +55,7 @@ void World::InitWorld()
 		systemResponse = std::make_unique<SystemResponse>();
 	}
 
-	// Tree 登録を先に行い、CreateNewChunk 内の RegisterAI が成功するようにする
+	// ツリー登録を先に行いCreateNewChunk内のRegisterAIが成功するようにする
 	InitAI(aiManager);
 
 	chunk = CreateNewChunk(aiManager);
@@ -67,14 +67,6 @@ void World::InitWorld()
 	std::ifstream stream(kDataPath);
 	nlohmann::json json;
 	stream >> json;
-
-	
-	//prefabManager.CreatePrefabScene(name);
-	//std::vector<EntityPrefab> vec = LoadPrefab(json, serialize, name);
-	//for (auto it : vec)
-	//{
-	//	prefabManager.AddPrefab(name, it);
-	//}
 }
 
 void World::InitResponse(std::unique_ptr<SystemResponse>& response)
@@ -89,7 +81,6 @@ void World::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& 
 
 void World::InitAI(AIManager& a_aiManager)
 {
-	// !!!New!!!
 	(void)a_aiManager;
 }
 
@@ -112,12 +103,21 @@ void World::ContextUpdate(float a_delatTime)
 	}
 
 	// AIの更新頻度を管理
-	context.aiTickThisFrame = false;
+	context.aiBehaviorTickThisFrame = false;
+	context.aiMindTickThisFrame = false;
 	context.aiDeltaTime = 0.0f;
 	aiTickAccum += context.deltaTime;
+	aiMindTickAccum += context.deltaTime;
+	if (aiMindTickAccum >= kAIMindTickInterval)
+	{
+		context.aiMindTickThisFrame = true;
+		context.aiMindDeltaTime = aiMindTickAccum;
+		aiMindTickAccum = 0.0f;
+		
+	}
 	if (aiTickAccum >= kAITickInterval)
 	{
-		context.aiTickThisFrame = true;
+		context.aiBehaviorTickThisFrame = true;
 		context.aiDeltaTime = aiTickAccum;
 		aiTickAccum = 0.0f;
 	}
@@ -154,13 +154,13 @@ void World::DrawWorld()
 
 void World::FrameEnd()
 {
+	// 跡片付け
 	chunk.CleanupFrame();
-
+	// システム要求を処理
 	if (systemResponse == nullptr) return;
 	HandleSystemResponse(*systemResponse);
-
 	RequestSpawn();
-
+	// システム要求を初期化
 	systemResponse->ResetRequest();
 }
 

@@ -382,11 +382,17 @@ void TutorialWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, System
 	RailUpdateSystem(a_chunk, a_context);
 
 	// AI更新
-	a_aiManager.WriteSystem(AISystemInfo(a_context.aiDeltaTime));
+	a_aiManager.WriteSystem(AISystemInfo(a_context.aiDeltaTime, a_context.aiMindDeltaTime));
 	AISenseSystem(a_chunk, a_context, a_aiManager);
-	if (a_context.aiTickThisFrame)
+
+	if (a_context.aiMindTickThisFrame)
 	{
-		a_aiManager.TickAI();
+		a_aiManager.TickAllAIMind();
+	}
+
+	if (a_context.aiBehaviorTickThisFrame)
+	{
+		a_aiManager.TickBehaviorTree();
 	}
 
 	// キャラクターのシステム

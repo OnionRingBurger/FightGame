@@ -19,10 +19,5 @@ public:
 
 private:
 
-	static float GetNewUpdatePoint(const AIBlackboard& blackBoard, const AIMind& mind, const AISystemInfo& systemInfo);
-	static AIStance GetNewStance(const AIContext& context, const AIBlackboard& blackBord, const AIMind& mind);
-	static float ScoreByDistance(float dist, float mid, float coefficient);
-	static float ScoreByHitCount(int hitCount, float coefficient);
-	static float ScoreByStance(int stanceCount, float coefficient);
-	static float ApplyScoreBase(float score, float base);
+
 };

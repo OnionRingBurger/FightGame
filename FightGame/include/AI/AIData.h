@@ -73,15 +73,20 @@ struct AIContext
 // システム情報
 struct AISystemInfo
 {
-	float tickDelta;
+	float tickDeltaBehavier;
+	float tickDeltaMind;
 
 	AISystemInfo()
-		: tickDelta(0.0f)
+		: tickDeltaBehavier(0.0f)
+		, tickDeltaMind(0.0f)
 	{
 	}
 
-	explicit AISystemInfo(float a_tickDelta)
-		: tickDelta(a_tickDelta)
+	explicit AISystemInfo(
+		float a_tickDeltaBehavier,
+		float a_tickDeltaMind)
+		: tickDeltaBehavier(a_tickDeltaBehavier)
+		, tickDeltaMind(a_tickDeltaMind)
 	{
 	}
 };
@@ -138,8 +143,6 @@ struct AIMind
 	// 被弾数、ガード数
 	int sameTakenCount = 0;
 	int sameGuardCount = 0;
-
-	// TODO Playerの無防備度とかも見る
 };
 
 // ランタイムデータ

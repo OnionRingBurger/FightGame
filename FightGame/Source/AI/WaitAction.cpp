@@ -21,7 +21,7 @@ Node::Status WaitAction::Tick(AIContext& context, const AIBlackboard& blackBord,
 	result.UseAttack = false;
 
 	// !!!New!!!
-	context.actionDuration += systemInfo.tickDelta;
+	context.actionDuration += systemInfo.tickDeltaBehavier;
 
 	// I—¹‚µ‚½‚ç¬Œ÷
 	if (context.actionDuration >= maxDuration)
