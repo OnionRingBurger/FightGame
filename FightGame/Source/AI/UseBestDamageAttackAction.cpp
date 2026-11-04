@@ -16,10 +16,12 @@ Node::Status UseBestDamageAttackAction::Tick(
 	const AIBlackboard& blackBord,
 	AIMind& mind,
 	const AISystemInfo& systemInfo,
-	AIResult& result)
+	AIResult& result,
+	float deltaTime)
 {
 	(void)mind;
 	(void)systemInfo;
+	(void)deltaTime;
 
 	// !!!New!!!
 	result.UseGuard = false;

@@ -9,10 +9,11 @@ using namespace Component;
 // Chunk情報をAIManagerに登録するSystem
 void AISenseSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager)
 {
+	(void)a_context;
 
 	AISenseFrame senseFrame;
 
-	Entity player =	GetPlayer(a_chunk, float3());
+	Entity player = GetPlayer(a_chunk, float3());
 
 	// プレイヤーのステータスを代入
 	ComponentHandle<DeadState> deadState = a_chunk.GetComponent<DeadState>(player);
@@ -29,59 +30,31 @@ void AISenseSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_
 
 	for (auto it : enemyView)
 	{
-		// 敵データを作成し代入
-		AIBlackboard::BBEnemyData enemyData;
+		// 今フレームの状態
+		AISenseEnemyFrame enemyFrame;
 
-		// トランスフォーム
+		// トランスフォームを代入
 		ComponentHandle<Position> enemyPos = a_chunk.GetComponent<Position>(it);
-		enemyData.position = float2(enemyPos.Look().x, enemyPos.Look().z);
+		enemyFrame.position = float2(enemyPos.Look().x, enemyPos.Look().z);
 		ComponentHandle<Rotation> enemyRot = a_chunk.GetComponent<Rotation>(it);
-		enemyData.rotation = enemyRot.Look().yaw;
+		enemyFrame.rotation = enemyRot.Look().yaw;
 
-		// 行動可能かどうか
+		// 行動可能かどうかを代入
 		ComponentHandle<ActionMask> enemyMask = a_chunk.GetComponent<ActionMask>(it);
 		if (enemyMask.IsValid())
 		{
-			enemyData.canAttack = (enemyMask.Look().allowed & ActionFlag_Attack) != 0;
-			enemyData.canMove = (enemyMask.Look().allowed & ActionFlag_Move) != 0;
+			enemyFrame.canAttack = (enemyMask.Look().allowed & ActionFlag_Attack) != 0;
+			enemyFrame.canMove = (enemyMask.Look().allowed & ActionFlag_Move) != 0;
 		}
 		else
 		{
-			enemyData.canAttack = false;
-			enemyData.canMove = false;
+			enemyFrame.canAttack = false;
+			enemyFrame.canMove = false;
 		}
 
-		// 攻撃データを全てコピー
-		ComponentHandle<AttackStatus> enemyAttackStatus = a_chunk.GetComponent<AttackStatus>(it);
-		ComponentHandle<AIRole> enemyRole = a_chunk.GetComponent<AIRole>(it);
-
-		enemyData.attackDatas.clear();
-		for (const AttackPower& power : enemyAttackStatus.Look().attackPowers)
-		{
-			AIBlackboard::BBAttackData enemyAttackData;
-			enemyAttackData.maxLength = power.maxLength;
-			enemyAttackData.minLength = power.minLength;
-			enemyAttackData.angle = power.angle;
-			enemyAttackData.followOffset = power.followOffset;
-			enemyAttackData.waitTime = power.waitTime;
-			enemyAttackData.damageValue = power.damageValue;
-			enemyAttackData.endWithOwnerAction = power.endWithOwnerAction;
-			enemyData.attackDatas.push_back(enemyAttackData);
-		}
-		// ロール登録
-		enemyData.distFocus = enemyRole.Look().distFocus;
-		enemyData.farnessPref = enemyRole.Look().farnessPref;
-		enemyData.hitSensitivity = enemyRole.Look().hitSensitivity;
-		enemyData.stanceStickiness = enemyRole.Look().stanceStickiness;
-		enemyData.probeContinuePowRate = enemyRole.Look().probeContinuePowRate;
-		enemyData.holdContinuePowRate = enemyRole.Look().holdContinuePowRate;
-		enemyData.escapeContinuePowRate = enemyRole.Look().escapeContinuePowRate;
-
-		// 対応する位置に上書き
-		senseFrame.enemyDatas[it] = enemyData;
+		senseFrame.enemies[it] = enemyFrame;
 	}
 
 	// AI側に書き込む
-	a_aiManager.WriteSense(senseFrame);
-	
+	a_aiManager.WriteSenseFrame(senseFrame);
 }

@@ -14,7 +14,7 @@ using RuntimeMap = std::unordered_map<Entity, AIRuntime>;
 class AIManager
 {
 public:
-	AIManager();
+	explicit AIManager(float behaviorTickInterval);
 	~AIManager();
 
 	bool RegisterTree(const std::string& aiType, std::unique_ptr<BehaviorTree> tree);
@@ -25,9 +25,12 @@ public:
 	AIResult ReadResult(Entity entity) const;
 
 	// AI機能へのシーン情報を書き込み
-	void WriteSense(const AISenseFrame& senseFrame);
+	void WriteSenseFrame(const AISenseFrame& senseFrame);
+	void WriteSenseProfile(const AISenseProfile& senseProfile);
+	bool IsRegisteredAI(Entity entity) const;
+	bool IsSenseProfileReady(Entity entity) const;
 
-	// AI機能へのシステム情報書き込み
+	// AI機能へのシステム情報書き込み（当面は空の受け取り）
 	void WriteSystem(const AISystemInfo& a_systemInfo);
 
 	// 攻撃情報読み取り
@@ -35,32 +38,26 @@ public:
 	// 攻撃命中情報読み取り
 	void NotifyHitResolved(Entity hitEnemy, bool isGuard);
 
-	// 思考に基づいた挙動を更新
-	void TickBehaviorTree();
-
-	// AIの思考を更新
-	void TickAllAIMind();
+	// フレーム数を受け取り内部で低頻度で更新
+	void Tick(float deltaTime);
 
 private:
-	// 種類ごとのビヘイビアツリー
 	BTMap behavioreTreeMap;
 
-	// 各エンティティのと対応するAIの情報
 	RuntimeMap runtimeMap;
-	// 共有ブラックボード
 	AIBlackboard blackBoard;
-	// システム側の情報
 	AISystemInfo systemInfo;
 
+	float behaviorTickInterval;
+	float behaviorTickAccum;
 
+	void TickBehaviorTree(float behaviorDeltaTime);
+	void TickAllAIMind(float deltaTime);
 
-
-	// スタンス点更新
-	void UpdateStancePoint(AIMind& mind, const AISystemInfo& systemInfo);
-	// スタンス更新
+	void UpdateStancePoint(AIMind& mind, float deltaTime);
 	void UpdateStance(AIContext& context, const AIBlackboard& blackBoard, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result);
-	
-	void TickAIMind(AIContext& context, const AIBlackboard& blackBoard, AIMind& mind, AISystemInfo& systemInfo, AIResult& result);
+
+	void TickAIMind(AIContext& context, const AIBlackboard& blackBoard, AIMind& mind, float deltaTime, AIResult& result);
 
 	bool IsStanceUpdate(const AIMind& mind);
 

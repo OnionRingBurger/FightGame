@@ -9,8 +9,11 @@ RunPlayerNode::~RunPlayerNode()
 {
 }
 
-Node::Status RunPlayerNode::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status RunPlayerNode::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
+	(void)systemInfo;
+	(void)deltaTime;
+	(void)mind;
 		// àÍìxèâä˙âª
 		result.MoveDir = float2(0.0f, 0.0f);
 		result.IsMove = false;

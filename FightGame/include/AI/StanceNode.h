@@ -15,7 +15,7 @@ public:
 		std::unique_ptr<Node> neutralProbe);
 	~StanceNode() override;
 
-	Status Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result) override;
+	Status Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime) override;
 
 private:
 

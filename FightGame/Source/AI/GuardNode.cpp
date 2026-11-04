@@ -9,11 +9,12 @@ GuardNode::~GuardNode()
 {
 }
 
-Node::Status GuardNode::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status GuardNode::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
 	(void)context;
 	(void)mind;
 	(void)systemInfo;
+	(void)deltaTime;
 
 	result.MoveDir = float2(0.0f, 0.0f);
 	result.IsMove = false;

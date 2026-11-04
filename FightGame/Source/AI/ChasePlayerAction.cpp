@@ -14,10 +14,11 @@ ChasePlayerAction::~ChasePlayerAction()
 {
 }
 
-Node::Status ChasePlayerAction::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status ChasePlayerAction::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
 	(void)systemInfo;
 	(void)mind;
+	(void)deltaTime;
 	// àÍìxèâä˙âª
 	result.MoveDir = float2(0.0f, 0.0f);
 	result.IsMove = false;

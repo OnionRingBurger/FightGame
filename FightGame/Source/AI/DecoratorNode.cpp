@@ -12,7 +12,7 @@ DecoratorNode::~DecoratorNode()
 {
 }
 
-Node::Status DecoratorNode::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status DecoratorNode::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
 	// 子ノードが存在しなければ抜ける
 	if (!childNode)
@@ -21,7 +21,7 @@ Node::Status DecoratorNode::Tick(AIContext& context, const AIBlackboard& blackBo
 	}
 
 	// 条件を確認し、満たしていなければ抜ける
-	if (!CheckCondition(context, blackBord, mind, systemInfo, result))
+	if (!CheckCondition(context, blackBord, mind, systemInfo, result, deltaTime))
 	{
 		return NODE_FAILURE;
 	}
@@ -32,16 +32,17 @@ Node::Status DecoratorNode::Tick(AIContext& context, const AIBlackboard& blackBo
 		return NODE_FAILURE;
 	}
 
-	return childNode->Tick(context, blackBord, mind, systemInfo, result);
+	return childNode->Tick(context, blackBord, mind, systemInfo, result, deltaTime);
 }
 
-bool DecoratorNode::CheckCondition(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+bool DecoratorNode::CheckCondition(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
 	(void)context;
 	(void)blackBord;
 	(void)mind;
 	(void)systemInfo;
 	(void)result;
+	(void)deltaTime;
 	return true;
 }
 

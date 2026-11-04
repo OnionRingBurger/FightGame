@@ -11,7 +11,7 @@ ReactiveSelector::~ReactiveSelector()
 {
 }
 
-Node::Status ReactiveSelector::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status ReactiveSelector::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
 	// !!!New!!!
 	if (context.nodeIndexes.size() <= static_cast<size_t>(hierarchy))
@@ -52,7 +52,7 @@ Node::Status ReactiveSelector::Tick(AIContext& context, const AIBlackboard& blac
 			return NODE_FAILURE;
 		}
 
-		Status childState = childNodes.at(i)->Tick(context, blackBord, mind, systemInfo, result);
+		Status childState = childNodes.at(i)->Tick(context, blackBord, mind, systemInfo, result, deltaTime);
 		if (childState == NODE_FAILURE)
 		{
 			continue;

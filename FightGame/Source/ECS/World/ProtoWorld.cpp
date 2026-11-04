@@ -343,7 +343,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 			float3(0.0f, 0.0f, 0.0f),
 			float3(1.0f, 1.0f, 1.0f)
 		),
-		EfkEffectKey(kSnowEffect, true)  // ループ再生
+		EfkEffectKey(kSnowEffect, true)  // ???[?v???¶
 	);
 
 	Entity battleStart = newChunk.CreateNewEntity(
@@ -365,8 +365,8 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 
 void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
-	// 移動系の処理をあらかじめ行う
-	// Physics系の処理を行う
+	// ??“??n???????????????¶???s??
+	// Physics?n?????????s??
 	//WorldPowerSystem(a_chunk, a_context);
 	//VelocitySystem(a_chunk, a_context); //oo
 	//AngularVelocitySystem(a_chunk, a_context);
@@ -376,11 +376,11 @@ void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 	//ColliderBackSystem(a_chunk, a_context);//o
 
 
-	// 物理挙動の結果に基づいてキャラクターのステートを決定する
+	// ?¨???““?????‰????????????L???‰?N?^?[???X?e?[?g????’?????
 	GroundedSystem(a_chunk, a_context);
 	CharacterActionMaskSystem(a_chunk, a_context);
 
-	// Pose系の処理を行う
+	// Pose?n?????????s??
 
 	InputMoveSystem(a_chunk, a_context); //oo
 	InputRotatoSystem(a_chunk, a_context);  //oo
@@ -397,25 +397,25 @@ void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 
 	ResetConsoleSystem(a_chunk, a_context);
 
-	// 追従などの遅延系処理
+	// ’??]??????’x‰??n????
 	LookMoveSystem(a_chunk, a_context);
 	FollowTransformSystem(a_chunk, a_context);//o
 	CameraMoveSystem(a_chunk, a_context);//oo
 	LatePoseSystem(a_chunk, a_context);
-	// Transform適用
+	// Transform“K?p
 	TransformSystem(a_chunk, a_context);
 
 	EnemyAttackLoadSystem(a_chunk, a_context);
 
 
-	// リザルトなどをリセット
+	// ???U???g?????????Z?b?g
 	ResetSystem(a_chunk, a_context);
 }
 
 void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 
-	// Physics系の処理を行う
+	// Physics?n?????????s??
 	WorldPowerSystem(a_chunk, a_context);
 	ForceSystem(a_chunk, a_context);
 	VelocitySystem(a_chunk, a_context);
@@ -427,12 +427,12 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	ColliderBackSystem(a_chunk, a_context);
 	LatePhysicsPoseSystem(a_chunk, a_context);
 
-	// 物理挙動の結果に基づいてキャラクターのステートを決定する
+	// ?¨???““?????‰????????????L???‰?N?^?[???X?e?[?g????’?????
 	GroundedSystem(a_chunk, a_context);
 	CharacterActionMaskSystem(a_chunk, a_context);
 	MoveInputResolveSystem(a_chunk, a_context, a_aiManager);
 
-	// Pose系の処理を行う
+	// Pose?n?????????s??
 	InputMoveSystem(a_chunk, a_context);
 	InputRotatoSystem(a_chunk, a_context);
 	FlipSystem(a_chunk, a_context);
@@ -445,36 +445,27 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	ShakeSystem(a_chunk, a_context);
 	PoseSystem(a_chunk, a_context);
 
-	// 追従などの遅延系処理
+	// ’??]??????’x‰??n????
 	LookMoveSystem(a_chunk, a_context);
 	LookSystem(a_chunk, a_context);
 	LookOnSystem(a_chunk, a_context);
 	FollowTransformSystem(a_chunk, a_context);
 	CameraMoveSystem(a_chunk, a_context);
 	LatePoseSystem(a_chunk, a_context);
-	// Transform適用
+	// Transform“K?p
 	TransformSystem(a_chunk, a_context);
 
-	// Transform等を使用するSystemを実行
+	// Transform“????g?p????System?????s
 	RaySystem(a_chunk, a_context);
 	CameraViewSystem(a_chunk, a_context);
 	RailUpdateSystem(a_chunk, a_context);
 
 	// AI更新
-	a_aiManager.WriteSystem(AISystemInfo(a_context.aiDeltaTime, a_context.aiMindDeltaTime));
+	a_aiManager.WriteSystem(AISystemInfo());
 	AISenseSystem(a_chunk, a_context, a_aiManager);
+	a_aiManager.Tick(a_context.deltaTime);
 
-	if (a_context.aiMindTickThisFrame)
-	{
-		a_aiManager.TickAllAIMind();
-	}
-
-	if (a_context.aiBehaviorTickThisFrame)
-	{
-		a_aiManager.TickBehaviorTree();
-	}
-
-	// キャラクターのシステム
+	// ?L???‰?N?^?[???V?X?e??
 	AttackHitSystem(a_chunk, a_context, a_response, a_aiManager);
 	CharacterAttackSystem(a_chunk, a_context);
 	PlayerJumpSystem(a_chunk, a_context);
@@ -499,7 +490,7 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 
 	CursorSelectSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 
-	// Effect系統を処理
+	// Effect?n“???????
 	ControllerInputUISystem(a_chunk, a_context);
 	UVMoveSystem(a_chunk, a_context);
 	UILerpSystem(a_chunk, a_context);
@@ -515,12 +506,12 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	SpawnEfkEffectSystem(a_chunk, a_context);
 	UpdateEfkEffectSystem(a_chunk, a_context);
 
-	// ステージ読み込み
+	// ?X?e?[?W“???????
 	SpawnJsonSystem(a_chunk, a_context, a_response);
 	PlayerHealSystem(a_chunk, a_context);
 	CreateEffectSystem(a_chunk, a_context);
 
-	// 終了処理
+	// ?I??????
 	LifeTimeSystem(a_chunk, a_context);
 	CheckAliveTargetGameOverSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
 	CheckAliveTargetEnemySystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
@@ -603,7 +594,8 @@ void ProtoWorld::SpawnPostProcessing(const std::vector<Entity>& entities, Chunk&
 
 			a_chunk.AddComponent(it, status);
 			a_chunk.DeleteChunkComponent(it, AttackKeyLoad::kTypeId);
-			a_aiManager.RegisterAI(it, "Enemy");
+			// !!!New!!!
+			RegisterEnemyAI(a_chunk, a_aiManager, it);
 
 		}
 	}

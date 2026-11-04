@@ -76,15 +76,10 @@ private:
 	SystemContext context;
 	bool isGameEnd;
 	bool allLoadModel = false;
-	float aiTickAccum = 0.0f;
-	float aiMindTickAccum = 0.0f;
-
 
 	ComponentsSerialize& serialize;
 
-	// 3FãNÇ´Ç…çXêV
-	static constexpr float kAITickInterval = 3.0f / 60.0f;
-	static constexpr float kAIMindTickInterval = 3.0f / 60.0f;
+	static constexpr float kAIBehaviorTickInterval = 3.0f / 60.0f;
 
 protected:
 

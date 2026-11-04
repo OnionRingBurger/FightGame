@@ -12,11 +12,12 @@ InAttackRangeDecorator::~InAttackRangeDecorator()
 {
 }
 
-bool InAttackRangeDecorator::CheckCondition(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+bool InAttackRangeDecorator::CheckCondition(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
 	(void)mind;
 	(void)systemInfo;
 	(void)result;
+	(void)deltaTime;
 
 	// TODO 恐らく範囲外でも通してしまうバグがある模様、あるいは下のAttack側がおかしいかも
 

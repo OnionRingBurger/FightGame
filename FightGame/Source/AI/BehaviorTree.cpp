@@ -11,7 +11,7 @@ BehaviorTree::~BehaviorTree()
 }
 
 // ツリーの更新
-void BehaviorTree::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+void BehaviorTree::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
 	// ノードがなければ抜ける
 	if (!rootNode)
@@ -20,7 +20,7 @@ void BehaviorTree::Tick(AIContext& context, const AIBlackboard& blackBord, AIMin
 	}
 
 	// 更新
-	if (rootNode->Tick(context, blackBord, mind, systemInfo, result) != Node::NODE_RUNNING)
+	if (rootNode->Tick(context, blackBord, mind, systemInfo, result, deltaTime) != Node::NODE_RUNNING)
 	{
 		context.actionDuration = 0.0f;
 		context.nodeIndexes.clear();

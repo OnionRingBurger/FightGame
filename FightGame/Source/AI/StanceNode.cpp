@@ -24,7 +24,7 @@ StanceNode::~StanceNode()
 {
 }
 
-Node::Status StanceNode::Tick(AIContext& context, const AIBlackboard& blackBoard, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status StanceNode::Tick(AIContext& context, const AIBlackboard& blackBoard, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
 
 	// •ûj‚ª‘¶Ý‚µ‚È‚¢ê‡Ž¸”s‚ð•Ô‚·
@@ -42,7 +42,7 @@ Node::Status StanceNode::Tick(AIContext& context, const AIBlackboard& blackBoard
 	if (!isSafe) return NODE_FAILURE;
 
 	// ‘Î‰ž‚·‚é•ûj‚Ìƒm[ƒh‚ÌXV‚ðs‚¢Œ‹‰Ê‚ð•Ô‚·
-	return childNodes.at(stanceIndex)->Tick(context, blackBoard, mind, systemInfo, result);
+	return childNodes.at(stanceIndex)->Tick(context, blackBoard, mind, systemInfo, result, deltaTime);
 }
 
 

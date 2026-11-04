@@ -2,7 +2,9 @@
 #include "DebugConsole.h"
 #include "AI/RoleCurve.h"
 
-AIManager::AIManager()
+AIManager::AIManager(float a_behaviorTickInterval)
+	: behaviorTickInterval(a_behaviorTickInterval)
+	, behaviorTickAccum(0.0f)
 {
 }
 
@@ -63,22 +65,91 @@ AIResult AIManager::ReadResult(Entity entity) const
 	return it->second.result;
 }
 
-void AIManager::WriteSense(const AISenseFrame& senseFrame)
+void AIManager::WriteSenseFrame(const AISenseFrame& senseFrame)
 {
-	// プレイヤーを
+	// プレイヤーの情報を更新
 	blackBoard.playerPos = senseFrame.playerPos;
 	blackBoard.isPlayerDead = senseFrame.isPlayerDead;
-	// 敵情報はリセットして入れ直す
-	blackBoard.enemyDatas.clear();
-	for (const auto& pair : senseFrame.enemyDatas)
+
+	// 
+	for (const auto& pair : senseFrame.enemies)
+	{
+		// 書き込まれたデータの敵が未登録だった場合は抜ける
+		if (runtimeMap.find(pair.first) == runtimeMap.end())
+		{
+			continue;
+		}
+		// データを更新する
+		AIBlackboard::BBEnemyData& enemyData = blackBoard.enemyDatas[pair.first];
+		enemyData.position = pair.second.position;
+		enemyData.rotation = pair.second.rotation;
+		enemyData.canMove = pair.second.canMove;
+		enemyData.canAttack = pair.second.canAttack;
+	}
+
+	// 更新がなかったEntityを削除
+	for (auto it = blackBoard.enemyDatas.begin(); it != blackBoard.enemyDatas.end(); )
+	{
+		if (senseFrame.enemies.find(it->first) == senseFrame.enemies.end())
+		{
+			it = blackBoard.enemyDatas.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+}
+
+void AIManager::WriteSenseProfile(const AISenseProfile& senseProfile)
+{
+	for (const auto& pair : senseProfile.enemies)
 	{
 		// 存在するか確認
 		if (runtimeMap.find(pair.first) == runtimeMap.end())
 		{
 			continue;
 		}
-		blackBoard.enemyDatas[pair.first] = pair.second;
+
+		AIBlackboard::BBEnemyData& enemyData = blackBoard.enemyDatas[pair.first];
+		enemyData.attackDatas = pair.second.attackDatas;
+		enemyData.distFocus = pair.second.distFocus;
+		enemyData.farnessPref = pair.second.farnessPref;
+		enemyData.hitSensitivity = pair.second.hitSensitivity;
+		enemyData.stanceStickiness = pair.second.stanceStickiness;
+		enemyData.probeContinuePowRate = pair.second.probeContinuePowRate;
+		enemyData.holdContinuePowRate = pair.second.holdContinuePowRate;
+		enemyData.escapeContinuePowRate = pair.second.escapeContinuePowRate;
+
+		// !!!New!!!
+		RoleCurveKnobs roleKnobs;
+		roleKnobs.distFocus = enemyData.distFocus;
+		roleKnobs.farnessPref = enemyData.farnessPref;
+		roleKnobs.hitSensitivity = enemyData.hitSensitivity;
+		roleKnobs.stanceStickiness = enemyData.stanceStickiness;
+		const RoleCurveParams roleParams = MapRoleCurveKnobsToParams(roleKnobs);
+		enemyData.distCoefficient = roleParams.distCoefficient;
+		enemyData.farnessCoefficient = roleParams.farnessCoefficient;
+		enemyData.hitCoefficient = roleParams.hitCoefficient;
+		enemyData.stanceCoefficient = roleParams.stanceCoefficient;
+
+		enemyData.profileReady = true;
 	}
+}
+
+bool AIManager::IsRegisteredAI(Entity entity) const
+{
+	return runtimeMap.find(entity) != runtimeMap.end();
+}
+
+bool AIManager::IsSenseProfileReady(Entity entity) const
+{
+	const auto it = blackBoard.enemyDatas.find(entity);
+	if (it == blackBoard.enemyDatas.end())
+	{
+		return false;
+	}
+	return it->second.profileReady;
 }
 
 void AIManager::WriteSystem(const AISystemInfo& a_systemInfo)
@@ -141,7 +212,23 @@ void AIManager::NotifyHitResolved(Entity hitEnemy, bool isGuard)
 
 
 
-void AIManager::TickBehaviorTree()
+void AIManager::Tick(float deltaTime)
+{
+	// 思考を更新
+	// 更新頻度が各Entityの状態ごとに違うので
+	// 各々が更新頻度を確認する
+	TickAllAIMind(deltaTime);
+
+	// BTの更新頻度を計算
+	behaviorTickAccum += deltaTime;
+	if (behaviorTickAccum >= behaviorTickInterval)
+	{
+		TickBehaviorTree(behaviorTickAccum);
+		behaviorTickAccum = 0.0f;
+	}
+}
+
+void AIManager::TickBehaviorTree(float behaviorDeltaTime)
 {
 	// 各Entityを更新
 	for (auto& pair : runtimeMap)
@@ -167,35 +254,35 @@ void AIManager::TickBehaviorTree()
 				blackBoard,
 				runtime.mind,
 				systemInfo,
-				runtime.result
+				runtime.result,
+				behaviorDeltaTime
 			);
 	}
 }
 
-void AIManager::TickAllAIMind()
+void AIManager::TickAllAIMind(float deltaTime)
 {
 	// 各Entityを更新
-	for(auto& pair : runtimeMap)
+	for (auto& pair : runtimeMap)
 	{
 		AIRuntime& runtime = pair.second;
 		TickAIMind(
 			runtime.context,
 			blackBoard,
 			runtime.mind,
-			systemInfo,
+			deltaTime,
 			runtime.result
 		);
-
 	}
 }
 
 
-void AIManager::TickAIMind(AIContext& context, const AIBlackboard& blackBoard, AIMind& mind, AISystemInfo& systemInfo, AIResult& result)
+void AIManager::TickAIMind(AIContext& context, const AIBlackboard& blackBoard, AIMind& mind, float deltaTime, AIResult& result)
 {
 	// スタンス変更に至るポイントを更新
-	UpdateStancePoint(mind, systemInfo);
+	UpdateStancePoint(mind, deltaTime);
 	// 更新
-	if(IsStanceUpdate(mind))
+	if (IsStanceUpdate(mind))
 	{
 		// スタンスの更新
 		UpdateStance(
@@ -208,14 +295,14 @@ void AIManager::TickAIMind(AIContext& context, const AIBlackboard& blackBoard, A
 	}
 }
 
-void AIManager::UpdateStancePoint(AIMind& mind, const AISystemInfo& systemInfo)
+void AIManager::UpdateStancePoint(AIMind& mind, float deltaTime)
 {
 	// 現在のポイント
-	float currentPoint = mind.updatePoints;	
+	float currentPoint = mind.updatePoints;
 	// 時間経過による更新量
-	float deltaPoint = systemInfo.tickDeltaMind;
+	float deltaPoint = deltaTime;
 	// ガード数に応じてより早く更新する
-	float guardPoint = mind.sameGuardCount * systemInfo.tickDeltaMind * 1.5f;
+	float guardPoint = mind.sameGuardCount * deltaTime * 1.5f;
 
 	// ポイントの合計を出して更新
 	float pointAmount = currentPoint + deltaPoint + guardPoint;
@@ -251,7 +338,7 @@ void AIManager::UpdateStance(AIContext& context, const AIBlackboard& blackBoard,
 
 bool AIManager::IsStanceUpdate(const AIMind& mind)
 {
-	return mind.maxUpdatePoints > mind.updatePoints;
+	return mind.updatePoints >= mind.maxUpdatePoints;
 }
 
 
@@ -284,23 +371,29 @@ AIStance AIManager::GetNewStance(const AIContext& context, const AIBlackboard& b
 	const int hitTakenCount = mind.sameTakenCount - mind.sameGuardCount;
 	const int attackSuccessCount = mind.attackSuccessCount;
 
-    // 各係数を作成
+    // 各係数を作成 !!!Old!!!
     // const float distCoeff = enemyData.distCoefficient > 0.0f ? enemyData.distCoefficient : 1.0f;
     // const float farnessCoeff = enemyData.farnessCoefficient > 0.0f ? enemyData.farnessCoefficient : 1.0f;
     // const float hitCoeff = enemyData.hitCoefficient > 0.0f ? enemyData.hitCoefficient : 3.0f;
     // const float stanceCoeff = enemyData.stanceCoefficient;
 
-	// 各係数を作成
-	RoleCurveKnobs roleKnobs;
-	roleKnobs.distFocus = enemyData.distFocus;
-	roleKnobs.farnessPref = enemyData.farnessPref;
-	roleKnobs.hitSensitivity = enemyData.hitSensitivity;
-	roleKnobs.stanceStickiness = enemyData.stanceStickiness;
-	const RoleCurveParams roleParams = MapRoleCurveKnobsToParams(roleKnobs);
-	const float distCoeff = roleParams.distCoefficient;
-	const float farnessCoeff = roleParams.farnessCoefficient;
-	const float hitCoeff = roleParams.hitCoefficient;
-	const float stanceCoeff = roleParams.stanceCoefficient;
+	// 各係数を作成 !!!Old!!!
+	// RoleCurveKnobs roleKnobs;
+	// roleKnobs.distFocus = enemyData.distFocus;
+	// roleKnobs.farnessPref = enemyData.farnessPref;
+	// roleKnobs.hitSensitivity = enemyData.hitSensitivity;
+	// roleKnobs.stanceStickiness = enemyData.stanceStickiness;
+	// const RoleCurveParams roleParams = MapRoleCurveKnobsToParams(roleKnobs);
+	// const float distCoeff = roleParams.distCoefficient;
+	// const float farnessCoeff = roleParams.farnessCoefficient;
+	// const float hitCoeff = roleParams.hitCoefficient;
+	// const float stanceCoeff = roleParams.stanceCoefficient;
+
+	// !!!New!!!
+	const float distCoeff = enemyData.distCoefficient;
+	const float farnessCoeff = enemyData.farnessCoefficient;
+	const float hitCoeff = enemyData.hitCoefficient;
+	const float stanceCoeff = enemyData.stanceCoefficient;
 
 	// 有利位置: 得意距離に近いほど高い
 	const float advantagePos = ScoreByDistance(playerDistance, preferredMid, distCoeff);

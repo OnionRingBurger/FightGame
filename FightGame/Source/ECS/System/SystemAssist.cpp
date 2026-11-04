@@ -1,6 +1,7 @@
 #include <fstream>
 
 #include "SystemAssist.h"
+#include "AIData.h"
 #include "Components.h"
 #include "GameData.h"
 #include "Defines.h"
@@ -337,67 +338,65 @@ void AddGameBind(Input& a_input)
 }
 
 
-void NewSceneSpawn(ComponentsSerialize& a_serialize, Chunk& a_chunk, AIManager& aiManager, std::string a_newSceneName, float3 a_offset)
+// !!!New!!!
+void WriteAISenseProfile(Chunk& a_chunk, AIManager& a_aiManager, Entity entity)
 {
-	std::vector<Entity> newEntity = LoadJsonComponent(a_chunk, a_serialize, a_newSceneName);
-	for (auto it : newEntity)
+	// ìoò^çœÇ›Ç≈Ç©Ç¬ÇµÇÂÇ´Ç©Ç≥ÇÍÇƒÇ¢Ç»Ç©Ç¡ÇΩÇÁàÍíUìoò^
+	if (!a_aiManager.IsRegisteredAI(entity))
 	{
-		ComponentHandle<LeapPosComponent> leap = a_chunk.GetComponent<LeapPosComponent>(it);
-		if (leap.IsValid())
-		{
-			leap->leapStartPos += a_offset;
-			leap->leapEndPos += a_offset;
-		}
-
-		ComponentHandle<MotionTransform> motion = a_chunk.GetComponent<MotionTransform>(it);
-		ComponentHandle<PosePosState> posState = a_chunk.GetComponent<PosePosState>(it);
-		if (!motion.IsValid() || posState.IsValid()) continue;
-		motion->motionPos += a_offset;
-
-		ComponentHandle<EnemyTag> enemyTag = a_chunk.GetComponent<EnemyTag>(it);
-		if (!enemyTag.IsValid()) continue;
-
-
-		ComponentHandle<AttackKeyLoad> keyLoad = a_chunk.GetComponent<AttackKeyLoad>(it);
-		if (keyLoad.IsValid())
-		{
-			std::ifstream stream(kAttackDataPath);
-			if (!stream.is_open()) continue;
-			nlohmann::json json;
-			stream >> json;
-			AttackStatus status;
-			for (auto attackIt : keyLoad.Look().attackKeys)
-			{
-				status.attackPowers.push_back(
-					AttackPower(
-						json[attackIt].value("MinLength", 0.0f),
-						json[attackIt].value("MaxLength", 0.0f),
-						json[attackIt].value("Angle", 0.0f),
-						json[attackIt].value("MaxHeight", 0.0f),
-						json[attackIt].value("MaxLowness", 0.0f),
-						json[attackIt].value("DamageValue", 0.0f),
-						json[attackIt].value("MotionTime", 0.0f),
-						json[attackIt].value("LifeTime", 0.0f),
-						float3(
-							json[attackIt].value("FollowOffsetX", 0.0f),
-							json[attackIt].value("FollowOffsetY", 0.0f),
-							json[attackIt].value("FollowOffsetZ", 0.0f)
-						),
-						json[attackIt].value("WaitTime", 0.0f),
-						json[attackIt].value("StartupTime", 0.0f),
-						attackIt,
-						json[attackIt].value("EndWithOwnerAction", true))
-
-				);
-
-			}
-
-			a_chunk.AddComponent(it, status);
-			a_chunk.DeleteChunkComponent(it, AttackKeyLoad::kTypeId);
-			aiManager.RegisterAI(it, "Enemy");
-		
-		}
+		return;
 	}
+	if (a_aiManager.IsSenseProfileReady(entity))
+	{
+		return;
+	}
+
+	ComponentHandle<AttackStatus> enemyAttackStatus = a_chunk.GetComponent<AttackStatus>(entity);
+	ComponentHandle<AIRole> enemyRole = a_chunk.GetComponent<AIRole>(entity);
+	if (!enemyAttackStatus.IsValid() || !enemyRole.IsValid())
+	{
+		return;
+	}
+
+	// ÉvÉçÉtÉ@ÉCÉãÇÃïœçXÇçÏê¨
+	AISenseEnemyProfile enemyProfile;
+
+	// ìGÇÃçUåÇÉfÅ[É^ÇçÏê¨
+	enemyProfile.attackDatas.clear();
+	for (const AttackPower& power : enemyAttackStatus.Look().attackPowers)
+	{
+		AIBlackboard::BBAttackData enemyAttackData;
+		enemyAttackData.maxLength = power.maxLength;
+		enemyAttackData.minLength = power.minLength;
+		enemyAttackData.angle = power.angle;
+		enemyAttackData.followOffset = power.followOffset;
+		enemyAttackData.waitTime = power.waitTime;
+		enemyAttackData.damageValue = power.damageValue;
+		enemyAttackData.endWithOwnerAction = power.endWithOwnerAction;
+		enemyProfile.attackDatas.push_back(enemyAttackData);
+	}
+
+	// ÉçÅ[Éãìoò^
+	enemyProfile.distFocus = enemyRole.Look().distFocus;
+	enemyProfile.farnessPref = enemyRole.Look().farnessPref;
+	enemyProfile.hitSensitivity = enemyRole.Look().hitSensitivity;
+	enemyProfile.stanceStickiness = enemyRole.Look().stanceStickiness;
+	enemyProfile.probeContinuePowRate = enemyRole.Look().probeContinuePowRate;
+	enemyProfile.holdContinuePowRate = enemyRole.Look().holdContinuePowRate;
+	enemyProfile.escapeContinuePowRate = enemyRole.Look().escapeContinuePowRate;
+
+	AISenseProfile senseProfile;
+	senseProfile.enemies[entity] = enemyProfile;
+
+	// è„èëÇ´
+	a_aiManager.WriteSenseProfile(senseProfile);
+}
+
+// !!!New!!!
+void RegisterEnemyAI(Chunk& a_chunk, AIManager& a_aiManager, Entity entity)
+{
+	a_aiManager.RegisterAI(entity, "Enemy");
+	WriteAISenseProfile(a_chunk, a_aiManager, entity);
 }
 
 float3 GetEntityWorldPos(Chunk& a_chunk, Entity a_entity)

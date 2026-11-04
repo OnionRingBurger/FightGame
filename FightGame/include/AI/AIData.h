@@ -41,10 +41,19 @@ struct AIBlackboard
 		float hitSensitivity = 0.5f;
 		float stanceStickiness = 0.5f;
 
+		// !!!New!!!
+		float distCoefficient = 1.0f;
+		float farnessCoefficient = 1.0f;
+		float hitCoefficient = 3.0f;
+		float stanceCoefficient = 1.2f;
+
 		// 各方針の継続時の累乗倍率
 		float probeContinuePowRate = 1.5f;
 		float holdContinuePowRate = 0.6f;
 		float escapeContinuePowRate = 2.5f;
+
+		// !!!New!!!
+		bool profileReady = false;
 	};
 
 	float2 playerPos;
@@ -53,13 +62,45 @@ struct AIBlackboard
 	std::unordered_map<Entity, BBEnemyData> enemyDatas;
 };
 
-// 事実書き込み用データ
+
+// 各敵毎の状態書き込み用データ
+struct AISenseEnemyFrame
+{
+	float2 position;
+	float rotation = 0.0f;
+	bool canMove = false;
+	bool canAttack = false;
+};
+
+// 外部から受け取る状態書き込み用データ
 struct AISenseFrame
 {
 	float2 playerPos;
-	bool isPlayerDead;
-	std::unordered_map<Entity, AIBlackboard::BBEnemyData> enemyDatas;
+	bool isPlayerDead = false;
+	std::unordered_map<Entity, AISenseEnemyFrame> enemies;
 };
+
+
+// 各敵毎の設定書き込み用データ
+struct AISenseEnemyProfile
+{
+	std::vector<AIBlackboard::BBAttackData> attackDatas;
+	float distFocus = 0.5f;
+	float farnessPref = 0.5f;
+	float hitSensitivity = 0.5f;
+	float stanceStickiness = 0.5f;
+	float probeContinuePowRate = 1.5f;
+	float holdContinuePowRate = 0.6f;
+	float escapeContinuePowRate = 2.5f;
+};
+
+// 外部から受け取る設定書き込み用データ
+struct AISenseProfile
+{
+	std::unordered_map<Entity, AISenseEnemyProfile> enemies;
+};
+
+
 
 // ノードの利用状況
 struct AIContext
@@ -70,25 +111,10 @@ struct AIContext
 	float actionDuration;
 };
 
-// システム情報
+// システム情報（当面は空）
 struct AISystemInfo
 {
-	float tickDeltaBehavier;
-	float tickDeltaMind;
-
-	AISystemInfo()
-		: tickDeltaBehavier(0.0f)
-		, tickDeltaMind(0.0f)
-	{
-	}
-
-	explicit AISystemInfo(
-		float a_tickDeltaBehavier,
-		float a_tickDeltaMind)
-		: tickDeltaBehavier(a_tickDeltaBehavier)
-		, tickDeltaMind(a_tickDeltaMind)
-	{
-	}
+	AISystemInfo() = default;
 };
 
 // AI判断結果

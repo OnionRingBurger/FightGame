@@ -24,6 +24,7 @@ World::World(
 	ComponentsSerialize& a_serialize,
 	PrefabManager& a_prefabManager)
 	: prefabManager(a_prefabManager)
+	, aiManager(kAIBehaviorTickInterval)
 	, systemResponse()
 	, m_state(USECHUNK)
 	, isMouseLock(true)
@@ -100,26 +101,6 @@ void World::ContextUpdate(float a_delatTime)
 	{
 		systemResponse->StepStopTime(normalizeDeltatime);
 		context.deltaTime *= systemResponse->GetStopRate();
-	}
-
-	// AI‚ÌXV•p“x‚ðŠÇ—
-	context.aiBehaviorTickThisFrame = false;
-	context.aiMindTickThisFrame = false;
-	context.aiDeltaTime = 0.0f;
-	aiTickAccum += context.deltaTime;
-	aiMindTickAccum += context.deltaTime;
-	if (aiMindTickAccum >= kAIMindTickInterval)
-	{
-		context.aiMindTickThisFrame = true;
-		context.aiMindDeltaTime = aiMindTickAccum;
-		aiMindTickAccum = 0.0f;
-		
-	}
-	if (aiTickAccum >= kAITickInterval)
-	{
-		context.aiBehaviorTickThisFrame = true;
-		context.aiDeltaTime = aiTickAccum;
-		aiTickAccum = 0.0f;
 	}
 }
 

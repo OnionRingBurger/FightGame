@@ -382,18 +382,9 @@ void TutorialWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, System
 	RailUpdateSystem(a_chunk, a_context);
 
 	// AI更新
-	a_aiManager.WriteSystem(AISystemInfo(a_context.aiDeltaTime, a_context.aiMindDeltaTime));
+	a_aiManager.WriteSystem(AISystemInfo());
 	AISenseSystem(a_chunk, a_context, a_aiManager);
-
-	if (a_context.aiMindTickThisFrame)
-	{
-		a_aiManager.TickAllAIMind();
-	}
-
-	if (a_context.aiBehaviorTickThisFrame)
-	{
-		a_aiManager.TickBehaviorTree();
-	}
+	a_aiManager.Tick(a_context.deltaTime);
 
 	// キャラクターのシステム
 	AttackHitSystem(a_chunk, a_context, a_response, a_aiManager);
@@ -453,4 +444,67 @@ void TutorialWorld::HandleSystemResponse(SystemResponse& a_response)
 	if (!a_response.IsWorldRequest()) return;
 
 	worldRequest(a_response.GetWorldRequest());
+}
+
+void TutorialWorld::SpawnPostProcessing(const std::vector<Entity>& entities, Chunk& a_chunk, AIManager& a_aiManager, const SpawnRequest& a_request)
+{
+	for (auto it : entities)
+	{
+		ComponentHandle<LeapPosComponent> leap = a_chunk.GetComponent<LeapPosComponent>(it);
+		if (leap.IsValid())
+		{
+			leap->leapStartPos += a_request.offset;
+			leap->leapEndPos += a_request.offset;
+		}
+
+		ComponentHandle<MotionTransform> motion = a_chunk.GetComponent<MotionTransform>(it);
+		ComponentHandle<PosePosState> posState = a_chunk.GetComponent<PosePosState>(it);
+		if (!motion.IsValid() || posState.IsValid()) continue;
+		motion->motionPos += a_request.offset;
+
+		ComponentHandle<EnemyTag> enemyTag = a_chunk.GetComponent<EnemyTag>(it);
+		if (!enemyTag.IsValid()) continue;
+
+
+		ComponentHandle<AttackKeyLoad> keyLoad = a_chunk.GetComponent<AttackKeyLoad>(it);
+		if (keyLoad.IsValid())
+		{
+			std::ifstream stream(kAttackDataPath);
+			if (!stream.is_open()) continue;
+			nlohmann::json json;
+			stream >> json;
+			AttackStatus status;
+			for (auto attackIt : keyLoad.Look().attackKeys)
+			{
+				status.attackPowers.push_back(
+					AttackPower(
+						json[attackIt].value("MinLength", 0.0f),
+						json[attackIt].value("MaxLength", 0.0f),
+						json[attackIt].value("Angle", 0.0f),
+						json[attackIt].value("MaxHeight", 0.0f),
+						json[attackIt].value("MaxLowness", 0.0f),
+						json[attackIt].value("DamageValue", 0.0f),
+						json[attackIt].value("MotionTime", 0.0f),
+						json[attackIt].value("LifeTime", 0.0f),
+						float3(
+							json[attackIt].value("FollowOffsetX", 0.0f),
+							json[attackIt].value("FollowOffsetY", 0.0f),
+							json[attackIt].value("FollowOffsetZ", 0.0f)
+						),
+						json[attackIt].value("WaitTime", 0.0f),
+						json[attackIt].value("StartupTime", 0.0f),
+						attackIt,
+						json[attackIt].value("EndWithOwnerAction", true))
+
+				);
+
+			}
+
+			a_chunk.AddComponent(it, status);
+			a_chunk.DeleteChunkComponent(it, AttackKeyLoad::kTypeId);
+			// AIを登録
+			RegisterEnemyAI(a_chunk, a_aiManager, it);
+
+		}
+	}
 }

@@ -16,10 +16,12 @@ Node::Status UseLingeringAttackAction::Tick(
 	const AIBlackboard& blackBord,
 	AIMind& mind,
 	const AISystemInfo& systemInfo,
-	AIResult& result)
+	AIResult& result,
+	float deltaTime)
 {
 	(void)mind;
 	(void)systemInfo;
+	(void)deltaTime;
 
 	result.UseGuard = false;
 	result.MoveDir = float2(0.0f, 0.0f);

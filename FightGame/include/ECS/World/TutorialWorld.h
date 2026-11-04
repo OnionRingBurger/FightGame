@@ -24,5 +24,7 @@ protected:
 
 	virtual void HandleSystemResponse(SystemResponse& a_response) override;
 
+	virtual void SpawnPostProcessing(const std::vector<Entity>& entities, Chunk& a_chunk, AIManager& a_aiManager, const SpawnRequest& a_request) override;
+
 	std::function<void(std::string)> worldRequest;
 };

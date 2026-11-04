@@ -12,5 +12,5 @@ public:
 	~InAttackRangeDecorator() override;
 
 protected:
-	bool CheckCondition(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result) override;
+	bool CheckCondition(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime) override;
 };

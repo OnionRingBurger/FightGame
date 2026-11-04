@@ -11,10 +11,11 @@ UseAttackAction::~UseAttackAction()
 {
 }
 
-Node::Status UseAttackAction::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status UseAttackAction::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
 	(void)mind;
 	(void)systemInfo;
+	(void)deltaTime;
 
 	result.UseGuard = false;
 

@@ -337,7 +337,7 @@ struct LoadResultQueues
 	ThreadSafeQueue<JsonPrefabLoadResult> jsonPrefab;
 };
 
-// !!!New!!!
+// ƒ[ƒh‚·‚é“à—e
 struct LoadDatas
 {
 	std::vector<modelLoadData> model;
