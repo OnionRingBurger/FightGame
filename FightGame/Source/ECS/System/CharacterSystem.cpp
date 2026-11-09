@@ -1,8 +1,14 @@
 #include "CharacterSystem.h"
 
-using namespace Component;
+#include <fstream>
 
-void CharacterKill(Chunk& a_chunk, Entity killEntity);
+#include "GameData.h"
+#include "Geometory.h"
+#include "Sound.h"
+#include "json.hpp"
+#include "Defines.h"
+
+using namespace Component;
 
 namespace
 {
@@ -18,25 +24,77 @@ namespace
 		const bool isEnemy = a_chunk.GetComponent<EnemyTag>(a_attacker).IsValid();
 		if (!isPlayer && !isEnemy) return kInvalidEntity;
 
-		// 攻撃Entity生成
-		Entity attack = a_chunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(
-				float3(0.0f, 0.0f, 0.0f),
-				float3(0.0f, rotation.Look().yaw, 0.0f),
-				float3(1.0f, 1.0f, 1.0f)
-			),
-			SectorHitJudge(
+		const bool endWithOwnerAction = a_attackPower.endWithOwnerAction;
+
+		// !!!New!!!
+		const std::string& sectorKey = a_attackPower.sectorKey;
+		if (!sectorKey.empty())
+		{
+			Geometory::RegisterSector(
+				sectorKey,
 				a_attackPower.minLength,
 				a_attackPower.maxLength,
 				a_attackPower.angle,
 				a_attackPower.maxHeight,
-				a_attackPower.maxLowness
-			),
-			AddDamageComponent(a_attackPower.damageValue),
-			FollowPosition(a_attackPower.followOffset, a_attacker, FOLLOW_POS_LOCALOFFSET),
-			PosePosState(POSE_POS_FOLLOW),
-			AttackInstance(a_attacker, a_attackIndex, a_attackPower.lifeTime)
-		);
+				a_attackPower.maxLowness,
+				16);
+		}
+
+		// コンポーネントを事前に生成判定
+		AttackTelegraph attackTelegraph(
+			a_attackPower.minLength,
+			a_attackPower.maxLength,
+			a_attackPower.angle,
+			a_attackPower.maxHeight,
+			a_attackPower.maxLowness,
+			sectorKey);
+
+		Entity attack = kInvalidEntity;
+		if (endWithOwnerAction)
+		{
+			attack = a_chunk.CreateNewEntity(
+				MOVE_AND_TRANSFORM_COMPONENT(
+					float3(0.0f, 0.0f, 0.0f),
+					float3(0.0f, rotation.Look().yaw, 0.0f),
+					float3(1.0f, 1.0f, 1.0f)
+				),
+				SectorHitJudge(
+					a_attackPower.minLength,
+					a_attackPower.maxLength,
+					a_attackPower.angle,
+					a_attackPower.maxHeight,
+					a_attackPower.maxLowness
+				),
+				AddDamageComponent(a_attackPower.damageValue),
+				FollowPosition(a_attackPower.followOffset, a_attacker, FOLLOW_POS_LOCALOFFSET),
+				PosePosState(POSE_POS_FOLLOW),
+				AttackInstance(a_attacker, a_attackIndex, a_attackPower.lifeTime, true),
+				attackTelegraph
+			);
+		}
+		else
+		{
+			const float3 spawnPos = GetEntityPosePos(a_chunk, a_attacker)
+				+ GetLocalOffset(a_attackPower.followOffset, GetEntityPoseRot(a_chunk, a_attacker));
+
+			attack = a_chunk.CreateNewEntity(
+				MOVE_AND_TRANSFORM_COMPONENT(
+					spawnPos,
+					float3(0.0f, rotation.Look().yaw, 0.0f),
+					float3(1.0f, 1.0f, 1.0f)
+				),
+				SectorHitJudge(
+					a_attackPower.minLength,
+					a_attackPower.maxLength,
+					a_attackPower.angle,
+					a_attackPower.maxHeight,
+					a_attackPower.maxLowness
+				),
+				AddDamageComponent(a_attackPower.damageValue),
+				AttackInstance(a_attacker, a_attackIndex, a_attackPower.lifeTime, false),
+				attackTelegraph
+			);
+		}
 	
 		// 生成者に応じて攻撃タイプを生成
 		if (isPlayer) a_chunk.AddComponent(attack, PlayerAttackTag());
@@ -52,6 +110,20 @@ namespace
 		const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(a_attacker);
 		if (!rotation.IsValid()) return kInvalidEntity;
 
+		// !!!New!!!
+		const std::string& sectorKey = a_attackPower.sectorKey;
+		if (!sectorKey.empty())
+		{
+			Geometory::RegisterSector(
+				sectorKey,
+				a_attackPower.minLength,
+				a_attackPower.maxLength,
+				a_attackPower.angle,
+				a_attackPower.maxHeight,
+				a_attackPower.maxLowness,
+				16);
+		}
+
 		// 向いている方向に判定表示を生成
 		return a_chunk.CreateNewEntity(
 			MOVE_AND_TRANSFORM_COMPONENT(
@@ -64,7 +136,8 @@ namespace
 				a_attackPower.maxLength,
 				a_attackPower.angle,
 				a_attackPower.maxHeight,
-				a_attackPower.maxLowness
+				a_attackPower.maxLowness,
+				sectorKey
 			),
 			FollowPosition(a_attackPower.followOffset, a_attacker, FOLLOW_POS_LOCALOFFSET),
 			PosePosState(POSE_POS_FOLLOW)
@@ -76,6 +149,8 @@ namespace
 	{
 		Entity attack = SpawnActiveAttackEntity(a_chunk, a_attacker, a_attackPower, a_attackIndex);
 		if (attack == kInvalidEntity) return;
+
+		PlaySound(LoadSound("Assets/Sound/attack.mp3"));
 
 		// アクションを追加
 		a_chunk.AddComponent(a_attacker, AttackAction(attack, 0.0f, a_attackIndex, a_attackPower.motionTime));
@@ -99,6 +174,246 @@ namespace
 		a_chunk.AddComponent(
 			a_attacker,
 			AttackStartupAction(a_attackPower.startupTime, a_attackIndex, telegraph));
+	}
+
+	// !!!New!!!
+	float GetXZDistanceSq(const float3& a_from, const float3& a_to)
+	{
+		const float dx = a_to.x - a_from.x;
+		const float dz = a_to.z - a_from.z;
+		return dx * dx + dz * dz;
+	}
+
+	// !!!New!!!
+	bool IsEnemyAlive(Chunk& a_chunk, Entity a_enemy)
+	{
+		const ComponentHandle<DeadState> deadState = a_chunk.GetComponent<DeadState>(a_enemy);
+		return !deadState.IsValid() || !deadState.Look().isDead;
+	}
+
+	// ロックオン対象の状態が正常か確認
+	bool IsLookOnTargetValid(Chunk& a_chunk, Entity a_target)
+	{
+		if (a_target == kInvalidEntity) return false;
+		if (!a_chunk.GetComponent<EnemyTag>(a_target).IsValid()) return false;
+		const ComponentHandle<Position> targetPos = a_chunk.GetComponent<Position>(a_target);
+		if (!targetPos.IsValid()) return false;
+		return IsEnemyAlive(a_chunk, a_target);
+	}
+
+	// !!!New!!!
+	float GetCameraHorizontalHalfAngleDeg(Chunk& a_chunk, Entity a_cameraEntity)
+	{
+		const ComponentHandle<Camera> camera = a_chunk.GetComponent<Camera>(a_cameraEntity);
+		if (!camera.IsValid()) return 46.0f;
+
+		const float halfVertRad = camera.Look().fovy * 0.5f * RAD;
+		const float halfHorizRad = atanf(tanf(halfVertRad) * camera.Look().aspect);
+		return halfHorizRad * DEG;
+	}
+
+	// 対象がカメラの描画範囲外かどうかを返す
+	bool IsWithinCameraHorizontalFOV(
+		Chunk& a_chunk,
+		Entity a_cameraEntity,
+		const float3& a_from,
+		const float3& a_to,
+		float a_halfAngleDeg)
+	{
+		const ComponentHandle<Rotation> cameraRot = a_chunk.GetComponent<Rotation>(a_cameraEntity);
+		if (!cameraRot.IsValid()) return true;
+
+		const float3 forward = GetForward(float3(0.0f, cameraRot.Look().yaw, 0.0f));
+		float3 toTarget(a_to.x - a_from.x, 0.0f, a_to.z - a_from.z);
+		const float length = NormalizeLength(toTarget.x, toTarget.y, toTarget.z);
+		if (length < 1e-5f) return true;
+
+		toTarget.x /= length;
+		toTarget.z /= length;
+		const float3 dir(toTarget.x, 0.0f, toTarget.z);
+		const float cosHalfAngle = cosf(a_halfAngleDeg * RAD);
+		return DotFloat3(forward, dir) >= cosHalfAngle;
+	}
+
+	// !!!New!!!
+	float2 GetCameraUPXZ(Chunk& a_chunk, Entity a_cameraEntity)
+	{
+		const ComponentHandle<Rotation> cameraRot = a_chunk.GetComponent<Rotation>(a_cameraEntity);
+		if (!cameraRot.IsValid()) return float2(1.0f, 0.0f);
+
+		const float3 forward = GetForward(float3(0.0f, cameraRot.Look().yaw, 0.0f));
+		return float2(forward.x, forward.z);
+	}
+
+	float2 GetCameraRightXZ(Chunk& a_chunk, Entity a_cameraEntity)
+	{
+		const ComponentHandle<Rotation> cameraRot = a_chunk.GetComponent<Rotation>(a_cameraEntity);
+		if (!cameraRot.IsValid()) return float2(1.0f, 0.0f);
+
+		const float3 forward = GetForward(float3(0.0f, cameraRot.Look().yaw, 0.0f));
+		return float2(forward.z, -forward.x);
+	}
+
+
+	// 敵が範囲内に存在するか探索する
+	Entity FindNearestLookOnEnemy(
+		Chunk& a_chunk,
+		const float3& a_playerPos,
+		float a_radiusSq,
+		Entity a_cameraEntity,
+		float a_halfFovDeg)
+	{
+		Entity nearestEnemy = kInvalidEntity;
+		float nearestDistSq = FLT_MAX;
+
+		ComponentView enemyView = a_chunk.GetView<ComponentTypes<EnemyTag, Position>>();
+		for (auto enemyIt : enemyView)
+		{
+			if (!IsEnemyAlive(a_chunk, enemyIt)) continue;
+
+			// 距離を比較して範囲外なら抜ける
+			const float3 enemyPos = GetEntityWorldPos(a_chunk, enemyIt);
+			const float distSq = GetXZDistanceSq(a_playerPos, enemyPos);
+			if (distSq > a_radiusSq) continue;
+			//　カメラの範囲外かも判定
+			// if (!IsWithinCameraHorizontalFOV(a_chunk, a_cameraEntity, a_playerPos, enemyPos, a_halfFovDeg)) continue;
+
+			// 一番近かった場合記録する
+			if (distSq < nearestDistSq)
+			{
+				nearestDistSq = distSq;
+				nearestEnemy = enemyIt;
+			}
+		}
+
+		return nearestEnemy;
+	}
+
+	Entity FindNearestLookOnPlayer(
+		Chunk& a_chunk,
+		const float3& a_enemyPos,
+		float a_radiusSq,
+		float a_halfFovDeg)
+	{
+		Entity nearestEnemy = kInvalidEntity;
+		float nearestDistSq = FLT_MAX;
+
+		Entity player = GetPlayer(a_chunk, float3());
+		
+		if (player == kInvalidEntity) return kInvalidEntity;
+
+		// 距離を比較して範囲外なら抜ける
+		const float3 playerPos = GetEntityWorldPos(a_chunk, player);
+		const float distSq = GetXZDistanceSq(a_enemyPos, playerPos);
+		if (distSq > a_radiusSq) return kInvalidEntity;
+
+		return player;
+	}
+
+	// ロックオン切り替え、現在はカメラから見た方向で取得している
+	Entity FindLookOnSwitchTarget(
+		Chunk& a_chunk,
+		const float3& a_playerPos,
+		Entity a_currentTarget,
+		float2 a_input,
+		float a_radiusSq,
+		Entity a_cameraEntity)
+	{
+		// 現在の対象が正常か確認、不正な場合は空のEntityを返す
+		if ((a_input.x == 0 && a_input.y == 0) || !IsLookOnTargetValid(a_chunk, a_currentTarget)) return kInvalidEntity;
+
+		// プレイヤーへの距離とベクトル、カメラ方向を取得
+		const float3 currentPos = GetEntityWorldPos(a_chunk, a_currentTarget);
+		const float2 toCurrent(currentPos.x - a_playerPos.x, currentPos.z - a_playerPos.z);
+		if (GetLengthSq(toCurrent) < 1e-8f) return kInvalidEntity;
+		const float2 currentDir = Normalize(toCurrent);
+		float2 camera;
+
+		Entity bestEnemy = kInvalidEntity;
+		float bestAngle = FLT_MAX;
+		float bestDot = FLT_MAX;
+		float direction;
+		bool isUp = std::abs(a_input.x) < std::abs(a_input.y);
+		if (isUp)
+		{
+			direction = Sign(a_input.y);
+			camera = GetCameraUPXZ(a_chunk, a_cameraEntity);
+		}
+		else
+		{
+			direction = Sign(a_input.x);
+			camera = GetCameraRightXZ(a_chunk, a_cameraEntity);
+		}
+
+		ComponentView enemyView = a_chunk.GetView<ComponentTypes<EnemyTag, Position>>();
+		for (auto enemyIt : enemyView)
+		{
+			if (enemyIt == a_currentTarget) continue;
+			if (!IsEnemyAlive(a_chunk, enemyIt)) continue;
+
+			// 範囲外だった場合抜ける
+			const float3 enemyPos = GetEntityWorldPos(a_chunk, enemyIt);
+			const float distSq = GetXZDistanceSq(a_playerPos, enemyPos);
+			if (distSq > a_radiusSq) continue;
+
+			// 敵への方向を取得
+			const float2 toEnemy(enemyPos.x - a_playerPos.x, enemyPos.z - a_playerPos.z);
+			const float2 enemyDir = Normalize(toEnemy);
+
+			// 入力方向にいなかったら抜ける
+			const float2 targetToEnemy(enemyPos.x - currentPos.x, enemyPos.z - currentPos.z);
+			const float2 targetToEnemyDir = Normalize(targetToEnemy);
+			const float cameraDot = targetToEnemy.x * camera.x + targetToEnemy.y * camera.y;
+			if (direction < 0.0f && cameraDot >= 0.0f) continue;
+			if (direction > 0.0f && cameraDot <= 0.0f) continue;
+
+			// 方向を決定
+			const float dirDot = currentDir.x * enemyDir.x + currentDir.y * enemyDir.y;
+			const float clampedDot = std::clamp(dirDot, -1.0f, 1.0f);
+			const float angle = acosf(clampedDot) * DEG;
+			if (std::abs(cameraDot) < bestDot)
+			{
+				bestDot = std::abs(cameraDot);
+				bestAngle = angle;
+				bestEnemy = enemyIt;
+			}
+		}
+		return bestEnemy;
+	}
+
+	void StateToMove(Chunk& a_chunk, Entity a_entity)
+	{
+		// Stateを変更
+		ComponentHandle<PoseRotState> poseRot = a_chunk.GetComponent<PoseRotState>(a_entity);
+		if (poseRot.IsValid()) poseRot->state = POSE_ROT_LOOKMOVE;	}
+
+	void StateToLook(Chunk& a_chunk, Entity a_entity)
+	{
+		// ステートを変更
+		ComponentHandle<PoseRotState> poseRot = a_chunk.GetComponent<PoseRotState>(a_entity);
+		if (poseRot.IsValid()) poseRot->state = POSE_ROT_LOOK;
+		else a_chunk.AddComponent<PoseRotState>(a_entity, PoseRotState(POSE_ROT_LOOK));
+	}
+
+	void CancelLookOn(Chunk& a_chunk, Entity a_user)
+	{
+		// Actionを削除
+		a_chunk.DeleteChunkComponent(a_user, LookOnAction::kTypeId);
+
+		// Stateを変更
+		StateToMove(a_chunk, a_user);
+	}
+
+	void CancelLookOnPlayerUI(Chunk& a_chunk)
+	{
+		// マーカーの対象を更新
+		Entity targetMarker = GetLookOnMarker(a_chunk);
+		ComponentHandle<FollowPosition> markerFollow = a_chunk.GetComponent<FollowPosition>(targetMarker);
+		if (markerFollow.IsValid()) markerFollow->targetEntity = kInvalidEntity;
+		// カメラリグを更新
+		Entity rig = GetCameraRig(a_chunk);
+		a_chunk.DeleteChunkComponent(rig, PoseRotState::kTypeId);
+		a_chunk.DeleteChunkComponent(rig, RigLookOn::kTypeId);
 	}
 }
 
@@ -130,6 +445,14 @@ void GroundedSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
+	bool isStopAll = false;
+	ComponentView stopperView = a_chunk.GetView<ComponentTypes<AllActionStopper>>();
+	for (auto it : stopperView)
+	{
+		isStopAll = true;
+		break;
+	}
+
 	ComponentView view = a_chunk.GetView<ComponentTypes<ActionMask>>();
 
 	for (auto it : view)
@@ -139,17 +462,36 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 		BitFlag allowed = ActionFlag_All;
 		// 各情報StateとActionStateから不可能な行動を算出し、フラグを降ろす
 		const ComponentHandle<DeadState> dead = a_chunk.GetComponent<DeadState>(it);
-		if (dead.IsValid() && dead.Look().isDead)
+		if ((dead.IsValid() && dead.Look().isDead))
 		{
 			allowed = 0;
 		}
 		else
 		{
+			const ComponentHandle<EntryAction> entry = a_chunk.GetComponent<EntryAction>(it);
+			if(entry.IsValid() || isStopAll)
+			{
+				allowed = 0 | ActionFlag_EntryDuration;
+			}
+
 			const ComponentHandle<GroundedState> grounded = a_chunk.GetComponent<GroundedState>(it);
 			if (grounded.IsValid() && !grounded.Look().isGrounded)
 			{
 				allowed &= ~ActionFlag_Jump;
 				allowed &= ~ActionFlag_Guard;
+				allowed &= ~ActionFlag_EntryDuration;
+			}
+
+			const ComponentHandle<KnockbackAction> knockback = a_chunk.GetComponent<KnockbackAction>(it);
+			if (knockback.IsValid())
+			{
+				// ノックバック中は新たにノックバックしない
+				allowed &= ~ActionFlag_Jump;
+				allowed &= ~ActionFlag_Guard;
+				allowed &= ~ActionFlag_Move;
+				allowed &= ~ActionFlag_Attack;
+				allowed &= ~ActionFlag_KnockBack;
+				allowed &= ~ActionFlag_RotChange;
 			}
 
 			const ComponentHandle<JumpAction> jump = a_chunk.GetComponent<JumpAction>(it);
@@ -159,11 +501,19 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 				allowed &= ~ActionFlag_Guard;
 			}
 
+			const ComponentHandle<LookOnAction> lookonAction = a_chunk.GetComponent<LookOnAction>(it);
+			if (lookonAction.IsValid())
+			{
+				allowed &= ~ActionFlag_LookMove;
+			}
+
 			// !!!New!!!
 			const ComponentHandle<AttackAction> attackAction = a_chunk.GetComponent<AttackAction>(it);
 			if (attackAction.IsValid())
 			{
 				allowed &= ~ActionFlag_Attack;
+				allowed &= ~ActionFlag_LookMove;
+				allowed &= ~ActionFlag_RotChange;
 			}
 
 			// !!!New!!!
@@ -175,6 +525,8 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 				allowed &= ~ActionFlag_Jump;
 				allowed &= ~ActionFlag_Aim;
 				allowed &= ~ActionFlag_Guard;
+				allowed &= ~ActionFlag_LookMove;
+				allowed &= ~ActionFlag_RotChange;
 			}
 
 			const ComponentHandle<AttackWaitAction> attackWait = a_chunk.GetComponent<AttackWaitAction>(it);
@@ -193,6 +545,8 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 				allowed &= ~ActionFlag_Guard;
 				allowed &= ~ActionFlag_Move;
 			}
+
+
 		}
 
 		actionMask->allowed = allowed;
@@ -303,10 +657,15 @@ void CharacterAttackSystem(Chunk& a_chunk, const SystemContext& a_context)
 		if (attackPower.startupTime > 0.0f)
 		{
 			BeginAttackTelegraphFromPower(a_chunk, it, attackPower, attackIndex);
+			if (isPlayer) PlaySound(LoadSound("Assets/Sound/startup.mp3"));
+			else if(attackPower.damageValue >= 3.5f) PlaySound(LoadSound("Assets/Sound/enemystartup2.mp3"));
+			else PlaySound(LoadSound("Assets/Sound/enemystartup.mp3"));
+
 			continue;
 		}
 		// ない場合攻撃を生成
 		BeginActiveAttackFromPower(a_chunk, it, attackPower, attackIndex);
+
 	}
 }
 
@@ -421,6 +780,8 @@ void HitPointSystem(Chunk& a_chunk, SystemContext& a_context)
 
 void CharacterKill(Chunk& a_chunk, Entity killEntity)
 {
+	ClearCharacterAttackOnDeath(a_chunk, killEntity);
+
 	ComponentHandle<DeadState> deadState = a_chunk.GetComponent<DeadState>(killEntity);
 	if (deadState.IsValid()) deadState->isDead = true;
 }
@@ -432,7 +793,12 @@ void GuardSystem(Chunk& a_chunk, const SystemContext& a_context)
 	{
 		ComponentHandle<MoveInputResult> result = a_chunk.GetComponent<MoveInputResult>(it);
 		ComponentHandle<GuardState> guardState = a_chunk.GetComponent<GuardState>(it);
-		
+
+		DebugConsole::SetDrawPos(15, 19);
+		std::cout << "Input = " << a_context.input.IsRegisterPress("Guard") << std::endl;
+		DebugConsole::SetDrawPos(15, 20);
+		std::cout << "GuardSystem: useGuard = " << result.Look().useGuard << std::endl;
+
 		// ガード不可だった場合抜ける
 		if (!result.Look().useGuard || !IsActionAllowed(a_chunk, it, ActionFlag_Guard))
 		{
@@ -440,8 +806,25 @@ void GuardSystem(Chunk& a_chunk, const SystemContext& a_context)
 		}
 		// 攻撃中だった場合キャンセルする
 		CancelPlayerAttackIfAble(a_chunk, it);
+
+		// エフェクトを作成
+		Entity effect = a_chunk.CreateNewEntity(
+			MOVE_AND_TRANSFORM_COMPONENT(
+				float3(),
+				float3(),
+				float3(3.0f, 3.0f, 3.0f)
+			),
+			PosePosState(POSE_POS_FOLLOW),
+			PoseRotState(POSE_ROT_FOLLOW),
+			FollowPosition(float3(0.0f, -0.5f, 0.8f), it, FOLLOW_POS_LOCALOFFSET),
+			FollowRotation(float3(0.0f, 90.0f, 0.0f), it),
+			EfkEffectKey(kGuardEffectKey, true)
+			);
+
+		PlaySound(LoadSound("Assets/Sound/guardstart.mp3"));
+
 		// ガードへ移行
-		a_chunk.AddComponent(it, GuardAction(guardState.Look().guardPower));
+		a_chunk.AddComponent(it, GuardAction(guardState.Look().guardPower, guardState.Look().knockbackRate, effect));
 	}
 }
 
@@ -456,7 +839,645 @@ void GuardActionSystem(Chunk& a_chunk, const SystemContext& a_context)
 		// ガード中だった場合解除しない
 		if (result.Look().useGuard) continue;
 		
+
+		// SafeDeleteEffectEntity(a_chunk, guard.Look().guardEffect);
+		a_chunk.DeleteChunkEntity(guard.Look().guardEffect);
 		a_chunk.DeleteChunkComponent(it, GuardAction::kTypeId);
+		
+	}
+}
+
+// !!!New!!!
+void LookOnStateSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	const Entity cameraEntity = GetCamera(a_chunk);
+	const float halfFovDeg = GetCameraHorizontalHalfAngleDeg(a_chunk, cameraEntity);
+	// const int switchDirection = ResolveLookOnSwitchDirection(a_context);
 	
+
+	// ロックオン継続管理
+	ComponentView actionView = a_chunk.GetView<ComponentTypes<LookOnState, LookOnAction, MoveInputResult>>();
+	for (auto playerIt : actionView)
+	{
+		bool isPlayer = a_chunk.GetComponent<PlayerTag>(playerIt).IsValid();
+
+		ComponentHandle<LookOnAction> action = a_chunk.GetComponent<LookOnAction>(playerIt);
+		ComponentHandle<LookOnState> state = a_chunk.GetComponent<LookOnState>(playerIt);
+		ComponentHandle<MoveInputResult> result = a_chunk.GetComponent<MoveInputResult>(playerIt);
+
+		
+		// 死亡込みでロックオン対象がいるか確認する
+		bool targetAlive = false;
+		if (isPlayer) targetAlive = IsLookOnTargetValid(a_chunk, action.Look().target);
+		else targetAlive = GetPlayer(a_chunk, float3()) != kInvalidEntity;
+		if (!targetAlive)
+		{
+			CancelLookOn(a_chunk, playerIt);
+			if (isPlayer) CancelLookOnPlayerUI(a_chunk);
+			continue;
+		}
+
+		if (action.Look().targetCooltime > 0.0f)
+		{
+			float newCooltime = std::max(action.Look().targetCooltime - a_context.deltaTime, 0.0f);
+			action->targetCooltime = newCooltime;
+			continue;
+		}
+
+
+
+		// 対象への距離と座標を取得
+		const float3 playerPos = GetEntityWorldPos(a_chunk, playerIt);
+		const float releaseRadiusSq = state.Look().releaseRadius * state.Look().releaseRadius;
+		const float3 targetPos = GetEntityWorldPos(a_chunk, action.Look().target);
+		const float targetDistSq = GetXZDistanceSq(playerPos, targetPos);
+		float2 lookOnInput(result.Look().cameraDir * result.Look().cameraMagnitube);
+		if ((lookOnInput.x != 0 || lookOnInput.y != 0) && result.Look().moveCamera && isPlayer)
+		{
+			// 切り替え方向に対象が存在するか確認
+			const Entity switchTarget = FindLookOnSwitchTarget(
+				a_chunk,
+				playerPos,
+				action.Look().target,
+				lookOnInput,
+				releaseRadiusSq,
+				cameraEntity);
+			// 対象が存在した場合代入する
+			if (switchTarget != kInvalidEntity)
+			{
+				action->target = switchTarget;
+				action->targetCooltime = kLookOnChangeCooltime;
+				Entity targetMarker = GetLookOnMarker(a_chunk);
+				ComponentHandle<FollowPosition> markerFollow = a_chunk.GetComponent<FollowPosition>(targetMarker);
+				if (markerFollow.IsValid()) markerFollow->targetEntity = switchTarget;
+			}
+			continue;
+		}
+
+		// 対象が範囲外だった場合抜ける
+		if (targetDistSq > releaseRadiusSq)
+		{
+			CancelLookOn(a_chunk, playerIt);
+			if (isPlayer) CancelLookOnPlayerUI(a_chunk);
+			continue;
+		}
+	}
+	// 一番近い敵を登録
+	ComponentView searchView = a_chunk.GetView<ComponentTypes<PlayerTag, LookOnState>, ComponentTypes<LookOnAction>>();
+	for (auto playerIt : searchView)
+	{
+		ComponentHandle<LookOnState> state = a_chunk.GetComponent<LookOnState>(playerIt);
+		const float3 playerPos = GetEntityWorldPos(a_chunk, playerIt);
+		const float captureRadiusSq = state.Look().captureRadius * state.Look().captureRadius;
+
+		// 一番近い敵を取得
+		const Entity nearestEnemy = FindNearestLookOnEnemy(
+			a_chunk,
+			playerPos,
+			captureRadiusSq,
+			cameraEntity,
+			halfFovDeg);
+		if (nearestEnemy == kInvalidEntity) continue;
+
+		// 一番近い敵が範囲内だった場合Actionを追加し、登録する
+		a_chunk.AddComponent(playerIt, LookOnAction(nearestEnemy, kLookOnChangeCooltime));
+		// Stateを変更
+		StateToLook(a_chunk, playerIt);
+		// マーカーを設定
+		Entity targetMarker = GetLookOnMarker(a_chunk);
+		ComponentHandle<FollowPosition> markerFollow = a_chunk.GetComponent<FollowPosition>(targetMarker);
+		if (markerFollow.IsValid()) markerFollow->targetEntity = nearestEnemy;
+
+		// Rigを設定
+		Entity rig = GetCameraRig(a_chunk);
+		ComponentHandle<PoseRotState> rigRotState = a_chunk.GetComponent<PoseRotState>(rig);
+		if (rigRotState.IsValid())
+		{
+			rigRotState->state = POSE_ROT_LOOK;
+		}
+		else a_chunk.AddComponent(rig, PoseRotState(POSE_ROT_LOOK));
+		a_chunk.AddComponent(rig, RigLookOn());
+	}
+
+	// 一番近いプレイヤーを登録
+	ComponentView enemySearchView = a_chunk.GetView<ComponentTypes<LookOnState>, ComponentTypes<PlayerTag, LookOnAction>>();
+
+	for (auto it : enemySearchView)
+	{
+		ComponentHandle<LookOnState> state = a_chunk.GetComponent<LookOnState>(it);
+		const float3 enemyPos = GetEntityWorldPos(a_chunk, it);
+		const float captureRadiusSq = state.Look().captureRadius * state.Look().captureRadius;
+
+		// 一番近い敵を取得
+		const Entity nearestEnemy = FindNearestLookOnPlayer(
+			a_chunk,
+			enemyPos,
+			captureRadiusSq,
+			halfFovDeg);
+		if (nearestEnemy == kInvalidEntity) continue;
+
+		// 一番近い敵が範囲内だった場合Actionを追加し、登録する
+		a_chunk.AddComponent(it, LookOnAction(nearestEnemy, kLookOnChangeCooltime));
+
+		StateToLook(a_chunk, it);
+	}
+}
+
+// !!!New!!!
+void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager)
+{
+	// 入力を取得
+	const Axis& leftAxis = a_context.input.GetLeftAxis().magnitube >= a_context.input.GetKeyAxis().magnitube
+		? a_context.input.GetLeftAxis()
+		: a_context.input.GetKeyAxis();
+
+	const Axis& rightAxis = a_context.input.GetRightAxis();
+	const MouseMove mouseAxis = a_context.input.GetMouseAxis();
+
+	DebugConsole::SetDrawPos(20, 19);
+	std::cout << "MouseLength" << GetLength(mouseAxis) << std::endl;
+
+	float2 cameraMoveDir = float2(); 
+	float cameraMagnitube = 0.0f;
+	bool moveCamera = false;
+	if (rightAxis.magnitube > 0.0f)
+	{
+		cameraMoveDir.x = rightAxis.x;
+		cameraMoveDir.y = rightAxis.y;
+		cameraMagnitube = rightAxis.magnitube;
+		moveCamera = true;
+	}
+	else if (GetLength(mouseAxis) >= kLookOnChangeMouseLength)
+	{
+		float2 normalizeAxis = Normalize(mouseAxis);
+		cameraMoveDir.x = normalizeAxis.x;
+		cameraMoveDir.y = normalizeAxis.y * -1.0f;
+		cameraMagnitube = 1.0f;
+		moveCamera = true;
+	}
+	//else if(a_context.input.IsRegisterTrigger("LookOnLeft"))
+	//{
+	//	cameraMoveDir.x = -1.0f;
+	//	cameraMagnitube = 1.0f;
+	//	moveCamera = true;
+	//}
+	//else if(a_context.input.IsRegisterTrigger("LookOnRight"))
+	//{
+	//	cameraMoveDir.x = 1.0f;
+	//	cameraMagnitube = 1.0f;
+	//	moveCamera = true;
+	//}
+	// キー入力を取得
+	const bool rightAttackTrigger = a_context.input.IsRegisterTrigger("RightAttack");
+	const bool leftAttackTrigger = a_context.input.IsRegisterTrigger("LeftAttack");
+	const bool jumpTrigger = a_context.input.IsRegisterTrigger("Jump");
+	const bool guardPress = a_context.input.IsRegisterPress("Guard");
+
+	Entity cameraEntity = GetCamera(a_chunk);
+
+	ComponentView view = a_chunk.GetView<ComponentTypes<MoveInputResult, InputSource>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<MoveInputResult> result = a_chunk.GetComponent<MoveInputResult>(it);
+		const ComponentHandle<InputSource> source = a_chunk.GetComponent<InputSource>(it);
+
+		result->moveDir = float2(0.0f, 0.0f);
+		result->magnitube = 0.0f;
+		result->isInput = false;
+		result->useAttack = false;
+		result->useGuard = false;
+		result->attackIndex = 0;
+		result->cameraDir = float2();
+		result->moveCamera = true;
+		result->cameraMagnitube = 0.0f;
+
+		// !!!New!!!
+		switch (source.Look().move)
+		{
+		case InputOrigin::Device:
+		{
+			if (leftAxis.magnitube == 0.0f)
+			{
+				break;
+			}
+
+			DirectX::XMMATRIX matrix = DirectX::XMMatrixIdentity();
+			// カメラの角度を取得
+			ComponentHandle<Rotation> cameraRot = a_chunk.GetComponent<Rotation>(cameraEntity);
+			if (cameraRot.IsValid())
+			{
+				matrix *= DirectX::XMMatrixRotationRollPitchYaw(0.0f, cameraRot.Look().yaw * RAD, 0.0f);
+			}
+			// カメラの回転から見た前方方向のベクトルを取得する
+			DirectX::XMVECTOR forwardVector = DirectX::XMVector3TransformNormal({ 0, 0, 1 }, matrix);
+			// カメラから見た前方方向にたいして入力をかける
+			forwardVector = DirectX::XMVectorScale(forwardVector, leftAxis.y);
+			// 横方向も同様の計算を行う
+			DirectX::XMVECTOR besideVector = DirectX::XMVector3TransformNormal({ 1, 0, 0 }, matrix);
+			besideVector = DirectX::XMVectorScale(besideVector, leftAxis.x);
+
+			// ベクトルを加算して方向を取得
+			DirectX::XMVECTOR moveVector = DirectX::XMVectorAdd(forwardVector, besideVector);
+			DirectX::XMFLOAT3 moveFloat3;
+			XMStoreFloat3(&moveFloat3, moveVector);
+
+			// 数値を代入
+			result->moveDir = { moveFloat3.x, moveFloat3.z };
+			result->magnitube = leftAxis.magnitube;
+			result->isInput = true;
+			break;
+		}
+		case InputOrigin::AI:
+		{
+			const AIResult aiResult = a_aiManager.ReadResult(it);
+			result->moveDir = aiResult.MoveDir;
+			result->magnitube = aiResult.Magnitube;
+			result->isInput = aiResult.IsMove;
+			break;
+		}
+		case InputOrigin::None:
+		default:
+			break;
+		}
+
+		// !!!New!!!
+		switch (source.Look().attack)
+		{
+		case InputOrigin::Device:
+			// 右攻撃=0、左攻撃=1。同時押しは右優先
+			if (rightAttackTrigger)
+			{
+				result->useAttack = true;
+				result->attackIndex = 0;
+			}
+			else if (leftAttackTrigger)
+			{
+				result->useAttack = true;
+				result->attackIndex = 1;
+			}
+			break;
+		case InputOrigin::AI:
+		{
+			const AIResult aiResult = a_aiManager.ReadResult(it);
+			result->useAttack = aiResult.UseAttack;
+			result->attackIndex = aiResult.AttackIndex;
+			break;
+		}
+		case InputOrigin::None:
+		default:
+			break;
+		}
+
+		switch (source.Look().jump)
+		{
+		case InputOrigin::Device:
+			result->useJump = jumpTrigger;
+
+			break;
+
+		case InputOrigin::AI:
+			result->useJump = false;
+			break;
+
+		case InputOrigin::Title:
+			result->useJump = true;
+			break;
+
+		default:
+			break;
+		}
+
+		switch (source.Look().guard)
+		{
+		case InputOrigin::Device:
+			result->useGuard = guardPress;
+
+			break;
+
+		case InputOrigin::AI:
+		{
+			const AIResult aiResult = a_aiManager.ReadResult(it);
+			result->useGuard = aiResult.UseGuard;
+			break;
+		}
+
+		default:
+			break;
+		}
+
+		switch (source.Look().camera)
+		{
+		case InputOrigin::Device:
+
+			result->moveCamera = moveCamera;
+			result->cameraDir = cameraMoveDir;
+			result->cameraMagnitube = cameraMagnitube;
+			break;
+
+		case InputOrigin::AI:
+			result->moveCamera = false;
+			result->cameraDir = float2();
+			result->cameraMagnitube = 0.0f;
+			break;
+		}
+	}
+}
+
+void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response, AIManager& a_aiManager)
+{
+	// HitInfomationを保持したEnemyを取得する
+	ComponentView view = a_chunk.GetView<ComponentTypes<HitInfomation, HitPoint, AttackHitRecord>>();
+
+	Entity camera = GetCamera(a_chunk);
+
+	for (auto it : view)
+	{
+		// 敵のぶつかった結果を取得
+		const ComponentHandle<HitInfomation> info = a_chunk.GetComponent<HitInfomation>(it);
+		ComponentHandle<AttackHitRecord> hitRecord = a_chunk.GetComponent<AttackHitRecord>(it);
+		const ComponentHandle<GuardAction> guardAction = a_chunk.GetComponent<GuardAction>(it);
+		float guardPower = 1.0f;
+
+		bool isPlayer = a_chunk.GetComponent<PlayerTag>(it).IsValid();
+		bool isEnemy = a_chunk.GetComponent<EnemyTag>(it).IsValid();
+		bool isGuard = guardAction.IsValid();
+
+		if (isGuard)
+		{
+			guardPower = guardAction.Look().currentGuardPower;
+		};
+
+		// ノックバック倍率
+		float knockBackRate = 1.0f;
+		if(isGuard) knockBackRate *= guardAction.Look().knockbackRate;
+
+		for (const auto& triggerIt : info.Look().triggerResults)
+		{
+			// 自身と同じタイプだった場合次ループへ移行
+			if (isPlayer)
+			{
+				if (a_chunk.GetComponent<PlayerAttackTag>(triggerIt.triggerEntity).IsValid()) continue;
+			}
+			else if (isEnemy)
+			{
+				if (a_chunk.GetComponent<EnemyAttackTag>(triggerIt.triggerEntity).IsValid()) continue;
+			}
+
+			// ぶつかった対象ダメージを持っていなかった場合は次ループへ移行
+			const ComponentHandle<AddDamageComponent> damage = a_chunk.GetComponent<AddDamageComponent>(triggerIt.triggerEntity);
+			if (!damage.IsValid()) continue;
+
+			// 攻撃が被弾クールタイムなら次ループへ移行
+
+			auto coolDownIt = hitRecord->entries.find(triggerIt.triggerEntity);
+			// クールタイムが残っている場合は次ループへ移行
+			if (coolDownIt != hitRecord->entries.end() && coolDownIt->second > 0.0f)
+			{
+				continue;
+			}
+
+			// 体力にダメージを与える
+			ComponentHandle<HitPoint> hitPoint = a_chunk.GetComponent<HitPoint>(it);
+			float damageValue = damage.Look().damageValue * guardPower;
+			hitPoint->currentHP -= damageValue;
+			bool isHPZero = hitPoint.Look().currentHP <= 0.0f;
+
+			// ノックバックを入力
+			ComponentHandle<InterferenceResult> interferenceResult = a_chunk.GetComponent<InterferenceResult>(it);
+			ComponentHandle<Position> thisPos = a_chunk.GetComponent<Position>(it);
+			ComponentHandle<Position> triggerPos = a_chunk.GetComponent<Position>(triggerIt.triggerEntity);
+			if (interferenceResult.IsValid() && thisPos.IsValid() && triggerPos.IsValid())
+			{
+				interferenceResult->useKnockback = true;
+				float2 toTriggerVector = float2(triggerPos.Look().x - thisPos.Look().x, triggerPos.Look().z - thisPos.Look().z);
+				float2 normalieVector = Normalize(float2(-toTriggerVector.x, -toTriggerVector.y));
+				interferenceResult->knockBackDir = normalieVector;
+				interferenceResult->knockbackTime = 5.0f * knockBackRate;
+				if (isHPZero) interferenceResult->knockbackTime += 3000.0f;
+			}
+
+			// 攻撃成功を保存
+			ComponentHandle<AttackInstance> attackInstance =
+				a_chunk.GetComponent<AttackInstance>(triggerIt.triggerEntity);
+			if (attackInstance.IsValid())
+			{
+				attackInstance->connected = true;
+			}
+
+			// 敵に命中していた場合AIに情報を送る
+			if (isEnemy)
+			{
+				a_aiManager.NotifyHitResolved(it, isGuard);
+			}
+
+			// 画面エフェクトを出す
+			float waitTime = isGuard ? 8.0f * 2.0f : 2.0f * 2.0f;
+			float cameraPowerRate = 1.0f + std::sqrt(damageValue);
+			float3 cameraShakePower = isGuard ? float3(0.15f, 0.15f, 0.0f) : float3(0.025f, 0.025f, 0.00f) * cameraPowerRate;
+			float3 cameraShakeAmp = float3(0.15f, 0.15f, 0.15f);
+			float cameraShakeTime = isGuard ? 4.0f : 6.0f;
+			AddShakeEffect(a_chunk, camera, cameraShakePower, cameraShakeAmp, cameraShakeTime, 0.5f);
+
+
+			float3 shakePower = isGuard ? float3(0.15f, 0.15f, 0.15f) : float3(0.05f, 0.05f, 0.05f);
+			float3 shakeAmp = float3(0.5f, 0.5f, 0.5f);
+			float shakeTime = isGuard ? 15.0f : 21.0f;
+			ComponentHandle<ShakeComponent> hitterShake = a_chunk.GetComponent<ShakeComponent>(it);
+			AddShakeEffect(a_chunk, it, shakePower, shakeAmp, shakeTime, 0.5f);
+
+
+			a_response.AddStopTime(waitTime, 10.0f, 0.05f);
+
+
+			// ダメージエフェクトを出す
+			Entity hit = a_chunk.CreateNewEntity(
+				TRANSFORM_COMPONENT(
+					float3(thisPos.Look().x, thisPos.Look().y, thisPos.Look().z),
+					float3(),
+					float3(1.0f, 1.0f, 1.0f)
+				),
+				EfkEffectKey(kHitEffect, false)
+				);
+
+			if (isGuard)
+			{
+				PlaySound(LoadSound("Assets/Sound/guard.mp3"));
+			}
+			else if (isPlayer)
+			{
+				PlaySound(LoadSound("Assets/Sound/hit.mp3"));
+			}
+			else
+			{
+				PlaySound(LoadSound("Assets/Sound/enemyhit.mp3"));
+			}
+			// 被弾履歴に攻撃Entityとクールタイムを記録
+			float cooldownDuration = kDefaultAttackHitCooldown;
+
+			// 追加する
+			hitRecord->entries.insert({ triggerIt.triggerEntity, cooldownDuration });
+
+		}
+	}
+
+}
+
+void AttackHitRecordCleanupSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	// Viewを取得
+	ComponentView view = a_chunk.GetView<ComponentTypes<AttackHitRecord>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<AttackHitRecord> hitRecord = a_chunk.GetComponent<AttackHitRecord>(it);
+
+		std::vector<Entity> removeEntities;
+
+		for (auto entryIt = hitRecord->entries.begin(); entryIt != hitRecord->entries.end();)
+		{
+
+			// クールタイムを減らす
+			entryIt->second -= a_context.deltaTime;
+
+			// 被弾待機中でない場合対象をイテレータで削除する
+			const ComponentHandle<PlayerAttackTag> playerAttackTag = a_chunk.GetComponent<PlayerAttackTag>(entryIt->first);
+			const ComponentHandle<EnemyAttackTag> enemyAttackTag = a_chunk.GetComponent<EnemyAttackTag>(entryIt->first);
+
+			bool hasAttackTag = playerAttackTag.IsValid() || enemyAttackTag.IsValid();
+			if (entryIt->second <= 0.0f || !hasAttackTag)
+			{
+				// イテレータを削除して次のイテレータを取得
+				entryIt = hitRecord->entries.erase(entryIt);
+			}
+			else
+			{
+				// 削除しない場合は次のイテレータへ
+				++entryIt;
+			}
+		}
+	}
+}
+
+void KnockbackStateSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<InterferenceResult>>();
+	for (auto it : view)
+	{
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_KnockBack)) continue;
+		ComponentHandle<InterferenceResult> result = a_chunk.GetComponent<InterferenceResult>(it);
+		if (!result->useKnockback) continue;
+
+		a_chunk.AddComponent(it, KnockbackAction(result.Look().knockBackDir, 0.7f, result.Look().knockbackTime));
+	}
+}
+
+// !!!New!!!
+void KnockbackSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<Velocity, KnockbackAction>>();
+	for (auto it : view)
+	{
+		ComponentHandle<Velocity> velocity = a_chunk.GetComponent<Velocity>(it);
+		ComponentHandle<KnockbackAction> knockback = a_chunk.GetComponent<KnockbackAction>(it);
+		velocity->x = knockback->moveDir.x * knockback->speed;
+		velocity->z = knockback->moveDir.y * knockback->speed;
+
+		knockback->elapsedTime += a_context.deltaTime;
+		if (knockback->elapsedTime >= knockback->maxKnockbackTime)
+		{
+			a_chunk.DeleteChunkComponent(it, KnockbackAction::kTypeId);
+			velocity->x = 0.0f;
+			velocity->y = 0.0f;
+		}
+	}
+}
+
+void EntryActionSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<EntryAction>>();
+	for (auto it : view)
+	{
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_EntryDuration)) continue;
+
+		ComponentHandle<EntryAction> action = a_chunk.GetComponent<EntryAction>(it);
+		if (action.Look().canPlayEffect)
+		{
+			ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(it);
+			
+			// エフェクトを生成
+			a_chunk.CreateNewEntity(
+				TRANSFORM_COMPONENT(
+					float3(pos.Look().x, pos.Look().y - 0.5f, pos.Look().z),
+					float3(),
+					float3(1.0f, 1.0f, 1.0f)
+				),
+				EfkEffectKey(kEntryEffect, false)
+			);
+			action->canPlayEffect = false;
+
+			PlaySound(LoadSound("Assets/Sound/entry.mp3"));
+
+			// TODO カメラを揺らす
+		}
+		
+
+		action->duration += a_context.deltaTime;
+		if (action.Look().duration >= action.Look().maxDuration)
+		{
+			a_chunk.DeleteChunkComponent(it, EntryAction::kTypeId);
+		}
+	}
+
+}
+
+
+void EnemyAttackLoadSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<AttackKeyLoad>>();
+	if (view.begin() == view.end()) return;
+
+	std::ifstream stream(kAttackDataPath);
+	if (!stream.is_open()) return;
+
+	nlohmann::json json;
+	stream >> json;
+
+	for (auto it : view)
+	{
+		ComponentHandle<AttackKeyLoad> attackLoad = a_chunk.GetComponent<AttackKeyLoad>(it);
+		if (!attackLoad.IsValid()) continue;
+
+		AttackStatus status;
+		for (const std::string& attackKey : attackLoad.Look().attackKeys)
+		{
+			if (!json.contains(attackKey)) continue;
+			const nlohmann::json& attackData = json[attackKey];
+
+			status.attackPowers.push_back(
+				AttackPower(
+					attackData.value("MinLength", 0.0f),
+					attackData.value("MaxLength", 0.0f),
+					attackData.value("Angle", 0.0f),
+					attackData.value("MaxHeight", 0.0f),
+					attackData.value("MaxLowness", 0.0f),
+					attackData.value("DamageValue", 0.0f),
+					attackData.value("MotionTime", 0.0f),
+					attackData.value("LifeTime", 0.0f),
+					float3(
+						attackData.value("FollowOffsetX", 0.0f),
+						attackData.value("FollowOffsetY", 0.0f),
+						attackData.value("FollowOffsetZ", 0.0f)
+					),
+					attackData.value("WaitTime", 0.0f),
+					attackData.value("StartupTime", 0.0f),
+					attackKey,
+					attackData.value("EndWithOwnerAction", true)
+					)
+			);
+		}
+
+		a_chunk.AddComponent(it, status);
+		a_chunk.DeleteChunkComponent(it, AttackKeyLoad::kTypeId);
 	}
 }

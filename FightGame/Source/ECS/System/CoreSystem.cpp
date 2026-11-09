@@ -1,5 +1,6 @@
 #include "CoreSystem.h"
 #include "Components.h"
+#include "SystemAssist.h"
 
 using namespace Component;
 
@@ -22,12 +23,6 @@ void ResetSystem(Chunk& a_chunk, const SystemContext& a_context)
 		a_chunk.DeleteChunkComponent(it, RayInfomation::kTypeId);
 	}
 
-	ComponentView viewCreateEffect = a_chunk.GetView<ComponentTypes<CreateEffect>>();
-
-	for (auto it : viewCreateEffect)
-	{
-		a_chunk.DeleteChunkEntity(it);
-	}
 
 	ComponentView viewFixedResult = a_chunk.GetView<ComponentTypes<FixedResult>>();
 	for (auto it : viewFixedResult)
@@ -70,6 +65,43 @@ void ResetSystem(Chunk& a_chunk, const SystemContext& a_context)
 		result->useAttack = false;
 		result->attackIndex = 0;
 	}
+
+	ComponentView viewInterferenceResult = a_chunk.GetView<ComponentTypes<InterferenceResult>>();
+	for(auto it : viewInterferenceResult)
+	{
+		ComponentHandle<InterferenceResult> result = a_chunk.GetComponent<InterferenceResult>(it);
+		result->useKnockback = false;
+		result->knockBackDir = float2(0.0f, 0.0f);
+		result->knockbackTime = 0.0f;
+	}
+}
+
+void CreateLifeEndEffect(Chunk& a_chunk, Entity a_entity)
+{
+	// コンポーネントを取得
+	ComponentHandle<LifeTimeEndEffect> endEffect = a_chunk.GetComponent<LifeTimeEndEffect>(a_entity);
+	ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(a_entity);
+	if(!endEffect.IsValid() || !pos.IsValid()) return;
+
+	// Effekseerのエフェクトを生成
+	if(endEffect.Look().useEfkEffect)
+	{
+		a_chunk.CreateNewEntity(
+			MOVE_AND_TRANSFORM_COMPONENT(
+				TOFLOAT3(pos.Look()),
+				float3(),
+				float3(1.0f, 1.0f, 1.0f)
+			),
+			EfkEffectKey(endEffect.Look().efkEffectKey, 0.0f, false)
+		);
+	}
+
+	// 音を鳴らす
+	if(endEffect.Look().useSound)
+	{
+		
+	}
+
 }
 
 void LifeTimeSystem(Chunk& a_chunk, const SystemContext& a_context)
@@ -83,9 +115,55 @@ void LifeTimeSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		if (time.Look().time <= 0.0f)
 		{
+			// 死亡時エフェクトを生成
+			CreateLifeEndEffect(a_chunk, it);
+			// コンポーネントを削除
 			a_chunk.DeleteChunkEntity(it);
 		}
 	}
+}
+
+void DeleteOnInputSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<DeleteOnInput>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<DeleteOnInput> deleteOnInput = a_chunk.GetComponent<DeleteOnInput>(it);
+
+		deleteOnInput->elapsedTime += a_context.deltaTime;
+
+		if (deleteOnInput.Look().elapsedTime < deleteOnInput.Look().maxWaitTime)
+		{
+			continue;
+		}
+
+		if (a_context.input.IsRegisterTrigger(deleteOnInput.Look().key))
+		{
+			a_chunk.DeleteChunkEntity(it);
+		}
+	}
+}
+
+void SpawnJsonSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<SpawnJson>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<SpawnJson> spawn = a_chunk.GetComponent<SpawnJson>(it);
+
+		if (spawn.Look().currentDuration < spawn.Look().maxSpawnTime)
+		{
+			spawn->currentDuration += a_context.effectStepTime;
+			continue;
+		}
+
+		a_response.AddEntitySpawnRequest(SpawnRequest(spawn.Look().spawnKey, spawn.Look().offset));
+		a_chunk.DeleteChunkEntity(it);
+	}
+
+
 }
 
 void RaySystem(Chunk& a_chunk, const SystemContext& a_context)

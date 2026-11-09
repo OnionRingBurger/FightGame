@@ -2,11 +2,14 @@
 #include "Components.h"
 #include "Chunk.h"
 #include "SystemContext.h"
+#include "ISystemResponse.h"
 #include "SystemAssist.h"
 #include "AI/AIManager.h"
 
 
 void HitPointSystem(Chunk& a_chunk, SystemContext& a_context);
+
+void CharacterKill(Chunk& a_chunk, Entity killEntity);
 
 // 接地判定
 void GroundedSystem(Chunk& a_chunk, const SystemContext& a_context);
@@ -40,3 +43,23 @@ void GuardSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 // ガードアクションステートの管理
 void GuardActionSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+// ノックバックステートの管理
+void KnockbackSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void KnockbackStateSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+// !!!New!!!
+void LookOnStateSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+// 入力を確定する
+void MoveInputResolveSystem(Chunk& a_chunk, const SystemContext& a_context, AIManager& a_aiManager);
+
+// 被弾解決
+void AttackHitSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response, AIManager& a_aiManager);
+
+void AttackHitRecordCleanupSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void EntryActionSystem(Chunk& a_chunk, const SystemContext& a_context);
+
+void EnemyAttackLoadSystem(Chunk& a_chunk, const SystemContext& a_context);

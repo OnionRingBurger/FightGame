@@ -2,53 +2,54 @@
 #include "DebugConsole.h"
 #include "LoadWorld.h"
 #include <unordered_set>
+#include "Defines.h"
+#include "LoadDataJsonRegistrar.h"
 
 LoadScene::LoadScene(
 	std::function<void(std::string)> a_sceneChange,
-	ThreadSafeQueue<ModelLoadJob>& a_modelJobQueue,
-	ThreadSafeQueue<TextureLoadJob>& a_textureJobQueue,
-	std::vector<modelLoadData> a_modelDatas,
-	std::vector<std::string> a_textureDatas,
+	LoadJobQueues& a_jobQueues,
+	LoadManifestPaths a_manifestPaths,
 	IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
-	Input& a_input)
+	IEffectCacheAcquisition& effectCache,
+	Input& a_input,
+	ComponentsSerialize& a_serialize,
+	PrefabManager& a_prefabManager)
 	: sceneChange(a_sceneChange)
 	, inited(false)
-	, modelJobQueue(a_modelJobQueue)
-	, textureJobQueue(a_textureJobQueue)
-	, modelDatas(a_modelDatas)
-	, textureDatas(a_textureDatas)
+	, presentationReady(false)
+	, manifestRegistered(false)
+	, jobQueues(a_jobQueues)
+	, uiCache(a_uiCache)
+	, manifestPaths(std::move(a_manifestPaths))
+	
 {
-	DebugConsole::ToggleConsole();
-
 	std::vector<modelLoadData> useModelDatas = {
 	};
 
 	std::vector<std::string> useTextureDatas = {
-		"LoadMainCar",
-		"LoadRail",
-		"LoadWind"
+		"LoadSprite",
+
 	};
 
 	for (auto it : useModelDatas)
 	{
 		std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-		a_modelJobQueue.Push(std::move(ModelLoadJob(it.first, it.second, endFlag)));
+		jobQueues.model.Push(std::move(ModelLoadJob(it.first, it.second, endFlag)));
 		useDataLoadEndFlags.push_back(endFlag);
 	}
 
 	for (auto it : useTextureDatas)
 	{
 		std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-		a_textureJobQueue.Push(std::move(TextureLoadJob(it, endFlag)));
+		jobQueues.texture.Push(std::move(TextureLoadJob(it, endFlag)));
 		useDataLoadEndFlags.push_back(endFlag);
 	}
 
-
-	world = std::make_unique<LoadWorld>(a_modelCache, a_uiCache, a_input);
+	world = std::make_unique<LoadWorld>(a_modelCache, a_uiCache, effectCache, a_input, a_serialize, a_prefabManager);
 	world->InitWorld();
 	// ロード量を保持
-	maxLoadCount = loadEndFlags.size();
+	maxLoadCount = (int)loadEndFlags.size();
 
 }
 
@@ -61,41 +62,99 @@ void LoadScene::Update()
 {
 
 	RemoveIfFlaged(useDataLoadEndFlags);
-	if (useDataLoadEndFlags.empty() && !inited)
+
+	// !!!New!!!
+	if (useDataLoadEndFlags.empty() && !manifestRegistered)
 	{
+		presentationReady = true;
+
+		LoadDataJsonRegistrar loadDataJsonRegistrar(loadDatas);
+		loadDataJsonRegistrar.RegisterFromManifest(manifestPaths);
+
+		for (auto it : loadDatas.textFormat)
+		{
+			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
+			jobQueues.textFormat.Push(std::move(TextFormatLoadJob(it.key, it.useFile, it.font, it.fontFile, it.size, endFlag)));
+			useDataLoadEndFlags.push_back(endFlag);
+		}
+
+		manifestRegistered = true;
+		return;
+	}
+
+	if (useDataLoadEndFlags.empty() && manifestRegistered && !inited)
+	{
+		// !!!New!!!
+		for (const auto& it : loadDatas.textUI)
+		{
+			if (uiCache.GetTextFormat(it.formatKey) == nullptr)
+			{
+				return;
+			}
+		}
+
 		inited = true;
 
 		// 各モデル、テクスチャをロード予約して終了フラグを保持
-		for (auto it : modelDatas)
+		for (auto it : loadDatas.model)
 		{
 			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-			modelJobQueue.Push(std::move(ModelLoadJob(it.first, it.second, endFlag)));
+			jobQueues.model.Push(std::move(ModelLoadJob(it.first, it.second, endFlag)));
 			loadEndFlags.push_back(endFlag);
 		}
 
-		for (auto it : textureDatas)
+		for (auto it : loadDatas.texture)
 		{
 			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-			textureJobQueue.Push(std::move(TextureLoadJob(it, endFlag)));
+			jobQueues.texture.Push(std::move(TextureLoadJob(it, endFlag)));
 			loadEndFlags.push_back(endFlag);
+		}
+
+		for (auto it : loadDatas.effect)
+		{
+			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
+			jobQueues.effect.Push(std::move(EffectLoadJob(it.key, it.magnificent, endFlag)));
+			loadEndFlags.push_back(endFlag);
+		}
+
+		for (auto it : loadDatas.textUI)
+		{
+			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
+			// !!!New!!!
+			ComPtr<IDWriteTextFormat> format = uiCache.GetTextFormat(it.formatKey);
+			jobQueues.textUI.Push(std::move(TextUILoadJob(it.key, it.text, it.formatKey, it.width, it.height, endFlag, format)));
+			loadEndFlags.push_back(endFlag);
+		}
+
+		for (auto it : loadDatas.jsonPrefab)
+		{
+			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
+			jobQueues.jsonPrefab.Push(std::move(JsonPrefabLoadJob(endFlag, it.key)));
+			useDataLoadEndFlags.push_back(endFlag);
 		}
 	}
-
-
 
 	if (!inited) return;
 	RemoveIfFlaged(loadEndFlags);
 	if (loadEndFlags.empty())
 	{
-		DebugConsole::ToggleConsole();
+
+#ifdef CREATEGAME
+		sceneChange("CreateGame");
+#else
 		sceneChange("Game");
+		
+#endif // CREATEGAME
+
+		
 	}
 	world->UpdateWorld();
 }
 
 void LoadScene::Draw()
 {
-	if (!inited) return;
+	// !!!New!!!
+	if (!presentationReady) return;
 	world->DrawWorld();
 }
 
@@ -105,7 +164,7 @@ void LoadScene::PostFrameProcess()
 
 void LoadScene::RemoveIfFlaged(std::vector<std::shared_ptr<std::atomic_bool>>& loadEndFlags)
 {
-	for (int i = loadEndFlags.size() - 1; i >= 0; i--)
+	for (int i = (int)loadEndFlags.size() - 1; i >= 0; i--)
 	{
 		if (loadEndFlags.at(i)->load())
 		{
@@ -114,4 +173,3 @@ void LoadScene::RemoveIfFlaged(std::vector<std::shared_ptr<std::atomic_bool>>& l
 		}
 	}
 }
-

@@ -54,6 +54,8 @@ public:
 	bool IsRegisterKeyPress(std::string) const;
 	bool IsRegisterButtonPress(std::string) const;
 
+	bool IsUseController() const;
+
 	
 private:
 	std::optional<XINPUT_STATE> GetController();
@@ -85,10 +87,15 @@ private:
 	float2 oldMousePos;
 	XINPUT_KEYSTROKE currentStroke;
 	bool isGetController;
+	bool isControllerConnected = false;
 
 	BOOL isGetCursorPos;
 	BYTE g_keyTable[256];
 	BYTE g_oldTable[256];
+
+	WORD currentButton;
+	WORD oldButton;
+	WORD lastPacket;
 	
 };
 

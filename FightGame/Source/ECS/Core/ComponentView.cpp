@@ -3,17 +3,18 @@
 
 
 
-ComponentView::ComponentView(const std::vector<std::vector<Entity>>& a_entities)
+ComponentView::ComponentView(std::vector<std::vector<Entity>>& a_entities)
 {
 
 	std::vector<Entity> trueEntities;
 
+	std::sort(a_entities.begin(), a_entities.end(), [](const std::vector<Entity>& a, const std::vector<Entity> b) {return a.size() < b.size(); });
 
 	for (auto& entitiesIt : a_entities)
 	{
 		if (&entitiesIt == &a_entities.at(0))
 		{
-			trueEntities = a_entities.at(0);
+			trueEntities.swap(a_entities.at(0));
 			continue;
 		}
 
@@ -33,26 +34,27 @@ ComponentView::ComponentView(const std::vector<std::vector<Entity>>& a_entities)
 			
 		}
 		
-		trueEntities = cmpEntities;
+		trueEntities.swap(cmpEntities);
+		cmpEntities.clear();
 
 	}
 	
-	entities = trueEntities;
+	entities.swap(trueEntities);
 }
 
-ComponentView::ComponentView(const std::vector<std::vector<Entity>>& a_entities, const std::vector<std::vector<Entity>>& a_exclusionEntities)
+ComponentView::ComponentView(std::vector<std::vector<Entity>>& a_entities, std::vector<std::vector<Entity>>& a_exclusionEntities)
 {
 	// 条件に合致したEntity
 	std::vector<Entity> trueEntities;
 
-	// std::sort(a_entities.begin(), a_entities.end(), [](const std::vector<Entity>& a, const std::vector<Entity> b) {return a.size() > b.size(); });
+	std::sort(a_entities.begin(), a_entities.end(), [](const std::vector<Entity>& a, const std::vector<Entity> b) {return a.size() < b.size(); });
 
 	// 渡されたすべてのEntityを確認し、重複したEntityだけ残す
 	for (auto& entitiesIt : a_entities)
 	{
 		if (&entitiesIt == &a_entities.at(0))
 		{
-			trueEntities = a_entities.at(0);
+			trueEntities.swap(a_entities.at(0));
 			continue;
 		}
 
@@ -72,7 +74,8 @@ ComponentView::ComponentView(const std::vector<std::vector<Entity>>& a_entities,
 
 		}
 
-		trueEntities = cmpEntities;
+		trueEntities.swap(cmpEntities);
+		cmpEntities.clear();
 
 	}
 
@@ -104,11 +107,12 @@ ComponentView::ComponentView(const std::vector<std::vector<Entity>>& a_entities,
 		}
 
 		// trueEntityを更新
-		trueEntities = cmpEntities;
+		trueEntities.swap(cmpEntities);
+		cmpEntities.clear();
 
 	}
 
-	entities = trueEntities;
+	entities.swap(trueEntities);
 }
 
 

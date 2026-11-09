@@ -3,6 +3,8 @@
 #include "SystemContext.h"
 #include "MathAssist.h"
 #include "Components.h"
+#include "ComponentsSerialize.h"
+#include "AIManager.h"
 
 ////////////////////////////////////////////////////
 // システム内で使うための汎用昨日
@@ -12,17 +14,24 @@
 
 Entity GetPlayer(Chunk& a_chunk, float3 a_position);
 
+Entity GetCameraRig(Chunk& a_chunk);
+
 Entity GetRail(Chunk& a_chunk);
+
+Entity GetLookOnMarker(Chunk& a_chunk);
 
 float3 GetEntityWorldPos(Chunk& a_chunk, Entity a_entity);
 
-// !!!New!!! Pose 優先、無ければ Position
+
+// Pose 優先、無ければ Position。遅延系座標処理でのみ使う
 float3 GetEntityPosePos(Chunk& a_chunk, Entity a_entity);
 
 // !!!New!!! Pose 優先、無ければ Rotation（pitch/yaw/roll）
 float3 GetEntityPoseRot(Chunk& a_chunk, Entity a_entity);
 
 void ResetFixedPosState(ComponentHandle<Component::FixedResult> fixedResult, ComponentHandle<Component::MotionResult> motionResult);
+
+void ResetFixedRotState(ComponentHandle<FixedResult> fixedResult, ComponentHandle<MotionResult> motionResult);
 
 float3 GetLocalOffset(float3 worldOffset, float3 rotation);
 
@@ -34,3 +43,31 @@ Entity GetCamera(Chunk& a_chunk);
 bool IsActionAllowed(Chunk& a_chunk, Entity a_entity, Component::ActionFlag a_flag);
 
 void CancelPlayerAttackIfAble(Chunk& a_chunk, Entity a_entity);
+
+void ClearCharacterAttackOnDeath(Chunk& a_chunk, Entity a_entity);
+
+// !!!New!!!
+void WriteAISenseProfile(Chunk& a_chunk, AIManager& a_aiManager, Entity entity);
+
+// !!!New!!!
+void RegisterEnemyAI(Chunk& a_chunk, AIManager& a_aiManager, Entity entity);
+
+void RegisterAllAttackSectorsFromAttackData(int a_circumferenceCount);
+
+void AddShakeEffect(Chunk& a_chunk, Entity a_entity, float3 a_power, float3 a_amp, float a_time, float a_rate);
+
+void AddUIShakeEffect(Chunk& a_chunk, Entity a_entity, float2 a_basePos, float2 a_power, float2 a_amp, float a_maxShakeTime, float a_maxStopTime, float a_rate);
+
+void SafeDeleteEffectEntity(Chunk& a_chunk, Entity a_effect);
+
+bool IsClearStage(int stageIndex);
+
+bool IsUnlockStage(int stageIndex);
+
+void SaveClearStage(int stageIndex, bool isClear);
+
+void SaveUnlockStage(int stageIndex, bool isUnlock);
+
+
+// キーバインド
+void AddGameBind(Input& a_input);

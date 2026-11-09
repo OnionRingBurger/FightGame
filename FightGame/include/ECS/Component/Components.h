@@ -4,6 +4,7 @@
 #include <vector>
 #include <limits>
 #include <unordered_set>
+#include "imgui.h"
 #include "MathAssist.h"
 #include "ECSTypes.h"
 #include "TrailEffect.h"
@@ -23,13 +24,169 @@
 	FixedResult(), \
 	MotionResult(), \
 	EphemeralResult()
-
+// コンポーネント展開マクロ
+// !!!New!!!
+#define COMPONENT_TYPE_LIST(X) \
+	X(PlayerTag) \
+	X(EnemyTag) \
+	X(DarkTag) \
+	X(GoalTag) \
+	X(CameraTag) \
+	X(ItemTag) \
+	X(LaserPointTag) \
+	X(LaserOwnerTag) \
+	X(LaserTag) \
+	X(PlayerViewTag) \
+	X(DontHitRayTag) \
+	X(GunTag) \
+	X(Position) \
+	X(Rotation) \
+	X(Scale) \
+	X(LookLaserPoint) \
+	X(InputMove) \
+	X(InputRotato) \
+	X(ShakingComponent) \
+	X(PlayerWalkTimer) \
+	X(EnemySpawner) \
+	X(Timer) \
+	X(LookComponent) \
+	X(Velocity) \
+	X(Force) \
+	X(BoxCollider) \
+	X(MoveForward) \
+	X(ShooterComponent) \
+	X(GhostAreaComponent) \
+	X(OBBCollider) \
+	X(TrackingWarp) \
+	X(HitInfomation) \
+	X(ChunkChange) \
+	X(KeyChunkChange) \
+	X(CreateEffect) \
+	X(ZoomComponent) \
+	X(ZoomMove) \
+	X(DelayChunkChange) \
+	X(FadeUI) \
+	X(FadeChange) \
+	X(OwnerComponent) \
+	X(BulletComponent) \
+	X(Camera) \
+	X(CameraPoint) \
+	X(FollowPosition) \
+	X(FollowRotation) \
+	X(Ray) \
+	X(RayInfomation) \
+	X(LifeTime) \
+	X(TrailComponent) \
+	X(ModelKey) \
+	X(UIComponent) \
+	X(SpriteComponent) \
+	X(Poliline) \
+	X(LeapPosComponent) \
+	X(LeapRotComponent) \
+	X(FlipComponent) \
+	X(UIAngularSpeed) \
+	X(Pose) \
+	X(PosePosState) \
+	X(PoseRotState) \
+	X(RailComponent) \
+	X(RailUser) \
+	X(RailFly) \
+	X(AngleLimitComponent) \
+	X(DebugCameraTag) \
+	X(DebugInputPos) \
+	X(DebugInputRot) \
+	X(EnemyShooter) \
+	X(EnemyBulletTag) \
+	X(HitPoint) \
+	X(DeadState) \
+	X(HPGaugeUI) \
+	X(ShakeComponent) \
+	X(AddDamageComponent) \
+	X(SpriteAnimation) \
+	X(ShotUI) \
+	X(UVMove) \
+	X(MotionTransform) \
+	X(FixedResult) \
+	X(MotionResult) \
+	X(EphemeralResult) \
+	X(Firework) \
+	X(AlphaBlendComponent) \
+	X(AngularVelocity) \
+	X(SectorHitJudge) \
+	X(PlayerAttackTag) \
+	X(AttackHitRecord) \
+	X(GroundedState) \
+	X(ActionMask) \
+	X(JumpAction) \
+	X(WorldPower) \
+	X(JumpPower) \
+	X(AttackStatus) \
+	X(AttackAction) \
+	X(AttackWaitAction) \
+	X(LookMove) \
+	X(MoveInputResult) \
+	X(InputSource) \
+	X(EnemyAttackTag) \
+	X(AttackTelegraph) \
+	X(AttackStartupAction) \
+	X(AttackInstance) \
+	X(AIRole) \
+	X(GuardAction) \
+	X(GuardState) \
+	X(ClearTarget) \
+	X(EffectKey) \
+	X(KnockbackAction) \
+	X(InterferenceResult) \
+	X(Name) \
+	X(LookOnState) \
+	X(LookOnAction)\
+	X(AttackKeyLoad) \
+	X(PhaseSpawner) \
+	X(EfkEffectKey) \
+	X(EntryAction) \
+	X(BossTag) \
+	X(UseGhostShader) \
+	X(LookOnMarkerTag) \
+	X(NullTargetTag) \
+	X(SelectCursor) \
+	X(SelectBox) \
+	X(SelectPlayCommand) \
+	X(CameraRigTag) \
+	X(RigLookOn) \
+	X(FollowLeap) \
+	X(DebugEntityTag) \
+	X(EfkEffectRuntime) \
+	X(UIScaleLerp) \
+	X(UIPosLerp) \
+	X(DropUI) \
+	X(OtherChunkChangeLock) \
+	X(GameOverTarget) \
+	X(SoundKey) \
+	X(EfkEffectArea)\
+	X(AllActionStopper)\
+	X(CameraChangeEffect)\
+	X(PlayerHeal) \
+	X(DeleteOnInput) \
+	X(LifeTimeEndEffect) \
+	X(CameraMover) \
+	X(SpawnJson) \
+	X(TutorialSpawner) \
+	X(CreateTutorialWindow) \
+	X(UITextBoxCursor) \
+	X(StageData) \
+	X(UnlockStageEntity) \
+	X(UIShake) \
+	X(UIRailFly) \
+	X(ControllerInputUIReplace) \
+	X(Light) \
+	X(UseShadowShader)
 
 
 using BitFlag = unsigned int;
 constexpr Entity kInvalidEntity = {
-	-1,
-	-1
+	static_cast<EntityID>(-1),
+	static_cast<EntityID>(-1)
+
 };
 
 
@@ -595,6 +752,8 @@ namespace Component
 
 		// ・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽh・ｽﾌ抵ｿｽ・ｽS・ｽ・ｽ・ｽW
 		float3 center;
+		float3 oldCenter;
+		bool setOldCenter;
 
 		// x,y,z・ｽﾌ包ｿｽ・ｽ・ｽ・ｽx・ｽN・ｽg・ｽ・ｽ
 		std::array<float3, 3> axis;
@@ -608,8 +767,10 @@ namespace Component
 
 		OBBCollider(BitFlag a_flag = OBB_DEFAULT)
 			: center(0.0f, 0.0f, 0.0f)
+			, oldCenter(0.0f, 0.0f, 0.0f)
 			, half(0.0f, 0.0f, 0.0f)
 			, obbBitFlag(a_flag)
+			, setOldCenter(false)
 		{
 			for (int i = 0; i < 3; i++)
 			{
@@ -673,25 +834,40 @@ namespace Component
 		struct HitResult
 		{
 
-			// ・ｽﾔつゑｿｽ・ｽ・ｽ・ｽ・ｽEntity
+			// ぶつかった相手
 			Entity hitEntity;
 
-			// ・ｽ・ｽ・ｽ・ｽ・ｽﾟゑｿｽ・ｽ・ｽ・ｽ・ｽ
-			float3 normal;
-			// ・ｽ・ｽ・ｽ・ｽ・ｽﾟゑｿｽ・ｽ・ｽ
-			float depth;
+			bool isSweep;
 
+			// 法線移動
+			float3 normal;
+			// 深さ
+			float depth;
+			// スイープ用移動量
+			float3 sweepMotion;
+			// どのタイミングでヒットしたかを0~1の範囲で返す
+			float normalizeHitTime;
 			InfoColliderType otherType;
 
 			HitResult()
-				: HitResult(kInvalidEntity, float3(), 0.0f, DEFAULT)
+				: HitResult(kInvalidEntity, false, float3(), 0.0f, float3(), 0.0f, DEFAULT)
 			{
 			}
 
-			HitResult(Entity a_hitEntity, float3 a_normal, float a_depth, InfoColliderType a_otherType)
+			HitResult(
+				Entity a_hitEntity,
+				bool a_isSweep,
+				float3 a_normal,
+				float a_depth,
+				float3 a_sweepMotion,
+				float a_normalizeHitTime,
+				InfoColliderType a_otherType)
 				: hitEntity(a_hitEntity)
+				, isSweep(a_isSweep)
 				, normal(a_normal)
 				, depth(a_depth)
+				, sweepMotion(a_sweepMotion)
+				, normalizeHitTime(a_normalizeHitTime)
 				, otherType(a_otherType)
 			{
 			}
@@ -775,19 +951,28 @@ namespace Component
 		SPEEDLINEFADE,
 		SHOTFLASH,
 		DAMAGE_EFFECT,
-		DAMAGE_DIRECTION
+		DAMAGE_DIRECTION,
+		BATTLESTART,
+		GAMECLEAR,
+		STAGE_CLEAR_MOVIE,
+		WHITEWAVESTART,
+		WHITEWAVEEND,
+		EFFECT_NONE,
 	};
 	struct CreateEffect
 	{
 		static constexpr TypeID kTypeId = 34;
 		static constexpr const char* kTypeName = "CreateEffect";
-		static constexpr int kVersion = 0;
+		static constexpr int kVersion = 1;
 
 		EffectType type;
 
 
 		float2 posOffset;
 		float angleOffset;
+
+		float maxWaitTime;
+		float duration;
 
 		CreateEffect()
 			: CreateEffect(WHITEFADE_UP)
@@ -798,13 +983,17 @@ namespace Component
 			: type(a_type)
 			, posOffset()
 			, angleOffset()
+			, maxWaitTime(0.0f)
+			, duration(0.0f)
 		{
 		}
 
-		CreateEffect(EffectType a_type, float2 a_posOffset, float a_angleOffset)
+		CreateEffect(EffectType a_type, float2 a_posOffset, float a_angleOffset, float a_maxWaitTime = 0.0f)
 			: type(a_type)
 			, posOffset(a_posOffset)
 			, angleOffset(a_angleOffset)
+			, maxWaitTime(a_maxWaitTime)
+			, duration(0.0f)
 		{
 
 		}
@@ -922,14 +1111,21 @@ namespace Component
 		FadeType fadeType;
 		float fadeSpeed;
 
+		float progress;
+		float min;
+		float max;
+
 		FadeUI()
-			: FadeUI(FADE_UP, 0.0f)
+			: FadeUI(FADE_UP, 0.0f, 0.0f, 1.0f)
 		{
 		}
 
-		FadeUI(FadeType a_fadeType, float a_fadeSpeed)
+		FadeUI(FadeType a_fadeType, float a_fadeSpeed, float a_min = 0.0f, float a_max = 1.0f)
 			:fadeType(a_fadeType)
 			, fadeSpeed(a_fadeSpeed)
+			, progress(0.0f)
+			, min(a_min)
+			, max(a_max)
 		{
 		}
 
@@ -947,15 +1143,19 @@ namespace Component
 
 		FadeChungeType type;
 		bool isWait;
+		float maxCoolTime;
+		float duration;
 
 		FadeChange()
-			: FadeChange(FADE_CHANGE_FLICKER, false)
+			: FadeChange(FADE_CHANGE_FLICKER, false, 0.0f, 0.0f)
 		{
 		}
 
-		FadeChange(FadeChungeType a_type, bool a_isWait = false)
+		FadeChange(FadeChungeType a_type, bool a_isWait = false, float a_maxCoolTime = 0.0f, float a_startDuration = 0.0f)
 			: type(a_type)
 			, isWait(a_isWait)
+			, maxCoolTime(a_maxCoolTime)
+			, duration(a_startDuration)
 		{
 		}
 	};
@@ -1300,30 +1500,20 @@ namespace Component
 	{
 		static constexpr TypeID kTypeId = 53;
 		static constexpr const char* kTypeName = "SpriteComponent";
-		static constexpr int kVersion = 1;
+		static constexpr int kVersion = 2;
 
-		std::string key;
 		float3 offsetPos;
-		float2 size;
 		float3 offsetRotation;
-		float2 uvPos;
-		float2 uvScale;
-		float alpha;
 		bool isBillBoard;
 
 		SpriteComponent()
-			: SpriteComponent("", float3(), float2(), float3(), 1.0f, false, float2(0.0f, 0.0f), float2(1.0f, 1.0f))
+			: SpriteComponent(float3(), float3(), false)
 		{
 		}
 
-		SpriteComponent(std::string a_key, float3 a_offsetPos, float2 a_size, float3 a_offsetRotation, float a_alpha = 1.0f, bool a_isBillBoard = false, float2 a_uvPos = { 0.0f, 0.0f }, float2 a_uvScale = { 1.0f, 1.0f })
-			: key(a_key)
-			, offsetPos(a_offsetPos)
-			, size(a_size)
+		SpriteComponent(float3 a_offsetPos, float3 a_offsetRotation, bool a_isBillBoard = false)
+			: offsetPos(a_offsetPos)
 			, offsetRotation(a_offsetRotation)
-			, uvPos(a_uvPos)
-			, uvScale(a_uvScale)
-			, alpha(a_alpha)
 			, isBillBoard(a_isBillBoard)
 		{
 		}
@@ -1407,7 +1597,7 @@ namespace Component
 	struct FlipComponent
 	{
 		static constexpr TypeID kTypeId = 57;
-		static constexpr const char* kTypeName = "LeapRotComponent";
+		static constexpr const char* kTypeName = "FlipComponent";
 		static constexpr int kVersion = 0;
 		FlipComponent() = default;
 	};
@@ -1431,177 +1621,6 @@ namespace Component
 		}
 	};
 
-	//struct VelocityResult
-	//{
-	//	static constexpr TypeID kTypeId = 59;
-	//	static constexpr const char* kTypeName = "VelocityResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 posOffset;
-	//
-	//	VelocityResult()
-	//		: posOffset()
-	//	{
-	//	}
-	//};
-	//
-	//struct InputMoveResult
-	//{
-	//	static constexpr TypeID kTypeId = 60;
-	//	static constexpr const char* kTypeName = "InputMoveResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 posOffset;
-	//
-	//	InputMoveResult()
-	//		: posOffset()
-	//	{
-	//	}
-	//};
-	//
-	//struct InputRotatoResult
-	//{
-	//	static constexpr TypeID kTypeId = 61;
-	//	static constexpr const char* kTypeName = "InputRotatoResult";
-	//	static constexpr int kVersion = 0;
-	//	float3 rotatoOffset;
-	//
-	//	InputRotatoResult()
-	//		: rotatoOffset()
-	//	{
-	//	}
-	//};
-	//
-	//struct FlipResult
-	//{
-	//	static constexpr TypeID kTypeId = 62;
-	//	static constexpr const char* kTypeName = "RotationInputResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 rotatoOffset;
-	//
-	//	FlipResult()
-	//		: rotatoOffset()
-	//	{
-	//	}
-	//};
-	//
-	//struct MoveForwardResult
-	//{
-	//	static constexpr TypeID kTypeId = 63;
-	//	static constexpr const char* kTypeName = "MoveForwardResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 posOffset;
-	//	MoveForwardResult()
-	//		: posOffset()
-	//	{
-	//	}
-	//};
-	//
-	//struct ShakingPositionResult
-	//{
-	//	static constexpr TypeID kTypeId = 64;
-	//	static constexpr const char* kTypeName = "ShakingPositionResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 posOffset;
-	//
-	//	ShakingPositionResult()
-	//		: posOffset()
-	//	{
-	//	}
-	//};
-	//
-	//struct LookResult
-	//{
-	//	static constexpr TypeID kTypeId = 65;
-	//	static constexpr const char* kTypeName = "LookResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 newRot;
-	//
-	//	LookResult()
-	//		: newRot()
-	//	{
-	//	}
-	//};
-	//
-	//struct TrackingWarpResult
-	//{
-	//	static constexpr TypeID kTypeId = 66;
-	//	static constexpr const char* kTypeName = "TrackingWarpResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	bool isWarp;
-	//	float3 newPos;
-	//
-	//	TrackingWarpResult()
-	//		: isWarp(false)
-	//		, newPos()
-	//	{
-	//	}
-	//};
-	//
-	//
-	//struct LeapResult
-	//{
-	//	static constexpr TypeID kTypeId = 67;
-	//	static constexpr const char* kTypeName = "LeapResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 newPos;
-	//
-	//	LeapResult()
-	//		: newPos()
-	//	{
-	//	}
-	//};
-	//
-	//struct CameraPosResult
-	//{
-	//	static constexpr TypeID kTypeId = 68;
-	//	static constexpr const char* kTypeName = "CameraPosResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	bool isFollow;
-	//	float3 newPos;
-	//	Entity target;
-	//
-	//	CameraPosResult()
-	//		: isFollow(false)
-	//		, newPos()
-	//		, target(kInvalidEntity)
-	//	{
-	//	}
-	//};
-	//
-	//struct CameraRotResult
-	//{
-	//	static constexpr TypeID kTypeId = 69;
-	//	static constexpr const char* kTypeName = "CameraRotResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	Entity target;
-	//	CameraRotResult()
-	//		: target(kInvalidEntity)
-	//	{
-	//	}
-	//};
-	//
-	//struct ColliderBackResult
-	//{
-	//	static constexpr TypeID kTypeId = 70;
-	//	static constexpr const char* kTypeName = "ColliderBackResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 posOffset;
-	//
-	//	ColliderBackResult()
-	//		: posOffset()
-	//	{
-	//	}
-	//};
 
 	struct Pose
 	{
@@ -1677,49 +1696,6 @@ namespace Component
 		}
 	};
 
-	//struct FollowPosResult
-	//{
-	//	static constexpr TypeID kTypeId = 74;
-	//	static constexpr const char* kTypeName = "FollowPosResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 posOffset;
-	//	Entity target;
-	//	bool isFollowX;
-	//	bool isFollowY;
-	//	bool isFollowZ;
-	//
-	//	FollowPosResult()
-	//		: posOffset()
-	//		, target(kInvalidEntity)
-	//		, isFollowX(false)
-	//		, isFollowY(false)
-	//		, isFollowZ(false)
-	//	{
-	//	}
-	//};
-	//
-	//struct FollowRotResult
-	//{
-	//	static constexpr TypeID kTypeId = 75;
-	//	static constexpr const char* kTypeName = "FollowRotResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 rotOffset;
-	//	Entity target;
-	//	bool isFollowPitch;
-	//	bool isFollowYaw;
-	//	bool isFollowRoll;
-	//
-	//	FollowRotResult()
-	//		: rotOffset()
-	//		, target (kInvalidEntity)
-	//		, isFollowPitch(false)
-	//		, isFollowYaw(false)
-	//		, isFollowRoll(false)
-	//	{
-	//	}
-	//};
 
 	struct RailComponent
 	{
@@ -1775,20 +1751,6 @@ namespace Component
 		}
 	};
 
-	//struct RailResult
-	//{
-	//	static constexpr TypeID kTypeId = 78;
-	//	static constexpr const char* kTypeName = "RailResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	RailResult()
-	//		: newPos()
-	//	{
-	//	}
-	//
-	//	float3 newPos;
-	//};
-
 	struct RailFly
 	{
 		static constexpr TypeID kTypeId = 79;
@@ -1812,66 +1774,6 @@ namespace Component
 		}
 	};
 
-	//struct RailFlyResult
-	//{
-	//	static constexpr TypeID kTypeId = 80;
-	//	static constexpr const char* kTypeName = "RailFlyResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 posOffset;
-	//
-	//	RailFlyResult()
-	//		: posOffset(float3())
-	//	{
-	//	}
-	//
-	//	RailFlyResult(float3 a_posOffset)
-	//		: posOffset(a_posOffset)
-	//	{
-	//	}
-	//};
-	//
-	//struct RailApproach
-	//{
-	//	static constexpr TypeID kTypeId = 81;
-	//	static constexpr const char* kTypeName = "RailApproach";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 currentPosition;
-	//	float speed;
-	//	bool isStop;
-	//
-	//	RailApproach()
-	//		: RailApproach(float3(), 0.0f, false)
-	//	{
-	//	}
-	//
-	//	RailApproach(float3 a_position, float a_speed, bool a_isStop = false)
-	//		: currentPosition(a_position)
-	//		, speed(a_speed)
-	//		, isStop(a_isStop)
-	//	{
-	//	}
-	//};
-
-	//struct RailApproachResult
-	//{
-	//	static constexpr TypeID kTypeId = 82;
-	//	static constexpr const char* kTypeName = "RailApproachResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 posOffset;
-	//
-	//	RailApproachResult()
-	//		: posOffset()
-	//	{
-	//	}
-	//
-	//	RailApproachResult(float3 a_posOffset)
-	//		: posOffset(a_posOffset)
-	//	{
-	//	}
-	//};
 
 	struct AngleLimitComponent
 	{
@@ -1908,34 +1810,6 @@ namespace Component
 
 		DebugCameraTag() {};
 	};
-
-	//struct DebugCameraPosResult
-	//{
-	//	static constexpr TypeID kTypeId = 85;
-	//	static constexpr const char* kTypeName = "DebugCameraPosResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	Entity target;
-	//
-	//	DebugCameraPosResult()
-	//		: target(kInvalidEntity)
-	//	{
-	//	}
-	//};
-
-	//struct DebugCameraRotResult
-	//{
-	//	static constexpr TypeID kTypeId = 86;
-	//	static constexpr const char* kTypeName = "DebugCameraRotResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	Entity target;
-	//
-	//	DebugCameraRotResult()
-	//		: target(kInvalidEntity)
-	//	{
-	//	}
-	//};
 
 	struct DebugInputPos
 	{
@@ -1977,32 +1851,6 @@ namespace Component
 		}
 	};
 
-	//struct DebugInputPosResult
-	//{
-	//	static constexpr TypeID kTypeId = 89;
-	//	static constexpr const char* kTypeName = "DebugInputPosResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 posOffset;
-	//
-	//	DebugInputPosResult()
-	//		: posOffset()
-	//	{
-	//	}
-	//};
-
-	//struct DebugInputRotResult
-	//{
-	//	static constexpr TypeID kTypeId = 90;
-	//	static constexpr const char* kTypeName = "DebugInputRotResult";
-	//	static constexpr int kVersion = 0;
-	//	float3 rotatoOffset;
-	//
-	//	DebugInputRotResult()
-	//		: rotatoOffset()
-	//	{
-	//	}
-	//};
 
 	struct EnemyShooter
 	{
@@ -2016,6 +1864,13 @@ namespace Component
 			: shotTimer(a_maxShotWaitTimer)
 			, maxShotWaitTime(a_maxShotWaitTimer)
 		{
+		}
+
+		EnemyShooter()
+			: shotTimer(0.0f)
+			, maxShotWaitTime(0.0f)
+		{
+
 		}
 	};
 
@@ -2076,6 +1931,14 @@ namespace Component
 		float2 gaugePos;
 		float2 gaugeScale;
 
+		HPGaugeUI()
+			: target(kInvalidEntity)
+			, gaugePos()
+			, gaugeScale()
+		{
+
+		}
+
 		HPGaugeUI(Entity a_target, float2 a_gaugePos, float2 a_gaugeScale)
 			: target(a_target)
 			, gaugePos(a_gaugePos)
@@ -2099,32 +1962,23 @@ namespace Component
 		float3 shakeAmplitude;
 		//! ・ｽo・ｽﾟ趣ｿｽ・ｽ・ｽ
 		float elapsedTime;
+		// !!!New!!!
+		float decayRate;
 
-		ShakeComponent(float3 a_shakePower, float3 a_shakeAmplitude, float shakeTime = 0.0f)
+		ShakeComponent(float3 a_shakePower, float3 a_shakeAmplitude, float shakeTime, float a_decayRate)
 			: shakePower(a_shakePower)
 			, shakeAmplitude(a_shakeAmplitude)
 			, shakeTime(shakeTime)
 			, elapsedTime(0.0f)
+			, decayRate(a_decayRate)
 		{
 		}
 
-		ShakeComponent() : ShakeComponent(float3(1.0f, 1.0f, 1.0f), float3(1.0f, 1.0f, 1.0f), 0.0f)
+		ShakeComponent() : ShakeComponent(float3(1.0f, 1.0f, 1.0f), float3(1.0f, 1.0f, 1.0f), 0.0f, 0.5f)
 		{
 		}
 	};
 
-	//struct ShakeResult
-	//{
-	//	static constexpr TypeID kTypeId = 96;
-	//	static constexpr const char* kTypeName = "ShakeResult";
-	//	static constexpr int kVersion = 0;
-	//
-	//	float3 newOffset;
-	//
-	//	ShakeResult()
-	//	{
-	//	}
-	//};
 
 	struct AddDamageComponent
 	{
@@ -2156,17 +2010,21 @@ namespace Component
 		int nextSprite;
 		int2 spriteUVCount;
 		bool isLoop;
+		float countStepTime;
+		float maxCountStepTime;
 
-		SpriteAnimation(int a_maxSprite, int2 a_spriteUVCount, bool a_isLoop, int a_startSprite = 0)
+		SpriteAnimation(int a_maxSprite, int2 a_spriteUVCount, bool a_isLoop, float a_maxCountStepTime, int a_startSprite = 0)
 			: spriteUVCount(a_spriteUVCount)
 			, maxSprite(a_maxSprite)
 			, isLoop(a_isLoop)
+			, maxCountStepTime(a_maxCountStepTime)
+			, countStepTime(0)
 			, nextSprite(a_startSprite)
 		{
 		}
 
 		SpriteAnimation()
-			: SpriteAnimation(1, int2(1, 1), false, 0)
+			: SpriteAnimation(1, int2(1, 1), false, 0, 0)
 		{
 		}
 	};
@@ -2323,6 +2181,12 @@ namespace Component
 		{
 			fireworkType = flag;
 		}
+
+		Firework()
+			: fireworkType(FIREWORK_NONE)
+		{
+
+		}
 	};
 
 	struct AlphaBlendComponent
@@ -2411,7 +2275,11 @@ namespace Component
 		ActionFlag_Attack = 1 << 2,
 		ActionFlag_Jump = 1 << 3,
 		ActionFlag_Guard = 1 << 4,
-		ActionFlag_All = ActionFlag_Move | ActionFlag_Aim | ActionFlag_Attack | ActionFlag_Jump | ActionFlag_Guard,
+		ActionFlag_KnockBack = 1 << 5,
+		ActionFlag_LookMove = 1 << 6,
+		ActionFlag_RotChange = 1 << 7,
+		ActionFlag_EntryDuration = 1 << 8,
+		ActionFlag_All = ActionFlag_Move | ActionFlag_Aim | ActionFlag_Attack | ActionFlag_Jump | ActionFlag_Guard | ActionFlag_KnockBack | ActionFlag_LookMove | ActionFlag_RotChange | ActionFlag_EntryDuration,
 	};
 
 
@@ -2476,14 +2344,16 @@ namespace Component
 		static constexpr int kVersion = 0;
 
 		float3 power;
+		float3 rate;
 
 		WorldPower()
-			: WorldPower(float3(0.0f, 0.0f, 0.0f))
+			: WorldPower(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 0.0f))
 		{
 		}
 
-		WorldPower(float3 a_power)
+		WorldPower(float3 a_power, float3 a_rate)
 			: power(a_power)
+			, rate(a_rate)
 		{
 		}
 	};
@@ -2508,7 +2378,7 @@ namespace Component
 	};
 
 	// !!!New!!!
-	// 技1発分の定義（Component ではない）
+	// 技1発分の定義構造体
 	struct AttackPower
 	{
 		float minLength;
@@ -2523,10 +2393,14 @@ namespace Component
 		float waitTime;
 		// !!!New!!!
 		float startupTime;
+		// !!!New!!!
+		std::string sectorKey;
+		// !!!New!!!
+		bool endWithOwnerAction;
 
 
 		AttackPower()
-			: AttackPower(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, float3(), 0.0f, 0.0f)
+			: AttackPower(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, float3(), 0.0f, 0.0f, "", true)
 		{
 		}
 
@@ -2541,7 +2415,9 @@ namespace Component
 			float a_lifeTime,
 			float3 a_followOffset = float3(),
 			float a_waitTime = 0.0f,
-			float a_startupTime = 0.0f
+			float a_startupTime = 0.0f,
+			std::string a_sectorKey = "",
+			bool a_endWithOwnerAction = true
 			)
 			: minLength(a_minLength)
 			, maxLength(a_maxLength)
@@ -2554,6 +2430,8 @@ namespace Component
 			, followOffset(a_followOffset)
 			, waitTime(a_waitTime)
 			, startupTime(a_startupTime)
+			, sectorKey(std::move(a_sectorKey))
+			, endWithOwnerAction(a_endWithOwnerAction)
 		{
 		}
 	};
@@ -2571,6 +2449,18 @@ namespace Component
 		{
 		}
 
+
+		// float minLength;
+		// float maxLength;
+		// float angle;
+		// float maxHeight;
+		// float maxLowness;
+		// float damageValue;
+		// float motionTime;
+		// float lifeTime;
+		// float3 followOffset;
+		// float waitTime;
+		// float startupTime;
 		explicit AttackStatus(std::vector<AttackPower> a_attackPowers)
 			: attackPowers(std::move(a_attackPowers))
 		{
@@ -2647,6 +2537,7 @@ namespace Component
 		None = 0,
 		Device = 1,
 		AI = 2,
+		Title = 3
 	};
 
 	// !!!New!!!
@@ -2667,6 +2558,11 @@ namespace Component
 		bool useJump;
 		bool useGuard;
 
+		// カメラ操作
+		bool moveCamera;
+		float2 cameraDir;
+		float cameraMagnitube;
+
 		MoveInputResult()
 			: moveDir()
 			, magnitube(0.0f)
@@ -2675,6 +2571,9 @@ namespace Component
 			, attackIndex(0)
 			, useJump(false)
 			, useGuard(false)
+			, moveCamera(false)
+			, cameraDir()
+			, cameraMagnitube(0.0f)
 		{
 		}
 	};
@@ -2690,20 +2589,23 @@ namespace Component
 		InputOrigin attack;
 		InputOrigin jump;
 		InputOrigin guard;
+		InputOrigin camera;
 
 		InputSource(InputOrigin a_origin = InputOrigin::Device)
 			: move(a_origin)
 			, attack(a_origin)
 			, jump(a_origin)
 			, guard(a_origin)
+			, camera(a_origin)
 		{
 		}
 
-		InputSource(InputOrigin a_move, InputOrigin a_attack, InputOrigin a_jump, InputOrigin a_guard)
+		InputSource(InputOrigin a_move, InputOrigin a_attack, InputOrigin a_jump, InputOrigin a_guard, InputOrigin a_camera)
 			: move(a_move)
 			, attack(a_attack)
 			, jump(a_jump)
 			, guard(a_guard)
+			, camera(a_camera)
 		{
 		}
 	};
@@ -2730,23 +2632,27 @@ namespace Component
 		float angle;
 		float maxHeight;
 		float maxLowness;
+		// !!!New!!!
+		std::string sectorKey;
 
 		AttackTelegraph(
 			float a_minLength,
 			float a_maxLength,
 			float a_angle,
 			float a_maxHeight,
-			float a_maxLowness)
+			float a_maxLowness,
+			std::string a_sectorKey = "")
 			: minLength(a_minLength)
 			, maxLength(a_maxLength)
 			, angle(a_angle)
 			, maxHeight(a_maxHeight)
 			, maxLowness(a_maxLowness)
+			, sectorKey(std::move(a_sectorKey))
 		{
 		}
 
 		AttackTelegraph()
-			: AttackTelegraph(0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
+			: AttackTelegraph(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, "")
 		{
 		}
 	};
@@ -2828,25 +2734,33 @@ namespace Component
 		static constexpr int kVersion = 0;
 
 		// 距離による有利判定係数（得意間合い）
-		float distCoefficient = 1.0f;
+		float distFocus = 0.5f;
 		// 様子見用・距離の遠さ係数
-		float farnessCoefficient = 1.0f;
+		float farnessPref = 0.5f;
 		// 攻撃命中時の評価係数
-		float hitCoefficient = 3.0f;
+		float hitSensitivity = 0.5f;
 		// 方針連続時の減少係数、1.0f以下だと連続時に増加する
-		float stanceCoefficient = 1.2f;
+		float stanceStickiness = 0.5f;
+
+		// 各方針の継続時の累乗倍率
+		// !!!New!!!
+		float probeContinuePowRate = 1.5f;
+		// !!!New!!!
+		float holdContinuePowRate = 0.6f;
+		// !!!New!!!
+		float escapeContinuePowRate = 2.5f;
 
 		// 有利距離用係数、攻撃命中係数、方針連続使用係数、様子見距離用係数
-		AIRole(float a_distCoefficient, float a_hitCoefficient, float a_stanceCoefficient, float a_farnessCoefficient)
-			: distCoefficient(a_distCoefficient)
-			, farnessCoefficient(a_farnessCoefficient)
-			, hitCoefficient(a_hitCoefficient)
-			, stanceCoefficient(a_stanceCoefficient)
+		AIRole(float a_distFocus, float a_hitSensitivity, float a_stanceStickiness, float a_farnessPref)
+			: distFocus(a_distFocus)
+			, farnessPref(a_farnessPref)
+			, hitSensitivity(a_hitSensitivity)
+			, stanceStickiness(a_stanceStickiness)
 		{
 		}
 
 		AIRole()
-			: AIRole(1.0f, 3.0f, 1.2f, 1.0f)
+			: AIRole(0.5f, 0.5f, 0.5f, 0.5f)
 		{
 		}
 	};
@@ -2858,10 +2772,22 @@ namespace Component
 		static constexpr int kVersion = 0;
 
 		float currentGuardPower;
+		float knockbackRate;
+		Entity guardEffect;
 
-		GuardAction(float a_guardPower)
+		GuardAction(float a_guardPower, float a_knockbackRate, Entity a_guardEffect)
 			: currentGuardPower(a_guardPower)
+			, knockbackRate(a_knockbackRate)
+			, guardEffect(a_guardEffect)
 		{
+		}
+
+		GuardAction()
+			: currentGuardPower(0.0f)
+			, knockbackRate(1.0f)
+			, guardEffect(kInvalidEntity)
+		{
+
 		}
 	};
 	
@@ -2869,12 +2795,1123 @@ namespace Component
 	{
 		static constexpr TypeID kTypeId = 128;
 		static constexpr const char* kTypeName = "GuardState";
-		static constexpr int kVersion = 0;
+		static constexpr int kVersion = 1;
 		float guardPower;
-		GuardState(float a_guardPower)
+		// !!!New!!!
+		float knockbackRate;
+		GuardState()
+			: guardPower(0.0f)
+			, knockbackRate(1.0f)
+		{
+
+		}
+
+		GuardState(float a_guardPower, float a_knockbackRate)
 			: guardPower(a_guardPower)
+			, knockbackRate(a_knockbackRate)
 		{
 		}
 	};
 
+	// !!!New!!!
+	struct ClearTarget
+	{
+		static constexpr TypeID kTypeId = 129;
+		static constexpr const char* kTypeName = "ClearTarget";
+		static constexpr int kVersion = 0;
+
+		ClearTarget() {};
+	};
+
+	struct Name
+	{
+		static constexpr TypeID kTypeId = 130;
+		static constexpr const char* kTypeName = "Name";
+		static constexpr int kVersion = 0;
+
+		std::string name;
+
+		Name(std::string a_name)
+			: name(a_name)
+		{
+
+		}
+
+		Name()
+			: name("")
+		{
+
+		}
+	};
+
+	// !!!New!!!
+	struct KnockbackAction
+	{
+		static constexpr TypeID kTypeId = 131;
+		static constexpr const char* kTypeName = "KnockbackAction";
+		static constexpr int kVersion = 0;
+
+		float2 moveDir;
+		float speed;
+		float maxKnockbackTime;
+		float elapsedTime;
+
+		KnockbackAction()
+			: KnockbackAction(float2(), 0.0f, 0.0f, 0.0f)
+		{
+		}
+
+		KnockbackAction(float2 a_moveDir, float a_speed, float a_maxKnockbackTime, float a_elapsedTime = 0.0f)
+			: moveDir(a_moveDir)
+			, speed(a_speed)
+			, maxKnockbackTime(a_maxKnockbackTime)
+			, elapsedTime(a_elapsedTime)
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct InterferenceResult
+	{
+		static constexpr TypeID kTypeId = 132;
+		static constexpr const char* kTypeName = "InterferenceResult";
+		static constexpr int kVersion = 0;
+
+		bool useKnockback;
+		float2 knockBackDir;
+		float knockbackTime;
+
+		InterferenceResult()
+			: useKnockback(false)
+			, knockBackDir(float2(0.0f, 0.0f))
+			, knockbackTime(0.0f)
+		{
+		}
+	};
+
+	struct UseGhostShader
+	{
+		static constexpr TypeID kTypeId = 133;
+		static constexpr const char* kTypeName = "UseGhostShader";
+		static constexpr int kVersion = 0;
+
+		UseGhostShader()
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct LookOnState
+	{
+		static constexpr TypeID kTypeId = 134;
+		static constexpr const char* kTypeName = "LookOnState";
+		static constexpr int kVersion = 0;
+
+		float captureRadius;
+		float releaseRadius;
+		bool stickSwitchLatch;
+
+		LookOnState()
+			: LookOnState(6.8f, 7.8f)
+		{
+		}
+
+		LookOnState(float a_captureRadius, float a_releaseRadius)
+			: captureRadius(a_captureRadius)
+			, releaseRadius(a_releaseRadius)
+			, stickSwitchLatch(false)
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct LookOnAction
+	{
+		static constexpr TypeID kTypeId = 135;
+		static constexpr const char* kTypeName = "LookOnAction";
+		static constexpr int kVersion = 1;
+
+		Entity target;
+		float3 finalRot;
+		float targetCooltime;
+
+		LookOnAction()
+			: LookOnAction(kInvalidEntity, 0.0f)
+		{
+		}
+
+		LookOnAction(Entity a_target, float a_targetCooltime)
+			: target(a_target)
+			, finalRot()
+			, targetCooltime(a_targetCooltime)
+		{
+		}
+	};
+
+	struct LookOnMarkerTag
+	{
+		static constexpr TypeID kTypeId = 136;
+		static constexpr const char* kTypeName = "LookOnMarkerTag";
+		static constexpr int kVersion = 0;
+
+		LookOnMarkerTag()
+		{
+		}
+	};
+
+	// FollowPosition等をしている際、追従を付け外ししたくなったりした際にいちいち
+	struct NullTargetTag
+	{
+		static constexpr TypeID kTypeId = 155;
+		static constexpr const char* kTypeName = "NullTargetTag";
+		static constexpr int kVersion = 0;
+
+		NullTargetTag()
+		{
+		}
+	};
+
+	struct SelectCursor
+	{
+		static constexpr TypeID kTypeId = 137;
+		static constexpr const char* kTypeName = "SelectCursor";
+		static constexpr int kVersion = 0;
+
+		Entity selectEntity;
+		bool isActiv;
+		float coolTime;
+		float maxCoolTime;
+
+		SelectCursor()
+			: selectEntity(kInvalidEntity)
+			, isActiv(false)
+			, coolTime(0.0f)
+			, maxCoolTime(0.0f)
+		{
+		}
+
+		SelectCursor(Entity a_selectEntity, bool a_isActiv, float a_maxCoolTime)
+			: selectEntity(a_selectEntity)
+			, isActiv(a_isActiv)
+			, maxCoolTime(a_maxCoolTime)
+			, coolTime(0.0f)
+		{
+		}
+	};
+
+	struct SelectBox
+	{
+		static constexpr TypeID kTypeId = 138;
+		static constexpr const char* kTypeName = "SelectBox";
+		static constexpr int kVersion = 0;
+
+		float2 pos;
+		float2 cursorScale;
+
+		SelectBox()
+			: SelectBox(float2(), float2())
+		{
+		}
+
+		SelectBox(float2 a_pos, float2 a_cursorScale)
+			: pos(a_pos)
+			, cursorScale(a_cursorScale)
+		{
+		}
+	};
+
+	struct CameraRigTag
+	{
+		static constexpr TypeID kTypeId = 139;
+		static constexpr const char* kTypeName = "CameraRigTag";
+		static constexpr int kVersion = 0;
+
+		CameraRigTag()
+		{
+		}
+	};
+
+	struct RigLookOn
+	{
+		static constexpr TypeID kTypeId = 140;
+		static constexpr const char* kTypeName = "RigLookOn";
+		static constexpr int kVersion = 0;
+
+		RigLookOn()
+		{
+		}
+	};
+
+	struct FollowLeap
+	{
+		static constexpr TypeID kTypeId = 141;
+		static constexpr const char* kTypeName = "FollowLeap";
+		static constexpr int kVersion = 0;
+		float3 followLeap;
+
+		FollowLeap()
+			: followLeap()
+		{
+		}
+
+		FollowLeap(float3 a_followLeap)
+			:followLeap(a_followLeap)
+		{
+		}
+	};
+
+	struct DebugEntityTag
+	{
+		static constexpr TypeID kTypeId = 142;
+		static constexpr const char* kTypeName = "DebugEntityTag";
+		static constexpr int kVersion = 0;
+
+		DebugEntityTag()
+		{
+		}
+	};
+
+	struct AttackKeyLoad
+	{
+		static constexpr TypeID kTypeId = 143;
+		static constexpr const char* kTypeName = "AttackKeyLoad";
+		static constexpr int kVersion = 0;
+
+		int size;
+		std::vector<std::string> attackKeys;
+
+		AttackKeyLoad()
+			: size(0)
+			, attackKeys()
+
+		{
+		}
+
+		AttackKeyLoad(std::vector<std::string> a_attackKeys)
+			: attackKeys(a_attackKeys)
+			, size((int)a_attackKeys.size())
+		{
+		}
+	};
+
+	struct PhaseSpawner
+	{
+		static constexpr TypeID kTypeId = 144;
+		static constexpr const char* kTypeName = "PhaseSpawner";
+		static constexpr int kVersion = 0;
+
+		int size;
+		std::vector<std::string> spawnName;
+
+		PhaseSpawner()
+			: size(0)
+			, spawnName()
+
+		{
+		}
+
+		PhaseSpawner(std::vector<std::string> a_spawnName)
+			: spawnName(a_spawnName)
+			, size((int)a_spawnName.size())
+		{
+		}
+	};
+
+	struct EfkEffectKey
+	{
+		static constexpr TypeID kTypeId = 145;
+		static constexpr const char* kTypeName = "Effect";
+		static constexpr int kVersion = 0;
+
+		std::string handleId;
+		bool isLoop;
+		float waitTime;
+
+
+		EfkEffectKey(std::string a_handleId, bool a_isLoop, float a_waitTime = 0.0f)
+			: handleId(a_handleId)
+			, isLoop(a_isLoop)
+			, waitTime(a_waitTime)
+		{
+		};
+
+		EfkEffectKey()
+			: EfkEffectKey("", false, 0.0f)
+		{
+
+		}
+	};
+
+	struct EfkEffectRuntime
+	{
+		static constexpr TypeID kTypeId = 146;
+		static constexpr const char* kTypeName = "EffectRuntime";
+		static constexpr int kVersion = 0;
+
+		Effekseer::Handle handle;
+		bool isLoop;
+
+		EfkEffectRuntime(Effekseer::Handle a_handle, bool a_isLoop)
+			: handle(a_handle)
+			, isLoop(a_isLoop)
+		{
+		}
+
+		EfkEffectRuntime()
+			: EfkEffectRuntime(Effekseer::Handle(), false)
+		{
+		}
+
+	};
+
+	struct EntryAction
+	{
+		static constexpr TypeID kTypeId = 147;
+		static constexpr const char* kTypeName = "EntryAction";
+		static constexpr int kVersion = 0;
+
+		float duration;
+		float maxDuration;
+		bool canPlayEffect;
+
+		EntryAction(float a_maxDuration)
+			: maxDuration(a_maxDuration)
+			, duration(0.0f)
+			, canPlayEffect(true)
+		{
+		}
+
+		EntryAction()
+			: EntryAction(0.0f)
+		{
+		}
+
+	};
+
+
+	struct UIScaleLerp
+	{
+		static constexpr TypeID kTypeId = 148;
+		static constexpr const char* kTypeName = "UIScaleLerp";
+		static constexpr int kVersion = 0;
+
+		float progress;
+		float maxLerpTime;
+		float2 targetScale;
+		float2 startScale;
+
+		UIScaleLerp(float2 a_startScale, float2 a_targetScale, float a_maxLerpTime)
+			: startScale(a_startScale)
+			, targetScale(a_targetScale)
+			, progress(0.0f)
+			, maxLerpTime(a_maxLerpTime)
+		{
+		}
+
+		UIScaleLerp()
+			: UIScaleLerp(float2(), float2(), 0.0f)
+		{
+		}
+	};
+
+	struct UIPosLerp
+	{
+		static constexpr TypeID kTypeId = 149;
+		static constexpr const char* kTypeName = "UIPosLerp";
+		static constexpr int kVersion = 0;
+
+		float progress;
+		float maxLerpTime;
+		float2 targetPos;
+		float2 startPos;
+
+		UIPosLerp(float2 a_startPos, float2 a_targetPos, float a_maxLerpTime)
+			: startPos(a_startPos)
+			, targetPos(a_targetPos)
+			, progress(0.0f)
+			, maxLerpTime(a_maxLerpTime)
+		{
+		}
+
+		UIPosLerp()
+			: UIPosLerp(float2(), float2(), 0.0f)
+		{
+		}
+
+	};
+
+	struct DropUI
+	{
+		static constexpr TypeID kTypeId = 150;
+		static constexpr const char* kTypeName = "StartUI";
+		static constexpr int kVersion = 0;
+
+		std::vector<std::string> playSounds;
+
+		DropUI()
+			: DropUI(std::vector<std::string>())
+		{
+		}
+
+		DropUI(std::vector<std::string> a_playSounds)
+			: playSounds(a_playSounds)
+		{
+		}
+	};
+
+	struct OtherChunkChangeLock
+	{
+		static constexpr TypeID kTypeId = 151;
+		static constexpr const char* kTypeName = "OtherChunkChangeLock";
+		static constexpr int kVersion = 0;
+	};
+
+	struct GameOverTarget
+	{
+		static constexpr TypeID kTypeId = 152;
+		static constexpr const char* kTypeName = "GameOverTarget";
+		static constexpr int kVersion = 0;
+	};
+
+	struct BossTag
+	{
+		static constexpr TypeID kTypeId = 153;
+		static constexpr const char* kTypeName = "BossTag";
+		static constexpr int kVersion = 0;
+
+		BossTag()
+		{
+		}
+	};
+
+	struct SoundKey
+	{
+		static constexpr TypeID kTypeId = 154;
+		static constexpr const char* kTypeName = "SoundEffect";
+		static constexpr int kVersion = 0;
+
+
+		bool isLoop;
+		float waitTime;
+		std::string soundKey;
+
+		SoundKey()
+			: SoundKey(false, 0.0f, "")
+		{
+		}
+
+		SoundKey(bool a_isLoop,float a_waitTime, std::string a_soundKey)
+			: isLoop(a_isLoop)
+			, waitTime(a_waitTime)	
+			, soundKey(a_soundKey)
+		{
+		}
+	};
+
+	struct EfkEffectArea
+	{
+		static constexpr TypeID kTypeId = 156;
+		static constexpr const char* kTypeName = "EfkEffectArea";
+		static constexpr int kVersion = 0;
+
+		std::vector<std::string> spawnEffectKeys;
+		std::vector<std::string> spawnSoundKeys;
+		float spawnRadius;
+
+		float spawnInteval;
+		float currentDuration;
+		float spawnSpeedupRate;
+
+
+		EfkEffectArea(std::vector<std::string> a_spawnEffectKeys, std::vector<std::string> a_spawnSoundKeys,float a_spawnRadius, float a_spawnInteval, float a_spawnSpeedupRate)
+			: spawnEffectKeys(a_spawnEffectKeys)
+			, spawnSoundKeys(a_spawnSoundKeys)
+			, spawnRadius(a_spawnRadius)
+			, spawnInteval(a_spawnInteval)
+			, currentDuration(0.0f) 
+			, spawnSpeedupRate(a_spawnSpeedupRate)
+		{
+		}
+
+		EfkEffectArea()
+			: spawnRadius(0.0f)
+			, spawnInteval(0.0f)
+			, currentDuration(0.0f)
+			, spawnSpeedupRate(0.0f)
+		{
+		}
+	};
+
+	struct LifeTimeEndEffect
+	{
+		static constexpr TypeID kTypeId = 157;
+		static constexpr const char* kTypeName = "LifeTimeEndEffect";
+		static constexpr int kVersion = 0;
+
+		bool useSound;
+		std::string soundKey;
+		bool useEfkEffect;
+		std::string efkEffectKey;
+
+		LifeTimeEndEffect(bool a_useSound, std::string a_soundKey, bool a_useEfkEffect, std::string a_efkEffectKey)
+			: useSound(a_useSound)
+			, soundKey(a_soundKey)
+			, useEfkEffect(a_useEfkEffect)
+			, efkEffectKey(a_efkEffectKey)
+		{
+		}
+
+		LifeTimeEndEffect()
+			: LifeTimeEndEffect(false, "", false, "")
+		{
+		}
+	};
+
+	struct CameraMover
+	{
+		static constexpr TypeID kTypeId = 158;
+		static constexpr const char* kTypeName = "CameraMover";
+		static constexpr int kVersion = 0;
+
+		Entity targetPoint;
+		bool leapEnd;
+		float leapProgress;
+		float3 finalTargetPos;
+		float3 finalTargetRot;
+
+		CameraMover()
+			: CameraMover(kInvalidEntity)
+		{
+		}
+
+		CameraMover(Entity a_targetPoint)
+			: targetPoint(a_targetPoint)
+			, leapEnd(true)
+			, leapProgress(1.0f)
+			, finalTargetPos()
+			, finalTargetRot()
+		{
+
+		}
+	};
+
+	struct AllActionStopper
+	{
+		static constexpr TypeID kTypeId = 159;
+		static constexpr const char* kTypeName = "AllActionStopper";
+		static constexpr int kVersion = 0;
+
+		AllActionStopper()
+		{
+		}
+
+	};
+
+	struct CameraChangeEffect
+	{
+		static constexpr TypeID kTypeId = 160;
+		static constexpr const char* kTypeName = "CameraChangeEffect";
+		static constexpr int kVersion = 0;
+
+		std::string effectKey;
+
+		CameraChangeEffect(std::string a_effectKey)
+			: effectKey(a_effectKey)
+		{
+		}
+
+		CameraChangeEffect()
+			: CameraChangeEffect("")
+		{
+		}
+	};
+
+	struct SpawnJson
+	{
+		static constexpr TypeID kTypeId = 161;
+		static constexpr const char* kTypeName = "SpawnJson";
+		static constexpr int kVersion = 0;
+		std::string spawnKey;
+		float currentDuration;
+		float maxSpawnTime;
+		float3 offset;
+
+
+		SpawnJson(std::string a_spawnKey, float a_maxSpawnTime, float3 a_offset)
+			: spawnKey(a_spawnKey)
+			, currentDuration(0.0f)
+			, maxSpawnTime(a_maxSpawnTime)
+			, offset(a_offset)
+		{
+		}
+
+		SpawnJson()
+			: SpawnJson("", 0.0f, float3())
+		{
+		}
+	};
+
+	struct PlayerHeal
+	{
+		static constexpr TypeID kTypeId = 162;
+		static constexpr const char* kTypeName = "PlayerHeal";
+		static constexpr int kVersion = 0;
+
+		bool isHealEnd;
+		float healValue;
+
+		PlayerHeal(float a_healValue)
+			: healValue(a_healValue)
+			, isHealEnd(false)
+		{
+		}
+
+		PlayerHeal()
+			: PlayerHeal(0.0f)
+		{
+		}
+	};
+
+
+	struct TutorialState
+	{
+		bool useStartMessage;
+		std::string startMessageKey;
+		bool useLoad;
+		std::string load;
+	};
+
+	struct TutorialSpawner
+	{
+		static constexpr TypeID kTypeId = 163;
+		static constexpr const char* kTypeName = "TutorialSpawner";
+		static constexpr int kVersion = 0;
+
+		int progress;
+		std::vector<TutorialState> state;
+
+		TutorialSpawner(std::vector<TutorialState> a_state)
+			: state(a_state)
+			, progress(0)
+		{
+		}
+
+		TutorialSpawner()
+			: TutorialSpawner(std::vector<TutorialState>{})
+		{
+		}
+
+
+	};
+
+	struct CreateTutorialWindow
+	{
+		static constexpr TypeID kTypeId = 164;
+		static constexpr const char* kTypeName = "CreateTutorialWindow";
+		static constexpr int kVersion = 0;
+
+		std::string textKey;
+		float waitTime;
+
+		CreateTutorialWindow()
+			: CreateTutorialWindow("", 0.0f)
+		{
+		}
+
+		CreateTutorialWindow(std::string a_textKey, float a_waitTime)
+			: textKey(a_textKey)
+			, waitTime(a_waitTime)
+		{
+		}
+	};
+
+	enum UseSelectCommand
+	{
+		SELECT_NONE = 0,
+		SELECT_CHANGESCENE = 1 << 0,
+		SELECT_CREATEEFFECT = 1 << 1,
+		SELECT_PLAYSOUND = 1 << 2,
+		SELECT_ALLSELECT_DELETE = 1 << 3,
+		SELECT_LOAD = 1 << 4,
+		SELECT_HPHEAL = 1 << 5,
+		SELECT_SETSTAGE = 1 << 6,
+
+	};
+
+	struct SelectPlayCommand
+	{
+		static constexpr TypeID kTypeId = 165;
+		static constexpr const char* kTypeName = "SelectPlayCommand";
+		static constexpr int kVersion = 1;
+
+		BitFlag flag;
+
+		std::string sceneName;
+		float waitChangeScene;
+		EffectType effectType;
+		std::string soundName;
+		std::string loadName;
+		float healValue;
+		int stageIndex;
+
+		SelectPlayCommand()
+			: SelectPlayCommand(SELECT_NONE, "", 0.0f, EFFECT_NONE, "", "", 0.0f, 1)
+		{
+		}
+
+		SelectPlayCommand(
+			BitFlag a_flag,
+			std::string a_sceneName,
+			float a_waitChangeScene,
+			EffectType a_effectType,
+			std::string a_soundName,
+			std::string a_loadName,
+			float a_healValue,
+			int a_stageIndex
+			)
+			: flag(a_flag)
+			, sceneName(a_sceneName)
+			, waitChangeScene(a_waitChangeScene)
+			, effectType(a_effectType)
+			, soundName(a_soundName)
+			, loadName(a_loadName)
+			, healValue(a_healValue)
+			, stageIndex(a_stageIndex)
+		{ }
+	};
+
+	struct DeleteOnInput
+	{
+		static constexpr TypeID kTypeId = 166;
+		static constexpr const char* kTypeName = "DeleteOnInput";
+		static constexpr int kVersion = 0;
+
+		std::string key;
+		float maxWaitTime;
+		float elapsedTime;
+
+		DeleteOnInput()
+			: DeleteOnInput("", 0.0f)
+		{
+		}
+
+		DeleteOnInput(std::string a_key, float a_maxWaitTime)
+			: key(a_key)
+			, maxWaitTime(a_maxWaitTime)
+			, elapsedTime(0.0f)
+		{
+		}
+	};
+
+	// !!!New!!!
+	struct UITextBoxCursor
+	{
+		static constexpr TypeID kTypeId = 167;
+		static constexpr const char* kTypeName = "UITextBoxCursor";
+		static constexpr int kVersion = 0;
+
+		std::string uiKey;
+		float2 uiPos;
+		float2 uiScale;
+		float fadeSpeed;
+		float fadeMin;
+		float fadeMax;
+		std::string soundKey;
+
+		UITextBoxCursor()
+			: UITextBoxCursor("", float2(), float2(), 0.01f, 0.0f, 1.0f, "")
+		{
+		}
+
+		UITextBoxCursor(
+			std::string a_uiKey,
+			float2 a_uiPos,
+			float2 a_uiScale,
+			float a_fadeSpeed,
+			float a_fadeMin,
+			float a_fadeMax,
+			std::string a_soundKey
+		)
+			: uiKey(a_uiKey)
+			, uiPos(a_uiPos)
+			, uiScale(a_uiScale)
+			, fadeSpeed(a_fadeSpeed)
+			, fadeMin(a_fadeMin)
+			, fadeMax(a_fadeMax)
+			, soundKey(a_soundKey)
+		{
+		}
+	};
+
+	struct StageData
+	{
+		static constexpr TypeID kTypeId = 168;
+		static constexpr const char* kTypeName = "StageData";
+		static constexpr int kVersion = 0;
+		int currentStageIndex;
+		bool clearStageUnlock;
+		int unlockStageIndex;
+
+		StageData(int a_currentStageIndex, bool a_clearStageUnlock, int a_unlockStageIndex)
+			: currentStageIndex(a_currentStageIndex)
+			, clearStageUnlock(a_clearStageUnlock)
+			, unlockStageIndex(a_unlockStageIndex)
+		{
+		}
+
+		StageData()
+			: StageData(0, false, 0)
+		{
+		}
+	};
+
+	struct UnlockStageEntity
+	{
+		static constexpr TypeID kTypeId = 169;
+		static constexpr const char* kTypeName = "StageClear";
+		static constexpr int kVersion = 0;
+		// アンロックされている時用かどうか
+		bool isUnlock;
+		int stageIndex;
+		UnlockStageEntity(bool a_isUnlock, int a_stageIndex)
+			: isUnlock(a_isUnlock)
+			, stageIndex(a_stageIndex)
+		{
+		}
+
+		UnlockStageEntity()
+			: UnlockStageEntity(false, 0)
+		{
+		}
+	};
+
+	struct GameEndFlag
+	{
+		static constexpr TypeID kTypeId = 170;
+		static constexpr const char* kTypeName = "GameEndFlag";
+		static constexpr int kVersion = 0;
+	};
+
+	struct UIShake
+	{
+		static constexpr TypeID kTypeId = 171;
+		static constexpr const char* kTypeName = "UIShake";
+		static constexpr int kVersion = 0;
+
+		// UIの規定位置
+		float2 basePos;
+		// 揺れ幅
+		float2 shakePower;
+		// 揺れ出し出し幅
+		float2 shakeAmplitude;
+		// 揺れ時間
+		float maxShakeTime;
+		// 停止時間
+		float maxStopTime;
+		// 進行度
+		float phaseElapsed;
+		float shakeElapsed;
+		bool isShaking;
+		// !!!New!!!
+		float decayRate;
+
+		UIShake(
+			float2 a_basePos,
+			float2 a_shakePower,
+			float2 a_shakeAmplitude,
+			float a_maxShakeTime,
+			float a_maxStopTime,
+			float a_decayRate)
+			: basePos(a_basePos)
+			, shakePower(a_shakePower)
+			, shakeAmplitude(a_shakeAmplitude)
+			, maxShakeTime(a_maxShakeTime)
+			, maxStopTime(a_maxStopTime)
+			, phaseElapsed(0.0f)
+			, shakeElapsed(0.0f)
+			, isShaking(true)
+			, decayRate(a_decayRate)
+		{
+		}
+
+		UIShake()
+			: UIShake(float2(), float2(1.0f, 1.0f), float2(1.0f, 1.0f), 0.0f, 0.0f, 0.5f)
+		{
+		}
+	};
+
+	struct UIRailFly
+	{
+		static constexpr TypeID kTypeId = 172;
+		static constexpr const char* kTypeName = "UIRailFly";
+		static constexpr int kVersion = 0;
+
+		// !!!New!!!
+		float2 basePos;
+		// !!!New!!!
+		float flyPow;
+		// !!!New!!!
+		float flyProgress;
+		// !!!New!!!
+		float flySpeed;
+
+		UIRailFly(float2 a_basePos, float a_flyPow, float a_flySpeed)
+			: basePos(a_basePos)
+			, flyPow(a_flyPow)
+			, flyProgress(0.0f)
+			, flySpeed(a_flySpeed)
+		{
+		}
+
+		UIRailFly()
+			: UIRailFly(float2(), 0.0f, 0.0f)
+		{
+		}
+	};
+
+	// コントローラーとキーボード入力により切り替わるUI
+	struct ControllerInputUIReplace
+	{
+		static constexpr TypeID kTypeId = 173;
+		static constexpr const char* kTypeName = "ControllerInputUIReplace";
+		static constexpr int kVersion = 0;
+
+		std::string keyboardUIKey;
+		std::string controllerUIKey;
+		float2 keyboardUIScale;
+		float2 controllerUIScale;
+
+		ControllerInputUIReplace()
+			: ControllerInputUIReplace("", "", float2(), float2())
+		{
+		}
+
+		ControllerInputUIReplace(
+			std::string a_keyboardUIKey,
+			std::string a_controllerUIKey,
+			float2 a_keyboardUIScale,
+			float2 a_controllerUIScale)
+			: keyboardUIKey(a_keyboardUIKey)
+			, controllerUIKey(a_controllerUIKey)
+			, keyboardUIScale(a_keyboardUIScale)
+			, controllerUIScale(a_controllerUIScale)
+		{
+		}
+	};
+
+	// 影用ライト
+	struct Light
+	{
+		static constexpr TypeID kTypeId = 174;
+		static constexpr const char* kTypeName = "Light";
+		static constexpr int kVersion = 0;
+
+		float3 direction;
+		float3 color;
+		bool castShadow;
+
+		Light()
+			: Light(float3(-1.0f, -1.0f, -1.0f), float3(1.0f, 1.0f, 1.0f), true)
+		{
+		}
+
+		Light(float3 a_direction, float3 a_color, bool a_castShadow)
+			: direction(a_direction)
+			, color(a_color)
+			, castShadow(a_castShadow)
+		{
+		}
+	};
+
+	// 影シェーダー
+	struct UseShadowShader
+	{
+		static constexpr TypeID kTypeId = 175;
+		static constexpr const char* kTypeName = "UseShadowShader";
+		static constexpr int kVersion = 0;
+
+		UseShadowShader()
+		{
+		}
+	};
+};
+
+
+using namespace Component;
+
+//class ComponentsAPI
+//{
+//
+//private:
+//	std::map<TypeID, std::string> map;
+//	ComponentsAPI()
+//	{
+//#define ADDMAP(T) map.insert({T::kTypeId, T::kTypeName});
+//		COMPONENT_TYPE_LIST(ADDMAP);
+//	}
+//
+//
+//public:
+//	ComponentsAPI(ComponentsAPI&) = delete;
+//	ComponentsAPI& operator=(ComponentsAPI&) = delete;
+//	ComponentsAPI(ComponentsAPI&&) = delete;
+//	ComponentsAPI& operator=(ComponentsAPI&&) = delete;
+//
+//	static std::string IDToName(TypeID id)
+//	{
+//		static ComponentsAPI api;
+//		std::string ret;
+//		if (api.map.find(id) != api.map.end())
+//		{
+//			return api.map.at(id);
+//		}
+//		return "None";
+//	}
+//};
+
+template<typename T>
+inline void CreateImGuiValue(std::string name, T& value, const T& valueDefault) 
+{
+	ImGui::Text(name.c_str()); 
+}
+
+inline void CreateImGuiValue(std::string name, std::string& value, const std::string& valueDefault)
+{
+	char* newString = new char[100]();
+	value.copy(newString, 100);
+	ImGui::InputText(name.c_str(), newString, 100);
+	value = newString;
+	delete[] newString;
+}
+
+
+inline void CreateImGuiValue(std::string name, float& value, const float& valueDefault)
+{
+	ImGui::InputFloat(name.c_str(), &value);
+}
+
+inline void CreateImGuiValue(std::string name, int& value, const int& valueDefault)
+{
+	ImGui::InputInt(name.c_str(), &value);
+}
+
+inline void CreateImGuiValue(std::string name, size_t& value, const size_t& valueDefault)
+{
+	int input = (int)value;
+	ImGui::InputInt(name.c_str(), &input);
+	value = (size_t)input;
+}
+
+inline void CreateImGuiValue(std::string name, bool& value, const bool& valueDefault)
+{
+	ImGui::Checkbox(name.c_str(), &value);
+}
+
+
+
+
+
+inline void CreateImGuiEntity(std::string name, Entity& entity)
+{
+	ImGui::Text(name.c_str());
 }

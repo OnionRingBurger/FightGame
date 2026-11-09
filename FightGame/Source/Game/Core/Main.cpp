@@ -13,25 +13,30 @@
 #include "imGui/imgui_impl_win32.h"
 #include "DebugConsole.h"
 #include "Debug.h"
+#include "GameData.h"
 
 #include "GameScene.h"
 #include "LoadScene.h"
 #include "TestScene.h"
+#include "CreateGameScene.h"
 
 MainGame::MainGame()
 	: scene(nullptr)
 	, pRTV(nullptr)
 	, pDSV(nullptr)
-	, fpsOldTime(0.0f)
-	, preExecTime(0.0f)
+	, fpsOldTime(0)
+	, preExecTime(0)
 	, processingTime(0.0f)
 	, worstProcessingTime(0.0f)
 	, totalProcessingTime(0.0f)
 	, fpsCount(0)
+	, isFixedCursor(true)
 {
 	uiCache = UICache();
 	modelCache = ModelCache();
+	effectCache = EffectCache();
 	input = Input();
+	serialize = ComponentsSerialize();
 
 }
 
@@ -39,6 +44,7 @@ MainGame::MainGame()
 // TODO ランダムになっていないので修正
 void MainGame::Init()
 {
+	TestRegisterComponentType(serialize);
 
 	// DirectX初期化	
 	pRTV = GetDefaultRTV();
@@ -52,83 +58,25 @@ void MainGame::Init()
 
 	// TODO 処理中にMain側が終了しDirectXがUninitされると壊れるため修正する
 	runningLoadLoop = true;
-	// Load用ループを開始
+	// Load用ループを開始、内部で参照に対して右辺値を渡すことになるため、std::refを使用	
 	loadWorker = std::thread(
-		&MainGame::WorkerLoop,
-		this,
-		std::ref(modelJobQueue),
-		std::ref(modelResultQueue),
-		std::ref(textureJobQueue),
-		std::ref(textureResultQueue),
-		std::ref(soundJobQueue),
-		std::ref(soundResultQueue),
+		WorkerLoop,
+		std::ref(loadJobQueues),
+		std::ref(loadResultQueues),
+		std::ref(fontFileLoadCache),
+		std::ref(serialize),
 		std::ref(runningLoadLoop));
 	
 
-	modelDatas =
-	{
-		{"bricktexture1", 0.005f},
-		{"assaultRifle", 5.3f},
-		{"ghost_FINAL", 0.13f},
-		{"SM_SimpleTunnel", 1.0f},
-		{"Box", 1.0f},
-		{"Ball", 1.0f},
-		{"Laser", 1.0f},
-		{"LaserPoint", 1.0f},
-		{"Dark", 20.0f},
-		{"FireAnimation", 1.0f},
-		{"Light", 20.0f},
-		{"low_poly_treesNXT_5flat", 1.0f},
-		{"bolita_pinchos_pintada", 0.01f},
-		{"GreekPillar", 50.0f},
-		{"track_txt", 7.0f},
-		{"Minecart", 0.06f},
-		{"CrackedTombstone", 5.0f}
-	};
-
-	textureDatas =
-	{
-		"TitleLogo",
-		"Shadow",
-		"Mask",
-		"DarkMask",
-		"Reticle",
-		"DarkGameOver",
-		"PleaseKey",
-		"WhiteFade",
-		"DarkFade",
-		"DarkFadeMini",
-		"WhiteFadeBack",
-		"GameOver",
-		"GameClear",
-		"GameClearText",
-		"GameStart",
-		"Speedline",
-		"UIGauge",
-		"UIFrame",
-		"UIBack",
-		"ShotEffect",
-		"DamageEffect",
-		"DamageDirectionEffect",
-		"ShotIcon",
-		"WaitShot",
-		"CanShotReady",
-		"LeftClick",
-		"HitEffectRay",
-		"Blue",
-		"Alpha",
-		"Star",
-		"Red",
-		"Purple",
-		"Green"
-	};
+	// !!!New!!!
+	loadManifestPaths.path = "Assets/Data/LoadData.json";
 
 	ChangeScene("Load");
 
 	input.RegisterKey("GameEnd", VK_ESCAPE);
 	input.RegisterKey("DebugConsole", VK_F1);
 	
-
+	
 	// Soundの初期化
 	InitSound();
 	
@@ -208,11 +156,10 @@ void MainGame::MainLoop(HWND a_hwnd, MSG& message)
 
 
 				AdvanceUpdate(diff);
-				if (true)
+				if (isFixedCursor)
 				{
 					SetCursorPos(kMouseFixedPosX, kMouseFixedPosY);
 				}
-				ShowCursor(false);
 				Update();
 				Draw();
 				PostFrameProcess();
@@ -255,35 +202,70 @@ void MainGame::MainLoop(HWND a_hwnd, MSG& message)
 
 }
 
-// TODO 後に修正
-bool MainGame::IsMouseLock()
-{
-	return false;
-}
 
 bool MainGame::IsEnd()
 {
 	return isEnd;
 }
 
-
+// ロード結果を受け取り登録
 void MainGame::LoadLoopUpdate()
 {
 	// 各アセットの読み込み
 
-	while (!modelResultQueue.IsEnpty())
+	while (!loadResultQueues.model.IsEnpty())
 	{
 		ModelLoadResult result;
-		if (modelResultQueue.TryPop(result));
+		if (loadResultQueues.model.TryPop(result)) // ifが機能してなかったので修正
 		modelCache.RegisterModel(result.key, result.data);
 	}
 
-	while (!textureResultQueue.IsEnpty())
+	while (!loadResultQueues.texture.IsEnpty())
 	{
 		TextureLoadResult result;
-		if (textureResultQueue.TryPop(result));
-		uiCache.RegisterModel(result.key, result.data);
+		if (loadResultQueues.texture.TryPop(result))
+		uiCache.RegisterTexture(result.key, result.data);
 	}
+
+	while (!loadResultQueues.effect.IsEnpty())
+	{
+		EffectLoadResult result;
+		if (loadResultQueues.effect.TryPop(result) && result.effect) 
+		effectCache.RegisterEffect(result.key, result.effect);
+	}
+
+	while (!loadResultQueues.textFormat.IsEnpty())
+	{
+		TextFormatLoadResult result;
+		if (loadResultQueues.textFormat.TryPop(result) && result.format)
+		uiCache.RegisterTextFormat(result.key, result.format);
+	}
+
+	while (!loadResultQueues.textUI.IsEnpty())
+	{
+		TextUILoadResult result;
+		if (loadResultQueues.textUI.TryPop(result))
+			uiCache.RegisterTexture(result.key, result.data);
+	}
+
+	while (!loadResultQueues.jsonPrefab.IsEnpty())
+	{
+		JsonPrefabLoadResult result;
+		if (loadResultQueues.jsonPrefab.TryPop(result))
+		{
+			for (auto itScene : result.prefabScenes)
+			{
+				std::string sceneName = itScene.first;
+				prefabManager.CreatePrefabScene(sceneName);
+
+				for (auto itPrefab : itScene.second)
+				{
+					prefabManager.AddPrefab(sceneName, itPrefab);
+				}
+			}
+		}
+	}
+
 	// TODO Soundを読み込めるようにする
 }
 
@@ -336,12 +318,6 @@ void MainGame::Draw()
 	static bool camAutoSwitch = false;
 	static bool camUpDownSwitch = true;
 	static float camAutoRotate = 1.0f;
-	/*if (input.IsRegisterTrigger(VK_RETURN)) {
-		camAutoSwitch ^= true;
-	}
-	if (input.IsRegisterTrigger(VK_SPACE)) {
-		camUpDownSwitch ^= true;
-	}*/
 
 	DirectX::XMVECTOR camPos;
 	if (camAutoSwitch) {
@@ -371,7 +347,7 @@ void MainGame::Draw()
 
 	scene->Draw();
 
-	scene->PostFrameProcess();
+	// scene->PostFrameProcess();
 	EndDrawDirectX();
 
 
@@ -409,87 +385,36 @@ void MainGame::PostFrameProcess()
 }
 
 
-void MainGame::WorkerLoop(
-	ThreadSafeQueue<ModelLoadJob>& a_modelJobQueue,
-	ThreadSafeQueue<ModelLoadResult>& a_modelResultQueue,
-	ThreadSafeQueue<TextureLoadJob>& a_textureJobQueue,
-	ThreadSafeQueue<TextureLoadResult>& a_textureResultQueue,
-	ThreadSafeQueue<SoundLoadJob>& a_soundJobQueue,
-	ThreadSafeQueue<SoundLoadResult>& a_soundResultQueue,
-	std::atomic<bool>& a_running)
-{
-	if (FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)))
-	{
-#ifdef _DEBUG
-		DebugMessage("LoadLoopの初期化に失敗しました！");
-#endif // _DEBUG
-		
-		a_running = false;
-		return;
-	}
-	while (a_running)
-	{
-		while (!modelJobQueue.IsEnpty())
-		{
-			// 登録されているJobを受け取る
-			ModelLoadJob modelJob = a_modelJobQueue.Pop();
-
-			// Loadして終了フラグを立てる
-			ModelLoadResult modelResult = LoadModel(modelJob);
-			a_modelResultQueue.Push(std::move(modelResult));
-			if (modelJob.endFlagPointer)
-			{
-				modelJob.endFlagPointer->store(true);
-			}
-
-		}
-
-		while (!textureJobQueue.IsEnpty())
-		{
-			// 上と同じ
-			TextureLoadJob textureJob = a_textureJobQueue.Pop();
-
-			TextureLoadResult textureResult = LoadTexture(textureJob);
-			a_textureResultQueue.Push(std::move(textureResult));
-			if (textureJob.endFlagPointer)
-			{
-				textureJob.endFlagPointer->store(true);
-			}
-		}
-
-	}
-
-	CoUninitialize();
-}
-
 bool MainGame::ChangeScene(std::string a_key)
 {
 	bool ret = true;
 	if (a_key == "Load")
 	{
+
+
 		scene = make_unique<LoadScene>(
 			[this](std::string a_key)
 			{
 				sceneChangeQueue.push(a_key);
 			},
-			modelJobQueue,
-			textureJobQueue,
-			modelDatas,
-			textureDatas,
+			loadJobQueues,
+			loadManifestPaths,
 			modelCache,
 			uiCache,
-			input
+			effectCache,
+			input,
+			serialize,
+			prefabManager
 		);
 
-		modelDatas.clear();
-		textureDatas.clear();
 	}
 	else if (a_key == "Game")
 	{
-
+		scene.release();
 		scene = make_unique<GameScene>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](std::string a_key)
 			{
 				sceneChangeQueue.push(a_key);
@@ -502,7 +427,16 @@ bool MainGame::ChangeScene(std::string a_key)
 			{
 				ResetFPS();
 			},
-			input
+			// !!!New!!!
+			[this](bool a_isFixed)
+			{
+				bool cursor = !a_isFixed;
+				ShowCursor(cursor);
+				isFixedCursor = a_isFixed;
+			},
+			input,
+			serialize,
+			prefabManager
 		);
 	}
 	else if (a_key == "End")
@@ -511,6 +445,20 @@ bool MainGame::ChangeScene(std::string a_key)
 	else if (a_key == "Test")
 	{
 		scene = make_unique<TestScene>();
+	}
+	else if (a_key == "CreateGame")
+	{
+		ShowCursor(true);
+		isFixedCursor = false;
+
+		scene = make_unique<CreateGameScene>(
+			modelCache,
+			uiCache,
+			effectCache,
+			input,
+			serialize,
+			prefabManager
+		);
 	}
 	else
 	{

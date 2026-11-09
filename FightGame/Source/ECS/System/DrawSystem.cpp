@@ -2,45 +2,252 @@
 #include "Components.h"
 #include "DrawMatrix.h"
 #include "ShaderList.h"
+#include "DrawResources.h"
 #include "Sprite.h"
 #include "GameData.h"
+#include "Defines.h"
 
 using namespace Component;
 
 void OBBDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView);
 void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView);
-void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView, ComponentView entityView);
+bool BuildLightShadowMatrices(const ComponentHandle<Light>& a_light, const float3& a_focus, DirectX::XMFLOAT4X4& outView, DirectX::XMFLOAT4X4& outProj);
+void ShadowMapWrite(Chunk& a_chunk, const SystemContext& a_context, ComponentView entityView, DrawResources& a_drawResources, const ComponentHandle<Light>& a_light, const DirectX::XMFLOAT4X4& a_lightView, const DirectX::XMFLOAT4X4& a_lightProj);
+void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView, ComponentView entityView, ShadowMap* a_shadowMap);
 void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context);
 void PolylineDraw(Chunk& a_chunk, const SystemContext& a_context);
 void UIDraw(Chunk& a_chunk, const SystemContext& a_context);
+void EffectDraw(Chunk& a_chunk, const SystemContext& a_context);
+
 DirectX::XMMATRIX CreateBillBoardMatrix(const float3& cameraPos, const float3& lookPos, const float3& upVector);
 
-void DrawSystem(Chunk& a_chunk, const SystemContext& a_context)
+void DrawSystem(Chunk& a_chunk, const SystemContext& a_context, DrawResources& a_drawResources)
 {
-	ComponentView entityView = a_chunk.GetView<ComponentTypes<ModelKey, Position, Rotation, Scale>>();
-	ComponentView cameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
-	CameraDraw(a_chunk, a_context, cameraView, entityView);
 
 	ComponentView oBBCameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
 	OBBDraw(a_chunk, a_context, oBBCameraView);
 	SectorDraw(a_chunk, a_context, oBBCameraView);
 
+	ComponentView entityView = a_chunk.GetView<ComponentTypes<ModelKey, Position, Rotation, Scale>>();
+	ComponentView cameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
+	// ÉâÉCÉgÇÃçsóÒÇìnÇ∑
+	ComponentView lightView = a_chunk.GetView<ComponentTypes<Light>>();
+	ComponentHandle<Light> light;
+	float3 lightFocus(0.0f, 0.0f, 0.0f);
+	auto lightIt = lightView.begin();
+	if (lightIt != lightView.end())
+	{
+		light = a_chunk.GetComponent<Light>(*lightIt);
+		// !!!New!!!
+		ComponentHandle<Position> lightPos = a_chunk.GetComponent<Position>(*lightIt);
+		if (lightPos.IsValid())
+		{
+			lightFocus = float3(lightPos.Look().x, lightPos.Look().y, lightPos.Look().z);
+		}
+	}
+	if (light.IsValid())
+	{
+		const float3& lightColor = light.Look().color;
+		const float3& lightDir = light.Look().direction;
+		ShaderList::SetLight(
+			DirectX::XMFLOAT4(lightColor.x, lightColor.y, lightColor.z, 1.0f),
+			DirectX::XMFLOAT3(lightDir.x, lightDir.y, lightDir.z));
+	}
+	DirectX::XMFLOAT4X4 lightMatView;
+	DirectX::XMFLOAT4X4 lightMatProj;
+	DirectX::XMStoreFloat4x4(&lightMatView, DirectX::XMMatrixIdentity());
+	DirectX::XMStoreFloat4x4(&lightMatProj, DirectX::XMMatrixIdentity());
+	const bool hasLightMatrices = BuildLightShadowMatrices(light, lightFocus, lightMatView, lightMatProj);
+	// çÏê¨èoóàÇƒÇ¢ÇΩÇÁï`âÊ
+	if (hasLightMatrices)
+	{
+		ShadowMapWrite(a_chunk, a_context, entityView, a_drawResources, light, lightMatView, lightMatProj);
+		ShaderList::SetShadow(&lightMatView, &lightMatProj, 0.001f, 1.0f / static_cast<float>(kShadowMapSize));
+	}
+	SetSamplerState(SAMPLER_COMPARISON_SHADOW, 1);
+	CameraDraw(a_chunk, a_context, cameraView, entityView, a_drawResources.GetShadowMap());
+	
+
+	
 	SpriteDraw(a_chunk, a_context);
 
-	//PolylineDraw(a_chunk, a_context);
+	EffectDraw(a_chunk, a_context);
+
+	//// PolylineDraw(a_chunk, a_context);
 
 	UIDraw(a_chunk, a_context);
+
+
 }
 
 
-void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView, ComponentView entityView)
+bool BuildLightShadowMatrices(const ComponentHandle<Light>& a_light, const float3& a_focus, DirectX::XMFLOAT4X4& outView, DirectX::XMFLOAT4X4& outProj)
+{
+	if (!a_light.IsValid() || !a_light.Look().castShadow)
+	{
+		return false;
+	}
+
+	const float3& lightDirSrc = a_light.Look().direction;
+	DirectX::XMVECTOR lightDir = DirectX::XMVector3Normalize(
+		DirectX::XMVectorSet(lightDirSrc.x, lightDirSrc.y, lightDirSrc.z, 0.0f));
+	// !!!New!!!
+	DirectX::XMVECTOR focus = DirectX::XMVectorSet(a_focus.x, a_focus.y, a_focus.z, 0.0f);
+	const float lightDistance = 50.0f;
+	DirectX::XMVECTOR eye = DirectX::XMVectorSubtract(
+		focus, DirectX::XMVectorScale(lightDir, lightDistance));
+	DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	DirectX::XMVECTOR dotUp = DirectX::XMVector3Dot(lightDir, up);
+	if (fabsf(DirectX::XMVectorGetX(dotUp)) > 0.99f)
+	{
+		up = DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+	}
+
+	DirectX::XMFLOAT3 eyeF;
+	DirectX::XMFLOAT3 focusF;
+	DirectX::XMFLOAT3 upF;
+	DirectX::XMStoreFloat3(&eyeF, eye);
+	DirectX::XMStoreFloat3(&focusF, focus);
+	DirectX::XMStoreFloat3(&upF, up);
+	DrawMatrix::CreateViewMatrix(outView, float3{ eyeF.x, eyeF.y, eyeF.z }, float3{ focusF.x, focusF.y, focusF.z }, float3{ upF.x, upF.y, upF.z });
+
+	const float orthoSize = 100.0f;
+	const float nearZ = 1.0f;
+	const float farZ = 250.0f;
+	DirectX::XMMATRIX proj = DirectX::XMMatrixOrthographicLH(orthoSize, orthoSize, nearZ, farZ);
+	proj = DirectX::XMMatrixTranspose(proj);
+	DirectX::XMStoreFloat4x4(&outProj, proj);
+	return true;
+}
+
+void ShadowMapWrite(Chunk& a_chunk, const SystemContext& a_context, ComponentView entityView, DrawResources& a_drawResources, const ComponentHandle<Light>& a_light, const DirectX::XMFLOAT4X4& a_lightView, const DirectX::XMFLOAT4X4& a_lightProj)
+{
+	// !!!New!!!
+	ShadowMap* shadowMap = a_drawResources.GetShadowMap();
+	if (!shadowMap || !shadowMap->IsValid())
+	{
+		return;
+	}
+	if (!a_light.IsValid() || !a_light.Look().castShadow)
+	{
+		return;
+	}
+
+	a_drawResources.BeginShadowWrite();
+	SetDepthTest(DEPTH_TEST_TRUE);
+
+	DirectX::XMFLOAT4X4 wvp[3];
+	wvp[1] = a_lightView;
+	wvp[2] = a_lightProj;
+
+	for (auto it : entityView)
+	{
+		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(it);
+		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(it);
+		const ComponentHandle<Scale> scale = a_chunk.GetComponent<Scale>(it);
+		const ComponentHandle<ModelKey> key = a_chunk.GetComponent<ModelKey>(it);
+		if (!pos.IsValid() || !rot.IsValid() || !scale.IsValid() || !key.IsValid())
+		{
+			continue;
+		}
+
+		const BitFlag flag = key.Look().modelDrawFlag;
+		if (flag & MODEL_DRAW_NOTDEPTH)
+		{
+			continue;
+		}
+		if (a_chunk.GetComponent<UseGhostShader>(it).IsValid())
+		{
+			continue;
+		}
+		// !!!New!!!
+		if (a_chunk.GetComponent<UseShadowShader>(it).IsValid())
+		{
+			continue;
+		}
+
+		std::shared_ptr<Model> itModel = a_context.modelCache.GetModel(key.Look().key);
+		if (!itModel)
+		{
+			continue;
+		}
+
+		const bool useLocalOffset = (flag & MODEL_DRAW_LOCAL_OFFSET) != 0;
+		float3 floatPos(pos.Look().x, pos.Look().y, pos.Look().z);
+		float3 floatRot(
+			(rot.Look().pitch + key.Look().rotato.x) * RAD
+			, (rot.Look().yaw + key.Look().rotato.y) * RAD
+			, (rot.Look().roll + key.Look().rotato.z) * RAD
+		);
+		float3 floatScale(scale.Look().x, scale.Look().y, scale.Look().z);
+		DrawMatrix::CreateWorldMatrix(
+			wvp[0], floatPos, floatScale, floatRot, true,
+			key.Look().offset, useLocalOffset);
+
+		ShaderList::VSKind vsKind = key.Look().useAnime ? ShaderList::VS_ANIME : ShaderList::VS_WORLD;
+		ShaderList::SetWVP(wvp);
+		VertexShader* vs = ShaderList::GetVS(vsKind);
+		if (!vs)
+		{
+			continue;
+		}
+		vs->Bind();
+		GetContext()->PSSetShader(nullptr, nullptr, 0);
+
+		for (unsigned int i = 0; i < itModel->GetMeshNum(); ++i)
+		{
+			const Model::Mesh* mesh = itModel->GetMesh(i);
+			if (!mesh || !mesh->pMesh)
+			{
+				continue;
+			}
+
+			if (key.Look().useAnime)
+			{
+				DirectX::XMFLOAT4X4 bones[200];
+				for (int boneIdx = 0; boneIdx < static_cast<int>(mesh->bones.size()); ++boneIdx)
+				{
+					const Model::Bone& bone = mesh->bones[boneIdx];
+					DirectX::XMStoreFloat4x4(
+						&bones[boneIdx],
+						DirectX::XMMatrixTranspose(bone.invOffset * itModel->GetBoneMatrix(bone.nodeIndex)));
+				}
+				ShaderList::SetBones(bones);
+			}
+
+			mesh->pMesh->Draw();
+		}
+	}
+
+	a_drawResources.EndShadowWrite();
+	SetDepthTest(DEPTH_TEST_TRUE);
+}
+
+void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView, ComponentView entityView, ShadowMap* a_shadowMap)
 {
 	DirectX::XMFLOAT4X4 wvp[3];
 	ComponentHandle<Camera> useCamera;
 	ComponentHandle<Position> cameraPosition;
 	ComponentHandle<Rotation> cameraRotation;
 	ComponentHandle<ZoomComponent> zoom;
-	// àÍî‘óDêÊìxÇÃçÇÇ¢ÉJÉÅÉâÇéÊìæ
+	// ÉVÉÉÉhÉEÉ}ÉbÉvÇìoò^
+	const bool shadowMapReady =
+		a_shadowMap &&
+		a_shadowMap->IsValid() &&
+		a_shadowMap->GetDepthStencil() != nullptr;
+	if (shadowMapReady)
+	{
+		PixelShader* shadowPS = ShaderList::GetPS(ShaderList::PS_SHADOW_RECEIVE);
+		if (shadowPS)
+		{
+			shadowPS->SetTexture(1, a_shadowMap->GetDepthStencil());
+		}
+		PixelShader* alphaShadowPS = ShaderList::GetPS(ShaderList::PS_ALPHA_SHADOW);
+		if (alphaShadowPS)
+		{
+			alphaShadowPS->SetTexture(2, a_shadowMap->GetDepthStencil());
+		}
+	}
 
 	auto it = cameraView.begin();
 	auto end = cameraView.end();
@@ -123,18 +330,29 @@ void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		{
 			continue;
 		}
-		bool isGhost = a_chunk.GetComponent<EnemyTag>(it).IsValid() || a_chunk.GetComponent<EnemyBulletTag>(it).IsValid();
+		bool isGhost = a_chunk.GetComponent<UseGhostShader>(it).IsValid();
 		bool isAlpha = alphaBlend.IsValid();
+		bool isShadow = a_chunk.GetComponent<UseShadowShader>(it).IsValid();
 
 		ShaderList::VSKind vsKind = key.Look().useAnime ? ShaderList::VS_ANIME : ShaderList::VS_WORLD;
 		ShaderList::PSKind psKind;
 		if (isGhost) psKind = ShaderList::PS_GHOST;
+		else if (isAlpha && isShadow && shadowMapReady) psKind = ShaderList::PS_ALPHA_SHADOW;
 		else if (isAlpha) psKind = ShaderList::PS_ALPHA;
+		else if (isShadow && shadowMapReady) psKind = ShaderList::PS_SHADOW_RECEIVE;
 		else psKind = ShaderList::PS_SPECULAR;
-		// ÉVÉFÅ[É_Å[ÇÃìoò^
 		ShaderList::SetWVP(wvp);
 		itModel->SetVertexShader(ShaderList::GetVS(vsKind));
 		itModel->SetPixelShader(ShaderList::GetPS(psKind));
+		// !!!New!!!
+		if (psKind == ShaderList::PS_SHADOW_RECEIVE && shadowMapReady)
+		{
+			ShaderList::GetPS(psKind)->SetTexture(1, a_shadowMap->GetDepthStencil());
+		}
+		if (psKind == ShaderList::PS_ALPHA_SHADOW && shadowMapReady)
+		{
+			ShaderList::GetPS(psKind)->SetTexture(2, a_shadowMap->GetDepthStencil());
+		}
 
 		if (key.Look().modelDrawFlag & MODEL_DRAW_NOTDEPTH)
 		{
@@ -145,7 +363,7 @@ void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 			SetDepthTest(DEPTH_TEST_TRUE);
 		}
 		// ï`âÊèàóù
-		for (int i = 0; i < itModel->GetMeshNum(); i++)
+		for (unsigned int i = 0; i < itModel->GetMeshNum(); i++)
 		{
 			// ÉÅÉbÉVÉÖÇéÊìæ
 			Model::Mesh mesh = *itModel->GetMesh(i);
@@ -209,7 +427,7 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 
 		cameraHandle = itCamera;
 		cameraPosHandle = a_chunk.GetComponent<Position>(it);
-		currentPriority = itCamera.Look().cameraPriority;
+		currentPriority = (int)itCamera.Look().cameraPriority;
 
 
 	}
@@ -222,9 +440,10 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 	ComponentView view = a_chunk.GetView<ComponentTypes<SpriteComponent, Position, Scale, Rotation>>();
 	for (auto it : view)
 	{
+		const ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
 		const ComponentHandle<SpriteComponent> sprite = a_chunk.GetComponent<SpriteComponent>(it);
 
-		std::shared_ptr<Texture> uiTexture = a_context.uiCache.GetTexture(sprite.Look().key);
+		std::shared_ptr<Texture> uiTexture = a_context.uiCache.GetTexture(ui.Look().key);
 
 		DirectX::XMFLOAT4X4 worldMat, viewMat, projMat;
 
@@ -233,11 +452,12 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 			reinterpret_cast<const float3&>(a_chunk.GetComponent<Position>(it).Look());
 		const float3 scale = reinterpret_cast<const float3&>(a_chunk.GetComponent<Scale>(it).Look());
 		const float3 rotation = reinterpret_cast<const float3&>(a_chunk.GetComponent<Rotation>(it).Look()) +
-			sprite.Look().offsetRotation;
-		const float2 uvPos = sprite.Look().uvPos;
-		const float2 uvScale = sprite.Look().uvScale;
+			sprite.Look().offsetRotation + float3(0.0f, 0.0f, ui.Look().uiRotation);
+		const float2 offset = ui.Look().uiPos;
+		const float2 uvPos = ui.Look().uvPos;
+		const float2 uvScale = ui.Look().uvScale;
 
-		const float2 size = sprite.Look().size;
+		const float2 size = ui.Look().uiScale;
 
 		float3 cameraPos(
 			cameraPosHandle.Look().x,
@@ -248,7 +468,7 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 		float3 upVector = cameraHandle.Look().upVector;
 
 		DrawMatrix::CreateViewMatrix(viewMat, cameraPos, lookPos, upVector);
-		DrawMatrix::CreateProjectionMatrix(projMat, cameraHandle.Look().fovy, cameraHandle.Look().aspect, cameraHandle.Look().farCrip, cameraHandle.Look().nearCrip);
+		DrawMatrix::CreateProjectionMatrix(projMat, cameraHandle.Look().fovy, cameraHandle.Look().aspect, cameraHandle.Look().nearCrip, cameraHandle.Look().farCrip);
 
 
 
@@ -280,20 +500,20 @@ void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context)
 				worldMat,
 				pos,
 				scale,
-				rotation
+				float3(rotation.x * RAD, rotation.y * RAD, rotation.z * RAD)
 			);
 
 		}
 		Sprite::SetWorld(worldMat);
 		Sprite::SetView(viewMat);
 		Sprite::SetProjection(projMat);
-		Sprite::SetColor({ 1.0f, 1.0f, 1.0f,  sprite.Look().alpha });
+		Sprite::SetColor({ 1.0f, 1.0f, 1.0f,  ui.Look().alpha });
 		Sprite::SetSize({ size.x, size.y});
-		Sprite::SetOffset({ 0.0f, 0.0f });
+		Sprite::SetOffset({ offset.x, offset.y });
 		Sprite::SetTexture(uiTexture.get());
 		Sprite::SetUVPos({ uvPos.x, uvPos.y });
 		Sprite::SetUVScale({ uvScale.x, uvScale.y });
-
+		
 		Sprite::Draw();
 
 	}
@@ -306,7 +526,7 @@ void UIDraw(Chunk& a_chunk, const SystemContext& a_context)
 {
 	SetDepthTest(DEPTH_TEST_FALSE);
 
-	ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>>();
+	ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>, ComponentTypes<SpriteComponent>>();
 	for (auto it : view)
 	{
 		const ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
@@ -362,6 +582,100 @@ void UIDraw(Chunk& a_chunk, const SystemContext& a_context)
 
 }
 
+void EffectDraw(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentHandle<Camera> useCamera;
+	ComponentHandle<Position> cameraPosition;
+	ComponentHandle<Rotation> cameraRotation;
+	ComponentHandle<ZoomComponent> zoom;
+	// àÍî‘óDêÊìxÇÃçÇÇ¢ÉJÉÅÉâÇéÊìæ
+
+	ComponentView cameraView = a_chunk.GetView<ComponentTypes<CameraTag, Camera, Position, Rotation>>();
+
+	auto it = cameraView.begin();
+	auto end = cameraView.end();
+
+	if (it == end) return;
+
+	for (; it != end; ++it)
+	{
+		ComponentHandle<Camera> itCamera = a_chunk.GetComponent<Camera>(*it);
+
+		if (!useCamera.IsValid() || (itCamera.Look().cameraPriority > useCamera.Look().cameraPriority))
+		{
+			useCamera = itCamera;
+			cameraPosition = a_chunk.GetComponent<Position>(*it);
+			cameraRotation = a_chunk.GetComponent<Rotation>(*it);
+			zoom = a_chunk.GetComponent<ZoomComponent>(*it);
+		}
+	}
+	// ÉJÉÅÉâÇ™Ç»Ç©Ç¡ÇΩèÍçáî≤ÇØÇÈ
+	if (!useCamera.IsValid() || !cameraPosition.IsValid() || !cameraRotation.IsValid()) return;
+
+	float fovy = useCamera->fovy;
+	float aspect = useCamera->aspect;
+	float nearCrip = useCamera->nearCrip;
+	float farCrip = useCamera->farCrip;
+	float3 cameraForward = GetForward(TOFLOAT3(cameraRotation));
+
+	if (zoom.IsValid())
+	{
+		if (zoom.Look().zoom > 1.0f) fovy /= zoom.Look().zoom;
+	}
+
+	DirectX::XMFLOAT4X4 view;
+	DirectX::XMFLOAT4X4 proj;
+
+	DrawMatrix::CreateViewMatrix(view, float3{ cameraPosition->x, cameraPosition->y, cameraPosition->z }, useCamera->lookPosition, useCamera->upVector, false);
+	DrawMatrix::CreateProjectionMatrix(proj, fovy, aspect, nearCrip, farCrip, false);
+
+	Effekseer::Matrix44 cameraMat;
+	Effekseer::Matrix44 projMat;
+
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			cameraMat.Values[i][j] = ((float*)&view)[(i) * 4  + j];
+		}
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			projMat.Values[i][j] = ((float*)&proj)[(i) * 4 + j];
+		}
+	}
+
+	::Effekseer::Vector3D viewerPosition = ::Effekseer::Vector3D(10.0f, 5.0f, 20.0f);
+
+	// Specify a projection matrix
+	// ìäâeçsóÒÇê›íË
+	::Effekseer::Matrix44 projectionMatrix;
+	projectionMatrix.PerspectiveFovRH(90.0f / 180.0f * 3.14f, (float)SCREEN_WIDTH  / (float)SCREEN_HEIGHT, 1.0f, 500.0f);
+
+	// Specify a camera matrix
+	// ÉJÉÅÉâçsóÒÇê›íË
+	::Effekseer::Matrix44 cameraMatrix;
+	cameraMatrix.LookAtRH(viewerPosition, ::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(0.0f, 1.0f, 0.0f));
+
+	GetEffectRenderer()->SetCameraMatrix(cameraMat);
+	GetEffectRenderer()->SetProjectionMatrix(projMat);
+
+
+	GetEffectRenderer()->BeginRendering();
+
+	Effekseer::Manager::DrawParameter drawParameter;
+	drawParameter.ZNear = 0.0f;
+	drawParameter.ZFar = 1.0f;
+	drawParameter.ViewProjectionMatrix = GetEffectRenderer()->GetCameraProjectionMatrix();
+
+
+	GetEffectManager()->Draw(drawParameter);
+	GetEffectRenderer()->EndRendering();
+}
+
 void PolylineDraw(Chunk& a_chunk, const SystemContext& a_context)
 {
 	ComponentHandle<Camera> cameraHandle;
@@ -369,7 +683,7 @@ void PolylineDraw(Chunk& a_chunk, const SystemContext& a_context)
 	ComponentView cameraView = a_chunk.GetView<ComponentTypes<Camera>>();
 
 
-	int currentPriority = 0;
+	size_t currentPriority = 0;
 	for (auto it : cameraView)
 	{
 		const ComponentHandle<Camera> itCamera = a_chunk.GetComponent<Camera>(it);
@@ -555,6 +869,8 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 	DirectX::XMFLOAT4 attackColor(1.0f, 0.4f, 0.0f, 1.0f);
 	DirectX::XMFLOAT4 waitColor(0.0f, 0.4f, 1.0f, 1.0f);
 	constexpr int kArcSegments = 16;
+	// !!!New!!!
+	constexpr float kTelegraphHighlightSeconds = 12.0f;
 
 	// ï`âÊópÉâÉÄÉ_
 	auto drawSectorLines = [&](
@@ -625,6 +941,25 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		}
 	};
 
+	// !!!New!!!
+	auto drawSectorMesh = [&](Entity a_entity, float a_progress, float a_maxTime, float a_highlightTime, float3 a_color, Geometory::SectorShaderType a_shaderType)
+	{
+		const ComponentHandle<AttackTelegraph> telegraph = a_chunk.GetComponent<AttackTelegraph>(a_entity);
+		if (!telegraph.IsValid() || telegraph.Look().sectorKey.empty()) return;
+
+		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(a_entity);
+		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(a_entity);
+		if (!pos.IsValid() || !rot.IsValid()) return;
+
+		DirectX::XMFLOAT4X4 world;
+		const float3 floatPos(pos.Look().x, pos.Look().y, pos.Look().z);
+		const float3 floatScale(1.0f, 1.0f, 1.0f);
+		const float3 floatRot(rot.Look().pitch * RAD, rot.Look().yaw * RAD, rot.Look().roll * RAD);
+		DrawMatrix::CreateWorldMatrix(world, floatPos, floatScale, floatRot, true);
+		Geometory::SetWorld(world);
+		Geometory::DrawSector(telegraph.Look().sectorKey, a_progress, a_maxTime, a_highlightTime, a_color, a_shaderType);
+	};
+
 	// ìñÇΩÇËîªíËï`âÊ
 	ComponentView sectorView = a_chunk.GetView<ComponentTypes<SectorHitJudge, Position, Rotation>>();
 	for (auto sectorIt : sectorView)
@@ -644,15 +979,30 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 			pos.Look().z,
 			rot.Look().yaw,
 			attackColor);
+
+		// !!!New!!!
+		float progress = 1.0f;
+		float maxDuration = 0.0f;
+		const ComponentHandle<AttackInstance> attackInstance = a_chunk.GetComponent<AttackInstance>(sectorIt);
+		if (attackInstance.IsValid() && attackInstance.Look().maxDuration > 0.0f)
+		{
+			progress = attackInstance.Look().elapsedTime / attackInstance.Look().maxDuration;
+			maxDuration = attackInstance.Look().maxDuration;
+		}
+		drawSectorMesh(sectorIt, progress, maxDuration, maxDuration / 1.5f, float3(1.0, 0.12, 0.12), Geometory::SectorShaderType::Attack);
 	}
 
-	// îªíËï\é¶Çï`âÊ
-	ComponentView telegraphView = a_chunk.GetView<ComponentTypes<AttackTelegraph, Position, Rotation>>();
-	for (auto telegraphIt : telegraphView)
+	// îªíËó\ë™ï\é¶Çï`âÊ
+	ComponentView telegraphView = a_chunk.GetView<ComponentTypes<AttackStartupAction>>();
+	for (auto startupIt : telegraphView)
 	{
-		const ComponentHandle<AttackTelegraph> telegraph = a_chunk.GetComponent<AttackTelegraph>(telegraphIt);
-		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(telegraphIt);
-		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(telegraphIt);
+		const ComponentHandle<AttackStartupAction> startup = a_chunk.GetComponent<AttackStartupAction>(startupIt);
+		Entity telegraphEntity = startup.Look().telegraphEntity;
+		const ComponentHandle<AttackTelegraph> telegraph = a_chunk.GetComponent<AttackTelegraph>(telegraphEntity);
+		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(telegraphEntity);
+		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(telegraphEntity);
+
+		const ComponentHandle<AttackStatus> status = a_chunk.GetComponent<AttackStatus>(startupIt);
 
 		drawSectorLines(
 			telegraph.Look().minLength,
@@ -664,6 +1014,21 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 			pos.Look().y,
 			pos.Look().z,
 			rot.Look().yaw,
-			waitColor);
+			attackColor);
+
+		// !!!New!!!
+		float progress = 0.0f;
+		if (startup.Look().startupDuration > 0.0f)
+		{
+			progress = startup.Look().elapsedTime / startup.Look().startupDuration;
+		}
+
+		float3 defaultColor = float3(0.6f, 0.6f, 0.3f);
+		float3 attackPowerColor = float3(0.7f, 0.3f, 0.1f);
+		float damageRate = status.Look().attackPowers.at(startup.Look().attackIndex).damageValue / 4.0f;
+		damageRate = std::clamp(damageRate, 0.0f, 1.0f);
+		float3 color = defaultColor * (1.0f - damageRate) + attackPowerColor * damageRate;
+
+		drawSectorMesh(telegraphEntity, progress, startup.Look().startupDuration, kTelegraphHighlightSeconds, color, Geometory::SectorShaderType::Telegraph);
 	}
 }

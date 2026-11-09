@@ -3,6 +3,10 @@
 #include "System.h"
 #include "Sound.h"
 #include "GameData.h"
+#include <unordered_map>
+
+#include "Defines.h"
+#include <fstream>
 
 
 ////////////////////////////////
@@ -14,13 +18,19 @@
 World::World(
 	IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
+	IEffectCacheAcquisition& effectCache,
 	std::function<void(int)> a_tutorialRequest,
-	Input& a_input)
-	: systemResponse()
+	Input& a_input, 
+	ComponentsSerialize& a_serialize,
+	PrefabManager& a_prefabManager)
+	: prefabManager(a_prefabManager)
+	, aiManager(kAIBehaviorTickInterval)
+	, systemResponse()
 	, m_state(USECHUNK)
 	, isMouseLock(true)
-	, context(a_modelCache, a_uiCache, a_tutorialRequest, a_input) // TODO System側が勝手にリクエストを触れないようにする
+	, context(a_modelCache, a_uiCache, effectCache, a_tutorialRequest, a_input) // TODO System側が勝手にリクエストを触れないようにする
 	, isGameEnd(false)
+	, serialize(a_serialize)
 {
 }
 
@@ -37,28 +47,36 @@ World::~World()
 
 void World::InitWorld()
 {
-	// Contextの初期化
-	InitContext();
+	// !!!New!!!
+	drawResources.Init();
 
-	systemResponse = std::make_unique<SystemResponse>();
+	InitResponse(systemResponse);
+	if (!systemResponse)	
+	{
+		systemResponse = std::make_unique<SystemResponse>();
+	}
 
-	// Tree 登録を先に行い、CreateNewChunk 内の RegisterAI が成功するようにする
+	// ツリー登録を先に行いCreateNewChunk内のRegisterAIが成功するようにする
 	InitAI(aiManager);
 
 	chunk = CreateNewChunk(aiManager);
 
 	ContextUpdate(0.01f);
-	InitChunk(chunk, context, *systemResponse);
+	InitChunk(chunk, context, *systemResponse, aiManager, serialize);
 }
 
-void World::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse)
+void World::InitResponse(std::unique_ptr<SystemResponse>& response)
+{
+	systemResponse = std::make_unique<SystemResponse>();
+}
+
+void World::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 
 }
 
 void World::InitAI(AIManager& a_aiManager)
 {
-	// !!!New!!!
 	(void)a_aiManager;
 }
 
@@ -79,17 +97,6 @@ void World::ContextUpdate(float a_delatTime)
 		systemResponse->StepStopTime(normalizeDeltatime);
 		context.deltaTime *= systemResponse->GetStopRate();
 	}
-
-	// AIの更新頻度を管理
-	context.aiTickThisFrame = false;
-	context.aiDeltaTime = 0.0f;
-	aiTickAccum += context.deltaTime;
-	if (aiTickAccum >= kAITickInterval)
-	{
-		context.aiTickThisFrame = true;
-		context.aiDeltaTime = aiTickAccum;
-		aiTickAccum = 0.0f;
-	}
 }
 
 void World::UpdateWorld()
@@ -100,7 +107,7 @@ void World::UpdateWorld()
 	{
 	case USECHUNK:
 	{
-		UpdateChunk(chunk, context, *systemResponse, aiManager);
+		UpdateChunk(chunk, context, *systemResponse, aiManager, serialize);
 	}
 	break;
 
@@ -115,19 +122,34 @@ void World::UpdateWorld()
 void World::DrawWorld()
 {
 	// System処理
-	DrawSystem(chunk, context);
+	DrawSystem(chunk, context, drawResources);
 
-	chunk.CleanupFrame();
 	FrameEnd();
 
 }
 
 void World::FrameEnd()
 {
+	// 跡片付け
+	chunk.CleanupFrame();
+	// システム要求を処理
 	if (systemResponse == nullptr) return;
 	HandleSystemResponse(*systemResponse);
-
+	RequestSpawn();
+	// システム要求を初期化
 	systemResponse->ResetRequest();
+}
+
+void World::RequestSpawn()
+{
+	for(auto incomingRequest : systemResponse->GetEntitySpawnRequests())
+	{	
+		EntitySpawnRequest requestData;
+		prefabManager.TryGetPrefabScene(incomingRequest.key, requestData);
+	
+		std::vector<Entity> entities = spawnPort.AddEntities(chunk, requestData);
+		SpawnPostProcessing(entities, chunk, aiManager, incomingRequest);
+	}
 }
 
 //////////////////////////////
@@ -160,7 +182,7 @@ Chunk World::CreateNewChunk(AIManager& a_aiManager)
 	return Chunk();
 }
 
-void World::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager)
+void World::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
 	(void)a_chunk;
 	(void)a_context;
@@ -176,6 +198,10 @@ void World::UpdateIMGUI(Chunk& a_chunk, SystemContext& a_context)
 void World::HandleSystemResponse(SystemResponse& a_response)
 {
 
+}
+
+void World::SpawnPostProcessing(const std::vector<Entity>& entities, Chunk& a_chunk, AIManager& a_aiManager, const SpawnRequest& a_request)
+{
 }
 
 

@@ -10,10 +10,11 @@ WaitAction::~WaitAction()
 {
 }
 
-Node::Status WaitAction::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status WaitAction::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
 	(void)blackBord;
 	(void)mind;
+	(void)systemInfo;
 
 	// ‘Ò‹@’†‚È‚Ì‚Ås“®‚µ‚È‚¢
 	result.MoveDir = float2(0.0f, 0.0f);
@@ -21,7 +22,7 @@ Node::Status WaitAction::Tick(AIContext& context, const AIBlackboard& blackBord,
 	result.UseAttack = false;
 
 	// !!!New!!!
-	context.actionDuration += systemInfo.tickDelta;
+	context.actionDuration += deltaTime;
 
 	// I—¹‚µ‚½‚ç¬Œ÷
 	if (context.actionDuration >= maxDuration)

@@ -3,18 +3,27 @@
 #include "System.h"
 #include "Sound.h"
 #include "GameData.h"
+#include "Defines.h"
+#include "GameSystemResponse.h"
 
 using namespace Component;
 
-TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input)
+TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, std::function<void(int)> a_stageRequest, Input& a_input, ComponentsSerialize& a_serialize, PrefabManager& a_prefabManager)
 	: World(a_modelCache,
 		a_uiCache,
+		a_effectCache,
 		a_tutorialRequest,
-		a_input)
+		a_input,
+		a_serialize,
+		a_prefabManager)
 	, worldRequest(a_worldRequest)
+	, stageRequest(a_stageRequest)
 {
-	a_input.RegisterKey("ChunkChange", VK_LBUTTON);
-	a_input.RegisterButton("ChunkChange", VK_PAD_A);
+
+
+	a_input.RegisterButton("Select", XINPUT_GAMEPAD_A);
+	a_input.RegisterKey("Select", VK_SPACE);
+
 }
 
 Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
@@ -23,140 +32,258 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 	Chunk newChunk;
 
 	ResetSound();
-	PlaySound(LoadSound("Assets/Sound/title.mp3", true));
+
 
 	Entity titleLogo = newChunk.CreateNewEntity(
-		UIComponent("TitleLogo", float2(0.0f, 0.4f), float2(1.0f, 1.0f), 0.0f)
+		UIComponent("TitleLogo", float2(0.0f, 0.4f), float2(1.7f, 0.7f), 0.0f),
+		UIShake(float2(0.0f, 0.4f), float2(0.0005f, 0.0005f), float2(0.5f, 0.5f), 15.0f, 180.0f, 10.0f)
 	);
 
-	Entity keyLogo = newChunk.CreateNewEntity(
-		UIComponent("PleaseKey", float2(0.0f, -0.5f), float2(1.0f, 0.3f), 0.0f),
-		FadeUI(FADE_DOWN, 0.01f),
-		FadeChange(FADE_CHANGE_FLICKER)
-	);
-
-	Entity titleMask = newChunk.CreateNewEntity(
-		UIComponent("DarkMask", float2(0.0f, 0.0f), float2(2.0f, 2.0f), 0.0f)
-	);
-
-	Entity createEffectKey = newChunk.CreateNewEntity(
-		EffectKey(WHITEFADE_UP, "ChunkChange")
-	);
-
-	Entity createEffect = newChunk.CreateNewEntity(
-		CreateEffect(WHITEMINIFADE_CLEAR)
+	Entity titleCameraPoint = newChunk.CreateNewEntity(
+		Name("CameraPoint"),
+		MOVE_AND_TRANSFORM_COMPONENT(float3(-3.0f, -8.0f, -13.0f), float3(0.0f, 20.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
+		PosePosState(POSE_POS_LEAP),
+		CameraPoint(100, 100.0f, 100.0f),
+		RailFly(0.4f, 0.02f)
 	);
 
 	Entity titleCamera = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
 		PosePosState(POSE_POS_CAMERA),
 		PoseRotState(POSE_ROT_CAMERA),
-		Camera(10, float3{ 0.0f, 0.0f, 1.0f }, float3{ 0.0f, 1.0f, 0.0f }, 60.0f, 16 / 9, 0.05f, 1000.0f)
+		Camera(10, float3{ 0.0f, 0.0f, 1.0f }, float3{ 0.0f, 1.0f, 0.0f }, 60.0f, 1.777777, 0.05f, 1000.0f),
+		CameraMover(titleCameraPoint),
+		CameraTag()
 	);
 
-	Entity titleCameraPoint = newChunk.CreateNewEntity(
-		MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 10.0f, 0.0f), float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
-		PosePosState(POSE_POS_LEAP),
-		LeapPosComponent(true, float3(0.0f, 13.5f, 0.0f), float3(0.0f, 10.5f, 20.0f), 300.0f),
-		LeapRotComponent(true, float3(20.0f, 0.0f, 0.0f), float3(5.0f, 0.0f, 0.0f), 300.0f),
-		Velocity(0.0f, 0.0f, 0.05f),
-		CameraPoint(100.0f, 100.0f, 100.0f)
-	);
 
-	Entity changeScene = newChunk.CreateNewEntity(
-		ChunkChange(true, "Game"),
-		KeyChunkChange("ChunkChange", 240.0f)
-	);
-
-	Entity forwardDark = newChunk.CreateNewEntity(
+	Entity character = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(-2.0f, 65.5f, -6.0f),
 			float3(0.0f, 0.0f, 0.0f),
-			float3(0.0f, 0.0f, 0.0f),
-			float3(kTonnelWidth, kTonnelHeight, 0.1f)
+			float3(1.0f, 1.0f, 1.0f)
 		),
-		PosePosState(POSE_POS_FOLLOW),
-		FollowPosition(0.0f, 0.0f, kTitleTonnelSegmentLength * (kTitleTonnelSegmentCount - 2), titleCameraPoint, FOLLOW_POS_FIXED_X | FOLLOW_POS_FIXED_Y),
-		ModelKey("Dark", float3(), float3(), MODEL_DRAW_SHADOW)
+		ModelKey("Box"),
+		GroundedState(),
+		DeadState(),
+		ActionMask(),
+		Velocity(),
+		Force(),
+		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
+		OBBCollider(),
+		HitInfomation(),
+		AlphaBlendComponent("Red", "Red"),
+		EntryAction(0.1f)
 	);
 
-	for (int i = 0; i < kTitleTonnelSegmentCount; i++)
-	{
-		Entity titleTonnel = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, kTitleTonnelHeight / 2, kTitleTonnelSegmentLength * i), float3(0.0f, 0.0f, 0.0f), float3(0.1f, 0.1f, 0.1f)),
-			TrackingWarp(
-				titleCamera,
-				float3(0.0f, 0.0f, -kTitleTonnelSegmentLength),
-				float3(0.0f, 0.0f, kTitleTonnelSegmentLength * (kTitleTonnelSegmentCount - 1) - kTitleTonnelWarpMargin),
-				TRACK_FIXED_X | TRACK_FIXED_Y)
-		);
+	Entity enemy1 = newChunk.CreateNewEntity(
+		Name("Character"),
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(6.0f, -9.5f, -0.5f),
+			float3(0.0f, 42.0f, 0.0f),
+			float3(1.0f, 1.0f, 1.0f)
+		),
+		ModelKey("Box"),
+		AlphaBlendComponent("Red", "Purple"),
+		ShakeComponent(float3(0.05f, 0.05f, 0.05f), float3(1.1f, 1.1f, 1.1f), FLT_MAX, 1.0f)
+	);
 
-		Entity titleFloor1 = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 0.0f), float3(kTitleTonnelMeshSize, 1.0f, kTitleTonnelFloorDepth)),
-			PosePosState(POSE_POS_FOLLOW),
-			ModelKey("bricktexture1"),
-			HitInfomation(),
-			FollowPosition(0.0f, -kTitleTonnelHeight / 2, 0.0f, titleTonnel)
-		);
+	Entity enemy2 = newChunk.CreateNewEntity(
+		Name("Character"),
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(-4.0f, -9.5f, 2.5f),
+			float3(0.0f, 42.0f, 0.0f),
+			float3(1.0f, 1.0f, 1.0f)
+		),
+		ModelKey("Box"),
+		InputMove(kPlayerMoveSpeed),
+		MoveInputResult(),
+		PlayerTag(),
+		Firework(FIREWORK_NONE),
+		GroundedState(),
+		DeadState(),
+		ActionMask(),
+		Force(),
+		BoxCollider(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
+		OBBCollider(),
+		HitInfomation(),
+		JumpPower(float3(0.0f, 20.0f / 60.0f, 0.0f)),
+		AttackKeyLoad({ "Player1Attack1", "Player1Attack2" }),
+		PoseRotState(POSE_ROT_LOOKMOVE),
+		HitPoint(15.0f),
+		AttackHitRecord(),
+		GuardState(0.2f, 3.0f),
+		Name("Player"),
+		InterferenceResult(),
+		GhostAreaComponent(1.4f),
+		AlphaBlendComponent("Blue", "Green"),
+		AngularVelocity(float3(0.0f, 12.0f, 0.0f))
+	);
 
-		Entity titleFloor2 = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 0.0f), float3(kTitleTonnelMeshSize, 1.0f, kTitleTonnelFloorDepth)),
-			PosePosState(POSE_POS_FOLLOW),
-			ModelKey("bricktexture1"),
-			HitInfomation(),
-			FollowPosition(0.0f, kTitleTonnelHeight / 2, 0.0f, titleTonnel)
-		);
+	Entity floor = newChunk.CreateNewEntity(
+		TRANSFORM_COMPONENT(
+			float3(0.0f, -50.0f, 0.0f),
+			float3(0.0f, 0.0f, 0.0f),
+			float3(kDebugWorldSize.x, 80.0f, kDebugWorldSize.z)
+		),
+		BoxCollider(float3(0.0f, 30.0f, 0.0f), float3(kDebugWorldSize.x, 20.0f, kDebugWorldSize.z)),
+		OBBCollider(OBB_PushOutLocked),
+		ModelKey("Box"),
+		AlphaBlendComponent("Red", "Blue")
+	);
 
-		Entity titleFloor3 = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 0.0f), float3(1.0f, kTitleTonnelMeshSize, kTitleTonnelFloorDepth)),
-			PosePosState(POSE_POS_FOLLOW),
-			ModelKey("bricktexture1"),
-			HitInfomation(),
-			FollowPosition(kTitleTonnelWidth / 2, 0.0f, 0.0f, titleTonnel)
-		);
+	Entity underFloor = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, -40.0f, 10.0f),
+			float3(0.0f, 0.0f, 0.0f),
+			float3(kDebugWorldSize.x * 10.0f, 1.0, kDebugWorldSize.z * 6.0f)
+		),
+		ModelKey("Box"),
+		AlphaBlendComponent("White", "White")
+	);
+	
+	Entity sky = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, 0.0f, 80.0f),
+			float3(0.0f, 0.0f, 0.0f),
+			float3(kDebugWorldSize.x * 10.0f, 180.0, 1.0f)
+		),
+		ModelKey("Box"),
+		AlphaBlendComponent("White", "Blue")
+	);
 
-		Entity titleFloor4 = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 0.0f), float3(1.0f, kTitleTonnelMeshSize, kTitleTonnelFloorDepth)),
-			PosePosState(POSE_POS_FOLLOW),
-			ModelKey("bricktexture1"),
-			HitInfomation(),
-			FollowPosition(-kTitleTonnelWidth / 2, 0.0f, 0.0f, titleTonnel)
-		);
+	Entity worldPower = newChunk.CreateNewEntity(
+		WorldPower(float3(0.0f, -1.2f / 60.0f, 0.0f), float3(0.5f, 1.0f, 0.5f))
+	);
 
-		Entity titleFloor5 = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 45.0f), float3(1.0f, kTitleTonnelMeshSize, kTitleTonnelFloorDepth)),
-			PosePosState(POSE_POS_FOLLOW),
-			ModelKey("bricktexture1"),
-			HitInfomation(),
-			FollowPosition(kTitleTonnelWidth / 3.0f, kTitleTonnelHeight / 3.0f, 0.0f, titleTonnel)
-		);
+	Entity title = newChunk.CreateNewEntity(
+		SpawnJson("TitleCursor", 0.0f, float3())
+	);
 
-		Entity titleFloor6 = newChunk.CreateNewEntity(
-			MOVE_AND_TRANSFORM_COMPONENT(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 225.0f), float3(kTitleTonnelMeshSize, 1.0f, kTitleTonnelFloorDepth)),
-			PosePosState(POSE_POS_FOLLOW),
-			ModelKey("bricktexture1"),
-			HitInfomation(),
-			FollowPosition(-kTitleTonnelWidth / 3.0f, kTitleTonnelHeight / 3.0f, 0.0f, titleTonnel)
-		);
-	}
+	Entity effect = newChunk.CreateNewEntity(
+		CreateEffect(WHITEFADE_CLEAR)
+	);
 
+	PlaySound(LoadSound("Assets/Sound/title.mp3", true));
 	return newChunk;
 }
 
-void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
+void TitleWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
-	VelocitySystem(a_chunk, a_context);
-	LeapSystem(a_chunk, a_context);
-	TrackingWarpSystem(a_chunk, a_context);
+	// 物理挙動の結果に基づいてキャラクターのステートを決定する
+	GroundedSystem(a_chunk, a_context);
+	CharacterActionMaskSystem(a_chunk, a_context);
+
+	// Pose系の処理を行う
+
+	InputMoveSystem(a_chunk, a_context); //oo
+	InputRotatoSystem(a_chunk, a_context);  //oo
+	FlipSystem(a_chunk, a_context); //oo
+	LookSystem(a_chunk, a_context); //oo
+	MoveForwardSystem(a_chunk, a_context); //oo
+	LeapSystem(a_chunk, a_context);//oo
+	ShakingSystem(a_chunk, a_context); //oo
+	TrackingWarpSystem(a_chunk, a_context);//oo
+	RailSystem(a_chunk, a_context);
+	FlySystem(a_chunk, a_context);
+	ShakeSystem(a_chunk, a_context);
 	PoseSystem(a_chunk, a_context);
 
+	ResetConsoleSystem(a_chunk, a_context);
+
+	// 追従などの遅延系処理
+	LookMoveSystem(a_chunk, a_context);
+	FollowTransformSystem(a_chunk, a_context);//o
+	CameraMoveSystem(a_chunk, a_context);//oo
+	LatePoseSystem(a_chunk, a_context);
+	// Transform適用
+	TransformSystem(a_chunk, a_context);
+
+	SpawnJsonSystem(a_chunk, a_context, a_response);
+
+	EnemyAttackLoadSystem(a_chunk, a_context);
+
+	// リザルトなどをリセット
+	ResetSystem(a_chunk, a_context);
+}
+
+
+
+void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
+{
+
+	SpawnJsonSystem(a_chunk, a_context, a_response);
+	UnlockStageEntitySystem(a_chunk, a_context);
+
+	// Physics系の処理を行う
+	WorldPowerSystem(a_chunk, a_context);
+	ForceSystem(a_chunk, a_context);
+	VelocitySystem(a_chunk, a_context);
+	AngularVelocitySystem(a_chunk, a_context);
+	PhysicsPoseSystem(a_chunk, a_context);
+	ColliderSystem(a_chunk, a_context);
+	ColliderCheckSystem(a_chunk, a_context);
+	SectorCheckSystem(a_chunk, a_context);
+	ColliderBackSystem(a_chunk, a_context);
+	LatePhysicsPoseSystem(a_chunk, a_context);
+
+	// 物理挙動の結果に基づいてキャラクターのステートを決定する
+	GroundedSystem(a_chunk, a_context);
+	CharacterActionMaskSystem(a_chunk, a_context);
+	MoveInputResolveSystem(a_chunk, a_context, a_aiManager);
+
+	// Pose系の処理を行う
+	InputMoveSystem(a_chunk, a_context);
+	InputRotatoSystem(a_chunk, a_context);
+	FlipSystem(a_chunk, a_context);
+	MoveForwardSystem(a_chunk, a_context);
+	LeapSystem(a_chunk, a_context);
+	ShakingSystem(a_chunk, a_context);
+	TrackingWarpSystem(a_chunk, a_context);
+	RailSystem(a_chunk, a_context);
+	FlySystem(a_chunk, a_context);
+	ShakeSystem(a_chunk, a_context);
+	PoseSystem(a_chunk, a_context);
+
+	// 追従などの遅延系処理
+	LookMoveSystem(a_chunk, a_context);
+	LookSystem(a_chunk, a_context);
+	LookOnSystem(a_chunk, a_context);
 	FollowTransformSystem(a_chunk, a_context);
 	CameraMoveSystem(a_chunk, a_context);
 	LatePoseSystem(a_chunk, a_context);
+	// Transform適用
 	TransformSystem(a_chunk, a_context);
 
+	// キャラクターのシステム
+	AttackHitSystem(a_chunk, a_context, a_response, a_aiManager);
+	CharacterAttackSystem(a_chunk, a_context);
+	PlayerJumpSystem(a_chunk, a_context);
+	AttackStartupSystem(a_chunk, a_context);
+	AttackActionSystem(a_chunk, a_context);
+	AttackWaitActionSystem(a_chunk, a_context);
+	JumpPhysicsSystem(a_chunk, a_context);
+	GuardSystem(a_chunk, a_context);
+	GuardActionSystem(a_chunk, a_context);
+	HitPointSystem(a_chunk, a_context);
+	AttackHitRecordCleanupSystem(a_chunk, a_context);
+	AttackInstanceEndCheckSystem(a_chunk, a_context);
+	AttackInstanceResolveSystem(a_chunk, a_context, a_aiManager);
+	EntryActionSystem(a_chunk, a_context);
+	PlayerDeadSystem(a_chunk, a_context, a_response);
+	EnemyDeadSystem(a_chunk, a_context, a_response);
+	BossDeadSystem(a_chunk, a_context, a_response);
+
+	UILerpSystem(a_chunk, a_context);
+	UVMoveSystem(a_chunk, a_context);
+	UIShakeSystem(a_chunk, a_context);
+
+	CursorSelectSystem(a_chunk, a_context, a_response, a_aiManager, a_serialize);
+	SoundSystem(a_chunk, a_context);
+
 	CameraViewSystem(a_chunk, a_context);
-	CreateEffectSystem(a_chunk, a_context);
 	FadeUISystem(a_chunk, a_context);
+	CreateEffectSystem(a_chunk, a_context);
 
 	// 終了処理
 	LifeTimeSystem(a_chunk, a_context);
@@ -164,11 +291,24 @@ void TitleWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	ChunkChangeSystem(a_chunk, a_context, a_response);
 }
 
-void TitleWorld::HandleSystemResponse(SystemResponse& a_response)
+void TitleWorld::InitResponse(std::unique_ptr<SystemResponse>& response)
 {
-	if (!a_response.IsWorldRequest()) return;
+	response = std::make_unique<GameSystemResponse>();
+}
 
-	worldRequest(a_response.GetWorldRequest());
+void TitleWorld::HandleSystemResponse(SystemResponse& a_response)
+{;
+
+	GameSystemResponse& response = dynamic_cast<GameSystemResponse&>(a_response);
+
+	if (response.IsStageRequest())
+	{
+		stageRequest(response.GetStageIndex());
+	}
+
+	if (!response.IsWorldRequest()) return;
+
+	worldRequest(response.GetWorldRequest());
 }
 
 

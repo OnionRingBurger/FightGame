@@ -10,10 +10,14 @@ public:
 	GameScene(
 		IModelCacheAcquisition& modelCache,
 		IUICacheAcquisition& uiCache,
+		IEffectCacheAcquisition& effectCache,
 		std::function<void(std::string)> a_sceneChangeRequest,
 		std::function<void()> a_gameEnd,
 		std::function<void()> a_resetFPSRequest,
-		Input& a_input
+		std::function<void(bool)> a_setFixedCursor,
+		Input& a_input,
+		ComponentsSerialize& a_serialize,
+		PrefabManager& a_prefabManager
 	);
 	~GameScene() = default;
 	void AdvanceUpdate(float dt) override;
@@ -35,6 +39,7 @@ private:
 	GameSceneState state;
 	void ChangeState();
 	void ChangeWorld();
+	void ChangeScene();
 	bool isMouseLock;
 
 	std::queue<std::string> worldChangeRequests;
@@ -45,11 +50,16 @@ private:
 
 	void TutorialRequest(int);
 	void WorldRequest(std::string);
+	void StageRequest(int);
 
 	IModelCacheAcquisition& modelCache;
 	IUICacheAcquisition& uiCache;
+	IEffectCacheAcquisition& effectCache;
 
 	Input& input;
+	ComponentsSerialize& serialize;
+	// !!!New!!!
+	PrefabManager& prefabManager;
 
 	//! シーン切り替え用のリクエスト
 	std::function<void(std::string)> sceneChangeRequest;
@@ -57,5 +67,9 @@ private:
 	std::function<void(void)> resetFPSRequest;
 	//! ゲーム終了のコールバック
 	std::function<void(void)> gameEnd;
+	//! カーソル固定状態の変更リクエスト
+	std::function<void(bool)> setFixedCursor;
+
+	int currentStage;
 };
 

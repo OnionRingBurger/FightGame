@@ -6,15 +6,18 @@
 
 using namespace Component;
 
-ResultWorld::ResultWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input)
+ResultWorld::ResultWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, Input& a_input, ComponentsSerialize& a_serialize, PrefabManager& a_prefabManager)
 	: World(a_modelCache,
 		a_uiCache,
+		a_effectCache,
 		a_tutorialRequest,
-		a_input)
+		a_input,
+		a_serialize,
+		a_prefabManager)
 	, worldRequest(a_worldRequest)
 {
-	a_input.RegisterKey("ChunkChange", VK_LBUTTON);
-	a_input.RegisterButton("ChunkChange", VK_PAD_A);
+	a_input.RegisterKey("ChunkChange", VK_SPACE);
+	a_input.RegisterButton("ChunkChange", XINPUT_GAMEPAD_A);
 }
 
 Chunk ResultWorld::CreateNewChunk(AIManager& a_aiManager)
@@ -27,19 +30,20 @@ Chunk ResultWorld::CreateNewChunk(AIManager& a_aiManager)
 	PlaySound(LoadSound("Assets/Sound/gameoverback.mp3", false));
 
 	Entity gameOverLogo = newChunk.CreateNewEntity(
-		UIComponent("GameOver", float2(0.0f, 0.6f), float2(0.8f, 0.8f), 0.0f, 0.0f),
-		FadeUI(FADE_UP, 0.01f)
+		UIComponent("GameOver", float2(0.0f, 0.4f), float2(1.5f, 1.2f), 0.0f, 0.0f),
+		FadeUI(FADE_UP, 0.01f),
+		UIRailFly(float2(0.0f, 0.4f), 0.025f, 0.01f)
 	);
 
 	Entity gameOverKeyLogo = newChunk.CreateNewEntity(
-		UIComponent("PleaseKey", float2(0.0f, -0.5f), float2(1.0f, 0.3f), 0.0f),
+		UIComponent("PleaseKey", float2(0.0f, -0.65f), float2(1.0f, 0.3f), 0.0f),
 		FadeUI(FADE_DOWN, 0.01f),
 		FadeChange(FADE_CHANGE_FLICKER)
 	);
 
 	Entity gameOverCamera = newChunk.CreateNewEntity(
 		TRANSFORM_COMPONENT(float3(0.0f, 25.0f, -30.0f), float3(20.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f)),
-		Camera(10, float3{ 0.0f, 0.0f, 1.0f }, float3{ 0.0f, 1.0f, 0.0f }, 60.0f, 16 / 9, 0.05f, 1000.0f)
+		Camera(10, float3{ 0.0f, 0.0f, 1.0f }, float3{ 0.0f, 1.0f, 0.0f }, 60.0f, 1.77777, 0.05f, 1000.0f)
 	);
 
 	Entity resultChangeScene = newChunk.CreateNewEntity(
@@ -55,37 +59,84 @@ Chunk ResultWorld::CreateNewChunk(AIManager& a_aiManager)
 		CreateEffect(DARKFADE_CLEAR)
 	);
 
-	Entity mineCar = newChunk.CreateNewEntity(
-		TRANSFORM_COMPONENT(
-			float3(0.0f, 0.0f, 0.0f),
-			float3(0.0f, 20.0f, 0.0f),
-			float3(0.7f, 0.7f, 0.7f)
+	Entity back = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
+			float3(0.0f, 10.0f, 20.0f),
+			float3(0.0f, 00.0f, 0.0f),
+			float3(200.7f, 200.7f, 0.7f)
 		),
-		ModelKey("Minecart")
+		ModelKey("Box"),
+		AlphaBlendComponent("Blue", "Purple"),
+		AngularVelocity(float3(0.0f, 0.0f, 0.2f)),
+		RailFly(3.0f, 0.02f)
 	);
 
-	Entity tombstone = newChunk.CreateNewEntity(
-		TRANSFORM_COMPONENT(
+	Entity box = newChunk.CreateNewEntity(
+		MOVE_AND_TRANSFORM_COMPONENT(
 			float3(0.0f, 10.0f, 0.0f),
-			float3(-90.0f, 20.0f, 0.0f),
-			float3(0.7f, 0.7f, 0.7f)
+			float3(0.0f, 20.0f, 0.0f),
+			float3(3.7f, 3.7f, 3.7f)
 		),
-		ModelKey("CrackedTombstone")
+		ModelKey("Box"),
+		AlphaBlendComponent("Red", "Red"),
+		AngularVelocity(float3(0.7f, 0.0f, 0.0f)),
+		RailFly(0.5f, 0.02f)
 	);
 	return newChunk;
 }
 
-void ResultWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager)
+void ResultWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize)
 {
+	// Physics系の処理を行う
+	WorldPowerSystem(a_chunk, a_context);
+	ForceSystem(a_chunk, a_context);
 	VelocitySystem(a_chunk, a_context);
+	AngularVelocitySystem(a_chunk, a_context);
+	PhysicsPoseSystem(a_chunk, a_context);
+	ColliderSystem(a_chunk, a_context);
+	ColliderCheckSystem(a_chunk, a_context);
+	SectorCheckSystem(a_chunk, a_context);
+	ColliderBackSystem(a_chunk, a_context);
+	LatePhysicsPoseSystem(a_chunk, a_context);
+
+	// 物理挙動の結果に基づいてキャラクターのステートを決定する
+	GroundedSystem(a_chunk, a_context);
+	CharacterActionMaskSystem(a_chunk, a_context);
+	MoveInputResolveSystem(a_chunk, a_context, a_aiManager);
+
+	// Pose系の処理を行う
+	InputMoveSystem(a_chunk, a_context);
+	InputRotatoSystem(a_chunk, a_context);
+	FlipSystem(a_chunk, a_context);
+	MoveForwardSystem(a_chunk, a_context);
 	LeapSystem(a_chunk, a_context);
 	ShakingSystem(a_chunk, a_context);
 	TrackingWarpSystem(a_chunk, a_context);
+	RailSystem(a_chunk, a_context);
+	FlySystem(a_chunk, a_context);
+	ShakeSystem(a_chunk, a_context);
+	PoseSystem(a_chunk, a_context);
+
+	// 追従などの遅延系処理
+	LookMoveSystem(a_chunk, a_context);
+	LookSystem(a_chunk, a_context);
+	LookOnSystem(a_chunk, a_context);
 	FollowTransformSystem(a_chunk, a_context);
+	CameraMoveSystem(a_chunk, a_context);
+	LatePoseSystem(a_chunk, a_context);
+	// Transform適用
+	TransformSystem(a_chunk, a_context);
+
+	// Transform等を使用するSystemを実行
+	RaySystem(a_chunk, a_context);
+	CameraViewSystem(a_chunk, a_context);
+	RailUpdateSystem(a_chunk, a_context);
 	CameraMoveSystem(a_chunk, a_context);
 	CameraViewSystem(a_chunk, a_context);
 	CreateEffectSystem(a_chunk, a_context);
 	FadeUISystem(a_chunk, a_context);
+
+	UIRailFlySystem(a_chunk, a_context);
 
 	// 終了処理
 	LifeTimeSystem(a_chunk, a_context);

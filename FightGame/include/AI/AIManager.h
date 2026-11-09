@@ -14,7 +14,7 @@ using RuntimeMap = std::unordered_map<Entity, AIRuntime>;
 class AIManager
 {
 public:
-	AIManager();
+	explicit AIManager(float behaviorTickInterval);
 	~AIManager();
 
 	bool RegisterTree(const std::string& aiType, std::unique_ptr<BehaviorTree> tree);
@@ -24,28 +24,50 @@ public:
 
 	AIResult ReadResult(Entity entity) const;
 
-	// !!!New!!!
-	void WriteSense(const AISenseFrame& senseFrame);
+	// AI機能へのシーン情報を書き込み
+	void WriteSenseFrame(const AISenseFrame& senseFrame);
+	void WriteSenseProfile(const AISenseProfile& senseProfile);
+	bool IsRegisteredAI(Entity entity) const;
+	bool IsSenseProfileReady(Entity entity) const;
 
-	// !!!New!!!
+	// AI機能へのシステム情報書き込み（当面は空の受け取り）
 	void WriteSystem(const AISystemInfo& a_systemInfo);
 
-	// !!!New!!!
+	// 攻撃情報読み取り
 	void NotifyAttackResolved(Entity attacker, int attackIndex, bool connected);
+	// 攻撃命中情報読み取り
+	void NotifyHitResolved(Entity hitEnemy, bool isGuard);
 
-	void NotifyHitResolved(Entity hitEnemy);
-
-	// !!!New!!!
-	void TickAI();
+	// フレーム数を受け取り内部で低頻度で更新
+	void Tick(float deltaTime);
 
 private:
-	// 種類ごとのビヘイビアツリー
 	BTMap behavioreTreeMap;
 
-	// 各エンティティのと対応するAIの情報
 	RuntimeMap runtimeMap;
-	// 共有ブラックボード
 	AIBlackboard blackBoard;
-	// システム側の情報
 	AISystemInfo systemInfo;
+
+	float behaviorTickInterval;
+	float behaviorTickAccum;
+
+	void TickBehaviorTree(float behaviorDeltaTime);
+	void TickAllAIMind(float deltaTime);
+
+	void UpdateStancePoint(AIMind& mind, float deltaTime);
+	void UpdateStance(AIContext& context, const AIBlackboard& blackBoard, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result);
+
+	void TickAIMind(AIContext& context, const AIBlackboard& blackBoard, AIMind& mind, float deltaTime, AIResult& result);
+
+	bool IsStanceUpdate(const AIMind& mind);
+
+	AIStance GetNewStance(const AIContext& context, const AIBlackboard& blackBoard, const AIMind& mind);
+
+	float ApplyScoreBase(float score, float base);
+
+	float ScoreByDistance(float dist, float mid, float coefficient);
+
+	float ScoreByHitCount(int hitCount, float coefficient);
+
+	float ScoreByStance(int stanceCount, float coefficient);
 };

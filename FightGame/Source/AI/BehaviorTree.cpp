@@ -10,14 +10,17 @@ BehaviorTree::~BehaviorTree()
 {
 }
 
-void BehaviorTree::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+// ツリーの更新
+void BehaviorTree::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
-	// !!!New!!!
+	// ノードがなければ抜ける
 	if (!rootNode)
 	{
 		return;
 	}
-	if (rootNode->Tick(context, blackBord, mind, systemInfo, result) != Node::NODE_RUNNING)
+
+	// 更新
+	if (rootNode->Tick(context, blackBord, mind, systemInfo, result, deltaTime) != Node::NODE_RUNNING)
 	{
 		context.actionDuration = 0.0f;
 		context.nodeIndexes.clear();

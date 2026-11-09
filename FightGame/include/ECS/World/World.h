@@ -16,7 +16,12 @@
 #include "IScene.h"
 #include "IModelCacheAcquisition.h"
 #include "IUICacheAcquisition.h"
+#include "IEffectCacheAcquisition.h"
 #include "AI/AIManager.h"
+#include "ComponentsSerialize.h"
+#include "EntitySpawnPort.h"
+#include "PrefabManager.h"
+#include "DrawResources.h"
 
 enum WorldState
 {
@@ -34,8 +39,11 @@ public:
 	World(
 		IModelCacheAcquisition& modelCache,
 		IUICacheAcquisition& uiCache,
+		IEffectCacheAcquisition& effectCache,
 		std::function<void(int)> tutorialRequest,
-		Input& a_input);
+		Input& a_input,
+		ComponentsSerialize& a_serialize,
+		PrefabManager& a_prefabManager);
 	~World();
 
 	void InitWorld();
@@ -55,36 +63,43 @@ private:
 	void InitContext();
 	void FrameEnd();
 
+	void RequestSpawn();
+
+	// 各機能
 	Chunk chunk;
-	// !!!New!!!
 	AIManager aiManager;
+	EntitySpawnPort spawnPort;
+	PrefabManager& prefabManager;
 	std::unique_ptr<SystemResponse> systemResponse;
+	// WorldのState等
 	WorldState m_state;
 	bool isMouseLock;
 	SystemContext context;
+	DrawResources drawResources;
 	bool isGameEnd;
 	bool allLoadModel = false;
-	// !!!New!!!
-	float aiTickAccum = 0.0f;
-	// 3F起きに更新
-	static constexpr float kAITickInterval = 3.0f / 60.0f;
 
+	ComponentsSerialize& serialize;
+
+	static constexpr float kAIBehaviorTickInterval = 3.0f / 60.0f;
 
 protected:
 
-	virtual void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse);
+	virtual void InitResponse(std::unique_ptr<SystemResponse>& response);
 
-	// !!!New!!!
+	virtual void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize);
+
 	virtual void InitAI(AIManager& a_aiManager);
 
 	virtual Chunk CreateNewChunk(AIManager& a_aiManager);
 
-	virtual void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager);
+	virtual void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_systemResponse, AIManager& a_aiManager, ComponentsSerialize& a_serialize);
 
 	virtual void UpdateIMGUI(Chunk& a_chunk, SystemContext& a_context);
 
 	virtual void HandleSystemResponse(SystemResponse& a_response);
 
+	virtual void SpawnPostProcessing(const std::vector<Entity>& entities, Chunk& a_chunk, AIManager& a_aiManager, const SpawnRequest& a_request);
 };
 
 #endif // !

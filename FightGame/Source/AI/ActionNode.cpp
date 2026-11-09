@@ -9,7 +9,7 @@ ActionNode::~ActionNode()
 {
 }
 
-Node::Status ActionNode::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status ActionNode::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
 	// !!!New!!!
 	(void)context;
@@ -17,5 +17,6 @@ Node::Status ActionNode::Tick(AIContext& context, const AIBlackboard& blackBord,
 	(void)mind;
 	(void)systemInfo;
 	(void)result;
+	(void)deltaTime;
 	return NODE_FAILURE;
 }

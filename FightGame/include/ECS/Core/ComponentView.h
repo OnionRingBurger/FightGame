@@ -10,8 +10,8 @@ class ComponentView
 public:
 
 
-	ComponentView(const std::vector<std::vector<Entity>>& entities);
-	ComponentView(const std::vector<std::vector<Entity>>& entities, const std::vector<std::vector<Entity>>& exclusionEntities);
+	ComponentView(std::vector<std::vector<Entity>>& entities);
+	ComponentView(std::vector<std::vector<Entity>>& entities, std::vector<std::vector<Entity>>& exclusionEntities);
 	~ComponentView() = default;
 
 	using iterator = std::vector<Entity>::const_iterator;

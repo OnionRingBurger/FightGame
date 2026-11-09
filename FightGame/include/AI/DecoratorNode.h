@@ -11,11 +11,11 @@ public:
 	explicit DecoratorNode(std::unique_ptr<Node> child);
 	~DecoratorNode() override;
 
-	Status Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result) override;
+	Status Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime) override;
 
 protected:
 	// !!!New!!!
-	virtual bool CheckCondition(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result);
+	virtual bool CheckCondition(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime);
 
 	std::unique_ptr<Node> childNode;
 

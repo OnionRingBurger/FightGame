@@ -22,6 +22,8 @@ public:
 		PS_FOG, // SetMaterial, SetLight,SetFog
 		PS_GHOST, // SetMaterial, SetLight, SetArea, SetGhostFade
 		PS_ALPHA, // SetMaterial, SetLight
+		PS_SHADOW_RECEIVE, // SetMaterial, SetLight, SetCamera, SetShadow
+		PS_ALPHA_SHADOW, // AlphaBlend + SetShadow
 		PS_KIND_MAX
 	};
 
@@ -59,6 +61,8 @@ public:
 	static void SetFog(DirectX::XMFLOAT4 color, float start, float range);
 	static void SetArea(GhostAreas area);
 	static void SetGhostFade(float ghostFadeRange);
+	// !!!New!!!
+	static void SetShadow(DirectX::XMFLOAT4X4* lightView, DirectX::XMFLOAT4X4* lightProj, float bias, float texelSize);
 
 private:
 	static void MakeWorldVS();
@@ -69,6 +73,8 @@ private:
 	static void MakeFogPS();
 	static void MakeGhostPS();
 	static void MakeAlphaBlend();
+	static void MakeShadowReceivePS();
+	static void MakeAlphaShadowPS();
 
 private:
 	static VertexShader* m_pVS[VS_KIND_MAX];

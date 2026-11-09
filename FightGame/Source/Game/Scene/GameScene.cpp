@@ -6,32 +6,45 @@
 #include "ResultWorld.h"
 #include "TestWorld.h"
 #include "ProtoWorld.h"
+#include "TutorialWorld.h"
+#include "StartupWorld.h"
 
-constexpr const char* kStartWorld = "Proto";
+constexpr const char* kStartWorld = "Title";
 
 GameScene::GameScene(
 	IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
+	IEffectCacheAcquisition& a_effectCache,
 	std::function<void(std::string)> a_sceneChangeRequest,
 	std::function<void()> a_gameEnd,
 	std::function<void()> a_resetFPSRequest,
-	Input& a_input)
+	// !!!New!!!
+	std::function<void(bool)> a_setFixedCursor,
+	Input& a_input,
+	ComponentsSerialize& a_serialize,
+	PrefabManager& a_prefabManager)
 	: state(GAMESCENE_DEFAULT)
-	, isMouseLock(false)
+	, isMouseLock(true)
 	, sceneChangeRequest(a_sceneChangeRequest)
 	, modelCache(a_modelCache)
 	, uiCache(a_uiCache)
+	, effectCache(a_effectCache)
 	, input(a_input)
 	, gameEnd(a_gameEnd)
 	, resetFPSRequest(a_resetFPSRequest)
+	, setFixedCursor(a_setFixedCursor)
+	, serialize(a_serialize)
+	, prefabManager(a_prefabManager)
+	, currentStage(1)
 {
 
 	SetWorld(kStartWorld);
 
 	input.RegisterKey("GameEnd", VK_ESCAPE);
-	input.RegisterButton("GameEnd", VK_PAD_START);
+	input.RegisterButton("GameEnd", XINPUT_GAMEPAD_START);
 	input.RegisterKey("IMGUI", VK_F2);
-	input.RegisterKey("TutorialSkip", VK_RETURN);
+	input.RegisterKey("ToDebugScene", VK_F3);
+	setFixedCursor(isMouseLock);
 }
 
 void GameScene::AdvanceUpdate(float dt)
@@ -57,6 +70,7 @@ void GameScene::PostFrameProcess()
 {
 	ChangeState();
 	ChangeWorld();
+	ChangeScene();
 }
 
 void GameScene::ChangeState()
@@ -76,7 +90,7 @@ void GameScene::ChangeState()
 		else if(input.IsRegisterTrigger("IMGUI"))
 		{
 #ifdef _DEBUG
-
+			setFixedCursor(false);
 			state = GAMESCENE_IMGUI;
 			world->ChangeState(IMGUI);
 
@@ -86,8 +100,12 @@ void GameScene::ChangeState()
 
 		break;
 	case GAMESCENE_IMGUI:
-		state = GAMESCENE_DEFAULT;
-		world->ChangeState(USECHUNK);
+		if (input.IsRegisterTrigger("IMGUI"))
+		{
+			setFixedCursor(true);
+			state = GAMESCENE_DEFAULT;
+			world->ChangeState(USECHUNK);
+		}
 		break;
 
 	case GAMESCENE_TUTORIAL:
@@ -126,6 +144,19 @@ void GameScene::ChangeWorld()
 
 }
 
+void GameScene::ChangeScene()
+{
+
+#ifdef _DEBUG
+	if (input.IsRegisterTrigger("ToDebugScene"))
+	{
+		sceneChangeRequest("CreateGame");
+		setFixedCursor(false);
+	}
+#endif // _DEBUG
+
+}
+
 bool GameScene::SetWorld(std::string a_key)
 {
 	bool ret = true;
@@ -134,9 +165,13 @@ bool GameScene::SetWorld(std::string a_key)
 		world = std::make_unique<TitleWorld>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
-			input
+			[this](int a_stage) {StageRequest(a_stage); },
+			input,
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();
@@ -146,9 +181,12 @@ bool GameScene::SetWorld(std::string a_key)
 		world = std::make_unique<GameWorld>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
-			input
+			input,
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();
@@ -159,9 +197,12 @@ bool GameScene::SetWorld(std::string a_key)
 		world = std::make_unique<ResultWorld>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key);},
-			input
+			input,
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();
@@ -171,9 +212,12 @@ bool GameScene::SetWorld(std::string a_key)
 		world = std::make_unique<ClearWorld>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
-			input
+			input,
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();
@@ -183,9 +227,12 @@ bool GameScene::SetWorld(std::string a_key)
 		world = std::make_unique<TestWorld>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
-			input
+			input,
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();
@@ -195,9 +242,44 @@ bool GameScene::SetWorld(std::string a_key)
 		world = std::make_unique<ProtoWorld>(
 			modelCache,
 			uiCache,
+			effectCache,
 			[this](int a_id) {TutorialRequest(a_id); },
 			[this](std::string a_key) {WorldRequest(a_key); },
-			input
+			[this](int a_stage) {StageRequest(a_stage); },
+			input,
+			serialize,
+			prefabManager,
+			currentStage
+		);
+
+		world->InitWorld();
+	}
+	else if (a_key == "Tutorial")
+	{
+		world = std::make_unique<TutorialWorld>(
+			modelCache,
+			uiCache,
+			effectCache,
+			[this](int a_id) {TutorialRequest(a_id); },
+			[this](std::string a_key) {WorldRequest(a_key); },
+			input,
+			serialize,
+			prefabManager
+		);
+
+		world->InitWorld();
+	}
+	else if (a_key == "Startup")
+	{
+		world = std::make_unique<StartupWorld>(
+			modelCache,
+			uiCache,
+			effectCache,
+			[this](int a_id) {TutorialRequest(a_id); },
+			[this](std::string a_key) {WorldRequest(a_key); },
+			input,
+			serialize,
+			prefabManager
 		);
 
 		world->InitWorld();
@@ -218,4 +300,9 @@ void GameScene::TutorialRequest(int a_id)
 void GameScene::WorldRequest(std::string a_key)
 {
 	worldChangeRequests.push(a_key);
+}
+
+void GameScene::StageRequest(int a_stage)
+{
+	currentStage = a_stage;
 }

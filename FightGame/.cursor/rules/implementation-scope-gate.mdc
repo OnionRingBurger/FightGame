@@ -1,0 +1,41 @@
+---
+description: 実装依頼時はAskQuestionで編集スコープを確認してからWrite。プロジェクトソース編集前のゲート
+alwaysApply: true
+---
+
+# 実装スコープ確認ゲート
+
+プロジェクトソース（`.h` / `.cpp` 等）を **Write / StrReplace する前** に必ず通す。詳細手順はスキル `implementation-scope-gate`（[`.cursor/skills/implementation-scope-gate/SKILL.md`](.cursor/skills/implementation-scope-gate/SKILL.md)）を読む。
+
+## トリガー
+
+次が来たら **編集許可ではなくスコープ確認ターンの開始** とする。
+
+- 「実装して」「実装しろ」「実装しちゃって」「書いて」「修正して」
+- Build / Implement the plan 系
+- Plan や前ターンの設計合意だけ（ファイル名なし）
+
+## 必須手順（プロジェクトソース）
+
+1. 3群列挙（承認不要 / 要承認・未承認 / 触らない）
+2. **AskQuestion** で「今回触ってよいファイル／グループ」を提示（要承認は **デフォルト OFF**）
+3. ユーザーの回答があるまで **Write / StrReplace 禁止**
+4. 回答で選ばれた範囲だけ編集。未選択の要承認は止めて報告
+
+## 勘違い禁止（Shell 禁止リストと同列）
+
+次を **編集許可** と解釈してはならない。
+
+- 「実装して」単体、機能名（Stage2、ProtoWorld で switch 等）、Plan 本文
+- 3群列挙だけ（AskQuestion なし）
+- 3群で「要承認」と書いた **同ターン** での要承認ファイル編集
+- ユーザーの依頼文にファイル名が無いのに「暗黙の全体許可」とみなすこと
+
+## 例外（AskQuestion 不要）
+
+- `.cursor/rules/`、`.cursor/skills/`、`.plan.md` のみの変更
+- 当該ターンで **AskQuestion 回答済み**、またはユーザー発話に **編集可ファイルパスが明示** されている場合
+
+## 違反時
+
+AskQuestion 前にプロジェクトソースを編集したら **以降を続けず** 違反を報告する。

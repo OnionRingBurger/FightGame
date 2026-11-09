@@ -104,12 +104,13 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>include\assimp;include\DataManager;include\DirectXTex;include\Drawer;include\ECS\Core;include\Game\Core;include\imGui;include\nlohmann;include\Sound;include\Tool\Debug;include\ECS\System;include\ECS\Component;include\ECS\World;include\Game\Scene;include\Tool\Math;include;Source\imGui;include\AI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include\assimp;include\DataManager;include\DirectXTex;include\Drawer;include\ECS\Core;include\Game\Core;include\imGui;include\nlohmann;include\Sound;include\Tool\Debug;include\ECS\System;include\ECS\Component;include\ECS\World;include\Game\Scene;include\Tool\Math;include;Source\imGui;include\AI;include\EffekseerFiles;include\DirectWrite;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Lib\Release\xinput.lib;Lib\Debug\EffekseerRendererDX11d.lib;Lib\Debug\Effekseerd.lib;Lib\Debug\EffekseerRendererCommond.lib;Lib\Debug\assimp-vc143-mtd.lib;Lib\Debug\zlibstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -122,16 +123,20 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>include\assimp;include\DataManager;include\DirectXTex;include\Drawer;include\ECS\Core;include\Game\Core;include\imGui;include\nlohmann;include\Sound;include\Tool\Debug;include\ECS\System;include\ECS\Component;include\ECS\World;include\Game\Scene;include\Tool\Math;include;Source\imGui;include\AI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include\assimp;include\DataManager;include\DirectXTex;include\Drawer;include\ECS\Core;include\Game\Core;include\imGui;include\nlohmann;include\Sound;include\Tool\Debug;include\ECS\System;include\ECS\Component;include\ECS\World;include\Game\Scene;include\Tool\Math;include;Source\imGui;include\AI;include\EffekseerFiles;include\DirectWrite;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Lib\Release\xinput.lib;Lib\Release\Effekseer.lib;Lib\Release\EffekseerRendererDX11.lib;Lib\Release\EffekseerRendererCommon.lib;Lib\Release\assimp-vc143-mt.lib;Lib\Release\zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\AI\GuardNode.h" />
     <ClInclude Include="include\DataManager\AssimpModelLorder.h" />
+    <ClInclude Include="include\DataManager\EffectCache.h" />
+    <ClInclude Include="include\DataManager\IEffectCacheAcquisition.h" />
     <ClInclude Include="include\DataManager\IModelCacheAcquisition.h" />
     <ClInclude Include="include\DataManager\IModelLoader.h" />
     <ClInclude Include="include\DataManager\IUICacheAcquisition.h" />
@@ -162,12 +167,12 @@
     <ClInclude Include="include\ECS\Core\IComponentStorage.h" />
     <ClInclude Include="include\ECS\Core\StorageManager.h" />
     <ClInclude Include="include\ECS\Core\ECSTypes.h" />
-    <ClInclude Include="include\ECS\System\BulletSystem.h" />
     <ClInclude Include="include\ECS\System\CameraSystem.h" />
     <ClInclude Include="include\ECS\System\CharacterSystem.h" />
     <ClInclude Include="include\ECS\System\ColliderSystem.h" />
     <ClInclude Include="include\ECS\System\CoreSystem.h" />
     <ClInclude Include="include\ECS\System\DebugCameraSystem.h" />
+    <ClInclude Include="include\ECS\System\DebugSystemResponse.h" />
     <ClInclude Include="include\ECS\System\DrawSystem.h" />
     <ClInclude Include="include\ECS\System\EffectSystem.h" />
     <ClInclude Include="include\ECS\System\EnemySystem.h" />
@@ -184,9 +189,7 @@
     <ClInclude Include="include\ECS\System\SystemAssist.h" />
     <ClInclude Include="include\ECS\System\SystemContext.h" />
     <ClInclude Include="include\ECS\System\SystemResponse.h" />
-    <ClInclude Include="include\ECS\System\TestSystem.h" />
     <ClInclude Include="include\ECS\System\TransformSystem.h" />
-    <ClInclude Include="include\ECS\System\VelocitySystem.h" />
     <ClInclude Include="include\ECS\World\ClearWorld.h" />
     <ClInclude Include="include\ECS\World\CreateGameWorld.h" />
     <ClInclude Include="include\ECS\World\GameData.h" />
@@ -196,6 +199,7 @@
     <ClInclude Include="include\ECS\World\ResultWorld.h" />
     <ClInclude Include="include\ECS\World\TestWorld.h" />
     <ClInclude Include="include\ECS\World\TitleWorld.h" />
+    <ClInclude Include="include\ECS\World\TutorialWorld.h" />
     <ClInclude Include="include\ECS\World\World.h" />
     <ClInclude Include="include\Game\Core\Defines.h" />
     <ClInclude Include="include\Game\Core\Input.h" />
@@ -235,9 +239,25 @@
     <ClInclude Include="include\AI\RunPlayerNode.h" />
     <ClInclude Include="include\AI\ReactiveSelector.h" />
     <ClInclude Include="include\AI\AI.h" />
+    <ClInclude Include="include\DataManager\EffectManager.h" />
+    <ClInclude Include="include\AI\RoleCurve.h" />
+    <ClInclude Include="include\AI\UseLingeringAttackAction.h" />
+    <ClInclude Include="include\ECS\World\StartupWorld.h" />
+    <ClInclude Include="include\ECS\System\GameSystemResponse.h" />
+    <ClInclude Include="include\AI\AttackRangeCheck.h" />
+    <ClInclude Include="include\AI\UseBestDamageAttackAction.h" />
+    <ClInclude Include="include\DataManager\FontFileLoadCache.h" />
+    <ClInclude Include="include\ECS\System\ControllerInputUISystem.h" />
+    <ClInclude Include="include\ECS\Core\EntitySpawnPort.h" />
+    <ClInclude Include="include\ECS\Core\PrefabManager.h" />
+    <ClInclude Include="include\Game\Core\LoadDataJsonRegistrar.h" />
+    <ClInclude Include="include\Drawer\ShadowMap.h" />
+    <ClInclude Include="include\Drawer\DrawResources.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\DataManager\AssimpModelLorder.cpp" />
+    <ClCompile Include="Source\DataManager\EffectCache.cpp" />
+    <ClCompile Include="Source\DataManager\EffectManager.cpp" />
     <ClCompile Include="Source\DataManager\IModelLoader.cpp" />
     <ClCompile Include="Source\DataManager\ModelCache.cpp" />
     <ClCompile Include="Source\DataManager\SoundCache.cpp" />
@@ -269,12 +289,12 @@
     <ClCompile Include="Source\ECS\Core\HasView.cpp" />
     <ClCompile Include="Source\ECS\Core\StorageManager.cpp" />
     <ClCompile Include="Source\ECS\Core\ECSTypes.cpp" />
-    <ClCompile Include="Source\ECS\System\BulletSystem.cpp" />
     <ClCompile Include="Source\ECS\System\CameraSystem.cpp" />
     <ClCompile Include="Source\ECS\System\CharacterSystem.cpp" />
     <ClCompile Include="Source\ECS\System\ColliderSystem.cpp" />
     <ClCompile Include="Source\ECS\System\CoreSystem.cpp" />
     <ClCompile Include="Source\ECS\System\DebugCameraSystem.cpp" />
+    <ClCompile Include="Source\ECS\System\DebugSystemResponse.cpp" />
     <ClCompile Include="Source\ECS\System\DrawSystem.cpp" />
     <ClCompile Include="Source\ECS\System\EffectSystem.cpp" />
     <ClCompile Include="Source\ECS\System\EnemySystem.cpp" />
@@ -289,9 +309,7 @@
     <ClCompile Include="Source\ECS\System\SoundSystem.cpp" />
     <ClCompile Include="Source\ECS\System\SystemAssist.cpp" />
     <ClCompile Include="Source\ECS\System\SystemResponse.cpp" />
-    <ClCompile Include="Source\ECS\System\TestSystem.cpp" />
     <ClCompile Include="Source\ECS\System\TransformSystem.cpp" />
-    <ClCompile Include="Source\ECS\System\VelocitySystem.cpp" />
     <ClCompile Include="Source\ECS\World\ClearWorld.cpp" />
     <ClCompile Include="Source\ECS\World\CreateGameWorld.cpp" />
     <ClCompile Include="Source\ECS\World\GameWorld.cpp" />
@@ -300,6 +318,7 @@
     <ClCompile Include="Source\ECS\World\ResultWorld.cpp" />
     <ClCompile Include="Source\ECS\World\TestWorld.cpp" />
     <ClCompile Include="Source\ECS\World\TitleWorld.cpp" />
+    <ClCompile Include="Source\ECS\World\TutorialWorld.cpp" />
     <ClCompile Include="Source\ECS\World\World.cpp" />
     <ClCompile Include="Source\Game\Core\Input.cpp" />
     <ClCompile Include="Source\Game\Core\Loading.cpp" />
@@ -343,6 +362,20 @@
     <ClCompile Include="Source\AI\UseAttackAction.cpp" />
     <ClCompile Include="Source\AI\RunPlayerNode.cpp" />
     <ClCompile Include="Source\AI\ReactiveSelector.cpp" />
+    <ClCompile Include="Source\AI\GuardNode.cpp" />
+    <ClCompile Include="Source\AI\RoleCurve.cpp" />
+    <ClCompile Include="Source\AI\UseLingeringAttackAction.cpp" />
+    <ClCompile Include="Source\ECS\World\StartupWorld.cpp" />
+    <ClCompile Include="Source\ECS\System\GameSystemResponse.cpp" />
+    <ClCompile Include="Source\AI\AttackRangeCheck.cpp" />
+    <ClCompile Include="Source\AI\UseBestDamageAttackAction.cpp" />
+    <ClCompile Include="Source\DataManager\FontFileLoadCache.cpp" />
+    <ClCompile Include="Source\ECS\System\ControllerInputUISystem.cpp" />
+    <ClCompile Include="Source\ECS\Core\EntitySpawnPort.cpp" />
+    <ClCompile Include="Source\ECS\Core\PrefabManager.cpp" />
+    <ClCompile Include="Source\Game\Core\LoadDataJsonRegistrar.cpp" />
+    <ClCompile Include="Source\Drawer\ShadowMap.cpp" />
+    <ClCompile Include="Source\Drawer\DrawResources.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

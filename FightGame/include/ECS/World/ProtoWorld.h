@@ -1,26 +1,37 @@
 #pragma once
 
-#pragma once
 #include "World.h"
 class ProtoWorld : public World
 {
 public:
 	ProtoWorld(IModelCacheAcquisition& a_modelCache,
 		IUICacheAcquisition& a_uiCache,
+		IEffectCacheAcquisition& a_effectCache,
 		std::function<void(int)> a_tutorialRequest,
 		std::function<void(std::string)> a_worldRequest,
-		Input& a_input);
+		std::function<void(int)> a_stageRequest,
+		Input& a_input,
+		ComponentsSerialize& a_serialize,
+		PrefabManager& a_prefabManager,
+		int a_stage);
 
 protected:
+	virtual void InitResponse(std::unique_ptr<SystemResponse>& response) override;
+
 	virtual void InitAI(AIManager& a_aiManager) override;
 
-	virtual void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response) override;
+	virtual void InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize) override;
 
 	virtual Chunk CreateNewChunk(AIManager& a_aiManager) override;
 
-	virtual void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager) override;
+	virtual void UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize) override;
 
 	virtual void HandleSystemResponse(SystemResponse& a_response) override;
 
+	virtual void SpawnPostProcessing(const std::vector<Entity>& entities, Chunk& a_chunk, AIManager& a_aiManager, const SpawnRequest& a_request) override;
+
 	std::function<void(std::string)> worldRequest;
+	std::function<void(int)> stageRequest;
+
+	int stage;
 };

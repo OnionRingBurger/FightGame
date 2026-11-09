@@ -26,7 +26,6 @@ public:
 	// “n‚³‚ê‚½Entity‚ª¶‘¶‚µ‚Ä‚¢‚é‚©Šm”F
 	bool IsEntityIsAlive(Entity a_entity);
 
-	std::optional<Entity> ImGuiUseEntity();
 	void DefaultImGuiOutPut();
 
 	std::vector<Entity> GetAllEntity();

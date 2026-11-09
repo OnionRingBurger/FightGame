@@ -10,6 +10,8 @@
 #include "World.h"
 #include "ModelCache.h"
 #include "UICache.h"
+#include "FontFileLoadCache.h"
+#include "EffectCache.h"
 #include "IScene.h"
 
 class MainGame
@@ -22,7 +24,6 @@ public:
 	void Uninit();
 
 	void MainLoop(HWND a_hwnd, MSG& message);
-	bool IsMouseLock();
 	bool IsEnd();
 
 private:
@@ -68,37 +69,31 @@ private:
 	bool isEnd = false;
 
 	//! 読み込みリクエストとリザルト
-	ThreadSafeQueue<ModelLoadJob> modelJobQueue;
-	ThreadSafeQueue<ModelLoadResult> modelResultQueue;
-	ThreadSafeQueue<TextureLoadJob> textureJobQueue;
-	ThreadSafeQueue<TextureLoadResult> textureResultQueue;
-	ThreadSafeQueue<SoundLoadJob> soundJobQueue;
-	ThreadSafeQueue<SoundLoadResult> soundResultQueue;
+	LoadJobQueues loadJobQueues;
+	LoadResultQueues loadResultQueues;
 
 	//! 読み込み処理を回しているかどうか 
 	std::atomic<bool> runningLoadLoop = true;
 	
-	void WorkerLoop(
-		ThreadSafeQueue<ModelLoadJob>& a_modelJobQueue,
-		ThreadSafeQueue<ModelLoadResult>& a_modelResultQueue,
-		ThreadSafeQueue<TextureLoadJob>& a_textureJobQueue,
-		ThreadSafeQueue<TextureLoadResult>& a_textureResultQueue,
-		ThreadSafeQueue<SoundLoadJob>& a_soundJobQueue,
-		ThreadSafeQueue<SoundLoadResult>& a_soundResultQueue,
-		std::atomic<bool>& a_running);
-
 	bool ChangeScene(std::string);
 
 	void ResetFPS();
-
+	// 各種キャッシュ
 	ModelCache modelCache;
 	UICache uiCache;
+	FontFileLoadCache fontFileLoadCache;
+	EffectCache effectCache;
+
 	Input input;
+	ComponentsSerialize serialize;
+	PrefabManager prefabManager;
 	std::queue<std::string> sceneChangeQueue;
 	std::thread loadWorker;
 
-	std::vector<modelLoadData> modelDatas;
-	std::vector<std::string> textureDatas;
+	// 読み込み用のJsonパス
+	LoadManifestPaths loadManifestPaths;
+
+	bool isFixedCursor;
 
 	// FPS処理用
 	DWORD preExecTime;

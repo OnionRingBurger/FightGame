@@ -8,9 +8,48 @@
 #include "Model.h"
 #include "Texture.h"
 #include "Sound.h"
+#include "Effekseer.h"
 #include "DebugConsole.h"
+#include "ECSTypes.h"
+#include "ComponentsSerialize.h"
+// TODO 苦肉の策
+#include "UICache.h"
+#include "FontFileLoadCache.h"
+#include <wrl/client.h>
+// !!!New!!!
+#include "ThreadSafeQueue.h"
 
 using modelLoadData = std::pair<std::string, float>;
+using Microsoft::WRL::ComPtr;
+
+struct effectLoadData
+{
+	std::string key;
+	float magnificent;
+};
+
+struct textFormatData
+{
+	std::string key;
+	bool useFile;
+	std::wstring font;
+	std::wstring fontFile;
+	float size;
+};
+
+struct textUILoadData
+{
+	std::string key;
+	std::wstring text;
+	std::string formatKey;
+	float width;
+	float height;
+};
+
+struct JsonPrefabLoadData
+{
+	std::string key;
+};
 
 struct ModelLoadJob
 {
@@ -48,14 +87,111 @@ struct TextureLoadJob
 
 };
 
+struct EffectLoadJob
+{
+	std::string key;
+	float magnificent;
+	std::shared_ptr<std::atomic_bool> const endFlagPointer;
+
+	EffectLoadJob(std::string a_key, float a_magnificent, std::shared_ptr<std::atomic_bool> const a_endFlagPointer = nullptr)
+		: key(a_key)
+		, magnificent(a_magnificent)
+		, endFlagPointer(a_endFlagPointer)
+	{
+		if (endFlagPointer)
+		{
+			endFlagPointer->store(false);
+		}
+	}
+	
+};
+
 struct SoundLoadJob
 {
 	std::string path;
+	std::shared_ptr<std::atomic_bool> const endFlagPointer;
 
-	SoundLoadJob(std::string a_path)
+	SoundLoadJob(
+		std::string a_path,
+		std::shared_ptr<std::atomic_bool> const endFlagPointer)
 		: path(a_path)
 	{
 	};
+};
+
+struct TextFormatLoadJob
+{
+	std::shared_ptr<std::atomic_bool> const endFlagPointer;
+
+	std::string key;
+	bool useFile;
+	std::wstring font;
+	std::wstring fontFile;
+	float size;
+
+	TextFormatLoadJob(
+		std::string a_key,
+		bool a_useFile,
+		std::wstring a_font,
+		std::wstring a_fontFile,
+		float a_size,
+		std::shared_ptr<std::atomic_bool> const a_endFlagPointer)
+		: key(a_key)
+		, useFile(a_useFile)
+		, font(a_font)
+		, fontFile(a_fontFile)
+		, size(a_size)
+		, endFlagPointer(a_endFlagPointer)
+	{
+	};
+};
+
+struct TextUILoadJob
+{
+	std::shared_ptr<std::atomic_bool> const endFlagPointer;
+
+	std::string key;
+	std::wstring text;
+	std::string formatKey;
+	float width;
+	float height;
+	// !!!New!!!
+	ComPtr<IDWriteTextFormat> format;
+
+	TextUILoadJob(
+		std::string a_key,
+		std::wstring a_text,
+		std::string a_formatKey,
+		float a_width,
+		float a_height,
+		std::shared_ptr<std::atomic_bool> const a_endFlagPointer,
+		ComPtr<IDWriteTextFormat> a_format
+	)
+		: key(a_key)
+		, text(a_text)
+		, formatKey(a_formatKey)
+		, width(a_width)
+		, height(a_height)
+		, endFlagPointer(a_endFlagPointer)
+		, format(a_format)
+	{
+	}
+};
+
+struct JsonPrefabLoadJob
+{
+	std::shared_ptr<std::atomic_bool> const endFlagPointer;
+
+	std::string fileName;
+
+	JsonPrefabLoadJob(
+		std::shared_ptr<std::atomic_bool> const a_endFlagPointer,
+		std::string a_fileName
+	)
+		: endFlagPointer(a_endFlagPointer)
+		, fileName(a_fileName)
+	{
+	}
 };
 
 struct ModelLoadResult
@@ -101,7 +237,135 @@ struct TextureLoadResult
 	}
 };
 
+struct EffectLoadResult
+{
+	std::string key;
+	Effekseer::EffectRef effect;
+
+	EffectLoadResult()
+		: key("")
+		, effect(nullptr)
+	{
+
+	}
+
+	EffectLoadResult(std::string a_key, Effekseer::EffectRef a_effect)
+		: key(a_key)
+		, effect(a_effect)
+	{
+	}
+};
+
+struct TextFormatLoadResult
+{
+	std::string key;
+	ComPtr<IDWriteTextFormat> format;
+
+	TextFormatLoadResult()
+		: key("")
+		, format(nullptr)
+	{
+
+	}
+
+	TextFormatLoadResult(std::string a_key, ComPtr<IDWriteTextFormat> a_format)
+		: key(a_key)
+		, format(a_format)
+	{
+	}
+};
+
+
+// TextureLoadResultと同じだが、変更しやすいため別構造体へ分けてる
+struct TextUILoadResult
+{
+	std::string key;
+	std::shared_ptr<Texture> data;
+
+	TextUILoadResult(std::string a_key, std::shared_ptr<Texture> a_data)
+		: key(a_key)
+		, data(a_data)
+	{
+	}
+
+	TextUILoadResult()
+		: key()
+		, data(nullptr)
+	{
+	}
+
+};
+
+// JsonでPrefabを読み込む際のもの
+struct JsonPrefabLoadResult
+{
+	// 読み込んだScene毎のPrefab
+	std::unordered_map<std::string, std::vector<EntityPrefab>> prefabScenes;
+
+	JsonPrefabLoadResult()
+		: prefabScenes()
+	{
+	}
+
+	JsonPrefabLoadResult(std::unordered_map<std::string, std::vector<EntityPrefab>> a_prefabScenes)
+		: prefabScenes(a_prefabScenes)
+	{
+	}
+};
+
+// !!!New!!!
+struct LoadJobQueues
+{
+	ThreadSafeQueue<ModelLoadJob> model;
+	ThreadSafeQueue<TextureLoadJob> texture;
+	ThreadSafeQueue<EffectLoadJob> effect;
+	ThreadSafeQueue<SoundLoadJob> sound;
+	ThreadSafeQueue<TextFormatLoadJob> textFormat;
+	ThreadSafeQueue<TextUILoadJob> textUI;
+	ThreadSafeQueue<JsonPrefabLoadJob> jsonPrefab;
+};
+
+// !!!New!!!
+struct LoadResultQueues
+{
+	ThreadSafeQueue<ModelLoadResult> model;
+	ThreadSafeQueue<TextureLoadResult> texture;
+	ThreadSafeQueue<EffectLoadResult> effect;
+	ThreadSafeQueue<SoundLoadResult> sound;
+	ThreadSafeQueue<TextFormatLoadResult> textFormat;
+	ThreadSafeQueue<TextUILoadResult> textUI;
+	ThreadSafeQueue<JsonPrefabLoadResult> jsonPrefab;
+};
+
+// ロードする内容
+struct LoadDatas
+{
+	std::vector<modelLoadData> model;
+	std::vector<std::string> texture;
+	std::vector<effectLoadData> effect;
+	std::vector<textFormatData> textFormat;
+	std::vector<textUILoadData> textUI;
+	std::vector<JsonPrefabLoadData> jsonPrefab;
+};
+
+// !!!New!!!
+struct LoadManifestPaths
+{
+	std::string path;
+};
+
 void LoadSound();
 
 ModelLoadResult LoadModel(const ModelLoadJob& job);
 TextureLoadResult LoadTexture(const TextureLoadJob& job);
+EffectLoadResult LoadEffect(const EffectLoadJob& job);
+TextFormatLoadResult LoadFormat(const TextFormatLoadJob& a_job, FontFileLoadCache& a_fontFileCache);
+TextUILoadResult LoadTextUI(const TextUILoadJob& a_job);
+
+// !!!New!!!
+void WorkerLoop(
+	LoadJobQueues& a_jobQueues,
+	LoadResultQueues& a_resultQueues,
+	FontFileLoadCache& a_fontFileCache,
+	ComponentsSerialize& a_serialize,
+	std::atomic<bool>& a_running);

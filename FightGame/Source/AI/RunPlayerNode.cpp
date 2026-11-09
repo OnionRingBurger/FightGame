@@ -1,7 +1,7 @@
 #include "AI/RunPlayerNode.h"
 
-// !!!New!!!
-RunPlayerNode::RunPlayerNode()
+RunPlayerNode::RunPlayerNode(float a_magnitube)
+	: magnitube(a_magnitube)
 {
 }
 
@@ -9,13 +9,18 @@ RunPlayerNode::~RunPlayerNode()
 {
 }
 
-Node::Status RunPlayerNode::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status RunPlayerNode::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
+	(void)systemInfo;
+	(void)deltaTime;
+	(void)mind;
 		// 一度初期化
 		result.MoveDir = float2(0.0f, 0.0f);
 		result.IsMove = false;
 		result.UseAttack = false;
 		result.AttackIndex = 0;
+		result.Magnitube = 0.0f;
+		result.UseGuard = false;
 	
 		// プレイヤーが死んでいた場合失敗
 		if (blackBord.isPlayerDead)
@@ -47,6 +52,7 @@ Node::Status RunPlayerNode::Tick(AIContext& context, const AIBlackboard& blackBo
 		{
 			result.MoveDir = float2(dir.x * -1.0f, dir.y * -1.0f);
 			result.IsMove = true;
+			result.Magnitube = magnitube;
 		}
 	
 		// 追跡継続

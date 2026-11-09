@@ -3,10 +3,10 @@
 // 課題や気になったものなどを番外で実装するシステム
 ////////////////////////////////////////////////////
 
-#include "BulletSystem.h"
 #include "Components.h"
 #include "Sound.h"
 #include "SystemAssist.h"
+#include "SystemResponse.h"
 
 using namespace Component;
 

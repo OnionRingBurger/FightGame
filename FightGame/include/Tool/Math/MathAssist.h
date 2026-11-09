@@ -496,6 +496,7 @@ float3 MultiplyVector(float3, float3, float3);
 float3 Normalize(const float3& a_vector);
 float2 Normalize(const float2& a_vector);
 float NormalizeAngle(float radAngle);
+float3 NormalizeAngle(float3 radAngle);
 // “x”–@‚ÌŠp“x·‚ğ -180..180 ‚Éô‚Ş
 float DeltaDeg(float a_fromDeg, float a_toDeg);
 float3 Cross(float3, float3);
@@ -514,3 +515,4 @@ float2 AngleToVector(float a_angle);
 float Frac(float a_value);
 float Noise(float a_time);
 float Lerp(float start, float end, float rate);
+float3 Lerp(float3 start, float3 end, float rate);

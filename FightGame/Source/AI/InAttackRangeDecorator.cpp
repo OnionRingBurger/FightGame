@@ -1,7 +1,6 @@
 #include "AI/InAttackRangeDecorator.h"
 
-#include "MathAssist.h"
-#include "DebugConsole.h"
+#include "AI/AttackRangeCheck.h"
 
 // !!!New!!!
 InAttackRangeDecorator::InAttackRangeDecorator(std::unique_ptr<Node> child)
@@ -13,11 +12,12 @@ InAttackRangeDecorator::~InAttackRangeDecorator()
 {
 }
 
-bool InAttackRangeDecorator::CheckCondition(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+bool InAttackRangeDecorator::CheckCondition(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
 	(void)mind;
 	(void)systemInfo;
 	(void)result;
+	(void)deltaTime;
 
 	// TODO ‹°‚ç‚­”ÍˆÍŠO‚Å‚à’Ê‚µ‚Ä‚µ‚Ü‚¤ƒoƒO‚ª‚ ‚é–Í—lA‚ ‚é‚¢‚Í‰º‚ÌAttack‘¤‚ª‚¨‚©‚µ‚¢‚©‚à
 
@@ -40,38 +40,14 @@ bool InAttackRangeDecorator::CheckCondition(AIContext& context, const AIBlackboa
 		return false;
 	}
 
-	// –‘O‚É—v‘f‚ğŒvZ‚·‚é
-	const float2 toPlayer(
-		blackBord.playerPos.x - enemy.position.x,
-		blackBord.playerPos.y - enemy.position.y);
-	const float dist = GetLength(toPlayer);
-	float2 nomalizeVec = Normalize(toPlayer);
-	float2 enemyFrontVec = AngleToVector(-enemy.rotation + 90.0f);
-	float dot = nomalizeVec.x * enemyFrontVec.x + nomalizeVec.y * enemyFrontVec.y;
-	float toPlayerAngle = acosf(dot) * DEG;
-
 	// UŒ‚”ÍˆÍ‚ğ‘–¸‚µAˆê‚Â‚Å‚à”ÍˆÍ“à‚É‚ ‚ê‚Î¬Œ÷‚ğ•Ô‚·
 	for (const AIBlackboard::BBAttackData& attack : enemy.attackDatas)
 	{
-		float halfAttackAngle = attack.angle * 0.5f;
-		DebugConsole::SetDrawPos(1, 10);
-		std::cout << "toPlayerAngle: " << toPlayerAngle << ", halfAttackAngle: " << halfAttackAngle << std::endl;
-
-		// Ë’ö‹——£ŠO‚¾‚Á‚½ê‡”²‚¯‚é
-		if (!(dist >= attack.minLength) || !(dist <= attack.maxLength))
+		if (IsTargetInAttackRange(blackBord.playerPos, enemy.position, enemy.rotation, attack))
 		{
-			continue;
+			// “G‚ªUŒ‚”ÍˆÍ“à‚É‚¢‚é‚½‚ßAŠÖ”‚ğI—¹‚µ¬Œ÷‚ğ•Ô‚·
+			return true;
 		}
-
-		// UŒ‚Šp‚æ‚èŠO‚É‚¢‚½ê‡ê‡”²‚¯‚é
-
-		if (halfAttackAngle / 5.0f < toPlayerAngle)
-		{
-			continue;
-		}
-
-		// “G‚ªUŒ‚”ÍˆÍ“à‚É‚¢‚é‚½‚ßAŠÖ”‚ğI—¹‚µ¬Œ÷‚ğ•Ô‚·
-		return true;
 	}
 
 	// “G‚ªUŒ‚”ÍˆÍ“à‚É‚¢‚È‚©‚Á‚½‚½‚ß¸”s

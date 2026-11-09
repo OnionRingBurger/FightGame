@@ -11,7 +11,7 @@ public:
 	explicit WaitAction(float a_maxDuration);
 	~WaitAction() override;
 
-	Status Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result) override;
+	Status Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime) override;
 
 private:
 	// Œp‘±ŽžŠÔ

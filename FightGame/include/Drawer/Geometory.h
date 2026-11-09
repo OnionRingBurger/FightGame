@@ -2,11 +2,22 @@
 #define __GEOMETORY_H__
 
 #include <DirectXMath.h>
+#include <unordered_map>
 #include "Shader.h"
 #include "MeshBuffer.h"
+#include <string>
+#include "MathAssist.h"
 
 class Geometory
 {
+public:
+	// !!!New!!!
+	enum class SectorShaderType
+	{
+		Telegraph,
+		Attack,
+	};
+
 private:
 	struct LineVertex
 	{
@@ -17,6 +28,15 @@ private:
 	{
 		float pos[3];
 		float uv[2];
+	};
+	// !!!New!!!
+	struct SectorShape
+	{
+		float minLength;
+		float maxLength;
+		float angle;
+		float maxHeight;
+		float maxLowness;
 	};
 public:
 	static void Init();
@@ -33,11 +53,19 @@ public:
 	static void DrawCylinder();
 	static void DrawSphere();
 
+	// éñëOÇ…êFÇÒÇ»å`ÇÃêÓÇìoò^Ç∑ÇÈ
+	static void RegisterSector(std::string key ,float minLength, float maxLength, float angle, float maxHeight, float maxLowness, int circumferenceCount);
+	// ìoò^Ç≥ÇÍÇƒÇ¢ÇÈêÓå`Çï`âÊÇ∑ÇÈ
+	static void DrawSector(std::string key, float progress, float maxTime, float highlightTime, float3 defaultColor, SectorShaderType shaderType);
+
 private:
 	static void MakeVS();
 	static void MakePS();
 	static void MakeLineShader();
 	static void MakeLine();
+	static void MakeSectorShader();
+	// !!!New!!!
+	static void MakeAttackSectorShader();
 
 private:
 	static void MakeBox();
@@ -54,10 +82,20 @@ private:
 	static MeshBuffer* m_pLines;
 	static Shader* m_pVS;
 	static Shader* m_pPS;
+	static Shader* m_sectorVS;
+	static Shader* m_sectorPS;
+	// !!!New!!!
+	static Shader* m_attackSectorVS;
+	static Shader* m_attackSectorPS;
 	static Shader* m_pLineShader[2];
 	static DirectX::XMFLOAT4X4 m_WVP[3];
 	static void* m_pLineVtx;
 	static int m_lineCnt;
+	static std::unordered_map<std::string, MeshBuffer*> m_sectorBuffers;
+	// !!!New!!!
+	static std::unordered_map<std::string, SectorShape> m_sectorShapes;
+	static std::unordered_map<std::string, Vertex*> m_dynamicVertexSource;
+	static std::unordered_map<std::string, int*> m_dynamicIndexSource;
 };
 
 #endif // __GEOMETORY_H__

@@ -1,6 +1,8 @@
 #include "DirectX.h"
 #include "GameTexture.h"
 
+
+
 //--- グローバル変数
 ID3D11Device*				g_pDevice;
 ID3D11DeviceContext*		g_pContext;
@@ -11,7 +13,36 @@ ID3D11RasterizerState*		g_pRasterizerState[3];
 ID3D11DepthStencilState*	g_pDepthStencilState[3];
 ID3D11BlendState*			g_pBlendState[BLEND_MAX];
 ID3D11SamplerState*			g_pSamplerState[SAMPLER_MAX];
+Effekseer::ManagerRef managerRef;
+EffekseerRendererDX11::RendererRef rendererRef;
+Effekseer::Backend::GraphicsDeviceRef graphicsRef;
+// 文字生成のインターフェース
+IDWriteFactory* g_pDWriteFactory;
+ID2D1Factory* g_pD2D1Factory;
+IWICImagingFactory* g_pWICFactory;
 
+HRESULT InitDirectWrite()
+{
+	return DWriteCreateFactory(
+		DWRITE_FACTORY_TYPE_SHARED,
+		__uuidof(IDWriteFactory),
+		reinterpret_cast<IUnknown**>(&g_pDWriteFactory));
+}
+
+HRESULT InitD2DFactory()
+{
+	return D2D1CreateFactory(
+		D2D1_FACTORY_TYPE_MULTI_THREADED,
+		__uuidof(ID2D1Factory),
+		reinterpret_cast<void**>(&g_pD2D1Factory)
+	);
+}
+
+HRESULT InitWICFactory()
+{
+	return CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&g_pWICFactory));
+}
 
 ID3D11Device* GetDevice()
 {
@@ -32,6 +63,30 @@ RenderTarget* GetDefaultRTV()
 DepthStencil* GetDefaultDSV()
 {
 	return g_pDSV;
+}
+Effekseer::ManagerRef GetEffectManager()
+{
+	return managerRef;
+}
+
+EffekseerRenderer::RendererRef GetEffectRenderer()
+{
+	return rendererRef;
+}
+
+IDWriteFactory* GetDWriteFactory()
+{
+	return g_pDWriteFactory;
+}
+
+ID2D1Factory* GetD2DFactory()
+{
+	return g_pD2D1Factory;
+}
+
+IWICImagingFactory* GetWICFactory()
+{
+	return g_pWICFactory;
 }
 
 HRESULT InitDirectX(HWND hWnd, UINT width, UINT height, bool fullscreen)
@@ -196,19 +251,86 @@ HRESULT InitDirectX(HWND hWnd, UINT width, UINT height, bool fullscreen)
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	for (int i = 0; i < SAMPLER_MAX; ++i)
+	for (int i = 0; i <= SAMPLER_POINT; ++i)
 	{
 		samplerDesc.Filter = filter[i];
 		hr = g_pDevice->CreateSamplerState(&samplerDesc, &g_pSamplerState[i]);
 		if (FAILED(hr)) { return hr; }
 	}
+	// !!!New!!!
+	{
+		D3D11_SAMPLER_DESC shadowSamplerDesc = {};
+		shadowSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+		shadowSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+		shadowSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+		shadowSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+		shadowSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+		shadowSamplerDesc.BorderColor[0] = 1.0f;
+		shadowSamplerDesc.BorderColor[1] = 1.0f;
+		shadowSamplerDesc.BorderColor[2] = 1.0f;
+		shadowSamplerDesc.BorderColor[3] = 1.0f;
+		hr = g_pDevice->CreateSamplerState(&shadowSamplerDesc, &g_pSamplerState[SAMPLER_COMPARISON_SHADOW]);
+		if (FAILED(hr)) { return hr; }
+	}
 	SetSamplerState(SAMPLER_LINEAR);
+
+	hr = InitDirectWrite();
+	if (FAILED(hr)) 
+	{
+		return hr; 
+	}
+
+	hr = InitD2DFactory();
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+	hr = InitWICFactory();
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	// Effekseerの初期化
+	managerRef = Effekseer::Manager::Create(8000);
+
+	graphicsRef = EffekseerRendererDX11::CreateGraphicsDevice(GetDevice(), GetContext());
+	rendererRef = EffekseerRendererDX11::Renderer::Create(GetDevice(), GetContext(), 10000);
+
+	// Sprcify rendering modules
+// 描画モジュールの設定
+	managerRef->SetSpriteRenderer(rendererRef->CreateSpriteRenderer());
+	managerRef->SetRibbonRenderer(rendererRef->CreateRibbonRenderer());
+	managerRef->SetRingRenderer(rendererRef->CreateRingRenderer());
+	managerRef->SetTrackRenderer(rendererRef->CreateTrackRenderer());
+	managerRef->SetModelRenderer(rendererRef->CreateModelRenderer());
+
+	// Specify a texture, model, curve and material loader
+	// It can be extended by yourself. It is loaded from a file on now.
+	// テクスチャ、モデル、カーブ、マテリアルローダーの設定する。
+	// ユーザーが独自で拡張できる。現在はファイルから読み込んでいる。
+	managerRef->SetTextureLoader(rendererRef->CreateTextureLoader());
+	managerRef->SetModelLoader(rendererRef->CreateModelLoader());
+	managerRef->SetMaterialLoader(rendererRef->CreateMaterialLoader());
+	managerRef->SetCurveLoader(Effekseer::MakeRefPtr<Effekseer::CurveLoader>());
+
+	if (false)
+	{
+		managerRef->SetGpuTimer(rendererRef->CreateGpuTimer());
+	}
+
+	managerRef->SetCoordinateSystem(Effekseer::CoordinateSystem::LH);
 
 	return S_OK;
 }
 
 void UninitDirectX()
 {
+	rendererRef = nullptr;
+	graphicsRef = nullptr;
+	managerRef = nullptr;
+	
+
 	SAFE_DELETE(g_pDSV);
 	SAFE_DELETE(g_pRTV);
 
@@ -262,6 +384,39 @@ void SetRenderTargets(UINT num, RenderTarget** ppViews, DepthStencil* pView)
 	g_pContext->RSSetViewports(1, &vp);
 }
 
+void SetDepthStencilTarget(DepthStencil* pView)
+{
+	// !!!New!!!
+	ID3D11RenderTargetView* nullRTV = nullptr;
+	g_pContext->OMSetRenderTargets(1, &nullRTV, pView ? pView->GetView() : nullptr);
+
+	if (!pView)
+	{
+		return;
+	}
+
+	D3D11_VIEWPORT vp;
+	vp.TopLeftX = 0.0f;
+	vp.TopLeftY = 0.0f;
+	vp.Width = (float)pView->GetWidth();
+	vp.Height = (float)pView->GetHeight();
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
+	g_pContext->RSSetViewports(1, &vp);
+}
+
+void RestoreDefaultRenderTargets()
+{
+	// !!!New!!!
+	RenderTarget* pRTV = GetDefaultRTV();
+	DepthStencil* pDSV = GetDefaultDSV();
+	if (!pRTV)
+	{
+		return;
+	}
+	SetRenderTargets(1, &pRTV, pDSV);
+}
+
 void SetCullingMode(D3D11_CULL_MODE cull)
 {
 	switch (cull)
@@ -282,8 +437,8 @@ void SetBlendMode(BlendMode blend)
 	FLOAT blendFactor[4] = { D3D11_BLEND_ZERO, D3D11_BLEND_ZERO, D3D11_BLEND_ZERO, D3D11_BLEND_ZERO };
 	g_pContext->OMSetBlendState(g_pBlendState[blend], blendFactor, 0xffffffff);
 }
-void SetSamplerState(SamplerState state)
+void SetSamplerState(SamplerState state, UINT slot)
 {
 	if (state < 0 || state >= SAMPLER_MAX) return;
-	g_pContext->PSSetSamplers(0, 1, &g_pSamplerState[state]);
+	g_pContext->PSSetSamplers(slot, 1, &g_pSamplerState[state]);
 }

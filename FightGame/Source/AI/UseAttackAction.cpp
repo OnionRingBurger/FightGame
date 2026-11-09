@@ -1,5 +1,7 @@
 #include "AI/UseAttackAction.h"
 
+#include "AI/AttackRangeCheck.h"
+
 // !!!New!!!
 UseAttackAction::UseAttackAction()
 {
@@ -9,9 +11,14 @@ UseAttackAction::~UseAttackAction()
 {
 }
 
-Node::Status UseAttackAction::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result)
+Node::Status UseAttackAction::Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime)
 {
-	
+	(void)mind;
+	(void)systemInfo;
+	(void)deltaTime;
+
+	result.UseGuard = false;
+
 		// é©êgÇÃBBèÓïÒÇéÊìæÇ∑ÇÈ
 		const auto enemyIt = blackBord.enemyDatas.find(context.agentEntity);
 		if (enemyIt == blackBord.enemyDatas.end())
@@ -38,15 +45,6 @@ Node::Status UseAttackAction::Tick(AIContext& context, const AIBlackboard& black
 			return NODE_FAILURE;
 		}
 
-		// éñëOÇ…óvëfÇåvéZÇ∑ÇÈ
-		const float2 toPlayer(
-			blackBord.playerPos.x - enemy.position.x,
-			blackBord.playerPos.y - enemy.position.y);
-		const float dist = GetLength(toPlayer);
-		float2 nomalizeVec = Normalize(toPlayer);
-		float2 enemyFrontVec = AngleToVector(-enemy.rotation + 90.0f);
-		float dot = nomalizeVec.x * enemyFrontVec.x + nomalizeVec.y * enemyFrontVec.y;
-		float toPlayerAngle = acosf(dot) * DEG;
 		
 		bool isInAttackRange = false;
 
@@ -54,18 +52,11 @@ Node::Status UseAttackAction::Tick(AIContext& context, const AIBlackboard& black
 		for (int i = 0; i < enemy.attackDatas.size(); i++)
 		{
 			const AIBlackboard::BBAttackData& attack = enemy.attackDatas.at(i);
-			// éÀíˆãóó£äOÇæÇ¡ÇΩèÍçáî≤ÇØÇÈ
-			if (!(dist >= attack.minLength) || !(dist <= attack.maxLength))
+
+			if (!IsTargetInAttackRange(blackBord.playerPos, enemy.position, enemy.rotation, attack))
 			{
 				continue;
 			}
-	
-			// çUåÇäpÇÊÇËäOÇ…Ç¢ÇΩèÍçáèÍçáî≤ÇØÇÈ
-			float halfAttackAngle = attack.angle * 0.5f;
-			if (halfAttackAngle < toPlayerAngle)
-			{
-				continue;
-			}		
 
 			// ìGÇ™çUåÇîÕàÕì‡Ç…Ç¢ÇÈÇΩÇﬂÅAä÷êîÇèIóπÇµê¨å˜Çï‘Ç∑
 			attackIndex = i;

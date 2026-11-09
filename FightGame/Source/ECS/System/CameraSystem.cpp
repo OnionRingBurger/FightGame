@@ -70,6 +70,72 @@ void CameraViewSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 }
 
+void UpdateTargetCameraPoint(Chunk& a_chunk, Entity a_camera, Entity a_point)
+{
+	ComponentHandle<CameraMover> mover = a_chunk.GetComponent<CameraMover>(a_camera);
+	if (mover.Look().targetPoint == a_point) return;
+	
+	mover->targetPoint = a_point;
+	mover->leapProgress = 0.0f;
+	mover->leapEnd = false;
+
+
+	ComponentHandle<Pose> pointPose = a_chunk.GetComponent<Pose>(a_point);
+
+	float sign = Sign(pointPose.Look().pos.x - mover.Look().finalTargetPos.x);
+	if (sign == 0.0f) sign = 1.0f;
+	float2 startPos(3.0f * sign, 0.0f);
+	float2 endPos(-7.0f * sign, 0.0f);
+
+
+	ComponentHandle<CameraChangeEffect> effect = a_chunk.GetComponent<CameraChangeEffect>(a_point);
+	if (!effect.IsValid()) return;
+	a_chunk.CreateNewEntity(
+		UIComponent(effect.Look().effectKey, startPos, float2(3.5f, 3.0f), 0.0f),
+		UIPosLerp(startPos, endPos, 60.0f),
+		LifeTime(70.0f)
+	);
+
+	
+}
+
+void CameraChase(Chunk& a_chunk, const SystemContext& a_context, Entity a_camera, Entity a_point, float3& retPos, float3& retRot)
+{
+	// Poseを取得
+	ComponentHandle<Pose> pointPose = a_chunk.GetComponent<Pose>(a_point);
+	ComponentHandle<CameraMover> mover = a_chunk.GetComponent<CameraMover>(a_camera);
+
+	// もし時間が最大だった場合直接追従する
+	if (mover.Look().leapEnd)
+	{
+		retPos = pointPose.Look().pos;
+		retRot = pointPose.Look().rot;
+		mover->finalTargetPos = pointPose.Look().pos;
+		mover->finalTargetRot = pointPose.Look().rot;
+		return;
+	}
+
+	// CameraPointの指定時間でLeapする
+	ComponentHandle<Pose> cameraPose = a_chunk.GetComponent<Pose>(a_camera);
+	mover->leapProgress += a_context.deltaTime / 15.0f;
+	mover->leapProgress = std::clamp(mover.Look().leapProgress, 0.01f, 1.0f);
+	if (mover.Look().leapProgress >= 1.0f)
+	{
+		retPos = pointPose.Look().pos;
+		retRot = pointPose.Look().rot;
+		mover->finalTargetPos = pointPose.Look().pos;
+		mover->finalTargetRot = pointPose.Look().rot;
+		mover->leapEnd = true;
+		return;
+	}
+
+	
+	retPos = Lerp(mover.Look().finalTargetPos, pointPose.Look().pos, mover.Look().leapProgress);
+
+	retRot = Lerp(mover.Look().finalTargetRot, pointPose.Look().rot, mover.Look().leapProgress);
+
+}
+
 void CameraMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
 	ComponentView pointView = a_chunk.GetView<ComponentTypes<CameraPoint>>();
@@ -99,26 +165,22 @@ void CameraMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 	}
 	
 
-	ComponentView cameraView = a_chunk.GetView<ComponentTypes<Camera, Position, Rotation, FixedResult>>();
+	ComponentView cameraView = a_chunk.GetView<ComponentTypes<Camera, CameraMover, Position, Rotation, FixedResult>>();
 	for (auto cameraIt : cameraView)
 	{
-		ComponentHandle<Position> cameraPos = a_chunk.GetComponent<Position>(cameraIt);
-		ComponentHandle<Rotation> cameraRot = a_chunk.GetComponent<Rotation>(cameraIt);
-
-
-		float3 cameraPosF = TOFLOAT3(cameraPos.Look());
-		float3 vector = pointPos - cameraPosF;
-		float3 normalizeVector = Normalize(vector);
-
-		float moveDis = point.Look().posLeapSpeed * a_context.deltaTime;
-		float dis = NormalizeLength(vector.x, vector.y, vector.z);
+		UpdateTargetCameraPoint(a_chunk, cameraIt, pointEntity);
+		float3 newPos;
+		float3 newRot;
+		CameraChase(a_chunk, a_context, cameraIt, pointEntity, newPos, newRot);
+		
 		ComponentHandle<FixedResult> result = a_chunk.GetComponent<FixedResult>(cameraIt);
 
+		// ローカルのオフセットを取得
 		float3 offset =  GetLocalOffset(point->posOffset, pointRot);
 
-		result->newPos = pointPos + offset;
-
-		result->newRot = pointRot;
+		// 結果を代入
+		result->newPos = newPos + offset;
+		result->newRot = newRot;
 		
 
 	}

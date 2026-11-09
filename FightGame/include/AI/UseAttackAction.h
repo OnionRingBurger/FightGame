@@ -9,5 +9,5 @@ public:
 	UseAttackAction();
 	~UseAttackAction() override;
 
-	Status Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result) override;
+	Status Tick(AIContext& context, const AIBlackboard& blackBord, AIMind& mind, const AISystemInfo& systemInfo, AIResult& result, float deltaTime) override;
 };

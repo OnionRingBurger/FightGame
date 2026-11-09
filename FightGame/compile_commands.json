@@ -1,0 +1,582 @@
+[
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/DataManager/AssimpModelLorder.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/DataManager/AssimpModelLorder.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/DataManager/EffectCache.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/DataManager/EffectCache.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/DataManager/EffectManager.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/DataManager/EffectManager.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/DataManager/IModelLoader.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/DataManager/IModelLoader.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/DataManager/ModelCache.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/DataManager/ModelCache.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/DataManager/SoundCache.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/DataManager/SoundCache.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/DataManager/UICache.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/DataManager/UICache.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/DirectX.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/DirectX.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/DrawMatrix.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/DrawMatrix.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/Geometory.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/Geometory.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/MeshBuffer.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/MeshBuffer.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/Model.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/Model.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/Model_anime.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/Model_anime.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/Model_check.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/Model_check.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/Model_get.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/Model_get.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/Model_morph.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/Model_morph.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/PolylineBuffer.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/PolylineBuffer.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/PolylineEffect.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/PolylineEffect.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/Shader.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/Shader.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/ShaderList.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/ShaderList.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/Sprite.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/Sprite.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/GameTexture.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/GameTexture.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/TrailEffect.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/TrailEffect.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/_geometory.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/_geometory.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Drawer/_model.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Drawer/_model.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/Component/Components.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/Component/Components.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/Core/Chunk.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/Core/Chunk.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/Core/ComponentsSerialize.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/Core/ComponentsSerialize.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/Core/ComponentStorage.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/Core/ComponentStorage.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/Core/ComponentView.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/Core/ComponentView.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/Core/EntityManager.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/Core/EntityManager.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/Core/HasView.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/Core/HasView.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/Core/StorageManager.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/Core/StorageManager.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/Core/ECSTypes.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/Core/ECSTypes.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/CameraSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/CameraSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/CharacterSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/CharacterSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/ColliderSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/ColliderSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/CoreSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/CoreSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/DebugCameraSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/DebugCameraSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/DebugSystemResponse.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/DebugSystemResponse.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/DrawSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/DrawSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/EffectSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/EffectSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/EnemySystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/EnemySystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/GameLoopSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/GameLoopSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/ImGuiSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/ImGuiSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/ISystemResponse.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/ISystemResponse.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/ItemSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/ItemSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/OtherSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/OtherSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/PhysicsSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/PhysicsSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/PlayerSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/PlayerSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/RailSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/RailSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/SoundSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/SoundSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/SystemAssist.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/SystemAssist.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/SystemResponse.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/SystemResponse.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/TransformSystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/TransformSystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/World/ClearWorld.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/World/ClearWorld.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/World/CreateGameWorld.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/World/CreateGameWorld.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/World/GameWorld.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/World/GameWorld.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/World/LoadWorld.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/World/LoadWorld.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/World/ProtoWorld.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/World/ProtoWorld.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/World/ResultWorld.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/World/ResultWorld.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/World/TestWorld.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/World/TestWorld.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/World/TitleWorld.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/World/TitleWorld.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/World/TutorialWorld.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/World/TutorialWorld.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/World/World.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/World/World.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Game/Core/Input.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Game/Core/Input.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Game/Core/Loading.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Game/Core/Loading.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Game/Core/Main.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Game/Core/Main.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Game/Core/Startup.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Game/Core/Startup.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Game/Core/TestObject.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Game/Core/TestObject.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Game/Core/ThreadSafeQueue.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Game/Core/ThreadSafeQueue.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Game/Scene/CreateGameScene.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Game/Scene/CreateGameScene.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Game/Scene/GameScene.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Game/Scene/GameScene.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Game/Scene/IScene.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Game/Scene/IScene.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Game/Scene/LoadScene.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Game/Scene/LoadScene.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Game/Scene/TestScene.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Game/Scene/TestScene.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/imGui/imgui.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/imGui/imgui.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/imGui/imgui_demo.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/imGui/imgui_demo.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/imGui/imgui_draw.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/imGui/imgui_draw.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/imGui/imgui_impl_dx11.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/imGui/imgui_impl_dx11.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/imGui/imgui_impl_win32.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/imGui/imgui_impl_win32.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/imGui/imgui_tables.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/imGui/imgui_tables.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/imGui/imgui_widgets.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/imGui/imgui_widgets.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Sound/Sound.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Sound/Sound.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Sound/SoundManagerEX.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Sound/SoundManagerEX.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Tool/Debug/Debug.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Tool/Debug/Debug.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Tool/Debug/DebugConsole.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Tool/Debug/DebugConsole.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/Tool/Math/MathAssist.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/Tool/Math/MathAssist.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/BehaviorTree.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/BehaviorTree.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/Node.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/Node.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/AIManager.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/AIManager.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/Sequencer.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/Sequencer.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/Selector.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/Selector.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/CompositeNode.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/CompositeNode.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/ActionNode.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/ActionNode.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/ConditionNode.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/ConditionNode.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/LeafNode.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/LeafNode.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/RootNode.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/RootNode.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/ChasePlayerAction.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/ChasePlayerAction.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/AISystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/AISystem.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/WaitAction.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/WaitAction.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/StanceNode.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/StanceNode.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/DecoratorNode.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/DecoratorNode.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/InAttackRangeDecorator.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/InAttackRangeDecorator.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/UseAttackAction.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/UseAttackAction.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/RunPlayerNode.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/RunPlayerNode.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/ReactiveSelector.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/ReactiveSelector.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/GuardNode.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/GuardNode.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/RoleCurve.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/RoleCurve.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/UseLingeringAttackAction.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/UseLingeringAttackAction.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/World/StartupWorld.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/World/StartupWorld.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/GameSystemResponse.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/GameSystemResponse.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/AttackRangeCheck.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/AttackRangeCheck.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/AI/UseBestDamageAttackAction.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/AI/UseBestDamageAttackAction.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/DataManager/FontFileLoadCache.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/DataManager/FontFileLoadCache.cpp"
+    },
+    {
+        "directory":  "C:/Team/FightGame/FightGame",
+        "file":  "C:/Team/FightGame/FightGame/Source/ECS/System/ControllerInputUISystem.cpp",
+        "command":  "clang++ -xc++ -w -std=c++17 --target=x86_64-pc-windows-msvc -DWIN32 -D_DEBUG -D_CONSOLE -DUNICODE -D_UNICODE -Iinclude -Iinclude/assimp -Iinclude/DataManager -Iinclude/DirectXTex -Iinclude/Drawer -Iinclude/ECS/Core -Iinclude/ECS/Component -Iinclude/ECS/System -Iinclude/ECS/World -Iinclude/Game/Core -Iinclude/Game/Scene -Iinclude/imGui -Iinclude/nlohmann -Iinclude/Sound -Iinclude/Tool/Debug -Iinclude/Tool/Math -Iinclude/AI -Iinclude/EffekseerFiles -Iinclude/DirectWrite -ISource/imGui -c C:/Team/FightGame/FightGame/Source/ECS/System/ControllerInputUISystem.cpp"
+    }
+]

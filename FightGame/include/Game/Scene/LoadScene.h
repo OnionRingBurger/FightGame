@@ -14,13 +14,14 @@ class LoadScene : public IScene
 {
 public:
 	LoadScene(std::function<void(std::string)> a_sceneChange,
-		ThreadSafeQueue<ModelLoadJob>& a_modelJobQueue, 
-		ThreadSafeQueue<TextureLoadJob>& a_textureJobQueue,
-		std::vector<modelLoadData> a_modelDatas,
-		std::vector<std::string> a_textureDatas,
+		LoadJobQueues& a_jobQueues,
+		LoadManifestPaths a_manifestPaths,
 		IModelCacheAcquisition& a_modelCache,
 		IUICacheAcquisition& a_uiCache,
-		Input& a_input);
+		IEffectCacheAcquisition& effectCache,
+		Input& a_input,
+		ComponentsSerialize& a_serialize,
+		PrefabManager& a_prefabManager);
 
 	~LoadScene() = default;
 	void AdvanceUpdate(float dt) override;
@@ -30,16 +31,21 @@ public:
 
 private:
 	bool inited;
+	// !!!New!!!
+	bool presentationReady;
+	// !!!New!!!
+	bool manifestRegistered;
 	std::vector<std::shared_ptr<std::atomic_bool>> useDataLoadEndFlags;
 	std::function<void(std::string)> sceneChange;
 	std::vector<std::shared_ptr<std::atomic_bool>> loadEndFlags;
 	std::unique_ptr<World> world;
 	int maxLoadCount;
-	ThreadSafeQueue<ModelLoadJob>& modelJobQueue;
-	ThreadSafeQueue<TextureLoadJob>& textureJobQueue;
-	std::vector<modelLoadData> modelDatas;
-	std::vector<std::string> textureDatas;
+	LoadJobQueues& jobQueues;
+	// !!!New!!!
+	IUICacheAcquisition& uiCache;
+	// !!!New!!!
+	LoadManifestPaths manifestPaths;
+	LoadDatas loadDatas;
 
 	void RemoveIfFlaged(std::vector<std::shared_ptr<std::atomic_bool>>& loadEndFlags);
 };
-

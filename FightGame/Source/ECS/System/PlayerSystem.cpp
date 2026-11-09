@@ -2,176 +2,50 @@
 #include "Components.h"
 #include "SystemAssist.h"
 #include "Sound.h"
+#include "Defines.h"
+#include "GameData.h"
 
 using namespace Component;
 
-void PlayerWalkSystem(Chunk& a_chunk, const SystemContext& a_context)
-{
-	//ComponentView view = a_chunk.GetView<ComponentTypes<PlayerTag, ShakingComponent, InputMove>>();
 
-	//for (auto it : view)
-	//{
-	//	ComponentHandle<ShakingComponent> shaking = a_chunk.GetComponent<ShakingComponent>(it);
-	//	const ComponentHandle<InputMove> inputMove = a_chunk.GetComponent<InputMove>(it);
-	//	ComponentHandle<PlayerWalkTimer> timer = a_chunk.GetComponent<PlayerWalkTimer>(it);
-	//	shaking->isWait = !inputMove.Look().isInput;
-	//	if (timer.IsValid())
-	//	{
-	//		timer->time = std::clamp(timer.Look().time - a_context.deltaTime, 0.0f, timer.Look().maxTime);
-
-	//		if ((inputMove.Look().isInput) &&
-	//			shaking.Look().shankingDegree <= -1.0f &&
-	//			timer.Look().time <= 0.0f)
-	//		{
-	//			timer->time = timer.Look().maxTime;
-	//			PlaySound(LoadSound("Assets/Sound/walk.mp3"));
-	//		}
-
-	//	}
-
-	//}
-}
-
-void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context)
+void PlayerDeadSystem(Chunk& a_chunk, const SystemContext& a_context, ISystemResponse& a_response)
 {
 	ComponentView view = a_chunk.GetView<ComponentTypes<PlayerTag, DeadState>>();
 	for (auto it : view)
 	{
-		//ComponentHandle<DeadState> dead = a_chunk.GetComponent<DeadState>(it);
-		//if (!dead.Look().isDead) continue;
+		ComponentHandle<DeadState> dead = a_chunk.GetComponent<DeadState>(it);
+		if (!dead.Look().isDead) continue;
 
-		//a_chunk.DeleteChunkComponent(it, InputMove::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, InputRotato::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, Velocity::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, ShooterComponent::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, ShakingComponent::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, OBBCollider::kTypeId);
-		//a_chunk.DeleteChunkComponent(it, RailFly::kTypeId);
+		a_chunk.DeleteChunkComponent(it, PlayerTag::kTypeId);
+		a_chunk.DeleteChunkComponent(it, InputMove::kTypeId);
+		a_chunk.AddComponent(it, LifeTime(2.5f));
+		a_chunk.AddComponent(it, LifeTimeEndEffect(false, "", true, kBossDeadBrokenEffectKey));
 
-		//ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent>>();
-		//for (auto uiIt : view)
-		//{
-		//	a_chunk.DeleteChunkEntity(uiIt);
-		//}
 
-		//Entity chunkChange = a_chunk.CreateNewEntity(
-		//	ChunkChange(true, "Result"),
-		//	DelayChunkChange(240.0f)
-		//);
-		//PlaySound(LoadSound("Assets/Sound/dead.mp3"));
 
-		//Entity createEffect = a_chunk.CreateNewEntity(
-		//	CreateEffect(DARKFADE_UP)
-		//);
+		float3 shakePower = float3(0.03f, 0.03f, 0.03f);
+		float3 shakeAmp = float3(2.5f, 2.5f, 2.5f);
+		float shakeTime = 300.0f;
+		
+		AddShakeEffect(a_chunk, it, shakePower, shakeAmp, shakeTime, 1.0f);
 
-		//ComponentView gunView = a_chunk.GetView<ComponentTypes<GunTag, ModelKey>>();
-		//// a_chunk.DeleteChunkComponent(it, DeadState::kTypeId);
 
-		//for (auto gunIt : gunView)
-		//{
-		//	a_chunk.DeleteChunkComponent(gunIt, ModelKey::kTypeId);
-		//}
+		PlaySound(LoadSound("Assets/Sound/dead.mp3"));
+		PlaySound(LoadSound("Assets/Sound/dead2.mp3"));
+		PlaySound(LoadSound("Assets/Sound/enemydead.mp3"));
+
+		a_response.AddStopTime(60.0f, 60.0f, 0.00f);
+
+
 
 	}
 }
 
 
-void PlayerAttackSystem(Chunk& a_chunk, const SystemContext& a_context)
-{
-
-	//ComponentView view = a_chunk.GetView<ComponentTypes<MoveInputResult, Position, Rotation, AttackStatus>>();
-
-	//for (auto it : view)
-	//{
-	//	const ComponentHandle<MoveInputResult> inputResult = a_chunk.GetComponent<MoveInputResult>(it);
-	//	if (!inputResult.Look().useAttack) continue;
-
-	//	if (!IsActionAllowed(a_chunk, it, ActionFlag_Attack)) continue;
-
-	//	const ComponentHandle<AttackAction> attackAction = a_chunk.GetComponent<AttackAction>(it);
-	//	if (attackAction.IsValid()) continue;
-
-	//	const ComponentHandle<Position> position = a_chunk.GetComponent<Position>(it);
-	//	const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(it);
-	//	const ComponentHandle<AttackStatus> attackStatus = a_chunk.GetComponent<AttackStatus>(it);
-
-	//	// 使用する攻撃番号に対応する情報を取得
-	//	const int attackIndex = inputResult.Look().attackIndex;
-	//	if (attackIndex < 0 || attackIndex >= static_cast<int>(attackStatus.Look().attackPowers.size()))
-	//	{
-	//		continue;
-	//	}
-	//	const AttackPower& attackPower = attackStatus.Look().attackPowers[static_cast<size_t>(attackIndex)];
-
-	//	const bool isPlayer = a_chunk.GetComponent<PlayerTag>(it).IsValid();
-	//	const bool isEnemy = a_chunk.GetComponent<EnemyTag>(it).IsValid();
-
-	//	// 攻撃Entity生成
-	//	if (isPlayer)
-	//	{
-	//		Entity attack = a_chunk.CreateNewEntity(
-	//			MOVE_AND_TRANSFORM_COMPONENT(
-	//				float3(0.0f, 0.0f, 0.0f),
-	//				float3(0.0f, rotation.Look().yaw, 0.0f),
-	//				float3(1.0f, 1.0f, 1.0f)
-	//			),
-	//			SectorHitJudge(
-	//				attackPower.minLength,
-	//				attackPower.maxLength,
-	//				attackPower.angle,
-	//				attackPower.maxHeight,
-	//				attackPower.maxLowness
-	//			),
-	//			AddDamageComponent(attackPower.damageValue),
-	//			PlayerAttackTag(),
-	//			LifeTime(attackPower.lifeTime),
-	//			FollowPosition(attackPower.followOffset, it, FOLLOW_POS_LOCALOFFSET),
-	//			PosePosState(POSE_POS_FOLLOW)
-	//		);
-
-	//		a_chunk.AddComponent(it, AttackAction(attack, 0.0f));
-	//		if (attackPower.waitTime > 0.0f)
-	//		{
-	//			a_chunk.AddComponent(it, AttackWaitAction(0.0f, attackPower.waitTime));
-	//		}
-	//	}
-	//	else if (isEnemy)
-	//	{
-	//		Entity attack = a_chunk.CreateNewEntity(
-	//			MOVE_AND_TRANSFORM_COMPONENT(
-	//				float3(0.0f, 0.0f, 0.0f),
-	//				float3(0.0f, rotation.Look().yaw, 0.0f),
-	//				float3(1.0f, 1.0f, 1.0f)
-	//			),
-	//			SectorHitJudge(
-	//				attackPower.minLength,
-	//				attackPower.maxLength,
-	//				attackPower.angle,
-	//				attackPower.maxHeight,
-	//				attackPower.maxLowness
-	//			),
-	//			AddDamageComponent(attackPower.damageValue),
-	//			EnemyAttackTag(),
-	//			LifeTime(attackPower.lifeTime),
-	//			FollowPosition(attackPower.followOffset, it, FOLLOW_POS_LOCALOFFSET),
-	//			PosePosState(POSE_POS_FOLLOW)
-	//		);
-
-	//		a_chunk.AddComponent(it, AttackAction(attack, 0.0f));
-	//		if (attackPower.waitTime > 0.0f)
-	//		{
-	//			a_chunk.AddComponent(it, AttackWaitAction(0.0f, attackPower.waitTime));
-	//		}
-	//	}
-	//}
-}
-
 
 void PlayerJumpSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
-	if (!a_context.input.IsRegisterTrigger("Jump")) return;
-
-	ComponentView view = a_chunk.GetView<ComponentTypes<PlayerTag, ActionMask, JumpPower>>();
+	ComponentView view = a_chunk.GetView<ComponentTypes<MoveInputResult, ActionMask, JumpPower>>();
 
 	for (auto it : view)
 	{
@@ -179,6 +53,9 @@ void PlayerJumpSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		const ComponentHandle<JumpAction> jump = a_chunk.GetComponent<JumpAction>(it);
 		if (jump.IsValid()) continue;
+
+		const ComponentHandle<MoveInputResult> result = a_chunk.GetComponent<MoveInputResult>(it);
+		if (!result.Look().useJump) continue;
 
 		// 攻撃中だった場合キャンセルする
 		CancelPlayerAttackIfAble(a_chunk, it);
@@ -195,5 +72,44 @@ void PlayerJumpSystem(Chunk& a_chunk, const SystemContext& a_context)
 		velocity->x = jumpPower.Look().initialVelocity.x;
 		velocity->y = jumpPower.Look().initialVelocity.y;
 		velocity->z = jumpPower.Look().initialVelocity.z;
+
+		std::string path = kSoundAssetPath;
+		path += "jump.mp3";
+
+		// タイトル画面じゃなかったら音を出す
+		ComponentHandle<InputSource> source = a_chunk.GetComponent<InputSource>(it);
+		if(source.Look().jump != InputOrigin::Title) PlaySound(LoadSound(path.c_str()));
+	}
+}
+
+void PlayerHealSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<PlayerHeal>>();
+
+	Entity player = GetPlayer(a_chunk, float3());
+	ComponentHandle<HitPoint> hp = a_chunk.GetComponent<HitPoint>(player);
+
+	for (auto it : view)
+	{
+		// HPを回復する
+		ComponentHandle<PlayerHeal> heal = a_chunk.GetComponent<PlayerHeal>(it);
+		float healedHP = hp.Look().currentHP + heal.Look().healValue;
+		hp->currentHP = std::min(healedHP, hp.Look().maxHP);
+		// 回復Effectを生成
+		a_chunk.CreateNewEntity(
+			MOVE_AND_TRANSFORM_COMPONENT(
+				float3(),
+				float3(),
+				float3(1.0f, 1.0f, 1.0f)
+			),
+			FollowPosition(float3(), player),
+			PosePosState(POSE_POS_FOLLOW),
+			EfkEffectKey(kPlayerHealKey, false)
+		);
+
+		PlaySound(LoadSound("Assets/Sound/heal.mp3"));
+
+		// 回復Entityを削除
+		a_chunk.DeleteChunkEntity(it);
 	}
 }

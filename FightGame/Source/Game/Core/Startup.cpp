@@ -82,6 +82,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// ウィンドウの表示
 	ShowWindow(hWnd, nCmdShow);
+	ShowCursor(false);
 	UpdateWindow(hWnd);
 	SetForegroundWindow(hWnd);
 

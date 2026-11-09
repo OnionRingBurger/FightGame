@@ -5,50 +5,47 @@ constexpr float kTonnelHeight = 120.0f;
 constexpr float kTonnelColliderLength = 600.0f;
 constexpr float kTonnelLength = 10000.0f;
 
-// ループするトンネル区間（GameWorld のトンネル生成と対応）
-constexpr int kTonnelSegmentCount = 6;
-constexpr float kTonnelSegmentLength = 60.0f;
-constexpr float kTonnelWarpForwardMargin = 0.2f;
-constexpr float kTonnelLoopDepth = (kTonnelSegmentCount - 1) * kTonnelSegmentLength;
+constexpr float2 kTitleButtonSize = { 0.5f, 0.2f };
+constexpr float2 kStageSelectButtonSize = { 0.5f * 0.8f, 0.2f * 0.8f };
 
-constexpr float kEnemyMoveSpeed = 0.2f;
+constexpr float kTutorialTextTime = 35.0f;
 
-constexpr int kEnemyRandomWidth = (int)kTonnelWidth / 10;
-constexpr int kEnemyRandomHeight = (int)kTonnelHeight / 10;
-constexpr int kEnemyRandomDepth = (int)kTonnelLoopDepth / 30;
-constexpr float kEnemyRandomRate = 1.6f;
+constexpr float3 kGameStartLarpStartPos = {0.0f, 25.0f, -38.0f};
+constexpr float3 kGameStartLarpEndPos = { 0.0f, 10.0f, -10.0f };
+constexpr float kGameStartTime = 180.0f;
 
-constexpr float kEnemySpawnRateWidth = (kTonnelWidth / 2.0f - (float)kEnemyRandomWidth * kEnemyRandomRate / 2.0f) * 0.7f;
-constexpr float kEnemySpawnRateHeight = (kTonnelHeight / 2.0f - (float)kEnemyRandomHeight * kEnemyRandomRate / 2.0f) * 0.7f;
-constexpr float kEnemySpawnRateDepth = (kTonnelLoopDepth / 2.0f - (float)kEnemyRandomDepth * kEnemyRandomRate / 2.0f) * 0.7f;
+constexpr float3 kDefaultWorldPosition = { 0.0f, 50.0f, 50.0f };
+constexpr float3 kClearWorldPosition = { 0.0f, 50.0f + 30.0, 50.0f };
 
-constexpr float kEnemyFlyPower = 1.8f;
-constexpr float kEnemyNormalScale = 1.0f;
-constexpr float3 kEnemyShooterScale = { 1.0f, 1.0f, 1.0f };
-constexpr float kEnemyAttackDamage = 45.0f;
-constexpr float kEnemyShotDamage = 45.0f;
-constexpr float kEnemyMaxHP = 3.0f;
+constexpr float3 kDebugWorldSize = float3(48.0, 28.0f, 20.0f);
+
+constexpr int kSectorVertexCount = 15;
+constexpr float kWallThickness = 0.02f;
+constexpr float kWallHitboxThickness = 0.2f;
+
+// constexpr float kLookOnChangeCooltime = 15.0f;
+constexpr float kLookOnChangeCooltime = 35.0f;
+constexpr float kLookOnChangeMouseLength = 15.0f;
+
+constexpr float kSectorScaleFlashTime = 15.0f;
+constexpr float3 kSectorDefaultColor = float3(0.0f, 0.0f, 0.0f);
+constexpr float3 kSectorFlashColor = float3(0.0f, 0.0f, 0.0f);
+
 constexpr float kDefaultAttackHitCooldown = 300.0f;
-constexpr float3 kDefaultWorldPosition = {0.0f, 50.0f, 0.0f};
 
-constexpr float kEnemyShotSpeed = 0.8f;
+constexpr float2 kPlayerMoveSpeed = float2(0.09f, 0.09f);
+constexpr const char* kHitEffect = "IcicleBrokenChange.efkefc";
+constexpr const char* kSpawnEffect = "Spawn.efk";
+constexpr const char* kSnowEffect = "Snow.efkefc";
+constexpr const char* kEntryEffect = "Entry.efkefc";
+constexpr const char* kGuardEffectKey = "Guard.efk";
+constexpr const char* kRedBossEntryKey = "RedBossEntry.efkefc";
+constexpr const char* kDeadBrokenEffectKey = "DeadBroken.efkefc";
+constexpr const char* kBossDeadBrokenEffectKey = "BossDeadBroken.efkefc";
+constexpr const char* kPlayerHealKey = "Heal.efkefc";
+constexpr const char* kWhiteBossEntryKey = "WhiteBossEntry.efkefc";
 
-// 視線と被弾元方向のなす角がこの値以上なら「視線から外れた被弾」
-constexpr float kDamageDirectionMinAngleDeg = 45.0f;
-
-//! TitleWorld のトンネル
-constexpr float kTitleTonnelWidth = 60.0f;
-constexpr float kTitleTonnelHeight = 60.0f;
-constexpr float kTitleTonnelMeshSize = 60.0f;
-constexpr float kTitleTonnelSegmentLength = 60.0f;
-constexpr float kTitleTonnelFloorDepth = 60.5f;
-constexpr int kTitleTonnelSegmentCount = 5;
-constexpr float kTitleTonnelWarpMargin = 0.2f;
-constexpr float kRailPosition = kTonnelHeight / 2.5f;
-
-//! 画面に描画するための座標
-constexpr float kMineCarModelPosition = -15.0f;
-constexpr float kRailModelPosition = -kTonnelSegmentLength * 1.5f + kRailPosition -15.0f;
 
 // GhostShader: カメラからの距離フェード（exp(-d/L) の L）
 constexpr float kGhostFadeRange = 20.0f;
+

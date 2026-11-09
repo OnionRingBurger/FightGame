@@ -15,7 +15,7 @@ void SetCurrentPosePos(Entity a_entity, Chunk& a_chunk);
 void SetCurrentPoseRot(Entity a_entity, Chunk& a_chunk);
 bool IsSetFixedPos(const ComponentHandle<PosePosState>& a_posePosState, const std::vector<PosePosStateEnum>& a_setPoseState);
 bool IsSetFixedRot(const ComponentHandle<PoseRotState>& a_posePosState, const std::vector<PoseRotStateEnum>& a_setPoseState);
-
+float3 GetLookRot(Chunk& a_chunk, const Entity user, const Entity target);
 
 void InputMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
@@ -72,13 +72,14 @@ void InputMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		float3 move =
 		{
-			inputResult.Look().moveDir.x * (1 + inputResult.Look().magnitube / 2) * inputMove.Look().moveSpeed.x * a_context.deltaTime,
+			inputResult.Look().moveDir.x * (inputResult.Look().magnitube * 1.5f) * inputMove.Look().moveSpeed.x * a_context.deltaTime,
 			0.0f,
-			inputResult.Look().moveDir.y * (1 + inputResult.Look().magnitube / 2) * inputMove.Look().moveSpeed.y * a_context.deltaTime
+			inputResult.Look().moveDir.y * (inputResult.Look().magnitube * 1.5f) * inputMove.Look().moveSpeed.y * a_context.deltaTime
 		};
 		motionResult->posOffset.x += move.x;
 		motionResult->posOffset.y += move.y;
 		motionResult->posOffset.z += move.z;
+
 
 		// 攻撃中だった場合攻撃をキャンセルする
 		CancelPlayerAttackIfAble(a_chunk, it);
@@ -97,7 +98,6 @@ void LookMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 		
 	ComponentView view = a_chunk.GetView<ComponentTypes<LookMove, MoveInputResult, Pose, MotionResult>>();
 
-
 	for (auto it : view)
 	{
 		// 入力結果を取得
@@ -108,6 +108,8 @@ void LookMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		// 移動不可能だった場合抜ける
 		if (!IsActionAllowed(a_chunk, it, ActionFlag_Move)) continue;
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_LookMove)) continue;
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_RotChange)) continue;
 
 		// 角度に変換
 		float targetAngle = atan2(inputResult.Look().moveDir.x, inputResult.Look().moveDir.y) * DEG;
@@ -134,6 +136,78 @@ void LookMoveSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 }
 
+void LookOnSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView actionView = a_chunk.GetView<ComponentTypes<LookOnAction, MotionResult>>();
+
+	Entity cameraTarget = kInvalidEntity;
+	bool usePlayer = false;
+	bool useFinelRot = false;
+	float3 finalRot;
+	for (auto it : actionView)
+	{
+		if (!IsActionAllowed(a_chunk, it, ActionFlag_RotChange)) continue;
+
+		bool isPlayer = a_chunk.GetComponent<PlayerTag>(it).IsValid();
+
+		ComponentHandle<LookOnAction> look = a_chunk.GetComponent<LookOnAction>(it);
+
+		// 角度に変換
+		float3 targetRot = GetLookRot(a_chunk, it, look.Look().target);
+		float targetAngle = targetRot.y;
+
+
+		// 現在角度を取得
+		ComponentHandle<Pose> pose = a_chunk.GetComponent<Pose>(it);
+		float currentAngle = fmod(pose.Look().rot.y + 180.0f, 360.0f) - 180.0f;
+		while (currentAngle > 180.0f) currentAngle -= 360.0f;
+		while (currentAngle < -180.0f) currentAngle += 360.0f;
+
+		// 角度差から回転方向を取得
+		float angleDiff = targetAngle - currentAngle;
+		while (angleDiff > 180.0f) angleDiff -= 360.0f;
+		while (angleDiff < -180.0f) angleDiff += 360.0f;
+
+		float sign = std::abs(angleDiff) < 180.0f ? Sign(angleDiff) : Sign(angleDiff) * -1.0f;
+		float speed = 1.0f;
+		// 速度を取得する
+		ComponentHandle<LookMove> move = a_chunk.GetComponent<LookMove>(it);
+		if (move.IsValid()) speed = move.Look().rotateSpeed * a_context.deltaTime < std::abs(angleDiff) ? move.Look().rotateSpeed * a_context.deltaTime : std::abs(angleDiff);
+
+
+		// リザルトに書き込み
+		ComponentHandle<MotionResult> result = a_chunk.GetComponent<MotionResult>(it);
+		result->rotOffset.y += sign * speed;
+
+		if (isPlayer)
+		{
+			cameraTarget = look.Look().target;
+			usePlayer = true;	
+		}
+	}
+
+	// Playerがロックオンした場合カメラも移動する
+	if (!usePlayer) return;
+
+	ComponentView rigView = a_chunk.GetView<ComponentTypes<CameraRigTag, RigLookOn, MotionResult>>();
+	for (auto it : rigView)
+	{
+		float3 targetRot;
+		if (useFinelRot) targetRot = finalRot;
+		else targetRot = GetLookRot(a_chunk, it, cameraTarget);
+		
+		float3 currentRot = GetEntityPoseRot(a_chunk, it);
+		float delta = DeltaDeg(currentRot.y, targetRot.y);
+		float speed = 2.0f * a_context.deltaTime;
+		float move;
+		if (speed > std::abs(delta)) move = delta;
+		else move = speed * Sign(delta);
+
+		ComponentHandle<MotionResult> cameraResult = a_chunk.GetComponent<MotionResult>(it);
+		cameraResult->rotOffset.y += move;
+	}
+}
+
 
 void InputRotatoSystem(Chunk& a_chunk, const SystemContext& a_context)
 {
@@ -148,6 +222,7 @@ void InputRotatoSystem(Chunk& a_chunk, const SystemContext& a_context)
 	// 
 	float rx = isMagnitube ? a_context.input.GetRightAxis().x : a_context.input.GetMouseAxis().x;
 	float ry = isMagnitube ? a_context.input.GetRightAxis().y : a_context.input.GetMouseAxis().y;
+
 	// Rotato回転を処理
 	for (auto it : rotatoView)
 	{
@@ -246,12 +321,58 @@ void FollowTransformSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 
 		float3 pos(0.0f, 0.0f, 0.0f);
+		if (!(followData.Look().flag & FOLLOW_POS_FIXED_X)) pos.x = targetPose.Look().pos.x;
+		if (!(followData.Look().flag & FOLLOW_POS_FIXED_Y)) pos.y = targetPose.Look().pos.y;
+		if (!(followData.Look().flag & FOLLOW_POS_FIXED_Z)) pos.z = targetPose.Look().pos.z;
+
+		float3 targetPos = pos + worldOffset;
+		ComponentHandle<FollowLeap> leap = a_chunk.GetComponent<FollowLeap>(it);
+		if (!leap.IsValid())
+		{
+
+			result->newPos = targetPos;
+			continue;
+		}
 
 		if (!(followData.Look().flag & FOLLOW_POS_FIXED_X)) pos.x = targetPose.Look().pos.x;
 		if (!(followData.Look().flag & FOLLOW_POS_FIXED_Y)) pos.y = targetPose.Look().pos.y;
 		if (!(followData.Look().flag & FOLLOW_POS_FIXED_Z)) pos.z = targetPose.Look().pos.z;
 
-		result->newPos = pos + worldOffset;
+		ComponentHandle<Pose> thisPose = a_chunk.GetComponent<Pose>(it);
+		if (!thisPose.IsValid()) continue;
+		ComponentHandle<MotionResult> motionResult = a_chunk.GetComponent<MotionResult>(it);
+		if (!motionResult.IsValid()) continue;
+
+		// 対象への移動量を取得
+		float3 toTargetDis = targetPos - thisPose.Look().pos;
+		// 座標固定だった場合移動量を0にする
+		if ((followData.Look().flag & FOLLOW_POS_FIXED_X)) toTargetDis.x = 0.0f;
+		if ((followData.Look().flag & FOLLOW_POS_FIXED_Y)) toTargetDis.y = 0.0f;
+		if ((followData.Look().flag & FOLLOW_POS_FIXED_Z)) toTargetDis.z = 0.0f;
+
+		float3 normalizeVector = Normalize(toTargetDis);
+
+		
+
+		float3 maxSpeed = leap.Look().followLeap;
+
+		// 移動量を良い感じにする(調整中)
+		float3 moveRate;
+		if (toTargetDis.x != 0.0f) moveRate.x = std::pow(toTargetDis.x / 1.2f, 2.0f);
+		if (toTargetDis.y != 0.0f) moveRate.y = std::pow(toTargetDis.y / 1.2f, 2.0f);
+		if (toTargetDis.z != 0.0f) moveRate.z = std::pow(toTargetDis.z / 1.2f, 2.0f);
+
+		float3 move;
+		move.x = normalizeVector.x * maxSpeed.x * moveRate.x * a_context.deltaTime;
+		move.y = normalizeVector.y * maxSpeed.y * moveRate.y * a_context.deltaTime;
+		move.z = normalizeVector.z * maxSpeed.z * moveRate.z * a_context.deltaTime;
+		
+		if (abs(move.x) > abs(toTargetDis.x)) move.x = toTargetDis.x;
+		if (abs(move.y) > abs(toTargetDis.y)) move.y = toTargetDis.y;
+		if (abs(move.z) > abs(toTargetDis.z)) move.z = toTargetDis.z;
+
+
+		motionResult->posOffset += move;
 	};
 
 
@@ -386,6 +507,10 @@ void LeapSystem(Chunk& a_chunk, const SystemContext& a_context)
 		if (leap.Look().leapTime == leap.Look().leapMaxTime)
 		{
 			leap->isActicv = false;
+			a_chunk.DeleteChunkComponent(it, PoseRotState::kTypeId);
+
+			ComponentHandle<MotionResult> motionResult = a_chunk.GetComponent<MotionResult>(it);
+			ResetFixedRotState(result, motionResult);
 		}
 	}
 }
@@ -442,50 +567,16 @@ void LookSystem(Chunk& a_chunk, const SystemContext& a_context)
 	for (auto it : view)
 	{
 		const ComponentHandle<LookComponent> look = a_chunk.GetComponent<LookComponent>(it);
-		const ComponentHandle<Position> position = a_chunk.GetComponent<Position>(it);
 		ComponentHandle<FixedResult> lookResult = a_chunk.GetComponent<FixedResult>(it);
 
-		const ComponentHandle<Position> targetPos = a_chunk.GetComponent<Position>(look.Look().target);
-		if (!targetPos.IsValid())
-		{
-			return;
-		}
 
-		float3 relativeDistance(
-			targetPos.Look().x - position.Look().x,
-			targetPos.Look().y - position.Look().y,
-			targetPos.Look().z - position.Look().z
-		);
+		float3 finalRot = GetLookRot(a_chunk, it, look.Look().target);
 
-		float targetDistance = NormalizeLength(
-			relativeDistance.x,
-			relativeDistance.y,
-			relativeDistance.z
-		);
-
-		if (targetDistance == std::numeric_limits<float>::max())
-		{
-			continue;
-		}
-
-		float pitchSign = Sign(relativeDistance.y) * -1.0f;
-
-		float dirXZ =
-			std::sqrtf(
-				std::pow(relativeDistance.x, 2.0f) + std::pow(relativeDistance.z, 2.0f)
-			);
-
-		float dirY = std::sqrtf(
-			std::pow(relativeDistance.y, 2.0f)
-		);
-
-		float finalPitch = atan2f(dirY, dirXZ) * (180 / PI) * pitchSign;
-		float finalYaw = atan2f(relativeDistance.x, relativeDistance.z) * (180 / PI);
-
-		lookResult->newRot.x = finalPitch;
-		lookResult->newRot.y = finalYaw;
+		lookResult->newRot.x = finalRot.x;
+		lookResult->newRot.y = finalRot.y;
 		lookResult->newRot.z = 0.0f;
 	}
+
 }
 
 void ShakeSystem(Chunk& a_chunk, const SystemContext& a_context)
@@ -512,11 +603,14 @@ void ShakeSystem(Chunk& a_chunk, const SystemContext& a_context)
 		// 角度を持っている場合は向いてる方向に進むようにする
 		ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(it);
 
+		float powerRate = 1.0f;
+		powerRate = Lerp(1.0f, shake.Look().decayRate, shake.Look().elapsedTime / (shake.Look().elapsedTime + shake.Look().shakeTime));
+
 
 		matrix *= DirectX::XMMatrixTranslation(
-			Noise((shake.Look().elapsedTime + kNoiseXTimeOffsert) * shake.Look().shakeAmplitude.x) * shake.Look().shakePower.x,
-			Noise((shake.Look().elapsedTime + kNoiseYTimeOffsert) * shake.Look().shakeAmplitude.y) * shake.Look().shakePower.y,
-			Noise((shake.Look().elapsedTime + kNoiseZTimeOffsert) * shake.Look().shakeAmplitude.z) * shake.Look().shakePower.z
+			Noise((shake.Look().elapsedTime + kNoiseXTimeOffsert) * shake.Look().shakeAmplitude.x) * shake.Look().shakePower.x * powerRate,
+			Noise((shake.Look().elapsedTime + kNoiseYTimeOffsert) * shake.Look().shakeAmplitude.y) * shake.Look().shakePower.y * powerRate,
+			Noise((shake.Look().elapsedTime + kNoiseZTimeOffsert) * shake.Look().shakeAmplitude.z) * shake.Look().shakePower.z * powerRate
 		);
 
 		// 回転をかける
@@ -788,6 +882,47 @@ bool IsSetFixedRot(const ComponentHandle<PoseRotState>& a_poseRotState, const st
 	return false;
 }
 
+float3 GetLookRot(Chunk& a_chunk, const Entity user, const Entity target)
+{
+	const float3 position = GetEntityPosePos(a_chunk, user);
+
+	const float3 targetPos = GetEntityPosePos(a_chunk, target);
+	
+	
+	float3 relativeDistance(
+		targetPos.x - position.x,
+		targetPos.y - position.y,
+		targetPos.z - position.z
+	);
+
+	float targetDistance = NormalizeLength(
+		relativeDistance.x,
+		relativeDistance.y,
+		relativeDistance.z
+	);
+
+	if (targetDistance == std::numeric_limits<float>::max())
+	{
+		return float3();
+	}
+
+	float pitchSign = Sign(relativeDistance.y) * -1.0f;
+
+	float dirXZ =
+		std::sqrtf(
+			std::pow(relativeDistance.x, 2.0f) + std::pow(relativeDistance.z, 2.0f)
+		);
+
+	float dirY = std::sqrtf(
+		std::pow(relativeDistance.y, 2.0f)
+	);
+
+	float finalPitch = atan2f(dirY, dirXZ) * (180 / PI) * pitchSign;
+	float finalYaw = atan2f(relativeDistance.x, relativeDistance.z) * (180 / PI);
+
+	return float3(finalPitch, finalYaw, 0.0f);
+}
+
 
 //void CurrentPosePos(const Entity& a_entity, Chunk& a_chunk)
 //{
@@ -826,5 +961,33 @@ void ApplyPoseToTransform(Chunk& a_chunk)
 			rot->yaw = pose.Look().rot.y;
 			rot->roll = pose.Look().rot.z;
 		}
+	}
+}
+
+void MoveForwardSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+
+	ComponentView view = a_chunk.GetView<ComponentTypes<MoveForward, MotionResult, Rotation>>();
+
+	for (auto it : view)
+	{
+		ComponentHandle<MotionResult> result = a_chunk.GetComponent<MotionResult>(it);
+		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(it);
+		ComponentHandle<MoveForward> move = a_chunk.GetComponent<MoveForward>(it);
+
+		move->speed *= pow(move.Look().attenuation, a_context.deltaTime);
+
+		float3 radRotation(rot.Look().pitch * RAD, rot.Look().yaw * RAD, rot.Look().roll * RAD);
+
+		float3 forward;
+		forward.x = std::sin(radRotation.y) * std::cos(radRotation.x);
+		forward.y = std::sin(-radRotation.x);
+		forward.z = std::cos(radRotation.y) * std::cos(radRotation.x);
+
+		float3 displacement = forward * move.Look().speed * a_context.deltaTime;
+
+		result->posOffset.x += displacement.x;
+		result->posOffset.y += displacement.y;
+		result->posOffset.z += displacement.z;
 	}
 }

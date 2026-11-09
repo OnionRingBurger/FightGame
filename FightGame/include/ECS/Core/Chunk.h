@@ -5,6 +5,9 @@
 #include "EntityManager.h"
 #include "StorageManager.h"
 #include "ComponentView.h"
+#include <vector>
+
+using DeleteView = std::vector<Entity>::const_iterator;
 
 class Chunk
 {
@@ -36,6 +39,8 @@ public:
 	template<typename UseComponentsTypes, typename ExclusionComponentsTypes>
 	ComponentView GetView();
 
+	DeleteView GetDeleteView();
+
 	void DeleteChunkComponent(Entity, TypeID a_typeId);
 
 	void CleanupFrame();
@@ -48,6 +53,7 @@ private:
 	// íœ—\’è‚ÌComponent‚âEntity‚ğ•Û
 	std::vector<std::pair<Entity, TypeID>> deleteComponents;
 	std::vector<Entity> deleteEntities;
+
 
 };
 
@@ -88,6 +94,8 @@ inline ComponentView Chunk::GetView()
 {
 	return storageManager.GetView<UseComponentsTypes, ExclusionComponentsTypes>();
 }
+
+
 
 
 #endif
