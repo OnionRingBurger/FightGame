@@ -177,7 +177,9 @@
 	X(UnlockStageEntity) \
 	X(UIShake) \
 	X(UIRailFly) \
-	X(ControllerInputUIReplace)
+	X(ControllerInputUIReplace) \
+	X(Light) \
+	X(UseShadowShader)
 
 
 using BitFlag = unsigned int;
@@ -3767,7 +3769,7 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// コントローラーとキーボード入力により切り替わるUI
 	struct ControllerInputUIReplace
 	{
 		static constexpr TypeID kTypeId = 173;
@@ -3793,6 +3795,42 @@ namespace Component
 			, controllerUIKey(a_controllerUIKey)
 			, keyboardUIScale(a_keyboardUIScale)
 			, controllerUIScale(a_controllerUIScale)
+		{
+		}
+	};
+
+	// 影用ライト
+	struct Light
+	{
+		static constexpr TypeID kTypeId = 174;
+		static constexpr const char* kTypeName = "Light";
+		static constexpr int kVersion = 0;
+
+		float3 direction;
+		float3 color;
+		bool castShadow;
+
+		Light()
+			: Light(float3(-1.0f, -1.0f, -1.0f), float3(1.0f, 1.0f, 1.0f), true)
+		{
+		}
+
+		Light(float3 a_direction, float3 a_color, bool a_castShadow)
+			: direction(a_direction)
+			, color(a_color)
+			, castShadow(a_castShadow)
+		{
+		}
+	};
+
+	// 影シェーダー
+	struct UseShadowShader
+	{
+		static constexpr TypeID kTypeId = 175;
+		static constexpr const char* kTypeName = "UseShadowShader";
+		static constexpr int kVersion = 0;
+
+		UseShadowShader()
 		{
 		}
 	};

@@ -348,6 +348,12 @@ struct LoadDatas
 	std::vector<JsonPrefabLoadData> jsonPrefab;
 };
 
+// !!!New!!!
+struct LoadManifestPaths
+{
+	std::string path;
+};
+
 void LoadSound();
 
 ModelLoadResult LoadModel(const ModelLoadJob& job);

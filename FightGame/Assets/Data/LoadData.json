@@ -1,0 +1,236 @@
+{
+  "models": [
+    { "key": "Box", "scale": 1.0 },
+    { "key": "Ball", "scale": 1.0 }
+  ],
+  "textures": [
+    "TitleLogo",
+    "Shadow",
+    "Mask",
+    "DarkMask",
+    "DarkGameOver",
+    "PleaseKey",
+    "WhiteFade",
+    "DarkFade",
+    "DarkFadeMini",
+    "WhiteFadeBack",
+    "GameOver",
+    "GameClear",
+    "GameClearText",
+    "Speedline",
+    "UIGauge",
+    "UIFrame",
+    "UIBack",
+    "ShotEffect",
+    "DamageEffect",
+    "DamageDirectionEffect",
+    "ShotIcon",
+    "WaitShot",
+    "CanShotReady",
+    "LeftClick",
+    "HitEffectRay",
+    "Blue",
+    "Alpha",
+    "Star",
+    "Red",
+    "Purple",
+    "Green",
+    "LookOnMaker",
+    "White",
+    "UIBack2",
+    "Sea",
+    "Ready",
+    "Fight",
+    "BattleStart",
+    "ButtonA",
+    "ButtonB",
+    "JumpUI",
+    "GuardUI",
+    "ButtonRB",
+    "ButtonLB",
+    "RetryBack",
+    "Retry",
+    "Yes",
+    "No",
+    "BackShadow",
+    "GameEnd",
+    "GameEndFrame",
+    "ClearBack",
+    "CameraChange",
+    "ClearCameraChange",
+    "ClearMovieBack",
+    "Kintoki",
+    "StageClear",
+    "TutorialWindow",
+    "TitleStart",
+    "TitleTutorial",
+    "Controller",
+    "SelectBack",
+    "Stage1",
+    "Stage2",
+    "Back",
+    "Azuki",
+    "Yellow",
+    "Mizore",
+    "WaveFadeMask_A",
+    "AttackUI",
+    "SpaceKeyUI",
+    "EKeyUI",
+    "LeftClickUI",
+    "RightClickUI",
+    "RightStick",
+    "MouseMove",
+    "TargetUI"
+  ],
+  "effects": [
+    { "key": "Freeze.efk", "magnificent": 1.0 },
+    { "key": "IcicleBrokenChange.efkefc", "magnificent": 0.55 },
+    { "key": "Spawn.efk", "magnificent": 0.45 },
+    { "key": "Snow.efkefc", "magnificent": 3.0 },
+    { "key": "Entry.efkefc", "magnificent": 1.5 },
+    { "key": "Guard.efk", "magnificent": 0.6 },
+    { "key": "RedBossEntry.efkefc", "magnificent": 0.3 },
+    { "key": "DeadBroken.efkefc", "magnificent": 0.5 },
+    { "key": "BossDeadBroken.efkefc", "magnificent": 0.8 },
+    { "key": "Heal.efkefc", "magnificent": 0.8 },
+    { "key": "WhiteBossEntry.efkefc", "magnificent": 1.4 }
+  ],
+  "textFormats": [
+    {
+      "key": "DefaultFormat",
+      "useFile": true,
+      "font": "03スマートフォントUI",
+      "fontFile": "Assets/Font/03SmartUI.otf",
+      "size": 96.0
+    },
+    {
+      "key": "ShortFormat",
+      "useFile": true,
+      "font": "03スマートフォントUI",
+      "fontFile": "Assets/Font/03SmartUI.otf",
+      "size": 80.0
+    },
+    {
+      "key": "BigFormat",
+      "useFile": true,
+      "font": "03スマートフォントUI",
+      "fontFile": "Assets/Font/03SmartUI.otf",
+      "size": 120.0
+    },
+    {
+      "key": "SmartFormat",
+      "useFile": true,
+      "font": "03スマートフォントUI",
+      "fontFile": "Assets/Font/03SmartUI.otf",
+      "size": 120.0
+    }
+  ],
+  "textUIs": [
+    {
+      "key": "ControllerText",
+      "text": "本ゲームはキーボード操作でも遊べますが、\nコントローラーを使用すると、より楽しんでいただけます。",
+      "formatKey": "SmartFormat",
+      "width": 3600.0,
+      "height": 600.0
+    },
+    {
+      "key": "StartText",
+      "text": "上からくるぞ！\n気を付けろ！",
+      "formatKey": "DefaultFormat",
+      "width": 2112.0,
+      "height": 480.0
+    },
+    {
+      "key": "TutorialAttack",
+      "text": "まずは敵に攻撃を当ててダメージを与えよう！\n体力を削りきることで敵を倒せるぞ！",
+      "formatKey": "DefaultFormat",
+      "width": 2112.0,
+      "height": 480.0
+    },
+    {
+      "key": "TutorialClear1",
+      "text": "よくやった！",
+      "formatKey": "DefaultFormat",
+      "width": 2112.0,
+      "height": 480.0
+    },
+    {
+      "key": "TutorialAttack2",
+      "text": "攻撃には発生が早く、使い勝手の良い弱攻撃と\n火力が高く、範囲が広い強攻撃の二種類が存在する。",
+      "formatKey": "ShortFormat",
+      "width": 2112.0,
+      "height": 480.0
+    },
+    {
+      "key": "TutorialAttack3",
+      "text": "一方的に攻撃できる距離では強攻撃が、お互いの攻撃が\n当たる距離では敵を弾く弱攻撃が有効だ！",
+      "formatKey": "ShortFormat",
+      "width": 2112.0,
+      "height": 480.0
+    },
+    {
+      "key": "TutorialCursor1",
+      "text": "攻撃は狙っている敵の方向へ向かう。\n狙う敵をうまく選べば巻き込んで攻撃を当てられるぞ！",
+      "formatKey": "ShortFormat",
+      "width": 2112.0,
+      "height": 480.0
+    },
+    {
+      "key": "TutorialEnemy",
+      "text": "敵の種類の攻撃はジャンプやガードで防げるぞ！\n隙をついて上手く反撃しよう！",
+      "formatKey": "ShortFormat",
+      "width": 2112.0,
+      "height": 480.0
+    },
+    {
+      "key": "TutorialEnemy2",
+      "text": "一部の敵は特定の間合いでガードやジャンプで\n防ぎきるのが難しい攻撃を放ってくる",
+      "formatKey": "ShortFormat",
+      "width": 2112.0,
+      "height": 480.0
+    },
+    {
+      "key": "TutorialEnemy3",
+      "text": "そんな敵と戦うときは、相手の間合いを避け、有利な立ち位置で戦おう！",
+      "formatKey": "ShortFormat",
+      "width": 2112.0,
+      "height": 480.0
+    },
+    {
+      "key": "Phase1",
+      "text": "よくやった！",
+      "formatKey": "DefaultFormat",
+      "width": 2112.0,
+      "height": 480.0
+    },
+    {
+      "key": "Phase2",
+      "text": "ある程度敵を倒し切るとHPが回復するぞ！",
+      "formatKey": "DefaultFormat",
+      "width": 2112.0,
+      "height": 480.0
+    },
+    {
+      "key": "TutorialClear",
+      "text": "素晴らしい！実戦ではより強い敵が現れる、\n間合いを意識して戦うことを忘れるな！",
+      "formatKey": "DefaultFormat",
+      "width": 2112.0,
+      "height": 480.0
+    },
+    {
+      "key": "GameStart",
+      "text": "Start",
+      "formatKey": "DefaultFormat",
+      "width": 480.0,
+      "height": 96.0
+    },
+    {
+      "key": "Tutorial",
+      "text": "Tutorial",
+      "formatKey": "DefaultFormat",
+      "width": 480.0,
+      "height": 96.0
+    }
+  ],
+  "jsonPrefab": "Assets/Data/EntityData.json"
+}

@@ -392,7 +392,7 @@ JsonPrefabLoadResult LoadJsonPrefab(const JsonPrefabLoadJob& a_job, const Compon
 	return std::move(ret);
 }
 
-// !!!New!!!
+// 読み込み用のマルチスレッド処理
 void WorkerLoop(
 	LoadJobQueues& a_jobQueues,
 	LoadResultQueues& a_resultQueues,

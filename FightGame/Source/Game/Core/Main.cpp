@@ -68,144 +68,8 @@ void MainGame::Init()
 		std::ref(runningLoadLoop));
 	
 
-	loadDatas.model =
-	{
-		{"Box", 1.0f},
-		{"Ball", 1.0f},
-	};
-
-	loadDatas.texture =
-	{
-		"TitleLogo",
-		"Shadow",
-		"Mask",
-		"DarkMask",
-		"DarkGameOver",
-		"PleaseKey",
-		"WhiteFade",
-		"DarkFade",
-		"DarkFadeMini",
-		"WhiteFadeBack",
-		"GameOver",
-		"GameClear",
-		"GameClearText",
-		"Speedline",
-		"UIGauge",
-		"UIFrame",
-		"UIBack",
-		"ShotEffect",
-		"DamageEffect",
-		"DamageDirectionEffect",
-		"ShotIcon",
-		"WaitShot",
-		"CanShotReady",
-		"LeftClick",
-		"HitEffectRay",
-		"Blue",
-		"Alpha",
-		"Star",
-		"Red",
-		"Purple",
-		"Green",
-		"LookOnMaker",
-		"White",
-		"UIBack2",
-		"Sea",
-		"Ready",
-		"Fight",
-		"BattleStart",
-		"ButtonA",
-		"ButtonB",
-		"JumpUI",
-		"GuardUI",
-		"ButtonRB",
-		"ButtonLB",
-		"RetryBack",
-		"Retry",
-		"Yes",
-		"No",
-		"BackShadow",
-		"GameEnd",
-		"GameEndFrame",
-		"ClearBack",
-		"CameraChange",
-		"ClearCameraChange",
-		"ClearMovieBack",
-		"Kintoki",
-		"StageClear",
-		"TutorialWindow",
-		"TitleStart",
-		"TitleTutorial",
-		"Controller",
-		"SelectBack",
-		"Stage1",
-		"Stage2",
-		"Back",
-		"Azuki",
-		"Yellow",
-		"Mizore",
-		"WaveFadeMask_A",
-		"AttackUI",
-		"SpaceKeyUI",
-		"EKeyUI",
-		"LeftClickUI",
-		"RightClickUI",
-		"RightStick",
-		"MouseMove",
-		"TargetUI"
-	};
-
-	loadDatas.effect =
-	{
-		{kTestEffect, 1.0f},
-		{kHitEffect, 0.55f},
-		{kSpawnEffect, 0.45f},
-		{kSnowEffect, 3.0f},
-		{kEntryEffect, 1.5f},
-		{kGuardEffectKey, 0.6f},
-		{kRedBossEntryKey, 0.3f},
-		{kDeadBrokenEffectKey, 0.5f},
-		{kBossDeadBrokenEffectKey, 0.8f},
-		{kPlayerHealKey, 0.8f},
-		{kWhiteBossEntryKey, 1.4f}
-	};
-
-
-
-
-
-	loadDatas.textFormat =
-	{
-		{ "DefaultFormat", true, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 96.0f },
-		{ "ShortFormat", true, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 80.0f },
-		{ "BigFormat", true, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 120.0f },
-		{ "SmartFormat", true, L"03スマートフォントUI", L"Assets/Font/03SmartUI.otf", 120.0f }
-	};
-
-	loadDatas.textUI =
-	{
-		{ "ControllerText", L"本ゲームはキーボード操作でも遊べますが、\nコントローラーを使用すると、より楽しんでいただけます。", "SmartFormat", 120.0f * 30.0f, 120.0f * 5.0f },
-		{ "StartText", L"上からくるぞ！\n気を付けろ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "TutorialAttack", L"まずは敵に攻撃を当ててダメージを与えよう！\n体力を削りきることで敵を倒せるぞ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "TutorialClear1", L"よくやった！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "TutorialAttack2", L"攻撃には発生が早く、使い勝手の良い弱攻撃と\n火力が高く、範囲が広い強攻撃の二種類が存在する。", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "TutorialAttack3", L"一方的に攻撃できる距離では強攻撃が、お互いの攻撃が\n当たる距離では敵を弾く弱攻撃が有効だ！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "TutorialCursor1", L"攻撃は狙っている敵の方向へ向かう。\n狙う敵をうまく選べば巻き込んで攻撃を当てられるぞ！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "TutorialEnemy", L"敵の種類の攻撃はジャンプやガードで防げるぞ！\n隙をついて上手く反撃しよう！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "TutorialEnemy2", L"一部の敵は特定の間合いでガードやジャンプで\n防ぎきるのが難しい攻撃を放ってくる", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "TutorialEnemy3", L"そんな敵と戦うときは、相手の間合いを避け、有利な立ち位置で戦おう！", "ShortFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "Phase1", L"よくやった！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "Phase2", L"ある程度敵を倒し切るとHPが回復するぞ！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "TutorialClear", L"素晴らしい！実戦ではより強い敵が現れる、\n間合いを意識して戦うことを忘れるな！", "DefaultFormat", 96.0f * 22.0f, 96.0f * 5.0f },
-		{ "GameStart", L"Start", "DefaultFormat", 96.0f * 5.0f, 96.0f},
-		{ "Tutorial", L"Tutorial", "DefaultFormat", 96.0f * 5.0f, 96.0f }
-
-	};
-
-	loadDatas.jsonPrefab =
-	{
-		{kDataPath}
-	};
+	// !!!New!!!
+	loadManifestPaths.path = "Assets/Data/LoadData.json";
 
 	ChangeScene("Load");
 
@@ -454,12 +318,6 @@ void MainGame::Draw()
 	static bool camAutoSwitch = false;
 	static bool camUpDownSwitch = true;
 	static float camAutoRotate = 1.0f;
-	/*if (input.IsRegisterTrigger(VK_RETURN)) {
-		camAutoSwitch ^= true;
-	}
-	if (input.IsRegisterTrigger(VK_SPACE)) {
-		camUpDownSwitch ^= true;
-	}*/
 
 	DirectX::XMVECTOR camPos;
 	if (camAutoSwitch) {
@@ -540,7 +398,7 @@ bool MainGame::ChangeScene(std::string a_key)
 				sceneChangeQueue.push(a_key);
 			},
 			loadJobQueues,
-			std::move(loadDatas),
+			loadManifestPaths,
 			modelCache,
 			uiCache,
 			effectCache,
@@ -572,7 +430,8 @@ bool MainGame::ChangeScene(std::string a_key)
 			// !!!New!!!
 			[this](bool a_isFixed)
 			{
-				ShowCursor(!a_isFixed);
+				bool cursor = !a_isFixed;
+				ShowCursor(cursor);
 				isFixedCursor = a_isFixed;
 			},
 			input,

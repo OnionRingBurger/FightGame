@@ -40,7 +40,7 @@ GameScene::GameScene(
 
 	SetWorld(kStartWorld);
 
-	input.RegisterKey("GameEnd", 'K');
+	input.RegisterKey("GameEnd", VK_ESCAPE);
 	input.RegisterButton("GameEnd", XINPUT_GAMEPAD_START);
 	input.RegisterKey("IMGUI", VK_F2);
 	input.RegisterKey("ToDebugScene", VK_F3);

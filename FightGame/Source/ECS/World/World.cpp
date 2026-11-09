@@ -47,8 +47,8 @@ World::~World()
 
 void World::InitWorld()
 {
-	// ContextÇÃèâä˙âª
-	InitContext();
+	// !!!New!!!
+	drawResources.Init();
 
 	InitResponse(systemResponse);
 	if (!systemResponse)	
@@ -63,11 +63,6 @@ void World::InitWorld()
 
 	ContextUpdate(0.01f);
 	InitChunk(chunk, context, *systemResponse, aiManager, serialize);
-
-	// ÉtÉ@ÉCÉãÇì«Ç›çûÇﬁ
-	std::ifstream stream(kDataPath);
-	nlohmann::json json;
-	stream >> json;
 }
 
 void World::InitResponse(std::unique_ptr<SystemResponse>& response)
@@ -127,7 +122,7 @@ void World::UpdateWorld()
 void World::DrawWorld()
 {
 	// Systemèàóù
-	DrawSystem(chunk, context);
+	DrawSystem(chunk, context, drawResources);
 
 	FrameEnd();
 

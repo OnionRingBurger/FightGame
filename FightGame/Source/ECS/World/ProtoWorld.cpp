@@ -118,6 +118,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		RailFly(0.08f, 0.09f)
 	);
 
+
 	// !!!New!!!
 	std::vector<std::string> phaseKeys;
 
@@ -259,7 +260,8 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		ModelKey("Box"),
 		BoxCollider(float3(0.0f, 30.0f, 0.0f), float3(kDebugWorldSize.x, 20.0f, kDebugWorldSize.z)),
 		OBBCollider(OBB_PushOutLocked),
-		floorColor
+		floorColor,
+		UseShadowShader()
 	);
 
 
@@ -337,6 +339,20 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 		seaColor
 	);
 
+	Entity light = newChunk.CreateNewEntity(
+		Position(float3(0.0f, 0.0f, 0.0f) + kDefaultWorldPosition),
+		Light(float3(0.35f, -1.0f, 0.8f), float3(0.1f, 0.1f, 0.1f), true)
+	);
+
+	//Entity testBlock = newChunk.CreateNewEntity(
+	//	TRANSFORM_COMPONENT(
+	//		float3(),
+	//		float3(),
+	//		float3(1.0f, 1.0f, 1.0f)
+	//	),
+	//	ModelKey("Box")
+	//);
+
 	Entity snowEffect = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
 			float3(0.0f, 5.0f, -5.0f) + kDefaultWorldPosition,
@@ -407,8 +423,6 @@ void ProtoWorld::InitChunk(Chunk& a_chunk, SystemContext& a_context, SystemRespo
 
 	EnemyAttackLoadSystem(a_chunk, a_context);
 
-
-	// ???U???g?????????Z?b?g
 	ResetSystem(a_chunk, a_context);
 }
 

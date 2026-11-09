@@ -229,7 +229,8 @@ Chunk TutorialWorld::CreateNewChunk(AIManager& a_aiManager)
 		ModelKey("Box"),
 		BoxCollider(float3(0.0f, 30.0f, 0.0f), float3(kDebugWorldSize.x, 20.0f, kDebugWorldSize.z)),
 		OBBCollider(OBB_PushOutLocked),
-		AlphaBlendComponent("Red", "Blue")
+		AlphaBlendComponent("Red", "Blue"),
+		UseShadowShader()
 	);
 
 
@@ -327,6 +328,12 @@ Chunk TutorialWorld::CreateNewChunk(AIManager& a_aiManager)
 
 	Entity configUI = newChunk.CreateNewEntity(
 		SpawnJson("GameControllerUI", 0.0f, float3())
+	);
+
+
+	Entity light = newChunk.CreateNewEntity(
+		Position(float3(0.0f, 0.0f, 0.0f) + kDefaultWorldPosition),
+		Light(float3(0.35f, -1.0f, 0.8f), float3(0.1f, 0.1f, 0.1f), true)
 	);
 
 	PlaySound(LoadSound("Assets/Sound/gamebgm.mp3", true));

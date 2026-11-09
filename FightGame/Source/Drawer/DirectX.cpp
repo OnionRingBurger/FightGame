@@ -251,10 +251,25 @@ HRESULT InitDirectX(HWND hWnd, UINT width, UINT height, bool fullscreen)
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	for (int i = 0; i < SAMPLER_MAX; ++i)
+	for (int i = 0; i <= SAMPLER_POINT; ++i)
 	{
 		samplerDesc.Filter = filter[i];
 		hr = g_pDevice->CreateSamplerState(&samplerDesc, &g_pSamplerState[i]);
+		if (FAILED(hr)) { return hr; }
+	}
+	// !!!New!!!
+	{
+		D3D11_SAMPLER_DESC shadowSamplerDesc = {};
+		shadowSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+		shadowSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+		shadowSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+		shadowSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+		shadowSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+		shadowSamplerDesc.BorderColor[0] = 1.0f;
+		shadowSamplerDesc.BorderColor[1] = 1.0f;
+		shadowSamplerDesc.BorderColor[2] = 1.0f;
+		shadowSamplerDesc.BorderColor[3] = 1.0f;
+		hr = g_pDevice->CreateSamplerState(&shadowSamplerDesc, &g_pSamplerState[SAMPLER_COMPARISON_SHADOW]);
 		if (FAILED(hr)) { return hr; }
 	}
 	SetSamplerState(SAMPLER_LINEAR);
@@ -369,6 +384,39 @@ void SetRenderTargets(UINT num, RenderTarget** ppViews, DepthStencil* pView)
 	g_pContext->RSSetViewports(1, &vp);
 }
 
+void SetDepthStencilTarget(DepthStencil* pView)
+{
+	// !!!New!!!
+	ID3D11RenderTargetView* nullRTV = nullptr;
+	g_pContext->OMSetRenderTargets(1, &nullRTV, pView ? pView->GetView() : nullptr);
+
+	if (!pView)
+	{
+		return;
+	}
+
+	D3D11_VIEWPORT vp;
+	vp.TopLeftX = 0.0f;
+	vp.TopLeftY = 0.0f;
+	vp.Width = (float)pView->GetWidth();
+	vp.Height = (float)pView->GetHeight();
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
+	g_pContext->RSSetViewports(1, &vp);
+}
+
+void RestoreDefaultRenderTargets()
+{
+	// !!!New!!!
+	RenderTarget* pRTV = GetDefaultRTV();
+	DepthStencil* pDSV = GetDefaultDSV();
+	if (!pRTV)
+	{
+		return;
+	}
+	SetRenderTargets(1, &pRTV, pDSV);
+}
+
 void SetCullingMode(D3D11_CULL_MODE cull)
 {
 	switch (cull)
@@ -389,8 +437,8 @@ void SetBlendMode(BlendMode blend)
 	FLOAT blendFactor[4] = { D3D11_BLEND_ZERO, D3D11_BLEND_ZERO, D3D11_BLEND_ZERO, D3D11_BLEND_ZERO };
 	g_pContext->OMSetBlendState(g_pBlendState[blend], blendFactor, 0xffffffff);
 }
-void SetSamplerState(SamplerState state)
+void SetSamplerState(SamplerState state, UINT slot)
 {
 	if (state < 0 || state >= SAMPLER_MAX) return;
-	g_pContext->PSSetSamplers(0, 1, &g_pSamplerState[state]);
+	g_pContext->PSSetSamplers(slot, 1, &g_pSamplerState[state]);
 }

@@ -31,6 +31,8 @@ constexpr int kMouseFixedPosY = 400;
 
 // シェーダー
 constexpr int kMaxArea = 100;
+// シャドウマップのサイズ
+constexpr int kShadowMapSize = 2048;
 
 constexpr const char* kDataPath = "Assets/Data/EntityData.json";
 constexpr const char* kDataTestPath = "Assets/Data/EntityDataTest.json";

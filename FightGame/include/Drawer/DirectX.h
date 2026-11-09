@@ -45,6 +45,7 @@ enum SamplerState
 {
 	SAMPLER_LINEAR,
 	SAMPLER_POINT,
+	SAMPLER_COMPARISON_SHADOW,
 	SAMPLER_MAX
 };
 
@@ -67,7 +68,10 @@ void BeginDrawDirectX();
 void EndDrawDirectX();
 
 void SetRenderTargets(UINT num, RenderTarget** ppViews, DepthStencil* pView);
+// !!!New!!!
+void SetDepthStencilTarget(DepthStencil* pView);
+void RestoreDefaultRenderTargets();
 void SetCullingMode(D3D11_CULL_MODE cull);
 void SetDepthTest(DepthMode);
 void SetBlendMode(BlendMode blend);
-void SetSamplerState(SamplerState state);
+void SetSamplerState(SamplerState state, UINT slot = 0);

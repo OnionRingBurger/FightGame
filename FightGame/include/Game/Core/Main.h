@@ -69,9 +69,7 @@ private:
 	bool isEnd = false;
 
 	//! 読み込みリクエストとリザルト
-	// !!!New!!!
 	LoadJobQueues loadJobQueues;
-	// !!!New!!!
 	LoadResultQueues loadResultQueues;
 
 	//! 読み込み処理を回しているかどうか 
@@ -92,8 +90,8 @@ private:
 	std::queue<std::string> sceneChangeQueue;
 	std::thread loadWorker;
 
-	// 将来的にSceneから要求を受けて登録することになるかもしれないのでメンバとして保持
-	LoadDatas loadDatas;
+	// 読み込み用のJsonパス
+	LoadManifestPaths loadManifestPaths;
 
 	bool isFixedCursor;
 

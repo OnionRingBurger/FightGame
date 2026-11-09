@@ -120,8 +120,28 @@ HRESULT Shader::Make(void* pData, UINT size)
 		if (FAILED(hr)) { return hr; }
 	}
 	// テクスチャ領域作成
-	// m_pTextures.resize(shaderDesc.TextureNormalInstructions, nullptr);
-	m_pTextures.resize(shaderDesc.BoundResources, nullptr);
+	UINT textureSlotCount = 0;
+	for (UINT i = 0; i < shaderDesc.BoundResources; ++i)
+	{
+		D3D11_SHADER_INPUT_BIND_DESC bindDesc = {};
+		hr = pReflection->GetResourceBindingDesc(i, &bindDesc);
+		if (FAILED(hr))
+		{
+			continue;
+		}
+		if (bindDesc.Type == D3D_SIT_TEXTURE ||
+			bindDesc.Type == D3D_SIT_TBUFFER ||
+			bindDesc.Type == D3D_SIT_UAV_RWTYPED)
+		{
+			const UINT need = bindDesc.BindPoint + bindDesc.BindCount;
+			if (need > textureSlotCount)
+			{
+				textureSlotCount = need;
+			}
+		}
+	}
+	m_pTextures.resize(textureSlotCount, nullptr);
+	SAFE_RELEASE(pReflection);
 	return MakeShader(pData, size);
 }
 

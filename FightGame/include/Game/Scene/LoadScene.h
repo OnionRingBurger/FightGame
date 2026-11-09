@@ -15,7 +15,7 @@ class LoadScene : public IScene
 public:
 	LoadScene(std::function<void(std::string)> a_sceneChange,
 		LoadJobQueues& a_jobQueues,
-		LoadDatas a_loadDatas,
+		LoadManifestPaths a_manifestPaths,
 		IModelCacheAcquisition& a_modelCache,
 		IUICacheAcquisition& a_uiCache,
 		IEffectCacheAcquisition& effectCache,
@@ -31,6 +31,10 @@ public:
 
 private:
 	bool inited;
+	// !!!New!!!
+	bool presentationReady;
+	// !!!New!!!
+	bool manifestRegistered;
 	std::vector<std::shared_ptr<std::atomic_bool>> useDataLoadEndFlags;
 	std::function<void(std::string)> sceneChange;
 	std::vector<std::shared_ptr<std::atomic_bool>> loadEndFlags;
@@ -39,8 +43,9 @@ private:
 	LoadJobQueues& jobQueues;
 	// !!!New!!!
 	IUICacheAcquisition& uiCache;
+	// !!!New!!!
+	LoadManifestPaths manifestPaths;
 	LoadDatas loadDatas;
 
 	void RemoveIfFlaged(std::vector<std::shared_ptr<std::atomic_bool>>& loadEndFlags);
 };
-

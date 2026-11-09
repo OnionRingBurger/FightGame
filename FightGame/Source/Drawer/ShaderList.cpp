@@ -23,6 +23,10 @@ void ShaderList::Init()
 	MakeFogPS();
 	MakeGhostPS();
 	MakeAlphaBlend();
+	// !!!New!!!
+	MakeShadowReceivePS();
+	// !!!New!!!
+	MakeAlphaShadowPS();
 
 	DirectX::XMFLOAT4X4 mat[250];
 	for (int i = 0; i < 250; ++i)
@@ -44,6 +48,10 @@ void ShaderList::Init()
 	SetFog(DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 50.0f, 50.0f);
 	SetArea(std::vector<GhostArea>());
 	SetGhostFade(20.0f);
+	// !!!New!!!
+	DirectX::XMFLOAT4X4 identity;
+	DirectX::XMStoreFloat4x4(&identity, DirectX::XMMatrixIdentity());
+	SetShadow(&identity, &identity, 0.001f, 1.0f / static_cast<float>(kShadowMapSize));
 }
 
 void ShaderList::Uninit()
@@ -123,6 +131,8 @@ void ShaderList::SetCamera(const DirectX::XMFLOAT3 pos, const  DirectX::XMFLOAT3
 	m_pPS[PS_SPECULAR]->WriteBuffer(2, param);
 	m_pPS[PS_TOON]->WriteBuffer(2, param);
 	m_pPS[PS_GHOST]->WriteBuffer(2, param);
+	// !!!New!!!
+	m_pPS[PS_SHADOW_RECEIVE]->WriteBuffer(2, param);
 }
 void ShaderList::SetFog(DirectX::XMFLOAT4 color, float start, float range)
 {
@@ -154,6 +164,24 @@ void ShaderList::SetGhostFade(float ghostFadeRange)
 {
 	DirectX::XMFLOAT4 param = { ghostFadeRange, 0.0f, 0.0f, 0.0f };
 	m_pPS[PS_GHOST]->WriteBuffer(4, &param);
+}
+
+void ShaderList::SetShadow(DirectX::XMFLOAT4X4* lightView, DirectX::XMFLOAT4X4* lightProj, float bias, float texelSize)
+{
+	// !!!New!!!
+	struct ShadowParam
+	{
+		DirectX::XMFLOAT4X4 lightView;
+		DirectX::XMFLOAT4X4 lightProj;
+		DirectX::XMFLOAT4 shadowParam;
+	};
+	ShadowParam param;
+	param.lightView = *lightView;
+	param.lightProj = *lightProj;
+	param.shadowParam = DirectX::XMFLOAT4(bias, texelSize, 0.0f, 0.0f);
+	m_pPS[PS_SHADOW_RECEIVE]->WriteBuffer(3, &param);
+	// !!!New!!!
+	m_pPS[PS_ALPHA_SHADOW]->WriteBuffer(3, &param);
 }
 
 void ShaderList::MakeWorldVS()
@@ -578,4 +606,154 @@ float4 main(PS_IN pin) : SV_TARGET
 })EOT";
 	m_pPS[PS_ALPHA] = new PixelShader();
 	m_pPS[PS_ALPHA]->Compile(code);
+}
+
+void ShaderList::MakeShadowReceivePS()
+{
+	const char* code = R"EOT(
+struct PS_IN {
+	float4 pos : SV_POSITION;
+	float3 normal : NORMAL0;
+	float2 uv : TEXCOORD0;
+	float4 color : COLOR0;
+	float4 wPos : POSITION0;
+};
+cbuffer Material : register(b0)
+{
+	float4 objDiffuse;
+	float4 objAmbient;
+	float4 objSpecular;
+};
+cbuffer Light : register(b1)
+{
+	float4 lightDiffuse;
+	float4 lightDir;
+};
+cbuffer Camera : register(b2)
+{
+	float4 cameraPos;
+};
+cbuffer Shadow : register(b3)
+{
+	float4x4 lightView;
+	float4x4 lightProj;
+	float4 shadowParam;
+};
+Texture2D tex : register(t0);
+Texture2D shadowMap : register(t1);
+SamplerState samp : register(s0);
+SamplerComparisonState shadowSamp : register(s1);
+float4 main(PS_IN pin) : SV_TARGET
+{
+	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	if(objAmbient.a >= 1.0f)
+		color = tex.Sample(samp, pin.uv);
+	float3 N = normalize(pin.normal);
+	float3 L = normalize(-lightDir);
+	float3 V = normalize(cameraPos.xyz - pin.wPos.xyz);
+	float3 R = reflect(-V, N);
+	float dotNL = saturate((dot(N, L) + 0.5f) / 1.5f);
+	float dotRL = saturate(dot(R, L));
+	float3 diffuse = objDiffuse.rgb * lightDiffuse.rgb;
+	float3 ambient = objAmbient.rgb * lightDiffuse.rgb;
+	float3 specular = objSpecular.rgb * lightDiffuse.rgb;
+	color.rgb *= saturate(lerp(
+		lerp(diffuse * ambient, diffuse + ambient, pow(ambient, 4.0f)),
+		diffuse, dotNL));
+	color.rgb += specular * saturate(pow(dotRL, max(0.01f, objSpecular.a)));
+
+	float4 lightPos = float4(pin.wPos.xyz, 1.0f);
+	lightPos = mul(lightPos, lightView);
+	lightPos = mul(lightPos, lightProj);
+	float3 proj = lightPos.xyz / lightPos.w;
+	float2 shadowUV = float2(proj.x * 0.5f + 0.5f, proj.y * -0.5f + 0.5f);
+	float bias = shadowParam.x;
+	float texel = shadowParam.y;
+	float shadow = 0.0f;
+	[unroll]
+	for (int y = -1; y <= 1; ++y)
+	{
+		[unroll]
+		for (int x = -1; x <= 1; ++x)
+		{
+			float2 offset = float2(x, y) * texel;
+			shadow += shadowMap.SampleCmpLevelZero(shadowSamp, shadowUV + offset, proj.z - bias);
+		}
+	}
+	shadow /= 9.0f;
+	color.rgb *= lerp(0.35f, 1.0f, shadow);
+	return color;
+})EOT";
+	m_pPS[PS_SHADOW_RECEIVE] = new PixelShader();
+	m_pPS[PS_SHADOW_RECEIVE]->Compile(code);
+}
+
+void ShaderList::MakeAlphaShadowPS()
+{
+	const char* code = R"EOT(
+struct PS_IN {
+	float4 pos : SV_POSITION;
+	float3 normal : NORMAL0;
+	float2 uv : TEXCOORD0;
+	float4 color : COLOR0;
+	float4 wPos : POSITION0;
+};
+cbuffer Material : register(b0)
+{
+	float4 objDiffuse;
+	float4 objAmbient;
+	float4 objSpecular;
+};
+cbuffer Light : register(b1)
+{
+	float4 lightDiffuse;
+	float4 lightDir;
+};
+cbuffer Camera : register(b2)
+{
+	float4 cameraPos;
+};
+cbuffer Shadow : register(b3)
+{
+	float4x4 lightView;
+	float4x4 lightProj;
+	float4 shadowParam;
+};
+Texture2D alphaTex1 : register(t0);
+Texture2D alphaTex2 : register(t1);
+Texture2D shadowMap : register(t2);
+SamplerState samp : register(s0);
+SamplerComparisonState shadowSamp : register(s1);
+float4 main(PS_IN pin) : SV_TARGET
+{
+	float4 alphaColor1 = alphaTex1.Sample(samp, pin.uv);
+	float4 alphaColor2 = alphaTex2.Sample(samp, pin.uv);
+	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	color.xyz = (alphaColor1.xyz + alphaColor2.xyz) / 1.5f;
+	color.rgb += (objDiffuse.rgb + lightDiffuse.rgb + cameraPos.xyz) * 0.0f;
+
+	float4 lightPos = float4(pin.wPos.xyz, 1.0f);
+	lightPos = mul(lightPos, lightView);
+	lightPos = mul(lightPos, lightProj);
+	float3 proj = lightPos.xyz / lightPos.w;
+	float2 shadowUV = float2(proj.x * 0.5f + 0.5f, proj.y * -0.5f + 0.5f);
+	float bias = shadowParam.x;
+	float texel = shadowParam.y;
+	float shadow = 0.0f;
+	[unroll]
+	for (int y = -1; y <= 1; ++y)
+	{
+		[unroll]
+		for (int x = -1; x <= 1; ++x)
+		{
+			float2 offset = float2(x, y) * texel;
+			shadow += shadowMap.SampleCmpLevelZero(shadowSamp, shadowUV + offset, proj.z - bias);
+		}
+	}
+	shadow /= 9.0f;
+	color.rgb *= lerp(0.35f, 1.0f, shadow);
+	return color;
+})EOT";
+	m_pPS[PS_ALPHA_SHADOW] = new PixelShader();
+	m_pPS[PS_ALPHA_SHADOW]->Compile(code);
 }

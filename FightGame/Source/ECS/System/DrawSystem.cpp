@@ -2,6 +2,7 @@
 #include "Components.h"
 #include "DrawMatrix.h"
 #include "ShaderList.h"
+#include "DrawResources.h"
 #include "Sprite.h"
 #include "GameData.h"
 #include "Defines.h"
@@ -10,7 +11,9 @@ using namespace Component;
 
 void OBBDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView);
 void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView);
-void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView, ComponentView entityView);
+bool BuildLightShadowMatrices(const ComponentHandle<Light>& a_light, const float3& a_focus, DirectX::XMFLOAT4X4& outView, DirectX::XMFLOAT4X4& outProj);
+void ShadowMapWrite(Chunk& a_chunk, const SystemContext& a_context, ComponentView entityView, DrawResources& a_drawResources, const ComponentHandle<Light>& a_light, const DirectX::XMFLOAT4X4& a_lightView, const DirectX::XMFLOAT4X4& a_lightProj);
+void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView, ComponentView entityView, ShadowMap* a_shadowMap);
 void SpriteDraw(Chunk& a_chunk, const SystemContext& a_context);
 void PolylineDraw(Chunk& a_chunk, const SystemContext& a_context);
 void UIDraw(Chunk& a_chunk, const SystemContext& a_context);
@@ -18,7 +21,7 @@ void EffectDraw(Chunk& a_chunk, const SystemContext& a_context);
 
 DirectX::XMMATRIX CreateBillBoardMatrix(const float3& cameraPos, const float3& lookPos, const float3& upVector);
 
-void DrawSystem(Chunk& a_chunk, const SystemContext& a_context)
+void DrawSystem(Chunk& a_chunk, const SystemContext& a_context, DrawResources& a_drawResources)
 {
 
 	ComponentView oBBCameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
@@ -27,7 +30,42 @@ void DrawSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 	ComponentView entityView = a_chunk.GetView<ComponentTypes<ModelKey, Position, Rotation, Scale>>();
 	ComponentView cameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
-	CameraDraw(a_chunk, a_context, cameraView, entityView);
+	// ライトの行列を渡す
+	ComponentView lightView = a_chunk.GetView<ComponentTypes<Light>>();
+	ComponentHandle<Light> light;
+	float3 lightFocus(0.0f, 0.0f, 0.0f);
+	auto lightIt = lightView.begin();
+	if (lightIt != lightView.end())
+	{
+		light = a_chunk.GetComponent<Light>(*lightIt);
+		// !!!New!!!
+		ComponentHandle<Position> lightPos = a_chunk.GetComponent<Position>(*lightIt);
+		if (lightPos.IsValid())
+		{
+			lightFocus = float3(lightPos.Look().x, lightPos.Look().y, lightPos.Look().z);
+		}
+	}
+	if (light.IsValid())
+	{
+		const float3& lightColor = light.Look().color;
+		const float3& lightDir = light.Look().direction;
+		ShaderList::SetLight(
+			DirectX::XMFLOAT4(lightColor.x, lightColor.y, lightColor.z, 1.0f),
+			DirectX::XMFLOAT3(lightDir.x, lightDir.y, lightDir.z));
+	}
+	DirectX::XMFLOAT4X4 lightMatView;
+	DirectX::XMFLOAT4X4 lightMatProj;
+	DirectX::XMStoreFloat4x4(&lightMatView, DirectX::XMMatrixIdentity());
+	DirectX::XMStoreFloat4x4(&lightMatProj, DirectX::XMMatrixIdentity());
+	const bool hasLightMatrices = BuildLightShadowMatrices(light, lightFocus, lightMatView, lightMatProj);
+	// 作成出来ていたら描画
+	if (hasLightMatrices)
+	{
+		ShadowMapWrite(a_chunk, a_context, entityView, a_drawResources, light, lightMatView, lightMatProj);
+		ShaderList::SetShadow(&lightMatView, &lightMatProj, 0.001f, 1.0f / static_cast<float>(kShadowMapSize));
+	}
+	SetSamplerState(SAMPLER_COMPARISON_SHADOW, 1);
+	CameraDraw(a_chunk, a_context, cameraView, entityView, a_drawResources.GetShadowMap());
 	
 
 	
@@ -43,14 +81,173 @@ void DrawSystem(Chunk& a_chunk, const SystemContext& a_context)
 }
 
 
-void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView, ComponentView entityView)
+bool BuildLightShadowMatrices(const ComponentHandle<Light>& a_light, const float3& a_focus, DirectX::XMFLOAT4X4& outView, DirectX::XMFLOAT4X4& outProj)
+{
+	if (!a_light.IsValid() || !a_light.Look().castShadow)
+	{
+		return false;
+	}
+
+	const float3& lightDirSrc = a_light.Look().direction;
+	DirectX::XMVECTOR lightDir = DirectX::XMVector3Normalize(
+		DirectX::XMVectorSet(lightDirSrc.x, lightDirSrc.y, lightDirSrc.z, 0.0f));
+	// !!!New!!!
+	DirectX::XMVECTOR focus = DirectX::XMVectorSet(a_focus.x, a_focus.y, a_focus.z, 0.0f);
+	const float lightDistance = 50.0f;
+	DirectX::XMVECTOR eye = DirectX::XMVectorSubtract(
+		focus, DirectX::XMVectorScale(lightDir, lightDistance));
+	DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	DirectX::XMVECTOR dotUp = DirectX::XMVector3Dot(lightDir, up);
+	if (fabsf(DirectX::XMVectorGetX(dotUp)) > 0.99f)
+	{
+		up = DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+	}
+
+	DirectX::XMFLOAT3 eyeF;
+	DirectX::XMFLOAT3 focusF;
+	DirectX::XMFLOAT3 upF;
+	DirectX::XMStoreFloat3(&eyeF, eye);
+	DirectX::XMStoreFloat3(&focusF, focus);
+	DirectX::XMStoreFloat3(&upF, up);
+	DrawMatrix::CreateViewMatrix(outView, float3{ eyeF.x, eyeF.y, eyeF.z }, float3{ focusF.x, focusF.y, focusF.z }, float3{ upF.x, upF.y, upF.z });
+
+	const float orthoSize = 100.0f;
+	const float nearZ = 1.0f;
+	const float farZ = 250.0f;
+	DirectX::XMMATRIX proj = DirectX::XMMatrixOrthographicLH(orthoSize, orthoSize, nearZ, farZ);
+	proj = DirectX::XMMatrixTranspose(proj);
+	DirectX::XMStoreFloat4x4(&outProj, proj);
+	return true;
+}
+
+void ShadowMapWrite(Chunk& a_chunk, const SystemContext& a_context, ComponentView entityView, DrawResources& a_drawResources, const ComponentHandle<Light>& a_light, const DirectX::XMFLOAT4X4& a_lightView, const DirectX::XMFLOAT4X4& a_lightProj)
+{
+	// !!!New!!!
+	ShadowMap* shadowMap = a_drawResources.GetShadowMap();
+	if (!shadowMap || !shadowMap->IsValid())
+	{
+		return;
+	}
+	if (!a_light.IsValid() || !a_light.Look().castShadow)
+	{
+		return;
+	}
+
+	a_drawResources.BeginShadowWrite();
+	SetDepthTest(DEPTH_TEST_TRUE);
+
+	DirectX::XMFLOAT4X4 wvp[3];
+	wvp[1] = a_lightView;
+	wvp[2] = a_lightProj;
+
+	for (auto it : entityView)
+	{
+		const ComponentHandle<Position> pos = a_chunk.GetComponent<Position>(it);
+		const ComponentHandle<Rotation> rot = a_chunk.GetComponent<Rotation>(it);
+		const ComponentHandle<Scale> scale = a_chunk.GetComponent<Scale>(it);
+		const ComponentHandle<ModelKey> key = a_chunk.GetComponent<ModelKey>(it);
+		if (!pos.IsValid() || !rot.IsValid() || !scale.IsValid() || !key.IsValid())
+		{
+			continue;
+		}
+
+		const BitFlag flag = key.Look().modelDrawFlag;
+		if (flag & MODEL_DRAW_NOTDEPTH)
+		{
+			continue;
+		}
+		if (a_chunk.GetComponent<UseGhostShader>(it).IsValid())
+		{
+			continue;
+		}
+		// !!!New!!!
+		if (a_chunk.GetComponent<UseShadowShader>(it).IsValid())
+		{
+			continue;
+		}
+
+		std::shared_ptr<Model> itModel = a_context.modelCache.GetModel(key.Look().key);
+		if (!itModel)
+		{
+			continue;
+		}
+
+		const bool useLocalOffset = (flag & MODEL_DRAW_LOCAL_OFFSET) != 0;
+		float3 floatPos(pos.Look().x, pos.Look().y, pos.Look().z);
+		float3 floatRot(
+			(rot.Look().pitch + key.Look().rotato.x) * RAD
+			, (rot.Look().yaw + key.Look().rotato.y) * RAD
+			, (rot.Look().roll + key.Look().rotato.z) * RAD
+		);
+		float3 floatScale(scale.Look().x, scale.Look().y, scale.Look().z);
+		DrawMatrix::CreateWorldMatrix(
+			wvp[0], floatPos, floatScale, floatRot, true,
+			key.Look().offset, useLocalOffset);
+
+		ShaderList::VSKind vsKind = key.Look().useAnime ? ShaderList::VS_ANIME : ShaderList::VS_WORLD;
+		ShaderList::SetWVP(wvp);
+		VertexShader* vs = ShaderList::GetVS(vsKind);
+		if (!vs)
+		{
+			continue;
+		}
+		vs->Bind();
+		GetContext()->PSSetShader(nullptr, nullptr, 0);
+
+		for (unsigned int i = 0; i < itModel->GetMeshNum(); ++i)
+		{
+			const Model::Mesh* mesh = itModel->GetMesh(i);
+			if (!mesh || !mesh->pMesh)
+			{
+				continue;
+			}
+
+			if (key.Look().useAnime)
+			{
+				DirectX::XMFLOAT4X4 bones[200];
+				for (int boneIdx = 0; boneIdx < static_cast<int>(mesh->bones.size()); ++boneIdx)
+				{
+					const Model::Bone& bone = mesh->bones[boneIdx];
+					DirectX::XMStoreFloat4x4(
+						&bones[boneIdx],
+						DirectX::XMMatrixTranspose(bone.invOffset * itModel->GetBoneMatrix(bone.nodeIndex)));
+				}
+				ShaderList::SetBones(bones);
+			}
+
+			mesh->pMesh->Draw();
+		}
+	}
+
+	a_drawResources.EndShadowWrite();
+	SetDepthTest(DEPTH_TEST_TRUE);
+}
+
+void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView cameraView, ComponentView entityView, ShadowMap* a_shadowMap)
 {
 	DirectX::XMFLOAT4X4 wvp[3];
 	ComponentHandle<Camera> useCamera;
 	ComponentHandle<Position> cameraPosition;
 	ComponentHandle<Rotation> cameraRotation;
 	ComponentHandle<ZoomComponent> zoom;
-	// 一番優先度の高いカメラを取得
+	// シャドウマップを登録
+	const bool shadowMapReady =
+		a_shadowMap &&
+		a_shadowMap->IsValid() &&
+		a_shadowMap->GetDepthStencil() != nullptr;
+	if (shadowMapReady)
+	{
+		PixelShader* shadowPS = ShaderList::GetPS(ShaderList::PS_SHADOW_RECEIVE);
+		if (shadowPS)
+		{
+			shadowPS->SetTexture(1, a_shadowMap->GetDepthStencil());
+		}
+		PixelShader* alphaShadowPS = ShaderList::GetPS(ShaderList::PS_ALPHA_SHADOW);
+		if (alphaShadowPS)
+		{
+			alphaShadowPS->SetTexture(2, a_shadowMap->GetDepthStencil());
+		}
+	}
 
 	auto it = cameraView.begin();
 	auto end = cameraView.end();
@@ -135,16 +332,27 @@ void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		}
 		bool isGhost = a_chunk.GetComponent<UseGhostShader>(it).IsValid();
 		bool isAlpha = alphaBlend.IsValid();
+		bool isShadow = a_chunk.GetComponent<UseShadowShader>(it).IsValid();
 
 		ShaderList::VSKind vsKind = key.Look().useAnime ? ShaderList::VS_ANIME : ShaderList::VS_WORLD;
 		ShaderList::PSKind psKind;
 		if (isGhost) psKind = ShaderList::PS_GHOST;
+		else if (isAlpha && isShadow && shadowMapReady) psKind = ShaderList::PS_ALPHA_SHADOW;
 		else if (isAlpha) psKind = ShaderList::PS_ALPHA;
+		else if (isShadow && shadowMapReady) psKind = ShaderList::PS_SHADOW_RECEIVE;
 		else psKind = ShaderList::PS_SPECULAR;
-		// シェーダーの登録
 		ShaderList::SetWVP(wvp);
 		itModel->SetVertexShader(ShaderList::GetVS(vsKind));
 		itModel->SetPixelShader(ShaderList::GetPS(psKind));
+		// !!!New!!!
+		if (psKind == ShaderList::PS_SHADOW_RECEIVE && shadowMapReady)
+		{
+			ShaderList::GetPS(psKind)->SetTexture(1, a_shadowMap->GetDepthStencil());
+		}
+		if (psKind == ShaderList::PS_ALPHA_SHADOW && shadowMapReady)
+		{
+			ShaderList::GetPS(psKind)->SetTexture(2, a_shadowMap->GetDepthStencil());
+		}
 
 		if (key.Look().modelDrawFlag & MODEL_DRAW_NOTDEPTH)
 		{

@@ -3,11 +3,12 @@
 #include "LoadWorld.h"
 #include <unordered_set>
 #include "Defines.h"
+#include "LoadDataJsonRegistrar.h"
 
 LoadScene::LoadScene(
 	std::function<void(std::string)> a_sceneChange,
 	LoadJobQueues& a_jobQueues,
-	LoadDatas a_loadDatas,
+	LoadManifestPaths a_manifestPaths,
 	IModelCacheAcquisition& a_modelCache,
 	IUICacheAcquisition& a_uiCache,
 	IEffectCacheAcquisition& effectCache,
@@ -16,9 +17,11 @@ LoadScene::LoadScene(
 	PrefabManager& a_prefabManager)
 	: sceneChange(a_sceneChange)
 	, inited(false)
+	, presentationReady(false)
+	, manifestRegistered(false)
 	, jobQueues(a_jobQueues)
 	, uiCache(a_uiCache)
-	, loadDatas(std::move(a_loadDatas))
+	, manifestPaths(std::move(a_manifestPaths))
 	
 {
 	std::vector<modelLoadData> useModelDatas = {
@@ -43,13 +46,6 @@ LoadScene::LoadScene(
 		useDataLoadEndFlags.push_back(endFlag);
 	}
 
-	for (auto it : loadDatas.textFormat)
-	{
-		std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
-		jobQueues.textFormat.Push(std::move(TextFormatLoadJob(it.key, it.useFile, it.font, it.fontFile, it.size, endFlag)));
-		useDataLoadEndFlags.push_back(endFlag);
-	}
-
 	world = std::make_unique<LoadWorld>(a_modelCache, a_uiCache, effectCache, a_input, a_serialize, a_prefabManager);
 	world->InitWorld();
 	// ÉçÅ[Éhó Çï€éù
@@ -66,7 +62,27 @@ void LoadScene::Update()
 {
 
 	RemoveIfFlaged(useDataLoadEndFlags);
-	if (useDataLoadEndFlags.empty() && !inited)
+
+	// !!!New!!!
+	if (useDataLoadEndFlags.empty() && !manifestRegistered)
+	{
+		presentationReady = true;
+
+		LoadDataJsonRegistrar loadDataJsonRegistrar(loadDatas);
+		loadDataJsonRegistrar.RegisterFromManifest(manifestPaths);
+
+		for (auto it : loadDatas.textFormat)
+		{
+			std::shared_ptr<std::atomic_bool> endFlag = std::make_shared<std::atomic_bool>(false);
+			jobQueues.textFormat.Push(std::move(TextFormatLoadJob(it.key, it.useFile, it.font, it.fontFile, it.size, endFlag)));
+			useDataLoadEndFlags.push_back(endFlag);
+		}
+
+		manifestRegistered = true;
+		return;
+	}
+
+	if (useDataLoadEndFlags.empty() && manifestRegistered && !inited)
 	{
 		// !!!New!!!
 		for (const auto& it : loadDatas.textUI)
@@ -137,7 +153,8 @@ void LoadScene::Update()
 
 void LoadScene::Draw()
 {
-	if (!inited) return;
+	// !!!New!!!
+	if (!presentationReady) return;
 	world->DrawWorld();
 }
 
@@ -156,4 +173,3 @@ void LoadScene::RemoveIfFlaged(std::vector<std::shared_ptr<std::atomic_bool>>& l
 		}
 	}
 }
-

@@ -1178,6 +1178,23 @@ namespace ComponentSystem
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(Light& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("directionX", component.direction.x, -1.0f);
+		valueFunc("directionY", component.direction.y, -1.0f);
+		valueFunc("directionZ", component.direction.z, -1.0f);
+		valueFunc("colorR", component.color.x, 1.0f);
+		valueFunc("colorG", component.color.y, 1.0f);
+		valueFunc("colorB", component.color.z, 1.0f);
+		valueFunc("castShadow", component.castShadow, true);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(UseShadowShader& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
 	inline void ApplyToFields(DropUI& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
 		int size = static_cast<int>(component.playSounds.size());

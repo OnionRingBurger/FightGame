@@ -4,13 +4,38 @@
             "number": 0,
             "components": [
                 {
+                    "typeId": 130,
+                    "virsion": 0,
+                    "typeName": "Name",
+                    "data": {
+                        "name": "Enemy2"
+                    }
+                },
+                {
                     "typeId": 12,
                     "virsion": 0,
                     "typeName": "Position",
                     "data": {
                         "x": 0.0,
-                        "y": 90.5,
+                        "y": 45.0,
                         "z": 3.0
+                    }
+                },
+                {
+                    "typeId": 103,
+                    "virsion": 0,
+                    "typeName": "MotionResult",
+                    "data": {
+                        "posOffsetX": 0.0,
+                        "posOffsetY": 0.0,
+                        "posOffsetZ": 0.0,
+                        "rotOffsetX": 0.0,
+                        "rotOffsetY": 0.0,
+                        "rotOffsetZ": 0.0,
+                        "isWarp": false,
+                        "warpPosX": 0.0,
+                        "warpPosY": 0.0,
+                        "warpPosZ": 0.0
                     }
                 },
                 {
@@ -52,28 +77,11 @@
                     "typeName": "MotionTransform",
                     "data": {
                         "motionPosX": 0.0,
-                        "motionPosY": 90.5,
+                        "motionPosY": 45.0,
                         "motionPosZ": 3.0,
                         "motionRotX": 0.0,
                         "motionRotY": 0.0,
                         "motionRotZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 103,
-                    "virsion": 0,
-                    "typeName": "MotionResult",
-                    "data": {
-                        "posOffsetX": 0.0,
-                        "posOffsetY": 0.0,
-                        "posOffsetZ": 0.0,
-                        "rotOffsetX": 0.0,
-                        "rotOffsetY": 0.0,
-                        "rotOffsetZ": 0.0,
-                        "isWarp": false,
-                        "warpPosX": 0.0,
-                        "warpPosY": 0.0,
-                        "warpPosZ": 0.0
                     }
                 },
                 {
@@ -82,7 +90,7 @@
                     "typeName": "Pose",
                     "data": {
                         "posX": 0.0,
-                        "posY": 90.5,
+                        "posY": 45.0,
                         "posZ": 3.0,
                         "rotX": 0.0,
                         "rotY": 0.0,
@@ -100,14 +108,6 @@
                         "rotOffsetX": 0.0,
                         "rotOffsetY": 0.0,
                         "rotOffsetZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 130,
-                    "virsion": 0,
-                    "typeName": "Name",
-                    "data": {
-                        "name": "Enemy2"
                     }
                 },
                 {
@@ -156,14 +156,66 @@
                     }
                 },
                 {
-                    "typeId": 1,
+                    "typeId": 147,
                     "virsion": 0,
-                    "typeName": "EnemyTag"
+                    "typeName": "EntryAction",
+                    "data": {
+                        "duration": 0.0,
+                        "maxDuration": 120.0,
+                        "canPlayEffect": true
+                    }
+                },
+                {
+                    "typeId": 93,
+                    "virsion": 0,
+                    "typeName": "DeadState",
+                    "data": {
+                        "isDead": false
+                    }
+                },
+                {
+                    "typeId": 29,
+                    "virsion": 0,
+                    "typeName": "OBBCollider",
+                    "data": {
+                        "centerX": 0.0,
+                        "centerY": 0.0,
+                        "centerZ": 0.0,
+                        "halfX": 0.0,
+                        "halfY": 0.0,
+                        "halfZ": 0.0,
+                        "obbBitFlag": 0
+                    }
+                },
+                {
+                    "typeId": 92,
+                    "virsion": 0,
+                    "typeName": "HitPoint",
+                    "data": {
+                        "maxHP": 12.0,
+                        "currentHP": 12.0
+                    }
+                },
+                {
+                    "typeId": 132,
+                    "virsion": 0,
+                    "typeName": "InterferenceResult",
+                    "data": {
+                        "useKnockback": false,
+                        "knockBackDirX": 0.0,
+                        "knockBackDirY": 0.0,
+                        "knockbackTime": 0.0
+                    }
                 },
                 {
                     "typeId": 129,
                     "virsion": 0,
                     "typeName": "ClearTarget"
+                },
+                {
+                    "typeId": 1,
+                    "virsion": 0,
+                    "typeName": "EnemyTag"
                 },
                 {
                     "typeId": 120,
@@ -177,7 +229,11 @@
                         "useAttack": false,
                         "attackIndex": 0,
                         "useJump": false,
-                        "useGuard": false
+                        "useGuard": false,
+                        "moveCamera": false,
+                        "cameraDirX": 0.0,
+                        "cameraDirY": 0.0,
+                        "cameraMagnitube": 0.0
                     }
                 },
                 {
@@ -188,7 +244,8 @@
                         "move": 2,
                         "attack": 2,
                         "jump": 2,
-                        "guard": 2
+                        "guard": 2,
+                        "camera": 0
                     }
                 },
                 {
@@ -228,28 +285,6 @@
                     }
                 },
                 {
-                    "typeId": 29,
-                    "virsion": 0,
-                    "typeName": "OBBCollider",
-                    "data": {
-                        "centerX": 0.0,
-                        "centerY": 0.0,
-                        "centerZ": 0.0,
-                        "halfX": 0.0,
-                        "halfY": 0.0,
-                        "halfZ": 0.0,
-                        "obbBitFlag": 0
-                    }
-                },
-                {
-                    "typeId": 93,
-                    "virsion": 0,
-                    "typeName": "DeadState",
-                    "data": {
-                        "isDead": false
-                    }
-                },
-                {
                     "typeId": 126,
                     "virsion": 0,
                     "typeName": "AIRole",
@@ -280,25 +315,6 @@
                     }
                 },
                 {
-                    "typeId": 132,
-                    "virsion": 0,
-                    "typeName": "InterferenceResult",
-                    "data": {
-                        "useKnockback": false,
-                        "knockBackDirX": 0.0,
-                        "knockBackDirY": 0.0
-                    }
-                },
-                {
-                    "typeId": 92,
-                    "virsion": 0,
-                    "typeName": "HitPoint",
-                    "data": {
-                        "maxHP": 12.0,
-                        "currentHP": 12.0
-                    }
-                },
-                {
                     "typeId": 143,
                     "virsion": 0,
                     "typeName": "AttackKeyLoad",
@@ -311,16 +327,6 @@
                     "typeId": 110,
                     "virsion": 0,
                     "typeName": "AttackHitRecord"
-                },
-                {
-                    "typeId": 147,
-                    "virsion": 0,
-                    "typeName": "EntryAction",
-                    "data": {
-                        "duration": 0.0,
-                        "maxDuration": 120.0,
-                        "canPlayEffect": true
-                    }
                 },
                 {
                     "typeId": 128,
@@ -347,6 +353,14 @@
             "number": 1,
             "components": [
                 {
+                    "typeId": 130,
+                    "virsion": 0,
+                    "typeName": "Name",
+                    "data": {
+                        "name": "EnemyHP1"
+                    }
+                },
+                {
                     "typeId": 12,
                     "virsion": 0,
                     "typeName": "Position",
@@ -354,6 +368,42 @@
                         "x": 0.0,
                         "y": 1.0,
                         "z": 0.0
+                    }
+                },
+                {
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
+                    "data": {
+                        "key": "UIGauge",
+                        "uiPosX": 0.0,
+                        "uiPosY": 0.0,
+                        "uiScaleX": 1.0,
+                        "uiScaleY": 0.10000000149011612,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
+                    }
+                },
+                {
+                    "typeId": 103,
+                    "virsion": 0,
+                    "typeName": "MotionResult",
+                    "data": {
+                        "posOffsetX": 0.0,
+                        "posOffsetY": 0.0,
+                        "posOffsetZ": 0.0,
+                        "rotOffsetX": 0.0,
+                        "rotOffsetY": 0.0,
+                        "rotOffsetZ": 0.0,
+                        "isWarp": false,
+                        "warpPosX": 0.0,
+                        "warpPosY": 0.0,
+                        "warpPosZ": 0.0
                     }
                 },
                 {
@@ -403,23 +453,6 @@
                     }
                 },
                 {
-                    "typeId": 103,
-                    "virsion": 0,
-                    "typeName": "MotionResult",
-                    "data": {
-                        "posOffsetX": 0.0,
-                        "posOffsetY": 0.0,
-                        "posOffsetZ": 0.0,
-                        "rotOffsetX": 0.0,
-                        "rotOffsetY": 0.0,
-                        "rotOffsetZ": 0.0,
-                        "isWarp": false,
-                        "warpPosX": 0.0,
-                        "warpPosY": 0.0,
-                        "warpPosZ": 0.0
-                    }
-                },
-                {
                     "typeId": 71,
                     "virsion": 0,
                     "typeName": "Pose",
@@ -446,14 +479,6 @@
                     }
                 },
                 {
-                    "typeId": 130,
-                    "virsion": 0,
-                    "typeName": "Name",
-                    "data": {
-                        "name": "EnemyHP1"
-                    }
-                },
-                {
                     "typeId": 72,
                     "virsion": 0,
                     "typeName": "PosePosState",
@@ -474,22 +499,17 @@
                     }
                 },
                 {
-                    "typeId": 52,
+                    "typeId": 53,
                     "virsion": 2,
-                    "typeName": "UIComponent",
+                    "typeName": "SpriteComponent",
                     "data": {
-                        "key": "UIGauge",
-                        "uiPosX": 0.0,
-                        "uiPosY": 0.0,
-                        "uiScaleX": 1.0,
-                        "uiScaleY": 0.10000000149011612,
-                        "uiRotation": 0.0,
-                        "alpha": 1.0,
-                        "uvPosX": 0.0,
-                        "uvPosY": 0.0,
-                        "uvScaleX": 1.0,
-                        "uvScaleY": 1.0,
-                        "isActiv": true
+                        "offsetPosX": 0.0,
+                        "offsetPosY": 0.0,
+                        "offsetPosZ": 0.0,
+                        "offsetRotationX": 0.0,
+                        "offsetRotationY": 0.0,
+                        "offsetRotationZ": 0.0,
+                        "isBillBoard": true
                     }
                 },
                 {
@@ -502,20 +522,6 @@
                         "gaugePosY": 0.0,
                         "gaugeScaleX": 1.0,
                         "gaugeScaleY": 0.07999999821186066
-                    }
-                },
-                {
-                    "typeId": 53,
-                    "virsion": 2,
-                    "typeName": "SpriteComponent",
-                    "data": {
-                        "offsetPosX": 0.0,
-                        "offsetPosY": 0.0,
-                        "offsetPosZ": 0.0,
-                        "offsetRotationX": 0.0,
-                        "offsetRotationY": 0.0,
-                        "offsetRotationZ": 0.0,
-                        "isBillBoard": true
                     }
                 }
             ]
@@ -4678,67 +4684,8 @@
                     "typeName": "Position",
                     "data": {
                         "x": -5.0,
-                        "y": 105.5,
+                        "y": 65.5,
                         "z": 3.0
-                    }
-                },
-                {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "typeId": 102,
-                    "virsion": 0,
-                    "typeName": "FixedResult",
-                    "data": {
-                        "newPosX": 0.0,
-                        "newPosY": 0.0,
-                        "newPosZ": 0.0,
-                        "newRotX": 0.0,
-                        "newRotY": 0.0,
-                        "newRotZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 101,
-                    "virsion": 0,
-                    "typeName": "MotionTransform",
-                    "data": {
-                        "motionPosX": -5.0,
-                        "motionPosY": 105.5,
-                        "motionPosZ": 3.0,
-                        "motionRotX": 0.0,
-                        "motionRotY": 180.0,
-                        "motionRotZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 13,
-                    "virsion": 1,
-                    "typeName": "Rotation",
-                    "data": {
-                        "pitch": 0.0,
-                        "yaw": 180.0,
-                        "roll": 0.0
-                    }
-                },
-                {
-                    "typeId": 71,
-                    "virsion": 0,
-                    "typeName": "Pose",
-                    "data": {
-                        "posX": -5.0,
-                        "posY": 105.5,
-                        "posZ": 3.0,
-                        "rotX": 0.0,
-                        "rotY": 180.0,
-                        "rotZ": 0.0
                     }
                 },
                 {
@@ -4756,6 +4703,65 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 102,
+                    "virsion": 0,
+                    "typeName": "FixedResult",
+                    "data": {
+                        "newPosX": 0.0,
+                        "newPosY": 0.0,
+                        "newPosZ": 0.0,
+                        "newRotX": 0.0,
+                        "newRotY": 0.0,
+                        "newRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                },
+                {
+                    "typeId": 13,
+                    "virsion": 1,
+                    "typeName": "Rotation",
+                    "data": {
+                        "pitch": 0.0,
+                        "yaw": 180.0,
+                        "roll": 0.0
+                    }
+                },
+                {
+                    "typeId": 101,
+                    "virsion": 0,
+                    "typeName": "MotionTransform",
+                    "data": {
+                        "motionPosX": -5.0,
+                        "motionPosY": 65.5,
+                        "motionPosZ": 3.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 180.0,
+                        "motionRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": -5.0,
+                        "posY": 65.5,
+                        "posZ": 3.0,
+                        "rotX": 0.0,
+                        "rotY": 180.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -4817,14 +4823,66 @@
                     }
                 },
                 {
-                    "typeId": 1,
+                    "typeId": 147,
                     "virsion": 0,
-                    "typeName": "EnemyTag"
+                    "typeName": "EntryAction",
+                    "data": {
+                        "duration": 0.0,
+                        "maxDuration": 120.0,
+                        "canPlayEffect": true
+                    }
+                },
+                {
+                    "typeId": 93,
+                    "virsion": 0,
+                    "typeName": "DeadState",
+                    "data": {
+                        "isDead": false
+                    }
+                },
+                {
+                    "typeId": 29,
+                    "virsion": 0,
+                    "typeName": "OBBCollider",
+                    "data": {
+                        "centerX": 0.0,
+                        "centerY": 0.0,
+                        "centerZ": 0.0,
+                        "halfX": 0.0,
+                        "halfY": 0.0,
+                        "halfZ": 0.0,
+                        "obbBitFlag": 0
+                    }
+                },
+                {
+                    "typeId": 92,
+                    "virsion": 0,
+                    "typeName": "HitPoint",
+                    "data": {
+                        "maxHP": 8.0,
+                        "currentHP": 8.0
+                    }
+                },
+                {
+                    "typeId": 132,
+                    "virsion": 0,
+                    "typeName": "InterferenceResult",
+                    "data": {
+                        "useKnockback": false,
+                        "knockBackDirX": 0.0,
+                        "knockBackDirY": 0.0,
+                        "knockbackTime": 0.0
+                    }
                 },
                 {
                     "typeId": 129,
                     "virsion": 0,
                     "typeName": "ClearTarget"
+                },
+                {
+                    "typeId": 1,
+                    "virsion": 0,
+                    "typeName": "EnemyTag"
                 },
                 {
                     "typeId": 120,
@@ -4894,28 +4952,6 @@
                     }
                 },
                 {
-                    "typeId": 29,
-                    "virsion": 0,
-                    "typeName": "OBBCollider",
-                    "data": {
-                        "centerX": 0.0,
-                        "centerY": 0.0,
-                        "centerZ": 0.0,
-                        "halfX": 0.0,
-                        "halfY": 0.0,
-                        "halfZ": 0.0,
-                        "obbBitFlag": 0
-                    }
-                },
-                {
-                    "typeId": 93,
-                    "virsion": 0,
-                    "typeName": "DeadState",
-                    "data": {
-                        "isDead": false
-                    }
-                },
-                {
                     "typeId": 126,
                     "virsion": 0,
                     "typeName": "AIRole",
@@ -4946,26 +4982,6 @@
                     }
                 },
                 {
-                    "typeId": 132,
-                    "virsion": 0,
-                    "typeName": "InterferenceResult",
-                    "data": {
-                        "useKnockback": false,
-                        "knockBackDirX": 0.0,
-                        "knockBackDirY": 0.0,
-                        "knockbackTime": 0.0
-                    }
-                },
-                {
-                    "typeId": 92,
-                    "virsion": 0,
-                    "typeName": "HitPoint",
-                    "data": {
-                        "maxHP": 8.0,
-                        "currentHP": 8.0
-                    }
-                },
-                {
                     "typeId": 143,
                     "virsion": 0,
                     "typeName": "AttackKeyLoad",
@@ -4978,16 +4994,6 @@
                     "typeId": 110,
                     "virsion": 0,
                     "typeName": "AttackHitRecord"
-                },
-                {
-                    "typeId": 147,
-                    "virsion": 0,
-                    "typeName": "EntryAction",
-                    "data": {
-                        "duration": 0.0,
-                        "maxDuration": 120.0,
-                        "canPlayEffect": true
-                    }
                 },
                 {
                     "typeId": 128,
@@ -5027,67 +5033,8 @@
                     "typeName": "Position",
                     "data": {
                         "x": 5.0,
-                        "y": 85.5,
+                        "y": 45.5,
                         "z": 3.0
-                    }
-                },
-                {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
-                    "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "typeId": 102,
-                    "virsion": 0,
-                    "typeName": "FixedResult",
-                    "data": {
-                        "newPosX": 0.0,
-                        "newPosY": 0.0,
-                        "newPosZ": 0.0,
-                        "newRotX": 0.0,
-                        "newRotY": 0.0,
-                        "newRotZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 101,
-                    "virsion": 0,
-                    "typeName": "MotionTransform",
-                    "data": {
-                        "motionPosX": 5.0,
-                        "motionPosY": 85.5,
-                        "motionPosZ": 3.0,
-                        "motionRotX": 0.0,
-                        "motionRotY": 180.0,
-                        "motionRotZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 13,
-                    "virsion": 1,
-                    "typeName": "Rotation",
-                    "data": {
-                        "pitch": 0.0,
-                        "yaw": 180.0,
-                        "roll": 0.0
-                    }
-                },
-                {
-                    "typeId": 71,
-                    "virsion": 0,
-                    "typeName": "Pose",
-                    "data": {
-                        "posX": 5.0,
-                        "posY": 85.5,
-                        "posZ": 3.0,
-                        "rotX": 0.0,
-                        "rotY": 180.0,
-                        "rotZ": 0.0
                     }
                 },
                 {
@@ -5105,6 +5052,65 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 102,
+                    "virsion": 0,
+                    "typeName": "FixedResult",
+                    "data": {
+                        "newPosX": 0.0,
+                        "newPosY": 0.0,
+                        "newPosZ": 0.0,
+                        "newRotX": 0.0,
+                        "newRotY": 0.0,
+                        "newRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                },
+                {
+                    "typeId": 13,
+                    "virsion": 1,
+                    "typeName": "Rotation",
+                    "data": {
+                        "pitch": 0.0,
+                        "yaw": 180.0,
+                        "roll": 0.0
+                    }
+                },
+                {
+                    "typeId": 101,
+                    "virsion": 0,
+                    "typeName": "MotionTransform",
+                    "data": {
+                        "motionPosX": 5.0,
+                        "motionPosY": 45.5,
+                        "motionPosZ": 3.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 180.0,
+                        "motionRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 5.0,
+                        "posY": 45.5,
+                        "posZ": 3.0,
+                        "rotX": 0.0,
+                        "rotY": 180.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -5166,14 +5172,66 @@
                     }
                 },
                 {
-                    "typeId": 1,
+                    "typeId": 147,
                     "virsion": 0,
-                    "typeName": "EnemyTag"
+                    "typeName": "EntryAction",
+                    "data": {
+                        "duration": 0.0,
+                        "maxDuration": 120.0,
+                        "canPlayEffect": true
+                    }
+                },
+                {
+                    "typeId": 93,
+                    "virsion": 0,
+                    "typeName": "DeadState",
+                    "data": {
+                        "isDead": false
+                    }
+                },
+                {
+                    "typeId": 29,
+                    "virsion": 0,
+                    "typeName": "OBBCollider",
+                    "data": {
+                        "centerX": 0.0,
+                        "centerY": 0.0,
+                        "centerZ": 0.0,
+                        "halfX": 0.0,
+                        "halfY": 0.0,
+                        "halfZ": 0.0,
+                        "obbBitFlag": 0
+                    }
+                },
+                {
+                    "typeId": 92,
+                    "virsion": 0,
+                    "typeName": "HitPoint",
+                    "data": {
+                        "maxHP": 8.0,
+                        "currentHP": 8.0
+                    }
+                },
+                {
+                    "typeId": 132,
+                    "virsion": 0,
+                    "typeName": "InterferenceResult",
+                    "data": {
+                        "useKnockback": false,
+                        "knockBackDirX": 0.0,
+                        "knockBackDirY": 0.0,
+                        "knockbackTime": 0.0
+                    }
                 },
                 {
                     "typeId": 129,
                     "virsion": 0,
                     "typeName": "ClearTarget"
+                },
+                {
+                    "typeId": 1,
+                    "virsion": 0,
+                    "typeName": "EnemyTag"
                 },
                 {
                     "typeId": 120,
@@ -5243,28 +5301,6 @@
                     }
                 },
                 {
-                    "typeId": 29,
-                    "virsion": 0,
-                    "typeName": "OBBCollider",
-                    "data": {
-                        "centerX": 0.0,
-                        "centerY": 0.0,
-                        "centerZ": 0.0,
-                        "halfX": 0.0,
-                        "halfY": 0.0,
-                        "halfZ": 0.0,
-                        "obbBitFlag": 0
-                    }
-                },
-                {
-                    "typeId": 93,
-                    "virsion": 0,
-                    "typeName": "DeadState",
-                    "data": {
-                        "isDead": false
-                    }
-                },
-                {
                     "typeId": 126,
                     "virsion": 0,
                     "typeName": "AIRole",
@@ -5295,26 +5331,6 @@
                     }
                 },
                 {
-                    "typeId": 132,
-                    "virsion": 0,
-                    "typeName": "InterferenceResult",
-                    "data": {
-                        "useKnockback": false,
-                        "knockBackDirX": 0.0,
-                        "knockBackDirY": 0.0,
-                        "knockbackTime": 0.0
-                    }
-                },
-                {
-                    "typeId": 92,
-                    "virsion": 0,
-                    "typeName": "HitPoint",
-                    "data": {
-                        "maxHP": 8.0,
-                        "currentHP": 8.0
-                    }
-                },
-                {
                     "typeId": 143,
                     "virsion": 0,
                     "typeName": "AttackKeyLoad",
@@ -5327,16 +5343,6 @@
                     "typeId": 110,
                     "virsion": 0,
                     "typeName": "AttackHitRecord"
-                },
-                {
-                    "typeId": 147,
-                    "virsion": 0,
-                    "typeName": "EntryAction",
-                    "data": {
-                        "duration": 0.0,
-                        "maxDuration": 120.0,
-                        "canPlayEffect": true
-                    }
                 },
                 {
                     "typeId": 128,
@@ -5381,62 +5387,22 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
                     "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "typeId": 102,
-                    "virsion": 0,
-                    "typeName": "FixedResult",
-                    "data": {
-                        "newPosX": 0.0,
-                        "newPosY": 0.0,
-                        "newPosZ": 0.0,
-                        "newRotX": 0.0,
-                        "newRotY": 0.0,
-                        "newRotZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 101,
-                    "virsion": 0,
-                    "typeName": "MotionTransform",
-                    "data": {
-                        "motionPosX": 0.0,
-                        "motionPosY": 1.0,
-                        "motionPosZ": 0.0,
-                        "motionRotX": 0.0,
-                        "motionRotY": 0.0,
-                        "motionRotZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 13,
-                    "virsion": 1,
-                    "typeName": "Rotation",
-                    "data": {
-                        "pitch": 0.0,
-                        "yaw": 0.0,
-                        "roll": 0.0
-                    }
-                },
-                {
-                    "typeId": 71,
-                    "virsion": 0,
-                    "typeName": "Pose",
-                    "data": {
-                        "posX": 0.0,
-                        "posY": 1.0,
-                        "posZ": 0.0,
-                        "rotX": 0.0,
-                        "rotY": 0.0,
-                        "rotZ": 0.0
+                        "key": "UIGauge",
+                        "uiPosX": 0.0,
+                        "uiPosY": 0.0,
+                        "uiScaleX": 1.0,
+                        "uiScaleY": 0.10000000149011612,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
                     }
                 },
                 {
@@ -5454,6 +5420,65 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 102,
+                    "virsion": 0,
+                    "typeName": "FixedResult",
+                    "data": {
+                        "newPosX": 0.0,
+                        "newPosY": 0.0,
+                        "newPosZ": 0.0,
+                        "newRotX": 0.0,
+                        "newRotY": 0.0,
+                        "newRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                },
+                {
+                    "typeId": 13,
+                    "virsion": 1,
+                    "typeName": "Rotation",
+                    "data": {
+                        "pitch": 0.0,
+                        "yaw": 0.0,
+                        "roll": 0.0
+                    }
+                },
+                {
+                    "typeId": 101,
+                    "virsion": 0,
+                    "typeName": "MotionTransform",
+                    "data": {
+                        "motionPosX": 0.0,
+                        "motionPosY": 1.0,
+                        "motionPosZ": 0.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 1.0,
+                        "posZ": 0.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -5478,25 +5503,6 @@
                     }
                 },
                 {
-                    "typeId": 52,
-                    "virsion": 2,
-                    "typeName": "UIComponent",
-                    "data": {
-                        "key": "UIGauge",
-                        "uiPosX": 0.0,
-                        "uiPosY": 0.0,
-                        "uiScaleX": 1.0,
-                        "uiScaleY": 0.10000000149011612,
-                        "uiRotation": 0.0,
-                        "alpha": 1.0,
-                        "uvPosX": 0.0,
-                        "uvPosY": 0.0,
-                        "uvScaleX": 1.0,
-                        "uvScaleY": 1.0,
-                        "isActiv": true
-                    }
-                },
-                {
                     "typeId": 45,
                     "virsion": 0,
                     "typeName": "FollowPosition",
@@ -5506,18 +5512,6 @@
                         "offsetZ": 0.0,
                         "target": 0,
                         "flag": 8
-                    }
-                },
-                {
-                    "typeId": 94,
-                    "virsion": 0,
-                    "typeName": "HPGaugeUI",
-                    "data": {
-                        "target": 0,
-                        "gaugePosX": 0.0,
-                        "gaugePosY": 0.0,
-                        "gaugeScaleX": 1.0,
-                        "gaugeScaleY": 0.07999999821186066
                     }
                 },
                 {
@@ -5532,6 +5526,18 @@
                         "offsetRotationY": 0.0,
                         "offsetRotationZ": 0.0,
                         "isBillBoard": true
+                    }
+                },
+                {
+                    "typeId": 94,
+                    "virsion": 0,
+                    "typeName": "HPGaugeUI",
+                    "data": {
+                        "target": 0,
+                        "gaugePosX": 0.0,
+                        "gaugePosY": 0.0,
+                        "gaugeScaleX": 1.0,
+                        "gaugeScaleY": 0.07999999821186066
                     }
                 }
             ]
@@ -5558,62 +5564,22 @@
                     }
                 },
                 {
-                    "typeId": 14,
-                    "virsion": 0,
-                    "typeName": "Scale",
+                    "typeId": 52,
+                    "virsion": 2,
+                    "typeName": "UIComponent",
                     "data": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    }
-                },
-                {
-                    "typeId": 102,
-                    "virsion": 0,
-                    "typeName": "FixedResult",
-                    "data": {
-                        "newPosX": 0.0,
-                        "newPosY": 0.0,
-                        "newPosZ": 0.0,
-                        "newRotX": 0.0,
-                        "newRotY": 0.0,
-                        "newRotZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 101,
-                    "virsion": 0,
-                    "typeName": "MotionTransform",
-                    "data": {
-                        "motionPosX": 0.0,
-                        "motionPosY": 1.0,
-                        "motionPosZ": 0.0,
-                        "motionRotX": 0.0,
-                        "motionRotY": 0.0,
-                        "motionRotZ": 0.0
-                    }
-                },
-                {
-                    "typeId": 13,
-                    "virsion": 1,
-                    "typeName": "Rotation",
-                    "data": {
-                        "pitch": 0.0,
-                        "yaw": 0.0,
-                        "roll": 0.0
-                    }
-                },
-                {
-                    "typeId": 71,
-                    "virsion": 0,
-                    "typeName": "Pose",
-                    "data": {
-                        "posX": 0.0,
-                        "posY": 1.0,
-                        "posZ": 0.0,
-                        "rotX": 0.0,
-                        "rotY": 0.0,
-                        "rotZ": 0.0
+                        "key": "UIGauge",
+                        "uiPosX": 0.0,
+                        "uiPosY": 0.0,
+                        "uiScaleX": 1.0,
+                        "uiScaleY": 0.10000000149011612,
+                        "uiRotation": 0.0,
+                        "alpha": 1.0,
+                        "uvPosX": 0.0,
+                        "uvPosY": 0.0,
+                        "uvScaleX": 1.0,
+                        "uvScaleY": 1.0,
+                        "isActiv": true
                     }
                 },
                 {
@@ -5631,6 +5597,65 @@
                         "warpPosX": 0.0,
                         "warpPosY": 0.0,
                         "warpPosZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 102,
+                    "virsion": 0,
+                    "typeName": "FixedResult",
+                    "data": {
+                        "newPosX": 0.0,
+                        "newPosY": 0.0,
+                        "newPosZ": 0.0,
+                        "newRotX": 0.0,
+                        "newRotY": 0.0,
+                        "newRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 14,
+                    "virsion": 0,
+                    "typeName": "Scale",
+                    "data": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                },
+                {
+                    "typeId": 13,
+                    "virsion": 1,
+                    "typeName": "Rotation",
+                    "data": {
+                        "pitch": 0.0,
+                        "yaw": 0.0,
+                        "roll": 0.0
+                    }
+                },
+                {
+                    "typeId": 101,
+                    "virsion": 0,
+                    "typeName": "MotionTransform",
+                    "data": {
+                        "motionPosX": 0.0,
+                        "motionPosY": 1.0,
+                        "motionPosZ": 0.0,
+                        "motionRotX": 0.0,
+                        "motionRotY": 0.0,
+                        "motionRotZ": 0.0
+                    }
+                },
+                {
+                    "typeId": 71,
+                    "virsion": 0,
+                    "typeName": "Pose",
+                    "data": {
+                        "posX": 0.0,
+                        "posY": 1.0,
+                        "posZ": 0.0,
+                        "rotX": 0.0,
+                        "rotY": 0.0,
+                        "rotZ": 0.0
                     }
                 },
                 {
@@ -5655,25 +5680,6 @@
                     }
                 },
                 {
-                    "typeId": 52,
-                    "virsion": 2,
-                    "typeName": "UIComponent",
-                    "data": {
-                        "key": "UIGauge",
-                        "uiPosX": 0.0,
-                        "uiPosY": 0.0,
-                        "uiScaleX": 1.0,
-                        "uiScaleY": 0.10000000149011612,
-                        "uiRotation": 0.0,
-                        "alpha": 1.0,
-                        "uvPosX": 0.0,
-                        "uvPosY": 0.0,
-                        "uvScaleX": 1.0,
-                        "uvScaleY": 1.0,
-                        "isActiv": true
-                    }
-                },
-                {
                     "typeId": 45,
                     "virsion": 0,
                     "typeName": "FollowPosition",
@@ -5683,18 +5689,6 @@
                         "offsetZ": 0.0,
                         "target": 1,
                         "flag": 8
-                    }
-                },
-                {
-                    "typeId": 94,
-                    "virsion": 0,
-                    "typeName": "HPGaugeUI",
-                    "data": {
-                        "target": 1,
-                        "gaugePosX": 0.0,
-                        "gaugePosY": 0.0,
-                        "gaugeScaleX": 1.0,
-                        "gaugeScaleY": 0.07999999821186066
                     }
                 },
                 {
@@ -5709,6 +5703,18 @@
                         "offsetRotationY": 0.0,
                         "offsetRotationZ": 0.0,
                         "isBillBoard": true
+                    }
+                },
+                {
+                    "typeId": 94,
+                    "virsion": 0,
+                    "typeName": "HPGaugeUI",
+                    "data": {
+                        "target": 1,
+                        "gaugePosX": 0.0,
+                        "gaugePosY": 0.0,
+                        "gaugeScaleX": 1.0,
+                        "gaugeScaleY": 0.07999999821186066
                     }
                 }
             ]

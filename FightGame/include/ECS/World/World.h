@@ -21,6 +21,7 @@
 #include "ComponentsSerialize.h"
 #include "EntitySpawnPort.h"
 #include "PrefabManager.h"
+#include "DrawResources.h"
 
 enum WorldState
 {
@@ -74,6 +75,7 @@ private:
 	WorldState m_state;
 	bool isMouseLock;
 	SystemContext context;
+	DrawResources drawResources;
 	bool isGameEnd;
 	bool allLoadModel = false;
 
