@@ -58,6 +58,8 @@ private:
 	*/
 	void PostFrameProcess();
 
+	void DebugGeometoryDraw();
+
 	//! 現在のScene
 	std::unique_ptr<IScene> scene;
 	//! DXのレンダーターゲットビュー

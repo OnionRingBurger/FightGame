@@ -8,6 +8,18 @@
 
 using namespace Component;
 
+/// <summary>
+/// コンストラクタ
+/// </summary>
+/// <param name="a_modelCache">モデルのキャッシュ</param>
+/// <param name="a_uiCache">UIのキャッシュ</param>
+/// <param name="a_effectCache">エフェクトのキャッシュ</param>
+/// <param name="a_tutorialRequest">チュートリアル要求関数</param>
+/// <param name="a_worldRequest">World変更要求関数</param>
+/// <param name="a_stageRequest">ステージ変更リクエスト</param>
+/// <param name="a_input">入力</param>
+/// <param name="a_serialize">コンポーネント変換機</param>
+/// <param name="a_prefabManager">プレファブ管理機能</param>
 TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition& a_uiCache, IEffectCacheAcquisition& a_effectCache, std::function<void(int)> a_tutorialRequest, std::function<void(std::string)> a_worldRequest, std::function<void(int)> a_stageRequest, Input& a_input, ComponentsSerialize& a_serialize, PrefabManager& a_prefabManager)
 	: World(a_modelCache,
 		a_uiCache,
@@ -20,12 +32,18 @@ TitleWorld::TitleWorld(IModelCacheAcquisition& a_modelCache, IUICacheAcquisition
 	, stageRequest(a_stageRequest)
 {
 
-
+	// キー入力を登録
 	a_input.RegisterButton("Select", XINPUT_GAMEPAD_A);
 	a_input.RegisterKey("Select", VK_SPACE);
 
 }
 
+
+/// <summary>
+/// チャンク生成
+/// </summary>
+/// <param name="a_aiManager">AI管理機能</param>
+/// <returns>生成したチャンク</returns>
 Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 {
 	(void)a_aiManager;
@@ -129,10 +147,12 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		BoxCollider(float3(0.0f, 30.0f, 0.0f), float3(kDebugWorldSize.x, 20.0f, kDebugWorldSize.z)),
 		OBBCollider(OBB_PushOutLocked),
 		ModelKey("Box"),
-		AlphaBlendComponent("Red", "Blue")
+		AlphaBlendComponent("Red", "Blue"),
+		UseShadowShader()
 	);
 
-	Entity underFloor = newChunk.CreateNewEntity(
+
+	Entity underSea = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
 			float3(0.0f, -40.0f, 10.0f),
 			float3(0.0f, 0.0f, 0.0f),
@@ -142,6 +162,7 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		AlphaBlendComponent("White", "White")
 	);
 	
+	// 空
 	Entity sky = newChunk.CreateNewEntity(
 		MOVE_AND_TRANSFORM_COMPONENT(
 			float3(0.0f, 0.0f, 80.0f),
@@ -152,18 +173,28 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		AlphaBlendComponent("White", "Blue")
 	);
 
+	// 演出用重力
 	Entity worldPower = newChunk.CreateNewEntity(
 		WorldPower(float3(0.0f, -1.2f / 60.0f, 0.0f), float3(0.5f, 1.0f, 0.5f))
 	);
 
+	// タイトルロゴ
 	Entity title = newChunk.CreateNewEntity(
 		SpawnJson("TitleCursor", 0.0f, float3())
 	);
 
-	Entity effect = newChunk.CreateNewEntity(
+	// 開始時フェードアウト
+	Entity fade = newChunk.CreateNewEntity(
 		CreateEffect(WHITEFADE_CLEAR)
 	);
 
+	// ライト作成
+	Entity light = newChunk.CreateNewEntity(
+		Position(float3(0.0f, -10.0f, 0.0f)),
+		Light(float3(-0.5f, -1.0f, 1.8f), float3(0.1f, 0.1f, 0.1f), true)
+	);
+
+	// BGM再生
 	PlaySound(LoadSound("Assets/Sound/title.mp3", true));
 	return newChunk;
 }

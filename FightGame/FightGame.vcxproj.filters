@@ -13,732 +13,825 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ソース ファイル\AI">
+      <UniqueIdentifier>{E1040E92-5914-467A-800D-C431D7DD6E96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\DataManager">
+      <UniqueIdentifier>{24EA050D-69C0-465D-9C5A-B91CF943D6F6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Drawer">
+      <UniqueIdentifier>{8AEF6775-D6C6-4EC1-8B91-892FB9BA68A8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\ECS">
+      <UniqueIdentifier>{B196B1E4-6C8C-4D71-A535-E7338F4AB323}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game">
+      <UniqueIdentifier>{BBFDBA2B-5204-4240-8951-48684E1F9CF3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\imGui">
+      <UniqueIdentifier>{31251BF3-9840-4F3F-9264-9D6D0D7B198C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Sound">
+      <UniqueIdentifier>{7E023776-3F34-4814-9F1B-D47EFC29E6D7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Tool">
+      <UniqueIdentifier>{603E150A-5252-43AB-8DCF-B80249107AD3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\AI">
+      <UniqueIdentifier>{3000FACE-5E7A-41E2-8E78-4692AAA2D3B4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\DataManager">
+      <UniqueIdentifier>{D7816B93-0DF6-4322-BA91-286CDFDD97CC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Drawer">
+      <UniqueIdentifier>{6B01B141-087D-4CE5-81BB-92EA2FC9EFBA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\ECS">
+      <UniqueIdentifier>{C40408EA-E05C-41D7-9EAF-7108BB2E6152}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Game">
+      <UniqueIdentifier>{B2667F96-4438-4453-B236-809A3095BA1B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Sound">
+      <UniqueIdentifier>{47AFF751-3CA1-4B1E-A5E2-62697836C2FA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Tool">
+      <UniqueIdentifier>{CF161DA5-B9D1-43BD-A27F-60E61D34F030}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\ECS\Component">
+      <UniqueIdentifier>{7019CE5A-3136-4BE4-80AD-93BB878E9A9D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\ECS\Core">
+      <UniqueIdentifier>{83BF6E64-D127-4701-BDB2-A51FBEDF0FD6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\ECS\System">
+      <UniqueIdentifier>{9A0E8852-D1A2-4AD4-B3A5-E5BA2D35F498}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\ECS\World">
+      <UniqueIdentifier>{166A0CAA-5125-46AA-B509-6C0866BD1982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Core">
+      <UniqueIdentifier>{D48874B8-5930-439B-9B03-873B043F6F58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Scene">
+      <UniqueIdentifier>{EEBB61BE-9537-41D1-BDD2-192DF9F6F31A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Tool\Debug">
+      <UniqueIdentifier>{A7DD6183-E549-4F7B-B53B-CD45467B71C5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Tool\Math">
+      <UniqueIdentifier>{D273821A-8D7C-4201-A3FE-ED4C62DCB010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\ECS\Component">
+      <UniqueIdentifier>{1CB2BD1F-2B8F-4034-B2C6-B9296C53D508}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\ECS\Core">
+      <UniqueIdentifier>{7D9804D2-E54D-4868-87BB-80AB4F32C064}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\ECS\System">
+      <UniqueIdentifier>{2C27B167-C6D7-4C8C-945A-FF466DAE3310}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\ECS\World">
+      <UniqueIdentifier>{0D74681F-D5D4-492A-9650-44D2A11ADB85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Game\Core">
+      <UniqueIdentifier>{18EE3E0C-7F4B-4B70-B3FA-C3D2AE507E65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Game\Scene">
+      <UniqueIdentifier>{C539EE02-B7B4-457C-B59C-939F1D5B29C9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Tool\Debug">
+      <UniqueIdentifier>{4E57538E-7D8F-47FF-9AA2-34DA23CD74F2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Tool\Math">
+      <UniqueIdentifier>{E8134AB2-78D6-4E38-BBF8-DD481A60CC32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
-  <ItemGroup>
+<ItemGroup>
     <ClInclude Include="include\Drawer\DirectX.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\DrawMatrix.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\Geometory.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\MeshBuffer.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\Model.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\PolylineBuffer.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\PolylineEffect.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\Shader.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\ShaderList.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\Sprite.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\GameTexture.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\TrailEffect.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\DataManager\AssimpModelLorder.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\DataManager</Filter>
     </ClInclude>
     <ClInclude Include="include\DataManager\IModelCacheAcquisition.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\DataManager</Filter>
     </ClInclude>
     <ClInclude Include="include\DataManager\IModelLoader.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\DataManager</Filter>
     </ClInclude>
     <ClInclude Include="include\DataManager\IUICacheAcquisition.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\DataManager</Filter>
     </ClInclude>
     <ClInclude Include="include\DataManager\ModelCache.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\DataManager</Filter>
     </ClInclude>
     <ClInclude Include="include\DataManager\SoundCache.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\DataManager</Filter>
     </ClInclude>
     <ClInclude Include="include\DataManager\UICache.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\DataManager</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Component\Components.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Component</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\Chunk.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\ComponentField.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\ComponentsSerialize.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\ComponentStorage.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\ComponentView.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\ECSData.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\EntityManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\HasView.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\IComponentStorage.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\StorageManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\ECSTypes.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\CameraSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\CharacterSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\ColliderSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\CoreSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\DebugCameraSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\DrawSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\EffectSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\EnemySystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\GameLoopSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\ImGuiSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\ISystemResponse.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\ItemSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\PhysicsSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\PlayerSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\RailSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\SoundSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\System.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\SystemAssist.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\SystemContext.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\SystemResponse.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\TransformSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\World\ClearWorld.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\World</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\World\CreateGameWorld.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\World</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\World\GameData.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\World</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\World\GameWorld.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\World</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\World\LoadWorld.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\World</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\World\ResultWorld.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\World</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\World\TestWorld.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\World</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\World\TitleWorld.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\World</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\World\World.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\World</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Core\Defines.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Game\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Core\Input.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Game\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Core\Loading.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Game\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Core\Main.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Game\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Core\TestObject.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Game\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Core\ThreadSafeQueue.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Game\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Scene\CreateGameScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Scene\GameScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Scene\IScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Scene\LoadScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Scene\TestScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Sound\Sound.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Sound</Filter>
     </ClInclude>
     <ClInclude Include="include\Sound\SoundManagerEX.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Sound</Filter>
     </ClInclude>
     <ClInclude Include="include\Tool\Debug\conioex.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Tool\Debug</Filter>
     </ClInclude>
     <ClInclude Include="include\Tool\Debug\Debug.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Tool\Debug</Filter>
     </ClInclude>
     <ClInclude Include="include\Tool\Debug\DebugConsole.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Tool\Debug</Filter>
     </ClInclude>
     <ClInclude Include="include\Tool\Math\MathAssist.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Tool\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\World\ProtoWorld.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\World</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\OtherSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\BehaviorTree.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\Node.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\AIManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\AIData.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\Sequencer.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\Selector.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\CompositeNode.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\ActionNode.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\ConditionNode.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\LeafNode.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\RootNode.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\ChasePlayerAction.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\AISystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\WaitAction.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\StanceNode.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\DecoratorNode.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\InAttackRangeDecorator.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\UseAttackAction.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\RunPlayerNode.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\ReactiveSelector.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\AI.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\DebugSystemResponse.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\DataManager\EffectManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\DataManager</Filter>
     </ClInclude>
     <ClInclude Include="include\DataManager\EffectCache.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\DataManager</Filter>
     </ClInclude>
     <ClInclude Include="include\DataManager\IEffectCacheAcquisition.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\DataManager</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\GuardNode.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\World\TutorialWorld.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\World</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\RoleCurve.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\UseLingeringAttackAction.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\World\StartupWorld.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\World</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\GameSystemResponse.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\AttackRangeCheck.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\AI\UseBestDamageAttackAction.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\AI</Filter>
     </ClInclude>
     <ClInclude Include="include\DataManager\FontFileLoadCache.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\DataManager</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\System\ControllerInputUISystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\EntitySpawnPort.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\ECS\Core\PrefabManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\ECS\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Core\LoadDataJsonRegistrar.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Game\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\ShadowMap.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer\DrawResources.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Drawer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\DataManager\AssimpModelLorder.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\DataManager</Filter>
     </ClCompile>
     <ClCompile Include="Source\DataManager\IModelLoader.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\DataManager</Filter>
     </ClCompile>
     <ClCompile Include="Source\DataManager\ModelCache.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\DataManager</Filter>
     </ClCompile>
     <ClCompile Include="Source\DataManager\SoundCache.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\DataManager</Filter>
     </ClCompile>
     <ClCompile Include="Source\DataManager\UICache.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\DataManager</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\_geometory.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\_model.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\DirectX.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\DrawMatrix.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\Geometory.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\MeshBuffer.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\Model.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\Model_anime.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\Model_check.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\Model_get.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\Model_morph.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\PolylineBuffer.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\PolylineEffect.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\Shader.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\ShaderList.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\Sprite.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\GameTexture.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\TrailEffect.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\Component\Components.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\Component</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\Core\Chunk.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\Core\ComponentsSerialize.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\Core\ComponentStorage.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\Core\ComponentView.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\Core\EntityManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\Core\HasView.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\Core\StorageManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\Core\ECSTypes.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\CameraSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\CharacterSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\ColliderSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\CoreSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\DebugCameraSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\DrawSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\EffectSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\EnemySystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\GameLoopSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\ImGuiSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\ISystemResponse.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\ItemSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\PhysicsSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\PlayerSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\RailSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\SoundSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\SystemAssist.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\SystemResponse.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\TransformSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\World\ClearWorld.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\World</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\World\CreateGameWorld.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\World</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\World\GameWorld.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\World</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\World\LoadWorld.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\World</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\World\ResultWorld.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\World</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\World\TestWorld.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\World</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\World\World.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\World</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Core\Input.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Core\Loading.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Core\Main.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Core\Startup.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Core\TestObject.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Core\ThreadSafeQueue.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Scene\CreateGameScene.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Scene\GameScene.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Scene\IScene.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Scene\LoadScene.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Scene\TestScene.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\imGui\imgui.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\imGui</Filter>
     </ClCompile>
     <ClCompile Include="Source\imGui\imgui_demo.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\imGui</Filter>
     </ClCompile>
     <ClCompile Include="Source\imGui\imgui_draw.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\imGui</Filter>
     </ClCompile>
     <ClCompile Include="Source\imGui\imgui_impl_dx11.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\imGui</Filter>
     </ClCompile>
     <ClCompile Include="Source\imGui\imgui_impl_win32.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\imGui</Filter>
     </ClCompile>
     <ClCompile Include="Source\imGui\imgui_tables.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\imGui</Filter>
     </ClCompile>
     <ClCompile Include="Source\imGui\imgui_widgets.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\imGui</Filter>
     </ClCompile>
     <ClCompile Include="Source\Sound\Sound.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Sound</Filter>
     </ClCompile>
     <ClCompile Include="Source\Sound\SoundManagerEX.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Sound</Filter>
     </ClCompile>
     <ClCompile Include="Source\Tool\Debug\Debug.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Tool\Debug</Filter>
     </ClCompile>
     <ClCompile Include="Source\Tool\Debug\DebugConsole.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Tool\Debug</Filter>
     </ClCompile>
     <ClCompile Include="Source\Tool\Math\MathAssist.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Tool\Math</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\World\ProtoWorld.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\World</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\OtherSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\BehaviorTree.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\Node.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\AIManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\Sequencer.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\Selector.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\CompositeNode.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\ActionNode.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\ConditionNode.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\LeafNode.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\RootNode.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\ChasePlayerAction.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\AISystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\WaitAction.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\StanceNode.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\DecoratorNode.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\InAttackRangeDecorator.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\UseAttackAction.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\RunPlayerNode.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\ReactiveSelector.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\DebugSystemResponse.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\DataManager\EffectManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\DataManager</Filter>
     </ClCompile>
     <ClCompile Include="Source\DataManager\EffectCache.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\DataManager</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\GuardNode.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\World\TutorialWorld.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\World</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\RoleCurve.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\World\TitleWorld.cpp">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ソース ファイル\ECS\World</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\UseLingeringAttackAction.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\World\StartupWorld.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\World</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\GameSystemResponse.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\AttackRangeCheck.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\AI\UseBestDamageAttackAction.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\DataManager\FontFileLoadCache.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\DataManager</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\System\ControllerInputUISystem.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\Core\EntitySpawnPort.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\ECS\Core\PrefabManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\ECS\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Game\Core\LoadDataJsonRegistrar.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\ShadowMap.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Drawer\DrawResources.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Drawer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

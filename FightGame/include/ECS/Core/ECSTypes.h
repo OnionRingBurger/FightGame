@@ -8,6 +8,7 @@ using EntityID = size_t;
 using Generation = size_t;
 using TypeID = uint32_t;
 
+// Entity
 struct Entity
 {
 	EntityID id;
@@ -24,7 +25,7 @@ struct Entity
 	}
 };
 
-
+// Entityのハッシュ
 template<>
 struct std::hash<Entity>
 {
@@ -34,7 +35,7 @@ struct std::hash<Entity>
 	}
 };
 
-
+// OBBで使う機能
 class RigidTransform
 {
 public:
@@ -82,11 +83,18 @@ struct EntityPrefab
 
 };
 
+// Entity生成リクエスト
 struct EntitySpawnRequest
 {
 	std::vector<EntityPrefab> prefabs;
 };
 
 
-
+// Component登録時の変換等で使う対応表
 using EntityMap = std::map<int, Entity>;
+
+// 空Entity
+constexpr Entity kInvalidEntity = {
+	static_cast<EntityID>(-1),
+	static_cast<EntityID>(-1)
+};

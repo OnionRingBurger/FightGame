@@ -47,7 +47,7 @@ World::~World()
 
 void World::InitWorld()
 {
-	// !!!New!!!
+	// 各リソースを初期化
 	drawResources.Init();
 
 	InitResponse(systemResponse);
@@ -59,8 +59,9 @@ void World::InitWorld()
 	// ツリー登録を先に行いCreateNewChunk内のRegisterAIが成功するようにする
 	InitAI(aiManager);
 
+	// チャンク生成
 	chunk = CreateNewChunk(aiManager);
-
+	// 初期化システム実行
 	ContextUpdate(0.01f);
 	InitChunk(chunk, context, *systemResponse, aiManager, serialize);
 }
@@ -176,6 +177,11 @@ void World::ChangeState(WorldState state)
 //
 //////////////////////////////
 
+/// <summary>
+/// チャンクを生成する
+/// </summary>
+/// <param name="a_aiManager"></param>
+/// <returns></returns>
 Chunk World::CreateNewChunk(AIManager& a_aiManager)
 {
 	(void)a_aiManager;

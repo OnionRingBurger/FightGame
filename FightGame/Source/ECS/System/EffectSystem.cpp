@@ -398,21 +398,24 @@ void HPGaugeSystem(Chunk& a_chunk, const SystemContext& a_context)
 	ComponentView view = a_chunk.GetView<ComponentTypes<UIComponent, HPGaugeUI>>();
 	for (auto it : view)
 	{
-
+		// コンポーネント取得
 		ComponentHandle<HPGaugeUI> gauge = a_chunk.GetComponent<HPGaugeUI>(it);
-		Entity targetEntity = gauge.Look().target;
 		ComponentHandle<UIComponent> ui = a_chunk.GetComponent<UIComponent>(it);
 
-		// 対象のHPゲージがなかった場合ゲージ0にする
+		// 対象のコンポーネントを取得
+		Entity targetEntity = gauge.Look().target;
 		ComponentHandle<HitPoint> targetHP = a_chunk.GetComponent<HitPoint>(targetEntity);
+
+		// 対象のHPゲージがなかった場合ゲージ0にして抜ける
 		if (!targetHP.IsValid())
 		{
 			ui->uiScale.x = 0.0f;
 			continue;
 		}
 		
-		// HP割合
+		// HP割合を計算
 		float hpRatio = targetHP.Look().currentHP / targetHP.Look().maxHP;
+		// HP割合に応じてUVと座標を変更
 		ui->uvScale.x = hpRatio; 
 		ui->uiScale.x = gauge.Look().gaugeScale.x * hpRatio;
 		ui->uiPos.x = gauge.Look().gaugePos.x - gauge.Look().gaugeScale.x * (1 - hpRatio) / 2;
@@ -599,35 +602,8 @@ void UIShakeSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 		shake->phaseElapsed += a_context.effectStepTime;
 
-		if (shake.Look().isShaking)
-		{
-			shake->shakeElapsed += a_context.effectStepTime;
-
-			float remaining = shake.Look().maxShakeTime - shake.Look().phaseElapsed;
-			float powerRate = Lerp(
-				1.0f,
-				shake.Look().decayRate,
-				shake.Look().shakeElapsed / (shake.Look().shakeElapsed + std::max(remaining, 0.0f))
-			);
-
-			float offsetX = Noise((shake.Look().shakeElapsed + kUINoiseXTimeOffset) * shake.Look().shakeAmplitude.x)
-				* shake.Look().shakePower.x * powerRate;
-			float offsetY = Noise((shake.Look().shakeElapsed + kUINoiseYTimeOffset) * shake.Look().shakeAmplitude.y)
-				* shake.Look().shakePower.y * powerRate;
-
-			ui->uiPos.x = shake.Look().basePos.x + offsetX;
-			ui->uiPos.y = shake.Look().basePos.y + offsetY;
-
-			if (shake.Look().phaseElapsed >= shake.Look().maxShakeTime)
-			{
-				shake->isShaking = false;
-				shake->phaseElapsed = 0.0f;
-				shake->shakeElapsed = 0.0f;
-				ui->uiPos.x = shake.Look().basePos.x;
-				ui->uiPos.y = shake.Look().basePos.y;
-			}
-		}
-		else
+		// 振動中じゃなった場合初期位置に戻して抜ける
+		if (!shake.Look().isShaking)
 		{
 			ui->uiPos.x = shake.Look().basePos.x;
 			ui->uiPos.y = shake.Look().basePos.y;
@@ -638,6 +614,42 @@ void UIShakeSystem(Chunk& a_chunk, const SystemContext& a_context)
 				shake->phaseElapsed = 0.0f;
 				shake->shakeElapsed = 0.0f;
 			}
+
+			continue;
+		}
+
+		shake->shakeElapsed += a_context.effectStepTime;
+
+		// 残り時間を出し、そこから進行度を取得
+		float remaining = shake.Look().maxShakeTime - shake.Look().phaseElapsed;
+		float progress = shake.Look().shakeElapsed / (shake.Look().shakeElapsed + std::max(remaining, 0.0f));
+
+		// 演出が進むにつれて1倍からdecayRateに向けて振動力倍率を変化させる
+		float powerRate = Lerp(
+			1.0f,
+			shake.Look().decayRate, 
+			progress
+			
+		);
+
+		// 振動用マップから揺れを取得
+		float offsetX = Noise((shake.Look().shakeElapsed + kUINoiseXTimeOffset) * shake.Look().shakeAmplitude.x)
+			* shake.Look().shakePower.x * powerRate;
+		float offsetY = Noise((shake.Look().shakeElapsed + kUINoiseYTimeOffset) * shake.Look().shakeAmplitude.y)
+			* shake.Look().shakePower.y * powerRate;
+
+		// Uiの位置を起動
+		ui->uiPos.x = shake.Look().basePos.x + offsetX;
+		ui->uiPos.y = shake.Look().basePos.y + offsetY;
+
+		// 終了したらリセット
+		if (shake.Look().phaseElapsed >= shake.Look().maxShakeTime)
+		{
+			shake->isShaking = false;
+			shake->phaseElapsed = 0.0f;
+			shake->shakeElapsed = 0.0f;
+			ui->uiPos.x = shake.Look().basePos.x;
+			ui->uiPos.y = shake.Look().basePos.y;
 		}
 	}
 }

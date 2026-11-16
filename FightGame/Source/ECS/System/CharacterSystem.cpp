@@ -17,16 +17,19 @@ namespace
 	// 攻撃Entity生成関数
 	Entity SpawnActiveAttackEntity(Chunk& a_chunk, Entity a_attacker, const AttackPower& a_attackPower, int a_attackIndex)
 	{
+		// コンポーネントを取得
 		const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(a_attacker);
 		if (!rotation.IsValid()) return kInvalidEntity;
 
+		// フラグ取得
 		const bool isPlayer = a_chunk.GetComponent<PlayerTag>(a_attacker).IsValid();
 		const bool isEnemy = a_chunk.GetComponent<EnemyTag>(a_attacker).IsValid();
-		if (!isPlayer && !isEnemy) return kInvalidEntity;
-
 		const bool endWithOwnerAction = a_attackPower.endWithOwnerAction;
 
-		// !!!New!!!
+		// 攻撃者がプレイヤーでも敵でもない場合抜ける
+		if (!isPlayer && !isEnemy) return kInvalidEntity;
+
+		// 
 		const std::string& sectorKey = a_attackPower.sectorKey;
 		if (!sectorKey.empty())
 		{
@@ -50,8 +53,10 @@ namespace
 			sectorKey);
 
 		Entity attack = kInvalidEntity;
+		// 攻撃の性質に応じて生成
 		if (endWithOwnerAction)
 		{
+			// モーション終了後場に残らない攻撃後
 			attack = a_chunk.CreateNewEntity(
 				MOVE_AND_TRANSFORM_COMPONENT(
 					float3(0.0f, 0.0f, 0.0f),
@@ -74,6 +79,7 @@ namespace
 		}
 		else
 		{
+			// モーション終了後場に残る攻撃後
 			const float3 spawnPos = GetEntityPosePos(a_chunk, a_attacker)
 				+ GetLocalOffset(a_attackPower.followOffset, GetEntityPoseRot(a_chunk, a_attacker));
 
@@ -96,7 +102,7 @@ namespace
 			);
 		}
 	
-		// 生成者に応じて攻撃タイプを生成
+		// 生成者に応じてタグを付与
 		if (isPlayer) a_chunk.AddComponent(attack, PlayerAttackTag());
 		else if (isEnemy) a_chunk.AddComponent(attack, EnemyAttackTag());
 
@@ -110,7 +116,7 @@ namespace
 		const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(a_attacker);
 		if (!rotation.IsValid()) return kInvalidEntity;
 
-		// !!!New!!!
+		// 扇を登録、既に登録済みだった場合弾かれる
 		const std::string& sectorKey = a_attackPower.sectorKey;
 		if (!sectorKey.empty())
 		{
@@ -184,7 +190,7 @@ namespace
 		return dx * dx + dz * dz;
 	}
 
-	// !!!New!!!
+	// 敵が生存しているかどうか
 	bool IsEnemyAlive(Chunk& a_chunk, Entity a_enemy)
 	{
 		const ComponentHandle<DeadState> deadState = a_chunk.GetComponent<DeadState>(a_enemy);
@@ -295,11 +301,8 @@ namespace
 		float a_radiusSq,
 		float a_halfFovDeg)
 	{
-		Entity nearestEnemy = kInvalidEntity;
-		float nearestDistSq = FLT_MAX;
-
+		// プレイヤーを取得
 		Entity player = GetPlayer(a_chunk, float3());
-		
 		if (player == kInvalidEntity) return kInvalidEntity;
 
 		// 距離を比較して範囲外なら抜ける
@@ -322,16 +325,16 @@ namespace
 		// 現在の対象が正常か確認、不正な場合は空のEntityを返す
 		if ((a_input.x == 0 && a_input.y == 0) || !IsLookOnTargetValid(a_chunk, a_currentTarget)) return kInvalidEntity;
 
-		// プレイヤーへの距離とベクトル、カメラ方向を取得
+
+		// プレイヤーへの距離とベクトルを取得
 		const float3 currentPos = GetEntityWorldPos(a_chunk, a_currentTarget);
 		const float2 toCurrent(currentPos.x - a_playerPos.x, currentPos.z - a_playerPos.z);
 		if (GetLengthSq(toCurrent) < 1e-8f) return kInvalidEntity;
 		const float2 currentDir = Normalize(toCurrent);
-		float2 camera;
 
-		Entity bestEnemy = kInvalidEntity;
-		float bestAngle = FLT_MAX;
-		float bestDot = FLT_MAX;
+
+		// カメラ方向を取得
+		float2 camera;
 		float direction;
 		bool isUp = std::abs(a_input.x) < std::abs(a_input.y);
 		if (isUp)
@@ -345,6 +348,10 @@ namespace
 			camera = GetCameraRightXZ(a_chunk, a_cameraEntity);
 		}
 
+		// 最適な対象を探す
+		Entity bestEnemy = kInvalidEntity;
+		float bestAngle = FLT_MAX;
+		float bestDot = FLT_MAX;
 		ComponentView enemyView = a_chunk.GetView<ComponentTypes<EnemyTag, Position>>();
 		for (auto enemyIt : enemyView)
 		{
@@ -378,6 +385,8 @@ namespace
 				bestEnemy = enemyIt;
 			}
 		}
+
+		// 結果を返す
 		return bestEnemy;
 	}
 
@@ -468,12 +477,14 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 		}
 		else
 		{
+			// 登場
 			const ComponentHandle<EntryAction> entry = a_chunk.GetComponent<EntryAction>(it);
 			if(entry.IsValid() || isStopAll)
 			{
 				allowed = 0 | ActionFlag_EntryDuration;
 			}
 
+			// 地面
 			const ComponentHandle<GroundedState> grounded = a_chunk.GetComponent<GroundedState>(it);
 			if (grounded.IsValid() && !grounded.Look().isGrounded)
 			{
@@ -482,6 +493,7 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 				allowed &= ~ActionFlag_EntryDuration;
 			}
 
+			// ノックバック
 			const ComponentHandle<KnockbackAction> knockback = a_chunk.GetComponent<KnockbackAction>(it);
 			if (knockback.IsValid())
 			{
@@ -494,6 +506,7 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 				allowed &= ~ActionFlag_RotChange;
 			}
 
+			// ジャンプ
 			const ComponentHandle<JumpAction> jump = a_chunk.GetComponent<JumpAction>(it);
 			if (jump.IsValid())
 			{
@@ -501,13 +514,14 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 				allowed &= ~ActionFlag_Guard;
 			}
 
+			// ロックオン
 			const ComponentHandle<LookOnAction> lookonAction = a_chunk.GetComponent<LookOnAction>(it);
 			if (lookonAction.IsValid())
 			{
 				allowed &= ~ActionFlag_LookMove;
 			}
 
-			// !!!New!!!
+			// 攻撃
 			const ComponentHandle<AttackAction> attackAction = a_chunk.GetComponent<AttackAction>(it);
 			if (attackAction.IsValid())
 			{
@@ -516,7 +530,7 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 				allowed &= ~ActionFlag_RotChange;
 			}
 
-			// !!!New!!!
+			// 攻撃発生待機
 			const ComponentHandle<AttackStartupAction> attackStartup = a_chunk.GetComponent<AttackStartupAction>(it);
 			if (attackStartup.IsValid())
 			{
@@ -537,6 +551,7 @@ void CharacterActionMaskSystem(Chunk& a_chunk, const SystemContext& a_context)
 				allowed &= ~ActionFlag_Guard;
 			}
 
+			// ガード
 			const ComponentHandle<GuardAction> guard = a_chunk.GetComponent<GuardAction>(it);
 			if(guard.IsValid())
 			{

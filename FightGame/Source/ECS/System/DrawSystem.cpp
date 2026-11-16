@@ -62,7 +62,7 @@ void DrawSystem(Chunk& a_chunk, const SystemContext& a_context, DrawResources& a
 	if (hasLightMatrices)
 	{
 		ShadowMapWrite(a_chunk, a_context, entityView, a_drawResources, light, lightMatView, lightMatProj);
-		ShaderList::SetShadow(&lightMatView, &lightMatProj, 0.001f, 1.0f / static_cast<float>(kShadowMapSize));
+		ShaderList::SetShadow(&lightMatView, &lightMatProj, kShadowBias, 1.0f / static_cast<float>(kShadowMapSize));
 	}
 	SetSamplerState(SAMPLER_COMPARISON_SHADOW, 1);
 	CameraDraw(a_chunk, a_context, cameraView, entityView, a_drawResources.GetShadowMap());
@@ -93,9 +93,8 @@ bool BuildLightShadowMatrices(const ComponentHandle<Light>& a_light, const float
 		DirectX::XMVectorSet(lightDirSrc.x, lightDirSrc.y, lightDirSrc.z, 0.0f));
 	// !!!New!!!
 	DirectX::XMVECTOR focus = DirectX::XMVectorSet(a_focus.x, a_focus.y, a_focus.z, 0.0f);
-	const float lightDistance = 50.0f;
 	DirectX::XMVECTOR eye = DirectX::XMVectorSubtract(
-		focus, DirectX::XMVectorScale(lightDir, lightDistance));
+		focus, DirectX::XMVectorScale(lightDir, kShadowLightDistance));
 	DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	DirectX::XMVECTOR dotUp = DirectX::XMVector3Dot(lightDir, up);
 	if (fabsf(DirectX::XMVectorGetX(dotUp)) > 0.99f)
@@ -111,10 +110,7 @@ bool BuildLightShadowMatrices(const ComponentHandle<Light>& a_light, const float
 	DirectX::XMStoreFloat3(&upF, up);
 	DrawMatrix::CreateViewMatrix(outView, float3{ eyeF.x, eyeF.y, eyeF.z }, float3{ focusF.x, focusF.y, focusF.z }, float3{ upF.x, upF.y, upF.z });
 
-	const float orthoSize = 100.0f;
-	const float nearZ = 1.0f;
-	const float farZ = 250.0f;
-	DirectX::XMMATRIX proj = DirectX::XMMatrixOrthographicLH(orthoSize, orthoSize, nearZ, farZ);
+	DirectX::XMMATRIX proj = DirectX::XMMatrixOrthographicLH(kShadowOrthoSize, kShadowOrthoSize, kShadowNearZ, kShadowFarZ);
 	proj = DirectX::XMMatrixTranspose(proj);
 	DirectX::XMStoreFloat4x4(&outProj, proj);
 	return true;

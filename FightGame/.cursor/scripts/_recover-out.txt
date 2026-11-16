@@ -1,0 +1,149 @@
+HITS=28
+COMMITS=22
+COMMIT_SIG=e49b3f77=239
+COMMIT_SIG=a735aa1e=239
+COMMIT_SIG=6bcb5c53=239
+COMMIT_SIG=bb959334=239
+COMMIT_SIG=58da44cd=239
+COMMIT_SIG=be6e5e31=239
+COMMIT_SIG=d389d87c=239
+COMMIT_SIG=17ad763a=239
+COMMIT_SIG=ca06d2e0=239
+COMMIT_SIG=5658cf6b=239
+COMMIT_SIG=ad290c10=239
+COMMIT_SIG=6ef2c648=239
+COMMIT_SIG=59088faa=239
+COMMIT_SIG=ed6e1993=239
+COMMIT_SIG=dca48228=260
+COMMIT_SIG=05679f84=260
+COMMIT_SIG=a0051ec8=260
+COMMIT_SIG=282d8cd9=260
+COMMIT_SIG=5dfe253b=260
+COMMIT_SIG=7cfd2689=260
+COMMIT_SIG=2153274a=0
+COMMIT_SIG=12e4e554=0
+MIN_SIG=0 at 2153274a
+SAMPLE_HEX=2F 2F 20 81 45 BD 54 81 45 BD 81 45 BD 81 45 BD E2 82 B7 81 45 BD 81 45 BD 81 45 BD E6 82 A4 81 45 BD 81 45 BD 6E 61 6D 65 73 70 61 63 65 81 45 BD C5 88 CD 82 EF BF BD 81 45 BD 41 81 45 BD 81 45 BD 7B 81 45 BD 81 45 BD 75 73 69 6E 67 20 6E 61 6D 65 73 70 61 63 65 81 45 BD 81 45 BD 81 45 BD 67 81 45 BD 81 45 BD
+SAMPLE_AS_UTF8_TRY=// �E�T�E��E��E�₷�E��E��E�悤�E��E�namespace�E�ň͂��E�A�E��E�{�E��E�using namespace�E��E��E�g�E��E�
+---
+LINE=188
+NOW=// ・ｽT・ｽ・ｽ・ｽ竄ｷ・ｽ・ｽ・ｽ謔､・ｽ・ｽnamespace・ｽﾅ囲ゑｿｽ・ｽA・ｽ・ｽ{・ｽ・ｽusing namespace・ｽ・ｽ・ｽg・ｽ・ｽ
+GIT=2153274a => // 探しやすいようにnamespaceで囲う、基本はusing namespaceを使う
+RECOVERABLE=YES
+---
+LINE=629
+NOW=// ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+RECOVERABLE=NO
+---
+LINE=673
+NOW=// ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+RECOVERABLE=NO
+---
+LINE=748
+NOW=// ・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽh・ｽﾌ抵ｿｽ・ｽS・ｽ・ｽ・ｽW
+RECOVERABLE=NO
+---
+LINE=753
+NOW=// x,y,z・ｽﾌ包ｿｽ・ｽ・ｽ・ｽx・ｽN・ｽg・ｽ・ｽ
+RECOVERABLE=NO
+---
+LINE=760
+NOW=// ・ｽ・ｽ・ｽa
+RECOVERABLE=NO
+---
+LINE=873
+NOW=// ・ｽ・ｽ・ｽ・ｽ・ｽﾄゑｿｽ・ｽ・ｽEntity
+RECOVERABLE=NO
+---
+LINE=1164
+NOW=Entity owner; // ・ｽ・ｽ・ｽg・ｽ・ｽﾛ趣ｿｽ・ｽ・ｽ・ｽﾄゑｿｽ・ｽ・ｽEntity
+GIT=2153274a => // ぶつかったEntity
+RECOVERABLE=YES
+---
+LINE=1197
+NOW=// ・ｽJ・ｽ・ｽ・ｽ・ｽ・ｽﾌ趣ｿｽﾞを増やす・ｽ鼾・ｿｽﾊコ・ｽ・ｽ・ｽ|・ｽ[・ｽl・ｽ・ｽ・ｽg・ｽﾉ包ｿｽ・ｽ・ｽ・ｽ・ｽ
+RECOVERABLE=NO
+---
+LINE=1203
+NOW=float	fovy;		// ・ｽ・ｽp
+GIT=2153274a => float	fovy;		// 画角
+RECOVERABLE=YES
+---
+LINE=1204
+NOW=float	aspect;	//・ｽ@・ｽA・ｽX・ｽy・ｽN・ｽg・ｽ・ｽ
+GIT=2153274a => float	fovy;		// 画角
+RECOVERABLE=YES
+---
+LINE=1205
+NOW=float	nearCrip;		// ・ｽj・ｽA・ｽN・ｽ・ｽ・ｽb・ｽv
+GIT=2153274a => float	fovy;		// 画角
+RECOVERABLE=YES
+---
+LINE=1206
+NOW=float	farCrip;		// ・ｽt・ｽ@・ｽ[・ｽN・ｽ・ｽ・ｽb・ｽv
+GIT=2153274a => float	fovy;		// 画角
+RECOVERABLE=YES
+---
+LINE=1493
+NOW=// TODO Json・ｽﾇみ搾ｿｽ・ｽﾝゑｿｽ・ｽX・ｽV・ｽ・ｽ・ｽ・ｽ
+RECOVERABLE=NO
+---
+LINE=1977
+NOW=// ・ｽU・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+RECOVERABLE=NO
+---
+LINE=1979
+NOW=// ・ｽU・ｽ・ｽ・ｽﾌ大き・ｽ・ｽ
+RECOVERABLE=NO
+---
+LINE=1981
+NOW=//! ・ｽU・ｽ・ｽ・ｽﾌ鯉ｿｽ・ｽ・ｽ・ｽ・ｽ
+RECOVERABLE=NO
+---
+LINE=1983
+NOW=//! ・ｽo・ｽﾟ趣ｿｽ・ｽ・ｽ
+RECOVERABLE=NO
+---
+LINE=2058
+NOW=SHOTUI_CANSHOT = 1 << 0, // ・ｽﾋ鯉ｿｽ・ｽﾂ能・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
+GIT=2153274a => SHOTUI_CANSHOT = 1 << 0, // 射撃可能時に描画されるUI
+RECOVERABLE=YES
+---
+LINE=2059
+NOW=SHOTUI_WAIT = 1 << 1, // ・ｽﾋ鯉ｿｽ・ｽﾒ機・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
+GIT=2153274a => SHOTUI_WAIT = 1 << 1, // 射撃待機時に描画されるUI
+RECOVERABLE=YES
+---
+LINE=2060
+NOW=SHOTUI_FADERESET_UP = 1 << 2, // ・ｽﾋ鯉ｿｽ・ｽ?ｵ変更・ｽ・ｽ・ｽﾉ難ｿｽ・ｽ・ｽ・ｽx・ｽﾈどゑｿｽ・ｽ・ｽ・ｽZ・ｽb・ｽg・ｽ・ｽ・ｽ・ｽ・ｽ
+GIT=2153274a => SHOTUI_FADERESET_UP = 1 << 2, // 射撃状況変更時に透明度などがリセットされる
+RECOVERABLE=YES
+---
+LINE=2101
+NOW=// ・ｽ・ｽ・ｽt・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽp・ｽ・ｽ・ｽ・ｽ・ｽR・ｽﾚ難ｿｽ
+RECOVERABLE=NO
+---
+LINE=2124
+NOW=// ・ｽﾅ抵ｿｽ・ｽ・ｽW・ｽ・ｽResult
+RECOVERABLE=NO
+---
+LINE=2141
+NOW=// ・ｽ・ｽ・ｽR・ｽﾚ難ｿｽ・ｽ・ｽResult
+RECOVERABLE=NO
+---
+LINE=2163
+NOW=// 1・ｽt・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽﾌ移難ｿｽResult
+RECOVERABLE=NO
+---
+LINE=2260
+NOW=// ・ｽ・ｽﾌ範茨ｿｽ
+GIT=12e4e554 => // 自由移動のResult
+RECOVERABLE=YES
+---
+LINE=2263
+NOW=// ・ｽ・ｽﾌ角・ｽx
+RECOVERABLE=NO
+---
+LINE=2265
+NOW=// ・ｽ繪ｺ・ｽ・ｽ・ｽ・ｽ・ｽﾖの費ｿｽ・ｽ・ｽ
+RECOVERABLE=NO

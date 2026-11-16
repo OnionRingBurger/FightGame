@@ -1,0 +1,448 @@
+==== 2153274a ====
+TOTAL_LINES=2622
+34:// 探しやすいようにnamespaceで囲う、基本はusing namespaceを使う
+477:		// 減衰率
+521:		// 減衰率
+596:		// ワールドの中心座標
+599:		// x,y,zの方向ベクトル
+606:		// 半径
+676:			// ぶつかったEntity
+679:			// 押し戻し方向
+681:			// 押し戻し量
+702:			// 入ってきたEntity
+969:		Entity owner; // 自身を保持しているEntity
+1002:		// カメラの種類を増やす場合別コンポーネントに分ける
+1008:		float	fovy;		// 画角
+1009:		float	aspect;	//　アスペクト比
+1010:		float	nearCrip;		// ニアクリップ
+1011:		float	farCrip;		// ファークリップ
+1298:	// TODO Json読み込みを更新する
+1434:	//struct VelocityResult
+1437:	//	static constexpr const char* kTypeName = "VelocityResult";
+1442:	//	VelocityResult()
+1448:	//struct InputMoveResult
+1451:	//	static constexpr const char* kTypeName = "InputMoveResult";
+1456:	//	InputMoveResult()
+1462:	//struct InputRotatoResult
+1465:	//	static constexpr const char* kTypeName = "InputRotatoResult";
+1469:	//	InputRotatoResult()
+1475:	//struct FlipResult
+1478:	//	static constexpr const char* kTypeName = "RotationInputResult";
+1483:	//	FlipResult()
+1489:	//struct MoveForwardResult
+1492:	//	static constexpr const char* kTypeName = "MoveForwardResult";
+1496:	//	MoveForwardResult()
+1502:	//struct ShakingPositionResult
+1505:	//	static constexpr const char* kTypeName = "ShakingPositionResult";
+1510:	//	ShakingPositionResult()
+1516:	//struct LookResult
+1519:	//	static constexpr const char* kTypeName = "LookResult";
+1524:	//	LookResult()
+1530:	//struct TrackingWarpResult
+1533:	//	static constexpr const char* kTypeName = "TrackingWarpResult";
+1539:	//	TrackingWarpResult()
+1547:	//struct LeapResult
+1550:	//	static constexpr const char* kTypeName = "LeapResult";
+1555:	//	LeapResult()
+1561:	//struct CameraPosResult
+1564:	//	static constexpr const char* kTypeName = "CameraPosResult";
+1569:	//	Entity target;
+1571:	//	CameraPosResult()
+1574:	//		, target(kInvalidEntity)
+1579:	//struct CameraRotResult
+1582:	//	static constexpr const char* kTypeName = "CameraRotResult";
+1585:	//	Entity target;
+1586:	//	CameraRotResult()
+1587:	//		: target(kInvalidEntity)
+1592:	//struct ColliderBackResult
+1595:	//	static constexpr const char* kTypeName = "ColliderBackResult";
+1600:	//	ColliderBackResult()
+1680:	//struct FollowPosResult
+1683:	//	static constexpr const char* kTypeName = "FollowPosResult";
+1687:	//	Entity target;
+1692:	//	FollowPosResult()
+1694:	//		, target(kInvalidEntity)
+1702:	//struct FollowRotResult
+1705:	//	static constexpr const char* kTypeName = "FollowRotResult";
+1709:	//	Entity target;
+1714:	//	FollowRotResult()
+1716:	//		, target (kInvalidEntity)
+1778:	//struct RailResult
+1781:	//	static constexpr const char* kTypeName = "RailResult";
+1784:	//	RailResult()
+1815:	//struct RailFlyResult
+1818:	//	static constexpr const char* kTypeName = "RailFlyResult";
+1823:	//	RailFlyResult()
+1828:	//	RailFlyResult(float3 a_posOffset)
+1857:	//struct RailApproachResult
+1860:	//	static constexpr const char* kTypeName = "RailApproachResult";
+1865:	//	RailApproachResult()
+1870:	//	RailApproachResult(float3 a_posOffset)
+1912:	//struct DebugCameraPosResult
+1915:	//	static constexpr const char* kTypeName = "DebugCameraPosResult";
+1918:	//	Entity target;
+1920:	//	DebugCameraPosResult()
+1921:	//		: target(kInvalidEntity)
+1926:	//struct DebugCameraRotResult
+1929:	//	static constexpr const char* kTypeName = "DebugCameraRotResult";
+1932:	//	Entity target;
+1934:	//	DebugCameraRotResult()
+1935:	//		: target(kInvalidEntity)
+1980:	//struct DebugInputPosResult
+1983:	//	static constexpr const char* kTypeName = "DebugInputPosResult";
+1988:	//	DebugInputPosResult()
+1994:	//struct DebugInputRotResult
+1997:	//	static constexpr const char* kTypeName = "DebugInputRotResult";
+2001:	//	DebugInputRotResult()
+2094:		// 振動時間
+2096:		// 振動の大きさ
+2098:		//! 振動の激しさ
+2100:		//! 経過時間
+2116:	//struct ShakeResult
+2119:	//	static constexpr const char* kTypeName = "ShakeResult";
+2124:	//	ShakeResult()
+2178:		SHOTUI_CANSHOT = 1 << 0, // 射撃可能時に描画されるUI
+2179:		SHOTUI_WAIT = 1 << 1, // 射撃待機時に描画されるUI
+2180:		SHOTUI_FADERESET_UP = 1 << 2, // 射撃状況変更時に透明度などがリセットされる
+2221:	// 毎フレーム引き継ぐ自由移動
+2244:	// 固定座標のResult
+2261:	// 自由移動のResult
+2283:	// 1フレーム限りの移動Result
+2374:		// 扇の範囲
+2377:		// 扇の角度
+2379:		// 上下方向への判定
+==== 12e4e554 ====
+TOTAL_LINES=2367
+34:// 探しやすいようにnamespaceで囲う、基本はusing namespaceを使う
+477:		// 減衰率
+521:		// 減衰率
+596:		// ワールドの中心座標
+599:		// x,y,zの方向ベクトル
+606:		// 半径
+676:			// ぶつかったEntity
+679:			// 押し戻し方向
+681:			// 押し戻し量
+702:			// 入ってきたEntity
+969:		Entity owner; // 自身を保持しているEntity
+1002:		// カメラの種類を増やす場合別コンポーネントに分ける
+1008:		float	fovy;		// 画角
+1009:		float	aspect;	//　アスペクト比
+1010:		float	nearCrip;		// ニアクリップ
+1011:		float	farCrip;		// ファークリップ
+1298:	// TODO Json読み込みを更新する
+1434:	//struct VelocityResult
+1437:	//	static constexpr const char* kTypeName = "VelocityResult";
+1442:	//	VelocityResult()
+1448:	//struct InputMoveResult
+1451:	//	static constexpr const char* kTypeName = "InputMoveResult";
+1456:	//	InputMoveResult()
+1462:	//struct InputRotatoResult
+1465:	//	static constexpr const char* kTypeName = "InputRotatoResult";
+1469:	//	InputRotatoResult()
+1475:	//struct FlipResult
+1478:	//	static constexpr const char* kTypeName = "RotationInputResult";
+1483:	//	FlipResult()
+1489:	//struct MoveForwardResult
+1492:	//	static constexpr const char* kTypeName = "MoveForwardResult";
+1496:	//	MoveForwardResult()
+1502:	//struct ShakingPositionResult
+1505:	//	static constexpr const char* kTypeName = "ShakingPositionResult";
+1510:	//	ShakingPositionResult()
+1516:	//struct LookResult
+1519:	//	static constexpr const char* kTypeName = "LookResult";
+1524:	//	LookResult()
+1530:	//struct TrackingWarpResult
+1533:	//	static constexpr const char* kTypeName = "TrackingWarpResult";
+1539:	//	TrackingWarpResult()
+1547:	//struct LeapResult
+1550:	//	static constexpr const char* kTypeName = "LeapResult";
+1555:	//	LeapResult()
+1561:	//struct CameraPosResult
+1564:	//	static constexpr const char* kTypeName = "CameraPosResult";
+1569:	//	Entity target;
+1571:	//	CameraPosResult()
+1574:	//		, target(kInvalidEntity)
+1579:	//struct CameraRotResult
+1582:	//	static constexpr const char* kTypeName = "CameraRotResult";
+1585:	//	Entity target;
+1586:	//	CameraRotResult()
+1587:	//		: target(kInvalidEntity)
+1592:	//struct ColliderBackResult
+1595:	//	static constexpr const char* kTypeName = "ColliderBackResult";
+1600:	//	ColliderBackResult()
+1679:	//struct FollowPosResult
+1682:	//	static constexpr const char* kTypeName = "FollowPosResult";
+1686:	//	Entity target;
+1691:	//	FollowPosResult()
+1693:	//		, target(kInvalidEntity)
+1701:	//struct FollowRotResult
+1704:	//	static constexpr const char* kTypeName = "FollowRotResult";
+1708:	//	Entity target;
+1713:	//	FollowRotResult()
+1715:	//		, target (kInvalidEntity)
+1777:	//struct RailResult
+1780:	//	static constexpr const char* kTypeName = "RailResult";
+1783:	//	RailResult()
+1814:	//struct RailFlyResult
+1817:	//	static constexpr const char* kTypeName = "RailFlyResult";
+1822:	//	RailFlyResult()
+1827:	//	RailFlyResult(float3 a_posOffset)
+1856:	//struct RailApproachResult
+1859:	//	static constexpr const char* kTypeName = "RailApproachResult";
+1864:	//	RailApproachResult()
+1869:	//	RailApproachResult(float3 a_posOffset)
+1911:	//struct DebugCameraPosResult
+1914:	//	static constexpr const char* kTypeName = "DebugCameraPosResult";
+1917:	//	Entity target;
+1919:	//	DebugCameraPosResult()
+1920:	//		: target(kInvalidEntity)
+1925:	//struct DebugCameraRotResult
+1928:	//	static constexpr const char* kTypeName = "DebugCameraRotResult";
+1931:	//	Entity target;
+1933:	//	DebugCameraRotResult()
+1934:	//		: target(kInvalidEntity)
+1979:	//struct DebugInputPosResult
+1982:	//	static constexpr const char* kTypeName = "DebugInputPosResult";
+1987:	//	DebugInputPosResult()
+1993:	//struct DebugInputRotResult
+1996:	//	static constexpr const char* kTypeName = "DebugInputRotResult";
+2000:	//	DebugInputRotResult()
+2093:		// 振動時間
+2095:		// 振動の大きさ
+2097:		//! 振動の激しさ
+2099:		//! 経過時間
+2115:	//struct ShakeResult
+2118:	//	static constexpr const char* kTypeName = "ShakeResult";
+2123:	//	ShakeResult()
+2177:		SHOTUI_CANSHOT = 1 << 0, // 射撃可能時に描画されるUI
+2178:		SHOTUI_WAIT = 1 << 1, // 射撃待機時に描画されるUI
+2179:		SHOTUI_FADERESET_UP = 1 << 2, // 射撃状況変更時に透明度などがリセットされる
+2220:	// 毎フレーム引き継ぐ自由移動
+2243:	// 固定座標のResult
+2260:	// 自由移動のResult
+2282:	// 1フレーム限りの移動Result
+==== CURRENT CONTEXT ====
+--- NOW 188 ---
+    185:using BitFlag = unsigned int;
+    186:
+    187:
+>>> 188:// ・ｽT・ｽ・ｽ・ｽ竄ｷ・ｽ・ｽ・ｽ謔､・ｽ・ｽnamespace・ｽﾅ囲ゑｿｽ・ｽA・ｽ・ｽ{・ｽ・ｽusing namespace・ｽ・ｽ・ｽg・ｽ・ｽ
+    189:namespace Component
+    190:{
+    191:	struct PlayerTag
+--- NOW 629 ---
+    626:		static constexpr int kVersion = 1;
+    627:
+    628:		float3 force;
+>>> 629:		// ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+    630:		float attenuation;
+    631:
+    632:		Force(float3 a_force, float a_attenuation = 1.0f)
+--- NOW 673 ---
+    670:		static constexpr int kVersion = 0;
+    671:
+    672:		float speed;
+>>> 673:		// ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+    674:		float attenuation;
+    675:
+    676:		MoveForward()
+--- NOW 748 ---
+    745:		static constexpr const char* kTypeName = "OBBCollider";
+    746:		static constexpr int kVersion = 0;
+    747:
+>>> 748:		// ・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽh・ｽﾌ抵ｿｽ・ｽS・ｽ・ｽ・ｽW
+    749:		float3 center;
+    750:		float3 oldCenter;
+    751:		bool setOldCenter;
+--- NOW 753 ---
+    750:		float3 oldCenter;
+    751:		bool setOldCenter;
+    752:
+>>> 753:		// x,y,z・ｽﾌ包ｿｽ・ｽ・ｽ・ｽx・ｽN・ｽg・ｽ・ｽ
+    754:		std::array<float3, 3> axis;
+    755:
+    756:		std::array<float3, 3> edges;
+--- NOW 760 ---
+    757:
+    758:		BitFlag obbBitFlag;
+    759:
+>>> 760:		// ・ｽ・ｽ・ｽa	
+    761:		float3 half;
+    762:
+    763:		OBBCollider(BitFlag a_flag = OBB_DEFAULT)
+--- NOW 873 ---
+    870:
+    871:		struct TriggerResult
+    872:		{
+>>> 873:			// ・ｽ・ｽ・ｽ・ｽ・ｽﾄゑｿｽ・ｽ・ｽEntity
+    874:			Entity triggerEntity;
+    875:
+    876:			TriggerResult()
+--- NOW 1164 ---
+    1161:		static constexpr const char* kTypeName = "OwnerComponent";
+    1162:		static constexpr int kVersion = 0;
+    1163:
+>>> 1164:		Entity owner; // ・ｽ・ｽ・ｽg・ｽ・ｽﾛ趣ｿｽ・ｽ・ｽ・ｽﾄゑｿｽ・ｽ・ｽEntity
+    1165:
+    1166:		OwnerComponent()
+    1167:		{
+--- NOW 1197 ---
+    1194:		static constexpr const char* kTypeName = "Camera";
+    1195:		static constexpr int kVersion = 0;
+    1196:
+>>> 1197:		// ・ｽJ・ｽ・ｽ・ｽ・ｽ・ｽﾌ趣ｿｽﾞを増やす・ｽ鼾・ｿｽﾊコ・ｽ・ｽ・ｽ|・ｽ[・ｽl・ｽ・ｽ・ｽg・ｽﾉ包ｿｽ・ｽ・ｽ・ｽ・ｽ
+    1198:		size_t cameraPriority;
+    1199:
+    1200:		float3 lookPosition;
+--- NOW 1203 ---
+    1200:		float3 lookPosition;
+    1201:		float3 upVector;
+    1202:
+>>> 1203:		float	fovy;		// ・ｽ・ｽp
+    1204:		float	aspect;	//・ｽ@・ｽA・ｽX・ｽy・ｽN・ｽg・ｽ・ｽ
+    1205:		float	nearCrip;		// ・ｽj・ｽA・ｽN・ｽ・ｽ・ｽb・ｽv
+    1206:		float	farCrip;		// ・ｽt・ｽ@・ｽ[・ｽN・ｽ・ｽ・ｽb・ｽv
+--- NOW 1204 ---
+    1201:		float3 upVector;
+    1202:
+    1203:		float	fovy;		// ・ｽ・ｽp
+>>> 1204:		float	aspect;	//・ｽ@・ｽA・ｽX・ｽy・ｽN・ｽg・ｽ・ｽ
+    1205:		float	nearCrip;		// ・ｽj・ｽA・ｽN・ｽ・ｽ・ｽb・ｽv
+    1206:		float	farCrip;		// ・ｽt・ｽ@・ｽ[・ｽN・ｽ・ｽ・ｽb・ｽv
+    1207:
+--- NOW 1205 ---
+    1202:
+    1203:		float	fovy;		// ・ｽ・ｽp
+    1204:		float	aspect;	//・ｽ@・ｽA・ｽX・ｽy・ｽN・ｽg・ｽ・ｽ
+>>> 1205:		float	nearCrip;		// ・ｽj・ｽA・ｽN・ｽ・ｽ・ｽb・ｽv
+    1206:		float	farCrip;		// ・ｽt・ｽ@・ｽ[・ｽN・ｽ・ｽ・ｽb・ｽv
+    1207:
+    1208:		Camera()
+--- NOW 1206 ---
+    1203:		float	fovy;		// ・ｽ・ｽp
+    1204:		float	aspect;	//・ｽ@・ｽA・ｽX・ｽy・ｽN・ｽg・ｽ・ｽ
+    1205:		float	nearCrip;		// ・ｽj・ｽA・ｽN・ｽ・ｽ・ｽb・ｽv
+>>> 1206:		float	farCrip;		// ・ｽt・ｽ@・ｽ[・ｽN・ｽ・ｽ・ｽb・ｽv
+    1207:
+    1208:		Camera()
+    1209:			: Camera(0, float3(0.0f, 0.0f, 0.0f), float3(0.0f, 1.0f, 0.0f), 60.0f, 1.77777f, 0.05f, 1000.0f)
+--- NOW 1493 ---
+    1490:		}
+    1491:	};
+    1492:
+>>> 1493:	// TODO Json・ｽﾇみ搾ｿｽ・ｽﾝゑｿｽ・ｽX・ｽV・ｽ・ｽ・ｽ・ｽ
+    1494:	struct SpriteComponent
+    1495:	{
+    1496:		static constexpr TypeID kTypeId = 53;
+--- NOW 1977 ---
+    1974:		static constexpr const char* kTypeName = "ShakeComponent";
+    1975:		static constexpr int kVersion = 0;
+    1976:
+>>> 1977:		// ・ｽU・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+    1978:		float shakeTime;
+    1979:		// ・ｽU・ｽ・ｽ・ｽﾌ大き・ｽ・ｽ
+    1980:		float3 shakePower;
+--- NOW 1979 ---
+    1976:
+    1977:		// ・ｽU・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+    1978:		float shakeTime;
+>>> 1979:		// ・ｽU・ｽ・ｽ・ｽﾌ大き・ｽ・ｽ
+    1980:		float3 shakePower;
+    1981:		//! ・ｽU・ｽ・ｽ・ｽﾌ鯉ｿｽ・ｽ・ｽ・ｽ・ｽ
+    1982:		float3 shakeAmplitude;
+--- NOW 1981 ---
+    1978:		float shakeTime;
+    1979:		// ・ｽU・ｽ・ｽ・ｽﾌ大き・ｽ・ｽ
+    1980:		float3 shakePower;
+>>> 1981:		//! ・ｽU・ｽ・ｽ・ｽﾌ鯉ｿｽ・ｽ・ｽ・ｽ・ｽ
+    1982:		float3 shakeAmplitude;
+    1983:		//! ・ｽo・ｽﾟ趣ｿｽ・ｽ・ｽ
+    1984:		float elapsedTime;
+--- NOW 1983 ---
+    1980:		float3 shakePower;
+    1981:		//! ・ｽU・ｽ・ｽ・ｽﾌ鯉ｿｽ・ｽ・ｽ・ｽ・ｽ
+    1982:		float3 shakeAmplitude;
+>>> 1983:		//! ・ｽo・ｽﾟ趣ｿｽ・ｽ・ｽ
+    1984:		float elapsedTime;
+    1985:		// !!!New!!!
+    1986:		float decayRate;
+--- NOW 2058 ---
+    2055:	enum ShotUIType
+    2056:	{
+    2057:		SHOTUI_NONE = 0,
+>>> 2058:		SHOTUI_CANSHOT = 1 << 0, // ・ｽﾋ鯉ｿｽ・ｽﾂ能・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
+    2059:		SHOTUI_WAIT = 1 << 1, // ・ｽﾋ鯉ｿｽ・ｽﾒ機・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
+    2060:		SHOTUI_FADERESET_UP = 1 << 2, // ・ｽﾋ鯉ｿｽ・ｽ?ｵ変更・ｽ・ｽ・ｽﾉ難ｿｽ・ｽ・ｽ・ｽx・ｽﾈどゑｿｽ・ｽ・ｽ・ｽZ・ｽb・ｽg・ｽ・ｽ・ｽ・ｽ・ｽ
+    2061:		SHOTUI_FADERESET_DOWN = 1 << 3
+--- NOW 2059 ---
+    2056:	{
+    2057:		SHOTUI_NONE = 0,
+    2058:		SHOTUI_CANSHOT = 1 << 0, // ・ｽﾋ鯉ｿｽ・ｽﾂ能・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
+>>> 2059:		SHOTUI_WAIT = 1 << 1, // ・ｽﾋ鯉ｿｽ・ｽﾒ機・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
+    2060:		SHOTUI_FADERESET_UP = 1 << 2, // ・ｽﾋ鯉ｿｽ・ｽ?ｵ変更・ｽ・ｽ・ｽﾉ難ｿｽ・ｽ・ｽ・ｽx・ｽﾈどゑｿｽ・ｽ・ｽ・ｽZ・ｽb・ｽg・ｽ・ｽ・ｽ・ｽ・ｽ
+    2061:		SHOTUI_FADERESET_DOWN = 1 << 3
+    2062:	};
+--- NOW 2060 ---
+    2057:		SHOTUI_NONE = 0,
+    2058:		SHOTUI_CANSHOT = 1 << 0, // ・ｽﾋ鯉ｿｽ・ｽﾂ能・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
+    2059:		SHOTUI_WAIT = 1 << 1, // ・ｽﾋ鯉ｿｽ・ｽﾒ機・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
+>>> 2060:		SHOTUI_FADERESET_UP = 1 << 2, // ・ｽﾋ鯉ｿｽ・ｽ?ｵ変更・ｽ・ｽ・ｽﾉ難ｿｽ・ｽ・ｽ・ｽx・ｽﾈどゑｿｽ・ｽ・ｽ・ｽZ・ｽb・ｽg・ｽ・ｽ・ｽ・ｽ・ｽ
+    2061:		SHOTUI_FADERESET_DOWN = 1 << 3
+    2062:	};
+    2063:	struct ShotUI
+--- NOW 2101 ---
+    2098:		}
+    2099:	};
+    2100:
+>>> 2101:	// ・ｽ・ｽ・ｽt・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽp・ｽ・ｽ・ｽ・ｽ・ｽR・ｽﾚ難ｿｽ
+    2102:	struct MotionTransform
+    2103:	{
+    2104:		static constexpr TypeID kTypeId = 101;
+--- NOW 2124 ---
+    2121:	};
+    2122:
+    2123:
+>>> 2124:	// ・ｽﾅ抵ｿｽ・ｽ・ｽW・ｽ・ｽResult
+    2125:	struct FixedResult
+    2126:	{
+    2127:		static constexpr TypeID kTypeId = 102;
+--- NOW 2141 ---
+    2138:		}
+    2139:	};
+    2140:
+>>> 2141:	// ・ｽ・ｽ・ｽR・ｽﾚ難ｿｽ・ｽ・ｽResult
+    2142:	struct MotionResult
+    2143:	{
+    2144:		static constexpr TypeID kTypeId = 103;
+--- NOW 2163 ---
+    2160:		}
+    2161:	};
+    2162:
+>>> 2163:	// 1・ｽt・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽﾌ移難ｿｽResult
+    2164:	struct EphemeralResult
+    2165:	{
+    2166:		static constexpr TypeID kTypeId = 104;
+--- NOW 2260 ---
+    2257:		static constexpr const char* kTypeName = "SectorHitJudge";
+    2258:		static constexpr int kVersion = 0;
+    2259:
+>>> 2260:		// ・ｽ・ｽﾌ範茨ｿｽ
+    2261:		float minLength;
+    2262:		float maxLength;
+    2263:		// ・ｽ・ｽﾌ角・ｽx
+--- NOW 2263 ---
+    2260:		// ・ｽ・ｽﾌ範茨ｿｽ
+    2261:		float minLength;
+    2262:		float maxLength;
+>>> 2263:		// ・ｽ・ｽﾌ角・ｽx
+    2264:		float angle;
+    2265:		// ・ｽ繪ｺ・ｽ・ｽ・ｽ・ｽ・ｽﾖの費ｿｽ・ｽ・ｽ
+    2266:		float maxHeight;
+--- NOW 2265 ---
+    2262:		float maxLength;
+    2263:		// ・ｽ・ｽﾌ角・ｽx
+    2264:		float angle;
+>>> 2265:		// ・ｽ繪ｺ・ｽ・ｽ・ｽ・ｽ・ｽﾖの費ｿｽ・ｽ・ｽ
+    2266:		float maxHeight;
+    2267:		float maxLowness;
+    2268:

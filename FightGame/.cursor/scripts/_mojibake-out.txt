@@ -1,0 +1,143 @@
+FOUND=28
+FILES=1
+FILECOUNT=include\ECS\Component\Components.h=28
+---
+FILE=include\ECS\Component\Components.h
+LINE=188
+ENC=cp932
+TEXT=// ・ｽT・ｽ・ｽ・ｽ竄ｷ・ｽ・ｽ・ｽ謔､・ｽ・ｽnamespace・ｽﾅ囲ゑｿｽ・ｽA・ｽ・ｽ{・ｽ・ｽusing namespace・ｽ・ｽ・ｽg・ｽ・ｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=629
+ENC=cp932
+TEXT=// ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=673
+ENC=cp932
+TEXT=// ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=748
+ENC=cp932
+TEXT=// ・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽh・ｽﾌ抵ｿｽ・ｽS・ｽ・ｽ・ｽW
+---
+FILE=include\ECS\Component\Components.h
+LINE=753
+ENC=cp932
+TEXT=// x,y,z・ｽﾌ包ｿｽ・ｽ・ｽ・ｽx・ｽN・ｽg・ｽ・ｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=760
+ENC=cp932
+TEXT=// ・ｽ・ｽ・ｽa
+---
+FILE=include\ECS\Component\Components.h
+LINE=873
+ENC=cp932
+TEXT=// ・ｽ・ｽ・ｽ・ｽ・ｽﾄゑｿｽ・ｽ・ｽEntity
+---
+FILE=include\ECS\Component\Components.h
+LINE=1164
+ENC=cp932
+TEXT=Entity owner; // ・ｽ・ｽ・ｽg・ｽ・ｽﾛ趣ｿｽ・ｽ・ｽ・ｽﾄゑｿｽ・ｽ・ｽEntity
+---
+FILE=include\ECS\Component\Components.h
+LINE=1197
+ENC=cp932
+TEXT=// ・ｽJ・ｽ・ｽ・ｽ・ｽ・ｽﾌ趣ｿｽﾞを増やす・ｽ鼾・ｿｽﾊコ・ｽ・ｽ・ｽ|・ｽ[・ｽl・ｽ・ｽ・ｽg・ｽﾉ包ｿｽ・ｽ・ｽ・ｽ・ｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=1203
+ENC=cp932
+TEXT=float	fovy;		// ・ｽ・ｽp
+---
+FILE=include\ECS\Component\Components.h
+LINE=1204
+ENC=cp932
+TEXT=float	aspect;	//・ｽ@・ｽA・ｽX・ｽy・ｽN・ｽg・ｽ・ｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=1205
+ENC=cp932
+TEXT=float	nearCrip;		// ・ｽj・ｽA・ｽN・ｽ・ｽ・ｽb・ｽv
+---
+FILE=include\ECS\Component\Components.h
+LINE=1206
+ENC=cp932
+TEXT=float	farCrip;		// ・ｽt・ｽ@・ｽ[・ｽN・ｽ・ｽ・ｽb・ｽv
+---
+FILE=include\ECS\Component\Components.h
+LINE=1493
+ENC=cp932
+TEXT=// TODO Json・ｽﾇみ搾ｿｽ・ｽﾝゑｿｽ・ｽX・ｽV・ｽ・ｽ・ｽ・ｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=1974
+ENC=cp932
+TEXT=// ・ｽU・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=1976
+ENC=cp932
+TEXT=// ・ｽU・ｽ・ｽ・ｽﾌ大き・ｽ・ｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=1978
+ENC=cp932
+TEXT=//! ・ｽU・ｽ・ｽ・ｽﾌ鯉ｿｽ・ｽ・ｽ・ｽ・ｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=1980
+ENC=cp932
+TEXT=//! ・ｽo・ｽﾟ趣ｿｽ・ｽ・ｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=2053
+ENC=cp932
+TEXT=SHOTUI_CANSHOT = 1 << 0, // ・ｽﾋ鯉ｿｽ・ｽﾂ能・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
+---
+FILE=include\ECS\Component\Components.h
+LINE=2054
+ENC=cp932
+TEXT=SHOTUI_WAIT = 1 << 1, // ・ｽﾋ鯉ｿｽ・ｽﾒ機・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
+---
+FILE=include\ECS\Component\Components.h
+LINE=2055
+ENC=cp932
+TEXT=SHOTUI_FADERESET_UP = 1 << 2, // ・ｽﾋ鯉ｿｽ・ｽ?ｵ変更・ｽ・ｽ・ｽﾉ難ｿｽ・ｽ・ｽ・ｽx・ｽﾈどゑｿｽ・ｽ・ｽ・ｽZ・ｽb・ｽg・ｽ・ｽ・ｽ・ｽ・ｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=2096
+ENC=cp932
+TEXT=// ・ｽ・ｽ・ｽt・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽp・ｽ・ｽ・ｽ・ｽ・ｽR・ｽﾚ難ｿｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=2119
+ENC=cp932
+TEXT=// ・ｽﾅ抵ｿｽ・ｽ・ｽW・ｽ・ｽResult
+---
+FILE=include\ECS\Component\Components.h
+LINE=2136
+ENC=cp932
+TEXT=// ・ｽ・ｽ・ｽR・ｽﾚ難ｿｽ・ｽ・ｽResult
+---
+FILE=include\ECS\Component\Components.h
+LINE=2158
+ENC=cp932
+TEXT=// 1・ｽt・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽﾌ移難ｿｽResult
+---
+FILE=include\ECS\Component\Components.h
+LINE=2255
+ENC=cp932
+TEXT=// ・ｽ・ｽﾌ範茨ｿｽ
+---
+FILE=include\ECS\Component\Components.h
+LINE=2258
+ENC=cp932
+TEXT=// ・ｽ・ｽﾌ角・ｽx
+---
+FILE=include\ECS\Component\Components.h
+LINE=2260
+ENC=cp932
+TEXT=// ・ｽ繪ｺ・ｽ・ｽ・ｽ・ｽ・ｽﾖの費ｿｽ・ｽ・ｽ

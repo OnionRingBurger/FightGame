@@ -49,3 +49,9 @@ constexpr const char* kWhiteBossEntryKey = "WhiteBossEntry.efkefc";
 // GhostShader: カメラからの距離フェード（exp(-d/L) の L）
 constexpr float kGhostFadeRange = 20.0f;
 
+constexpr float kShadowLightDistance = 50.0f;
+constexpr float kShadowOrthoSize = 100.0f;
+constexpr float kShadowNearZ = 1.0f;
+constexpr float kShadowFarZ = 250.0f;
+constexpr float kShadowBias = 0.001f;
+

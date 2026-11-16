@@ -20,6 +20,9 @@
 #include "TestScene.h"
 #include "CreateGameScene.h"
 
+/// <summary>
+/// 生成時のコンストラクタ
+/// </summary>
 MainGame::MainGame()
 	: scene(nullptr)
 	, pRTV(nullptr)
@@ -32,6 +35,7 @@ MainGame::MainGame()
 	, fpsCount(0)
 	, isFixedCursor(true)
 {
+	// キャッシュ、入力、コンポーネント変換の初期化
 	uiCache = UICache();
 	modelCache = ModelCache();
 	effectCache = EffectCache();
@@ -41,7 +45,10 @@ MainGame::MainGame()
 }
 
 
-// TODO ランダムになっていないので修正
+/// <summary>
+/// MainGameの初期化
+/// 任意のタイミングで行えるように関数として分けている。
+/// </summary>
 void MainGame::Init()
 {
 	TestRegisterComponentType(serialize);
@@ -50,15 +57,14 @@ void MainGame::Init()
 	pRTV = GetDefaultRTV();
 	pDSV = GetDefaultDSV();
 
-	// 他機能初期化
+	// 描画機能初期化
 	Geometory::Init();
 	Sprite::Init();
 	ShaderList::Init();
 	SetDepthTest(DEPTH_TEST_TRUE);
 
-	// TODO 処理中にMain側が終了しDirectXがUninitされると壊れるため修正する
-	runningLoadLoop = true;
-	// Load用ループを開始、内部で参照に対して右辺値を渡すことになるため、std::refを使用	
+	// Load用ループを開始、内部で参照に対して右辺値を渡すことになるため、std::refを使用
+	runningLoadLoop = true;	
 	loadWorker = std::thread(
 		WorkerLoop,
 		std::ref(loadJobQueues),
@@ -68,41 +74,57 @@ void MainGame::Init()
 		std::ref(runningLoadLoop));
 	
 
-	// !!!New!!!
+	// 読み込み開始
 	loadManifestPaths.path = "Assets/Data/LoadData.json";
-
 	ChangeScene("Load");
 
+	// ゲーム機能の入力登録
 	input.RegisterKey("GameEnd", VK_ESCAPE);
+	// デバッグ入力登録
+#ifdef _DEBUG
 	input.RegisterKey("DebugConsole", VK_F1);
+#endif
 	
 	
 	// Soundの初期化
 	InitSound();
 	
+	//初期化完了
 	isInit = true;
 }
 
+/// <summary>
+/// 終了処理
+/// </summary>
 void MainGame::Uninit()
 {
+	// そもそも正常に初期化されていなければ行わない。
 	if (!isInit)
 	{
 		DebugMessage("初期化に失敗しているためメインループから抜けます。");
 		return;
 	}
 
+	// 音を停止
 	UninitSound();
 	
+	// Sceneや裏で回している機能を停止
 	scene = nullptr;
 
 	runningLoadLoop = false;
 	loadWorker.detach();
 
+	// 描画機能を終了
 	ShaderList::Uninit();
 	Sprite::Uninit();
 	Geometory::Uninit();
 }
 
+/// <summary>
+/// 事前更新処理
+/// 毎フレーム本更新処理の前に呼ばれる
+/// </summary>
+/// <param name="deltaTime">前回フレームからの経過時間</param>
 void MainGame::AdvanceUpdate(float deltaTime)
 {
 	input.UpdateInput();
@@ -110,7 +132,12 @@ void MainGame::AdvanceUpdate(float deltaTime)
 	LoadLoopUpdate();
 }
 
-
+/// <summary>
+/// メインループ
+/// 常に稼働し続け、ゲームの更新、描画処理を行う
+/// </summary>
+/// <param name="a_hwnd">ハンドル</param>
+/// <param name="message"></param>
 void MainGame::MainLoop(HWND a_hwnd, MSG& message)
 {
 	if (!isInit)
@@ -122,12 +149,12 @@ void MainGame::MainLoop(HWND a_hwnd, MSG& message)
 	// ランダム初期化
 	std::srand((unsigned)time(NULL));
 
-	//--- FPS制御
+	// FPS制御
 	timeBeginPeriod(1);
 	ResetFPS();
 
 
-	//--- ウィンドウの管理
+	// ウィンドウの管理
 	while (!IsEnd())
 	{
 
@@ -202,17 +229,23 @@ void MainGame::MainLoop(HWND a_hwnd, MSG& message)
 
 }
 
-
+/// <summary>
+/// ゲームが終了しているかどうかを返す
+/// </summary>
+/// <returns></returns>
 bool MainGame::IsEnd()
 {
 	return isEnd;
 }
 
-// ロード結果を受け取り登録
+/// <summary>
+/// 裏で回してるロード処理から登録された
+/// 読み込み結果を各キャッシュに登録する
+/// </summary>
 void MainGame::LoadLoopUpdate()
 {
 	// 各アセットの読み込み
-
+	// モデル登録
 	while (!loadResultQueues.model.IsEnpty())
 	{
 		ModelLoadResult result;
@@ -220,6 +253,7 @@ void MainGame::LoadLoopUpdate()
 		modelCache.RegisterModel(result.key, result.data);
 	}
 
+	// テクスチャ登録
 	while (!loadResultQueues.texture.IsEnpty())
 	{
 		TextureLoadResult result;
@@ -227,6 +261,7 @@ void MainGame::LoadLoopUpdate()
 		uiCache.RegisterTexture(result.key, result.data);
 	}
 
+	// エフェクト登録
 	while (!loadResultQueues.effect.IsEnpty())
 	{
 		EffectLoadResult result;
@@ -234,6 +269,7 @@ void MainGame::LoadLoopUpdate()
 		effectCache.RegisterEffect(result.key, result.effect);
 	}
 
+	// テクスチャフォーマット登録
 	while (!loadResultQueues.textFormat.IsEnpty())
 	{
 		TextFormatLoadResult result;
@@ -241,6 +277,7 @@ void MainGame::LoadLoopUpdate()
 		uiCache.RegisterTextFormat(result.key, result.format);
 	}
 
+	// UI化されたテクスチャ登録
 	while (!loadResultQueues.textUI.IsEnpty())
 	{
 		TextUILoadResult result;
@@ -248,6 +285,7 @@ void MainGame::LoadLoopUpdate()
 			uiCache.RegisterTexture(result.key, result.data);
 	}
 
+	// JsonのPrefab登録
 	while (!loadResultQueues.jsonPrefab.IsEnpty())
 	{
 		JsonPrefabLoadResult result;
@@ -269,6 +307,10 @@ void MainGame::LoadLoopUpdate()
 	// TODO Soundを読み込めるようにする
 }
 
+/// <summary>
+/// 本更新
+/// 毎フレーム呼ばれてSceneを更新する
+/// </summary>
 void MainGame::Update()
 {
 #ifdef _DEBUG
@@ -278,14 +320,68 @@ void MainGame::Update()
 
 }
 
+/// <summary>
+/// 描画処理
+/// 本更新後に呼ばれる
+/// </summary>
 void MainGame::Draw()
 {
+	// 初期化、対象設定
 	BeginDrawDirectX();
 	SetRenderTargets(1, &pRTV, pDSV);
 
-	// 軸線の表示
+	// Geometryのデバッグ描画
+	DebugGeometoryDraw();
+
+	// Sceneの初期化
+	scene->Draw();
+
+	// 描画終了
+	EndDrawDirectX();
+
+
+	// imGuiの描画
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+	ImGui::UpdatePlatformWindows();
+	ImGui::RenderPlatformWindowsDefault();
+
+}
+
+/// <summary>
+/// 更新後の後処理
+/// 本更新、描画終了後に呼ばれる
+/// </summary>
+void MainGame::PostFrameProcess()
+{
+	// Sceneのフレーム終了処理
+	scene->PostFrameProcess();
+
+	// Sceneが変更されるまでリクエストを確認
+	while (!sceneChangeQueue.empty())
+	{
+		// キーを取得
+		std::string key = sceneChangeQueue.front();
+		sceneChangeQueue.pop();
+		// Sceneを変更出来たらBreak
+		if (ChangeScene(key))
+		{
+			// Queueは初期化する
+			std::queue<std::string> empty;
+			sceneChangeQueue.swap(empty);
+			ResetFPS();
+			break;
+		}
+	}
+
+}
+
+void MainGame::DebugGeometoryDraw()
+{
+		// 軸線の表示
 #ifdef _DEBUG
-	// グリッド
+	// グリッド作成
 	DirectX::XMFLOAT4 lineColor(0.5f, 0.5f, 0.5f, 1.0f);
 	float size = DEBUG_GRID_NUM * DEBUG_GRID_MARGIN;
 	for (int i = 1; i <= DEBUG_GRID_NUM; ++i)
@@ -305,13 +401,7 @@ void MainGame::Draw()
 		pos[0].z = pos[1].z = -grid;
 		Geometory::AddLine(pos[0], pos[1], lineColor);
 	}
-	// 軸
-	//Geometory::AddLine(DirectX::XMFLOAT3(0, 0, 0), DirectX::XMFLOAT3(size, 0, 0), DirectX::XMFLOAT4(1, 0, 0, 1));
-	//Geometory::AddLine(DirectX::XMFLOAT3(0, 0, 0), DirectX::XMFLOAT3(0, size, 0), DirectX::XMFLOAT4(0, 1, 0, 1));
-	//Geometory::AddLine(DirectX::XMFLOAT3(0, 0, 0), DirectX::XMFLOAT3(0, 0, size), DirectX::XMFLOAT4(0, 0, 1, 1));
-	//Geometory::AddLine(DirectX::XMFLOAT3(0, 0, 0), DirectX::XMFLOAT3(-size, 0, 0), DirectX::XMFLOAT4(0, 0, 0, 1));
-	//Geometory::AddLine(DirectX::XMFLOAT3(0, 0, 0), DirectX::XMFLOAT3(0, 0, -size), DirectX::XMFLOAT4(0, 0, 0, 1));
-
+	// 表示
 	Geometory::DrawLines();
 
 	// カメラの値
@@ -341,50 +431,19 @@ void MainGame::Draw()
 		DirectX::XMMatrixPerspectiveFovLH(
 			DirectX::XMConvertToRadians(60.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f)
 	));
+
+	// 追加
 	Geometory::SetView(mat[0]);
 	Geometory::SetProjection(mat[1]);
 #endif
-
-	scene->Draw();
-
-	// scene->PostFrameProcess();
-	EndDrawDirectX();
-
-
-	// imGuiの描画
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-	ImGui::UpdatePlatformWindows();
-	ImGui::RenderPlatformWindowsDefault();
-
 }
 
-void MainGame::PostFrameProcess()
-{
-	// Sceneのフレーム終了処理
-	scene->PostFrameProcess();
-
-	// Sceneが変更されるまでリクエストを確認
-	while (!sceneChangeQueue.empty())
-	{
-		// キーを取得
-		std::string key = sceneChangeQueue.front();
-		sceneChangeQueue.pop();
-		// Sceneを変更出来たらBreak
-		if (ChangeScene(key))
-		{
-			// Queueは初期化する
-			std::queue<std::string> empty;
-			sceneChangeQueue.swap(empty);
-			ResetFPS();
-			break;
-		}
-	}
-
-}
-
-
+/// <summary>
+/// シーン切り替え
+/// キーを受け取り対象が存在する場合切り替える
+/// </summary>
+/// <param name="a_key">シーンのキー</param>
+/// <returns>変更が成功したか</returns>
 bool MainGame::ChangeScene(std::string a_key)
 {
 	bool ret = true;
@@ -468,6 +527,9 @@ bool MainGame::ChangeScene(std::string a_key)
 	return ret;
 }
 
+/// <summary>
+/// FPSの初期化
+/// </summary>
 void MainGame::ResetFPS()
 {
 	DWORD countStartTime = timeGetTime();

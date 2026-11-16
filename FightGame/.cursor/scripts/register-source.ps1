@@ -1,6 +1,8 @@
 # Registers or removes a source file entry in FightGame.vcxproj and FightGame.vcxproj.filters.
 # Designed to be encoding-safe: both files are read/written as UTF-8 explicitly,
-# and the filter name is detected from the filters file (no non-ASCII literals here).
+# and Japanese filter root names are detected from the filters file (no non-ASCII literals here).
+# New files are placed under Option A nested filters:
+#   <root>\<relative dir under Source or include>
 #
 # Usage (run from the project root, next to FightGame.vcxproj):
 #   powershell -ExecutionPolicy Bypass -File .cursor/scripts/register-source.ps1 -RelativePath "include\ECS\System\FooSystem.h"
@@ -59,6 +61,48 @@ function Insert-AfterLastMatch([string]$text, [string]$linePattern, [string]$ins
     return ($lines -join '')
 }
 
+function Get-RootFilterName([string]$text, [string]$fileExt) {
+    $filterDefs = [regex]::Matches($text, '<Filter Include="([^"]+)">\s*<UniqueIdentifier>[^<]*</UniqueIdentifier>\s*<Extensions>([^<]*)</Extensions>')
+    foreach ($m in $filterDefs) {
+        $list = $m.Groups[2].Value.Split(';') | ForEach-Object { $_.Trim().ToLowerInvariant() }
+        if ($list -contains $fileExt) { return $m.Groups[1].Value }
+    }
+    throw "No root filter found for extension .$fileExt in FightGame.vcxproj.filters"
+}
+
+function Get-NestedFilterName([string]$root, [string]$relPath) {
+    $norm = $relPath -replace '/', '\'
+    $under = $null
+    if ($norm -match '^(?i)Source\\(.+)$') { $under = $Matches[1] }
+    elseif ($norm -match '^(?i)include\\(.+)$') { $under = $Matches[1] }
+    else { $under = $norm }
+    $dir = [IO.Path]::GetDirectoryName($under)
+    if ([string]::IsNullOrEmpty($dir)) { return $root }
+    return $root + '\' + ($dir -replace '/', '\')
+}
+
+function Ensure-FilterNodes([string]$text, [string]$fullFilterName) {
+    $parts = $fullFilterName -split '\\'
+    $acc = ''
+    $result = $text
+    foreach ($p in $parts) {
+        if ($acc -eq '') { $acc = $p } else { $acc = $acc + '\' + $p }
+        if ($result -match ('<Filter Include="' + [regex]::Escape($acc) + '">')) { continue }
+
+        $guid = '{' + [guid]::NewGuid().ToString().ToUpperInvariant() + '}'
+        $node = '    <Filter Include="' + $acc + '">' + "`r`n" +
+                '      <UniqueIdentifier>' + $guid + '</UniqueIdentifier>' + "`r`n" +
+                '    </Filter>' + "`r`n"
+
+        # Insert before </ItemGroup> of the first ItemGroup that already has a <Filter
+        $m = [regex]::Match($result, '(?s)(<ItemGroup>\s*<Filter Include=.*?)(</ItemGroup>)')
+        if (-not $m.Success) { throw 'Could not find Filter ItemGroup to insert into' }
+        $result = $result.Substring(0, $m.Groups[2].Index) + $node + $result.Substring($m.Groups[2].Index)
+        if ($DryRun) { Write-Output "[dry-run] would add Filter: $acc" }
+    }
+    return $result
+}
+
 $escaped = [regex]::Escape($RelativePath)
 
 # ---- FightGame.vcxproj ----
@@ -96,23 +140,15 @@ if ($Remove) {
     if ($f.Text -match ('<' + $tag + ' Include="' + $escaped + '"')) {
         Write-Output 'filters: already registered, skipping.'
     } else {
-        # Detect the filter name from the Extensions lists in the filters file itself,
-        # so this script contains no non-ASCII filter names.
-        $filterName = $null
-        $filterDefs = [regex]::Matches($f.Text, '<Filter Include="([^"]+)">\s*<UniqueIdentifier>[^<]*</UniqueIdentifier>\s*<Extensions>([^<]*)</Extensions>')
-        foreach ($m in $filterDefs) {
-            if (($m.Groups[2].Value.Split(';') | ForEach-Object { $_.Trim().ToLowerInvariant() }) -contains $ext) {
-                $filterName = $m.Groups[1].Value
-                break
-            }
-        }
-        if (-not $filterName) { throw "No filter found for extension .$ext in FightGame.vcxproj.filters" }
+        $rootName = Get-RootFilterName $f.Text $ext
+        $filterName = Get-NestedFilterName $rootName $RelativePath
+        $withNodes = Ensure-FilterNodes $f.Text $filterName
 
         $entry = '    <' + $tag + ' Include="' + $RelativePath + '">' + "`r`n" +
                  '      <Filter>' + $filterName + '</Filter>' + "`r`n" +
                  '    </' + $tag + '>' + "`r`n"
-        $newText = Insert-AfterLastMatch $f.Text ('^[ \t]*</' + $tag + '>') $entry 'FightGame.vcxproj.filters'
-        if ($DryRun) { Write-Output "[dry-run] filters entry added under filter of .$ext" }
+        $newText = Insert-AfterLastMatch $withNodes ('^[ \t]*</' + $tag + '>') $entry 'FightGame.vcxproj.filters'
+        if ($DryRun) { Write-Output "[dry-run] filters entry under: $filterName" }
         Save-TextFile $filtersPath $newText $f.Bom 'FightGame.vcxproj.filters'
     }
 }

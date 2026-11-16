@@ -63,7 +63,7 @@ void ColliderSystem(Chunk& a_chunk, const SystemContext& a_context)
 		ComponentHandle<OBBCollider> obbCollider = a_chunk.GetComponent<OBBCollider>(it);
 		const ComponentHandle<Scale> scale = a_chunk.GetComponent<Scale>(it);
 
-		// !!!New!!! Pose óDêÊÇÃç¿ïWÅEâÒì]
+		// Pose óDêÊÇÃç¿ïWÅEâÒì]
 		float3 floatPosition = GetEntityPosePos(a_chunk, it);
 		float3 floatRotation = GetEntityPoseRot(a_chunk, it);
 		const ComponentHandle<Position> position = a_chunk.GetComponent<Position>(it);
@@ -298,33 +298,6 @@ void ColliderCheckSystem(Chunk& a_chunk, const SystemContext& a_context)
 
 				continue;
 			}
-
-			//// !!!New!!!
-			//const bool thisLocked = (thisCollider.Look().obbBitFlag & OBB_PushOutLocked) != 0;
-			//const bool otherLocked = (otherCollider.Look().obbBitFlag & OBB_PushOutLocked) != 0;
-			//if (thisLocked == otherLocked) continue;
-			//if ((thisCollider.Look().obbBitFlag & OBB_TRIGGER) || (otherCollider.Look().obbBitFlag & OBB_TRIGGER)) continue;
-
-			//const ComponentHandle<OBBCollider> movingCollider = otherLocked ? thisCollider : otherCollider;
-			//const ComponentHandle<OBBCollider> staticCollider = otherLocked ? otherCollider : thisCollider;
-			//const Entity staticEntity = otherLocked ? otherEntity : thisEntity;
-			//auto hitInfoMoving = otherLocked ? hitInfoThis : a_chunk.GetComponent<HitInfomation>(otherEntity);
-			//if (!hitInfoMoving.IsValid()) continue;
-			//if (!movingCollider.Look().setOldCenter) continue;
-
-			//float3 motion =
-			//{
-			//	movingCollider.Look().center.x - movingCollider.Look().oldCenter.x,
-			//	movingCollider.Look().center.y - movingCollider.Look().oldCenter.y,
-			//	movingCollider.Look().center.z - movingCollider.Look().oldCenter.z,
-			//};
-
-			//float hitTime = 0.0f;
-			//float3 sweepNormal;
-			//float sweepDepth = 0.0f;
-			//if (!SweepOBBTranslate(movingCollider, motion, staticCollider, hitTime, sweepNormal, sweepDepth)) continue;
-
-			//hitInfoMoving->hitResults.push_back(HitInfomation::HitResult(staticEntity, true, sweepNormal, sweepDepth, motion, hitTime, PUSHLOCKED));
 		}
 	}
 

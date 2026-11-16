@@ -9,12 +9,13 @@
 #include "ECSTypes.h"
 #include "TrailEffect.h"
 
-
+// 座標系追加
 #define TRANSFORM_COMPONENT(pos, rot, scale) \
 	Position(pos), \
 	Rotation((rot).x, (rot).y, (rot).z), \
 	Scale((scale).x, (scale).y, (scale).z)
 
+// 移動機能＋座標系追加
 #define MOVE_AND_TRANSFORM_COMPONENT(pos, rot, scale) \
 	Position(pos), \
 	Rotation((rot).x, (rot).y, (rot).z), \
@@ -25,7 +26,6 @@
 	MotionResult(), \
 	EphemeralResult()
 // コンポーネント展開マクロ
-// !!!New!!!
 #define COMPONENT_TYPE_LIST(X) \
 	X(PlayerTag) \
 	X(EnemyTag) \
@@ -181,16 +181,11 @@
 	X(Light) \
 	X(UseShadowShader)
 
-
+// ビットフラグ
 using BitFlag = unsigned int;
-constexpr Entity kInvalidEntity = {
-	static_cast<EntityID>(-1),
-	static_cast<EntityID>(-1)
-
-};
 
 
-// ・ｽT・ｽ・ｽ・ｽ竄ｷ・ｽ・ｽ・ｽ謔､・ｽ・ｽnamespace・ｽﾅ囲ゑｿｽ・ｽA・ｽ・ｽ{・ｽ・ｽusing namespace・ｽ・ｽ・ｽg・ｽ・ｽ
+// 探しやすいようにnamespaceで囲う、基本はusing namespaceを使う
 namespace Component
 {
 	struct PlayerTag
@@ -631,7 +626,7 @@ namespace Component
 		static constexpr int kVersion = 1;
 
 		float3 force;
-		// ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+		// 減衰率
 		float attenuation;
 
 		Force(float3 a_force, float a_attenuation = 1.0f)
@@ -675,7 +670,7 @@ namespace Component
 		static constexpr int kVersion = 0;
 
 		float speed;
-		// ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+		// 減衰率
 		float attenuation;
 
 		MoveForward()
@@ -750,19 +745,19 @@ namespace Component
 		static constexpr const char* kTypeName = "OBBCollider";
 		static constexpr int kVersion = 0;
 
-		// ・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽh・ｽﾌ抵ｿｽ・ｽS・ｽ・ｽ・ｽW
+		// ワールドの中心座標
 		float3 center;
 		float3 oldCenter;
 		bool setOldCenter;
 
-		// x,y,z・ｽﾌ包ｿｽ・ｽ・ｽ・ｽx・ｽN・ｽg・ｽ・ｽ
+		// x,y,zの方向ベクトル
 		std::array<float3, 3> axis;
 
 		std::array<float3, 3> edges;
 
 		BitFlag obbBitFlag;
 
-		// ・ｽ・ｽ・ｽa	
+		// 半径
 		float3 half;
 
 		OBBCollider(BitFlag a_flag = OBB_DEFAULT)
@@ -875,7 +870,7 @@ namespace Component
 
 		struct TriggerResult
 		{
-			// ・ｽ・ｽ・ｽ・ｽ・ｽﾄゑｿｽ・ｽ・ｽEntity
+			// 入ってきたEntity
 			Entity triggerEntity;
 
 			TriggerResult()
@@ -1166,7 +1161,7 @@ namespace Component
 		static constexpr const char* kTypeName = "OwnerComponent";
 		static constexpr int kVersion = 0;
 
-		Entity owner; // ・ｽ・ｽ・ｽg・ｽ・ｽﾛ趣ｿｽ・ｽ・ｽ・ｽﾄゑｿｽ・ｽ・ｽEntity
+		Entity owner; // 自身を保持しているEntity
 
 		OwnerComponent()
 		{
@@ -1199,16 +1194,16 @@ namespace Component
 		static constexpr const char* kTypeName = "Camera";
 		static constexpr int kVersion = 0;
 
-		// ・ｽJ・ｽ・ｽ・ｽ・ｽ・ｽﾌ趣ｿｽﾞを増やす・ｽ鼾・ｿｽﾊコ・ｽ・ｽ・ｽ|・ｽ[・ｽl・ｽ・ｽ・ｽg・ｽﾉ包ｿｽ・ｽ・ｽ・ｽ・ｽ
+		// カメラの種類を増やす場合別コンポーネントに分ける
 		size_t cameraPriority;
 
 		float3 lookPosition;
 		float3 upVector;
 
-		float	fovy;		// ・ｽ・ｽp
-		float	aspect;	//・ｽ@・ｽA・ｽX・ｽy・ｽN・ｽg・ｽ・ｽ
-		float	nearCrip;		// ・ｽj・ｽA・ｽN・ｽ・ｽ・ｽb・ｽv
-		float	farCrip;		// ・ｽt・ｽ@・ｽ[・ｽN・ｽ・ｽ・ｽb・ｽv
+		float	fovy;		// 画角
+		float	aspect;	//　アスペクト比
+		float	nearCrip;		// ニアクリップ
+		float	farCrip;		// ファークリップ
 
 		Camera()
 			: Camera(0, float3(0.0f, 0.0f, 0.0f), float3(0.0f, 1.0f, 0.0f), 60.0f, 1.77777f, 0.05f, 1000.0f)
@@ -1495,7 +1490,7 @@ namespace Component
 		}
 	};
 
-	// TODO Json・ｽﾇみ搾ｿｽ・ｽﾝゑｿｽ・ｽX・ｽV・ｽ・ｽ・ｽ・ｽ
+	// TODO Json読み込みを更新する
 	struct SpriteComponent
 	{
 		static constexpr TypeID kTypeId = 53;
@@ -1520,6 +1515,7 @@ namespace Component
 	};
 
 
+	// ポリライン(試作)
 	struct Poliline
 	{
 		static constexpr TypeID kTypeId = 54;
@@ -1528,6 +1524,7 @@ namespace Component
 		Poliline() = default;
 	};
 
+	// 座標線形補完コンポーネント
 	struct LeapPosComponent
 	{
 		static constexpr TypeID kTypeId = 55;
@@ -1561,6 +1558,7 @@ namespace Component
 		}
 	};
 
+	// 角度線形補完コンポーネント
 	struct LeapRotComponent
 	{
 		static constexpr TypeID kTypeId = 56;
@@ -1594,6 +1592,7 @@ namespace Component
 		}
 	};
 
+	// 反射コンポーネント
 	struct FlipComponent
 	{
 		static constexpr TypeID kTypeId = 57;
@@ -1602,6 +1601,7 @@ namespace Component
 		FlipComponent() = default;
 	};
 
+	// UI角回転速度
 	struct UIAngularSpeed
 	{
 		static constexpr TypeID kTypeId = 58;
@@ -1621,7 +1621,7 @@ namespace Component
 		}
 	};
 
-
+	// 座標系決定時の一時登録先
 	struct Pose
 	{
 		static constexpr TypeID kTypeId = 71;
@@ -1638,6 +1638,7 @@ namespace Component
 		}
 	};
 
+	// 特殊座標移動のステート
 	enum PosePosStateEnum
 	{
 		POSE_POS_NONE,
@@ -1647,7 +1648,8 @@ namespace Component
 		POSE_POS_LEAP,
 		POSE_POS_DEBUGCAMERA,
 	};
-
+	// 特殊座標移動のステートコンポーネント
+	// 主に処理タイミングの調整に使う
 	struct PosePosState
 	{
 		static constexpr TypeID kTypeId = 72;
@@ -1667,6 +1669,7 @@ namespace Component
 		}
 	};
 
+	// 特殊角度移動のステート
 	enum PoseRotStateEnum
 	{
 		POSE_ROT_NONE,
@@ -1677,6 +1680,8 @@ namespace Component
 		POSE_ROT_LOOKMOVE
 	};
 
+	// 特殊角度移動のステートコンポーネント
+	// 主に処理タイミングの調整に使う
 	struct PoseRotState
 	{
 		static constexpr TypeID kTypeId = 73;
@@ -1696,7 +1701,8 @@ namespace Component
 		}
 	};
 
-
+	// 移動用レールコンポーネント
+	// レールの現在進行度とそれに応じた座標を持ち、利用者側に追従してもらう形で使う
 	struct RailComponent
 	{
 		static constexpr TypeID kTypeId = 76;
@@ -1732,6 +1738,8 @@ namespace Component
 		}
 	};
 
+	// レール使用者
+	// 使用するレールを保持する
 	struct RailUser
 	{
 		static constexpr TypeID kTypeId = 77;
@@ -1751,6 +1759,7 @@ namespace Component
 		}
 	};
 
+	// 上下の揺れ
 	struct RailFly
 	{
 		static constexpr TypeID kTypeId = 79;
@@ -1775,6 +1784,7 @@ namespace Component
 	};
 
 
+	// 角度制限
 	struct AngleLimitComponent
 	{
 		static constexpr TypeID kTypeId = 83;
@@ -1802,6 +1812,7 @@ namespace Component
 		}
 	};
 
+	// デバッグカメラ用タグ
 	struct DebugCameraTag
 	{
 		static constexpr TypeID kTypeId = 84;
@@ -1810,6 +1821,7 @@ namespace Component
 
 		DebugCameraTag() {};
 	};
+
 
 	struct DebugInputPos
 	{
@@ -1852,6 +1864,7 @@ namespace Component
 	};
 
 
+	// 旧ゲームの敵射撃用コンポーネント
 	struct EnemyShooter
 	{
 		static constexpr TypeID kTypeId = 90;
@@ -1874,6 +1887,7 @@ namespace Component
 		}
 	};
 
+	// 旧ゲームの敵弾
 	struct EnemyBulletTag
 	{
 		static constexpr TypeID kTypeId = 91;
@@ -1882,6 +1896,7 @@ namespace Component
 		EnemyBulletTag() {};
 	};
 
+	// HP
 	struct HitPoint
 	{
 		static constexpr TypeID kTypeId = 92;
@@ -1908,6 +1923,8 @@ namespace Component
 		}
 	};
 
+	// 死亡ステート
+	// 最初はこれ単体であったが、今は他ステート解みあわせて使われている
 	struct DeadState
 	{
 		static constexpr TypeID kTypeId = 93;
@@ -1922,6 +1939,8 @@ namespace Component
 
 	};
 
+	// HPゲージ
+	// HPを保持している対象を保持しゲージを動かす
 	struct HPGaugeUI
 	{
 		static constexpr TypeID kTypeId = 94;
@@ -1948,21 +1967,22 @@ namespace Component
 
 	};
 
+	// 振動機能
 	struct ShakeComponent
 	{
 		static constexpr TypeID kTypeId = 95;
 		static constexpr const char* kTypeName = "ShakeComponent";
 		static constexpr int kVersion = 0;
 
-		// ・ｽU・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+		// 振動時間
 		float shakeTime;
-		// ・ｽU・ｽ・ｽ・ｽﾌ大き・ｽ・ｽ
+		// 振動の大きさ
 		float3 shakePower;
-		//! ・ｽU・ｽ・ｽ・ｽﾌ鯉ｿｽ・ｽ・ｽ・ｽ・ｽ
+		//! 振動の激しさ
 		float3 shakeAmplitude;
-		//! ・ｽo・ｽﾟ趣ｿｽ・ｽ・ｽ
+		//! 経過時間
 		float elapsedTime;
-		// !!!New!!!
+		//! 振動変化の最終倍率
 		float decayRate;
 
 		ShakeComponent(float3 a_shakePower, float3 a_shakeAmplitude, float shakeTime, float a_decayRate)
@@ -1979,7 +1999,8 @@ namespace Component
 		}
 	};
 
-
+	// 触れた場合ダメージを与えるコンポーネント
+	// 攻撃判定等につけられる
 	struct AddDamageComponent
 	{
 		static constexpr TypeID kTypeId = 97;
@@ -2000,6 +2021,8 @@ namespace Component
 
 	};
 
+	// スプライト
+	// 他コンポーネントと組み合わせて動きなどを付けることが多い
 	struct SpriteAnimation
 	{
 		static constexpr TypeID kTypeId = 98;
@@ -2033,9 +2056,9 @@ namespace Component
 	enum ShotUIType
 	{
 		SHOTUI_NONE = 0,
-		SHOTUI_CANSHOT = 1 << 0, // ・ｽﾋ鯉ｿｽ・ｽﾂ能・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
-		SHOTUI_WAIT = 1 << 1, // ・ｽﾋ鯉ｿｽ・ｽﾒ機・ｽ・ｽ・ｽﾉ描・ｽ謔ｳ・ｽ・ｽ・ｽUI
-		SHOTUI_FADERESET_UP = 1 << 2, // ・ｽﾋ鯉ｿｽ・ｽ?ｵ変更・ｽ・ｽ・ｽﾉ難ｿｽ・ｽ・ｽ・ｽx・ｽﾈどゑｿｽ・ｽ・ｽ・ｽZ・ｽb・ｽg・ｽ・ｽ・ｽ・ｽ・ｽ
+		SHOTUI_CANSHOT = 1 << 0, // 射撃可能時に描画されるUI
+		SHOTUI_WAIT = 1 << 1, // 射撃待機時に描画されるUI
+		SHOTUI_FADERESET_UP = 1 << 2, // 射撃状況変更時に透明度などがリセットされる
 		SHOTUI_FADERESET_DOWN = 1 << 3
 	};
 	struct ShotUI
@@ -2057,6 +2080,7 @@ namespace Component
 		}
 	};
 
+	// SpriteのUVを動かすコンポーネント
 	struct UVMove
 	{
 		static constexpr TypeID kTypeId = 100;
@@ -2076,7 +2100,7 @@ namespace Component
 		}
 	};
 
-	// ・ｽ・ｽ・ｽt・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽp・ｽ・ｽ・ｽ・ｽ・ｽR・ｽﾚ難ｿｽ
+	// 毎フレーム引き継ぐ自由移動
 	struct MotionTransform
 	{
 		static constexpr TypeID kTypeId = 101;
@@ -2099,7 +2123,7 @@ namespace Component
 	};
 
 
-	// ・ｽﾅ抵ｿｽ・ｽ・ｽW・ｽ・ｽResult
+	// 固定座標のResult
 	struct FixedResult
 	{
 		static constexpr TypeID kTypeId = 102;
@@ -2116,7 +2140,7 @@ namespace Component
 		}
 	};
 
-	// ・ｽ・ｽ・ｽR・ｽﾚ難ｿｽ・ｽ・ｽResult
+	// 自由移動のResult
 	struct MotionResult
 	{
 		static constexpr TypeID kTypeId = 103;
@@ -2138,7 +2162,7 @@ namespace Component
 		}
 	};
 
-	// 1・ｽt・ｽ・ｽ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ・ｽﾌ移難ｿｽResult
+	// 1フレーム限りの移動Result
 	struct EphemeralResult
 	{
 		static constexpr TypeID kTypeId = 104;
@@ -2169,6 +2193,7 @@ namespace Component
 
 	};
 
+	// 課題で作った花火
 	struct Firework
 	{
 		static constexpr TypeID kTypeId = 105;
@@ -2189,6 +2214,7 @@ namespace Component
 		}
 	};
 
+	// アルファブレンドのシェーダー
 	struct AlphaBlendComponent
 	{
 		static constexpr TypeID kTypeId = 106;
@@ -2210,7 +2236,7 @@ namespace Component
 		}
 	};
 
-
+	// 角速度
 	struct AngularVelocity
 	{
 		static constexpr TypeID kTypeId = 107;
@@ -2229,18 +2255,19 @@ namespace Component
 		}
 	};
 
+	// 扇の当たり判定
 	struct SectorHitJudge
 	{
 		static constexpr TypeID kTypeId = 108;
 		static constexpr const char* kTypeName = "SectorHitJudge";
 		static constexpr int kVersion = 0;
 
-		// ・ｽ・ｽﾌ範茨ｿｽ
+		// 扇の範囲
 		float minLength;
 		float maxLength;
-		// ・ｽ・ｽﾌ角・ｽx
+		// 扇の角度
 		float angle;
-		// ・ｽ繪ｺ・ｽ・ｽ・ｽ・ｽ・ｽﾖの費ｿｽ・ｽ・ｽ
+		// 上下方向への判定
 		float maxHeight;
 		float maxLowness;
 
@@ -2259,6 +2286,7 @@ namespace Component
 		}
 	};
 
+	// プレイヤーの攻撃タグ
 	struct PlayerAttackTag
 	{
 		static constexpr TypeID kTypeId = 109;
@@ -2267,7 +2295,7 @@ namespace Component
 		PlayerAttackTag() {};
 	};
 
-	// !!!New!!!
+	// 可能な行動フラグ
 	enum ActionFlag : BitFlag
 	{
 		ActionFlag_Move = 1 << 0,
@@ -2282,7 +2310,8 @@ namespace Component
 		ActionFlag_All = ActionFlag_Move | ActionFlag_Aim | ActionFlag_Attack | ActionFlag_Jump | ActionFlag_Guard | ActionFlag_KnockBack | ActionFlag_LookMove | ActionFlag_RotChange | ActionFlag_EntryDuration,
 	};
 
-
+	// 攻撃命中保存
+	// 攻撃者とその攻撃者に対する被弾クールタイムを保持
 	struct AttackHitRecord
 	{
 		static constexpr TypeID kTypeId = 110;
@@ -2297,7 +2326,8 @@ namespace Component
 	};
 
 
-	// !!!New!!!
+	// 接地ステート
+	// キャラクターのステートの一部
 	struct GroundedState
 	{
 		static constexpr TypeID kTypeId = 111;
@@ -2312,7 +2342,8 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// 行動マスク
+	// ステートやアクションから割り出された可能な行動を保持する
 	struct ActionMask
 	{
 		static constexpr TypeID kTypeId = 112;
@@ -2327,7 +2358,7 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// ジャンプ中のみ付与されるアクション
 	struct JumpAction
 	{
 		static constexpr TypeID kTypeId = 113;
@@ -2337,6 +2368,7 @@ namespace Component
 		JumpAction() = default;
 	};
 
+	// 空間全体にかかる力
 	struct WorldPower
 	{
 		static constexpr TypeID kTypeId = 114;
@@ -2358,6 +2390,7 @@ namespace Component
 		}
 	};
 
+	// ジャンプ力
 	struct JumpPower
 	{
 		static constexpr TypeID kTypeId = 115;
@@ -2377,7 +2410,6 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
 	// 技1発分の定義構造体
 	struct AttackPower
 	{
@@ -2391,11 +2423,8 @@ namespace Component
 		float lifeTime;
 		float3 followOffset;
 		float waitTime;
-		// !!!New!!!
 		float startupTime;
-		// !!!New!!!
 		std::string sectorKey;
-		// !!!New!!!
 		bool endWithOwnerAction;
 
 
@@ -2405,19 +2434,19 @@ namespace Component
 		}
 
 		AttackPower(
-			float a_minLength,
-			float a_maxLength,
-			float a_angle,
-			float a_maxHeight,
-			float a_maxLowness,
-			float a_damageValue,
-			float a_motionTime,
-			float a_lifeTime,
-			float3 a_followOffset = float3(),
-			float a_waitTime = 0.0f,
-			float a_startupTime = 0.0f,
-			std::string a_sectorKey = "",
-			bool a_endWithOwnerAction = true
+			float a_minLength, // 最小射程
+			float a_maxLength, // 最大射程
+			float a_angle, // 角度
+			float a_maxHeight, // 攻撃の上方向への範囲
+			float a_maxLowness, // 攻撃の下方向への範囲
+			float a_damageValue, // 火力
+			float a_motionTime, // モーション時間、ここをすぎるとキャンセルできる
+			float a_lifeTime, // 攻撃判定残存時間
+			float3 a_followOffset = float3(), // オフセット追従するか
+			float a_waitTime = 0.0f, // 攻撃前の待機時間
+			float a_startupTime = 0.0f, // 攻撃の前隙
+			std::string a_sectorKey = "", // Geometoryの範囲表示キー
+			bool a_endWithOwnerAction = true // 攻撃者のモーション終了時に攻撃をキャンセルするか
 			)
 			: minLength(a_minLength)
 			, maxLength(a_maxLength)
@@ -2436,6 +2465,7 @@ namespace Component
 		}
 	};
 
+
 	// 攻撃情報を実装
 	struct AttackStatus
 	{
@@ -2449,24 +2479,27 @@ namespace Component
 		{
 		}
 
-
-		// float minLength;
-		// float maxLength;
-		// float angle;
-		// float maxHeight;
-		// float maxLowness;
-		// float damageValue;
-		// float motionTime;
-		// float lifeTime;
-		// float3 followOffset;
-		// float waitTime;
-		// float startupTime;
+		// 構造体引数
+		// float minLength; 最小射程
+		// float maxLength; 最大射程
+		// float angle; 角度
+		// float maxHeight; 攻撃の上方向への範囲
+		// float maxLowness; 攻撃の下方向への範囲
+		// float damageValue; 火力
+		// float motionTime; モーション時間、ここをすぎるとキャンセルできる
+		// float lifeTime; 攻撃判定残存時間
+		// float3 followOffset; オフセット追従するか
+		// float waitTime; 攻撃前の待機時間
+		// float startupTime;　攻撃の前隙
+		// std::string a_sectorKey; Geometoryの範囲表示キー
+		// bool a_endWithOwnerAction = true; 攻撃者のモーション終了時に攻撃をキャンセルするか
 		explicit AttackStatus(std::vector<AttackPower> a_attackPowers)
 			: attackPowers(std::move(a_attackPowers))
 		{
 		}
 	};
 
+	// 攻撃中にのみ付与されるアクション
 	struct AttackAction
 	{
 		static constexpr TypeID kTypeId = 117;
@@ -2488,7 +2521,6 @@ namespace Component
 		{
 		}
 
-		// !!!New!!!
 		AttackAction(Entity a_attackEntity, float a_elapsedTime, int a_attackIndex, float a_maxDuration)
 			: attackEntity(a_attackEntity)
 			, elapsedTime(a_elapsedTime)
@@ -2498,15 +2530,16 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// 攻撃発生時にのみ付与されるアクション
 	struct AttackWaitAction
 	{
 		static constexpr TypeID kTypeId = 118;
 		static constexpr const char* kTypeName = "AttackWaitAction";
 		static constexpr int kVersion = 0;
 
+		// 現在の継続時間
 		float elapsedTime;
-		// !!!New!!!
+		// 最大待機時間
 		float waitDuration;
 
 		AttackWaitAction(float a_elapsedTime = 0.0f, float a_waitDuration = 0.0f)
@@ -2516,7 +2549,7 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// 移動入力方向を向くコンポーネント
 	struct LookMove
 	{
 		static constexpr TypeID kTypeId = 119;
@@ -2531,7 +2564,7 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// 入力種類
 	enum class InputOrigin
 	{
 		None = 0,
@@ -2540,7 +2573,8 @@ namespace Component
 		Title = 3
 	};
 
-	// !!!New!!!
+	// 移動入力結果
+	// AIやプレイヤー入力などから受け取って使用する
 	struct MoveInputResult
 	{
 		static constexpr TypeID kTypeId = 120;
@@ -2578,7 +2612,7 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// 各入力元を保持するコンポーネント
 	struct InputSource
 	{
 		static constexpr TypeID kTypeId = 121;
@@ -2611,7 +2645,7 @@ namespace Component
 	};
 
 	
-	// !!!New!!!
+	// 敵攻撃判定タグ
 	struct EnemyAttackTag
 	{
 		static constexpr TypeID kTypeId = 122;
@@ -2627,12 +2661,13 @@ namespace Component
 		static constexpr const char* kTypeName = "AttackTelegraph";
 		static constexpr int kVersion = 0;
 
+		// 形状
 		float minLength;
 		float maxLength;
 		float angle;
 		float maxHeight;
 		float maxLowness;
-		// !!!New!!!
+		// Geometoryの描画キー
 		std::string sectorKey;
 
 		AttackTelegraph(
@@ -2687,7 +2722,7 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// 攻撃判定
 	struct AttackInstance
 	{
 		static constexpr TypeID kTypeId = 125;
@@ -2727,6 +2762,8 @@ namespace Component
 		}
 	};
 
+
+	// AIの性格
 	struct AIRole
 	{
 		static constexpr TypeID kTypeId = 126;
@@ -2743,12 +2780,9 @@ namespace Component
 		float stanceStickiness = 0.5f;
 
 		// 各方針の継続時の累乗倍率
-		// !!!New!!!
-		float probeContinuePowRate = 1.5f;
-		// !!!New!!!
-		float holdContinuePowRate = 0.6f;
-		// !!!New!!!
-		float escapeContinuePowRate = 2.5f;
+		float probeContinuePowRate = 1.5f; // 継戦
+		float holdContinuePowRate = 0.6f; // 様子見
+		float escapeContinuePowRate = 2.5f; // 撤退
 
 		// 有利距離用係数、攻撃命中係数、方針連続使用係数、様子見距離用係数
 		AIRole(float a_distFocus, float a_hitSensitivity, float a_stanceStickiness, float a_farnessPref)
@@ -2765,6 +2799,7 @@ namespace Component
 		}
 	};
 
+	// ガード時に付与されるアクション
 	struct GuardAction
 	{
 		static constexpr TypeID kTypeId = 127;
@@ -2791,6 +2826,7 @@ namespace Component
 		}
 	};
 	
+	// 
 	struct GuardState
 	{
 		static constexpr TypeID kTypeId = 128;
@@ -2813,7 +2849,7 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// クリア対象
 	struct ClearTarget
 	{
 		static constexpr TypeID kTypeId = 129;
@@ -2823,6 +2859,8 @@ namespace Component
 		ClearTarget() {};
 	};
 
+	// 名前コンポーネント
+	// デバッグやプレファブ生成などで使われるが、ゲームロジックに含まれる事は現状ない
 	struct Name
 	{
 		static constexpr TypeID kTypeId = 130;
@@ -2844,7 +2882,7 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// ノックバック時に付与されるアクション
 	struct KnockbackAction
 	{
 		static constexpr TypeID kTypeId = 131;
@@ -2870,7 +2908,7 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// 行動干渉結果コンポーネント(現状はノックバックのみ)
 	struct InterferenceResult
 	{
 		static constexpr TypeID kTypeId = 132;
@@ -2889,6 +2927,7 @@ namespace Component
 		}
 	};
 
+	// 幽霊シェーダー
 	struct UseGhostShader
 	{
 		static constexpr TypeID kTypeId = 133;
@@ -2900,7 +2939,7 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// ロックオンステート
 	struct LookOnState
 	{
 		static constexpr TypeID kTypeId = 134;
@@ -2924,7 +2963,7 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// ロックオン時に付与されるアクション
 	struct LookOnAction
 	{
 		static constexpr TypeID kTypeId = 135;
@@ -2948,6 +2987,7 @@ namespace Component
 		}
 	};
 
+	// ロックオンマーカーのタグ
 	struct LookOnMarkerTag
 	{
 		static constexpr TypeID kTypeId = 136;
@@ -2971,6 +3011,7 @@ namespace Component
 		}
 	};
 
+	// 選択機能のカーソル
 	struct SelectCursor
 	{
 		static constexpr TypeID kTypeId = 137;
@@ -2999,6 +3040,7 @@ namespace Component
 		}
 	};
 
+	// 選択機能のボックス
 	struct SelectBox
 	{
 		static constexpr TypeID kTypeId = 138;
@@ -3603,7 +3645,7 @@ namespace Component
 		}
 	};
 
-	// !!!New!!!
+	// テキストボックスが選択されている際に行うUI演出
 	struct UITextBoxCursor
 	{
 		static constexpr TypeID kTypeId = 167;
@@ -3712,7 +3754,7 @@ namespace Component
 		float phaseElapsed;
 		float shakeElapsed;
 		bool isShaking;
-		// !!!New!!!
+		// 振動終了時の倍率
 		float decayRate;
 
 		UIShake(
@@ -3740,19 +3782,20 @@ namespace Component
 		}
 	};
 
+	// UIの上下揺れ
 	struct UIRailFly
 	{
 		static constexpr TypeID kTypeId = 172;
 		static constexpr const char* kTypeName = "UIRailFly";
 		static constexpr int kVersion = 0;
 
-		// !!!New!!!
+		// ベース地点
 		float2 basePos;
-		// !!!New!!!
+		// 揺れ幅
 		float flyPow;
-		// !!!New!!!
+		// 進行度
 		float flyProgress;
-		// !!!New!!!
+		// 揺れ速度
 		float flySpeed;
 
 		UIRailFly(float2 a_basePos, float a_flyPow, float a_flySpeed)
