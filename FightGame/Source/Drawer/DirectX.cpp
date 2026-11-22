@@ -10,7 +10,7 @@ IDXGISwapChain*				g_pSwapChain;
 RenderTarget*				g_pRTV;
 DepthStencil*				g_pDSV;
 ID3D11RasterizerState*		g_pRasterizerState[3];
-ID3D11DepthStencilState*	g_pDepthStencilState[3];
+ID3D11DepthStencilState*	g_pDepthStencilState[4];
 ID3D11BlendState*			g_pBlendState[BLEND_MAX];
 ID3D11SamplerState*			g_pSamplerState[SAMPLER_MAX];
 Effekseer::ManagerRef managerRef;
@@ -205,7 +205,10 @@ HRESULT InitDirectX(HWND hWnd, UINT width, UINT height, bool fullscreen)
 	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_DECR;
 	// create state
 	g_pDevice->CreateDepthStencilState(&dsDesc, &g_pDepthStencilState[DEPTH_TEST_TRUE]);
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	g_pDevice->CreateDepthStencilState(&dsDesc, &g_pDepthStencilState[DEPTH_TEST_WRITE_OFF]);
 	dsDesc.DepthEnable = false;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	g_pDevice->CreateDepthStencilState(&dsDesc, &g_pDepthStencilState[DEPTH_TEST_FALSE]);
 	dsDesc.DepthEnable = false;
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
@@ -338,7 +341,7 @@ void UninitDirectX()
 		SAFE_RELEASE(g_pSamplerState[i]);
 	for (int i = 0; i < BLEND_MAX; ++i)
 		SAFE_RELEASE(g_pBlendState[i]);
-	for (int i = 0; i < 2; ++i)
+	for (int i = 0; i < 4; ++i)
 		SAFE_RELEASE(g_pDepthStencilState[i]);
 	for(int i = 0; i < 3; ++ i)
 		SAFE_RELEASE(g_pRasterizerState[i]);

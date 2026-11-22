@@ -1,6 +1,6 @@
 ---
 name: implementation-scope-gate
-description: 実装依頼時にAskQuestionで編集スコープを確認してからプロジェクトソースを触る手順。World/Components.h/既存SystemはデフォルトOFF。Rules/Skills更新直後は rules-skills-consistency-check も実行。
+description: 実装依頼時にスコープ確認（AskQuestion優先、不可時はチャット同等）してからプロジェクトソースを触る手順。World/Components.h/既存SystemはデフォルトOFF。Rules/Skills更新直後は rules-skills-consistency-check も実行。
 ---
 
 # 実装スコープ確認ゲート
@@ -26,11 +26,13 @@ Rule: [`.cursor/rules/implementation-scope-gate.mdc`](../../rules/implementation
 | 要承認・未承認 | `include/ECS/World` / `Source/ECS/World`、`Components.h`、依頼外の既存 System、`GameScene` 等 |
 | 今回触らない | 依頼に無い World、配線先、JSON（ユーザー担当と明言されたもの） |
 
-### 2. AskQuestion（必須）
+### 2. スコープ確認（必須・出し方は優先順）
 
 **Write / StrReplace の前に** 必ず出す。要承認グループは **選択肢に含めてもデフォルトは未選択**（ユーザーが明示選択するまで触らない）。
 
-質問例:
+#### 2a. AskQuestion が使えるとき
+
+ツール一覧に `AskQuestion` がある場合のみ呼ぶ。
 
 - **title**: 今回の実装スコープ
 - **prompt**: このターンで編集してよいファイルを選んでください（複数可）。選ばれなかった要承認ファイルは編集しません。
@@ -44,6 +46,17 @@ Rule: [`.cursor/rules/implementation-scope-gate.mdc`](../../rules/implementation
 
 `allow_multiple: true` を使う。
 
+#### 2b. AskQuestion が無い／失敗したとき（正式フォールバック）
+
+Composer Agent など、セッションに AskQuestion が載らないことがある。**製品制約であり Rules では強制できない。**
+
+1. 探しまわらない（GetDynamicTools の繰り返し禁止）
+2. モード切替・モデル変更をユーザーに求めない（必要なら事実を1行）
+3. **同じ options をチャット本文の箇条書きで出し**、複数選択の返信を待つ
+4. チャットでの選択も AskQuestion 回答と **同等の編集許可**
+
+禁止: ツールが無いことを理由にスコープ確認を省略する／「AskQuestion で出して」とユーザーに押し戻すだけで止める。
+
 ### 3. 回答後のみ編集
 
 - 選ばれたファイル **だけ** Write / StrReplace
@@ -56,11 +69,11 @@ Rule: [`.cursor/rules/implementation-scope-gate.mdc`](../../rules/implementation
 - 未選択で未実装の部分
 - コンパイル未確認の可能性
 
-## AskQuestion が不要な場合
+## スコープ確認が不要な場合
 
 - Rules / Skills / 計画書 **のみ** の変更
 - **同ターン** のユーザー発話に編集可パスが列挙されている（例: `ProtoWorld.cpp を編集してよい`）
-- **直前ターン** の AskQuestion 回答が有効で、スコープ外の追加が無い
+- **直前ターン** のスコープ回答（AskQuestion またはチャット）が有効で、スコープ外の追加が無い
 
 ## Rules / Skills を更新した直後
 
@@ -69,6 +82,7 @@ Rule: [`.cursor/rules/implementation-scope-gate.mdc`](../../rules/implementation
 ## 監査チェックリスト（実装スコープ関連）
 
 - [ ] `implementation-scope-gate.mdc` と `edit-approval.mdc` で「実装して ≠ 編集許可」が一致しているか
-- [ ] AskQuestion 必須と「同ターン要承認編集禁止」が矛盾していないか
+- [ ] スコープ確認必須と「同ターン要承認編集禁止」が矛盾していないか
+- [ ] AskQuestion 不可時のチャットフォールバックが両方に書いてあるか
 - [ ] World / Components.h のデフォルト OFF が両方に書いてあるか
 - [ ] スキル内の Rule 参照パスが実在するか

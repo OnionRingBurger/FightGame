@@ -26,7 +26,6 @@ void DrawSystem(Chunk& a_chunk, const SystemContext& a_context, DrawResources& a
 
 	ComponentView oBBCameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
 	OBBDraw(a_chunk, a_context, oBBCameraView);
-	SectorDraw(a_chunk, a_context, oBBCameraView);
 
 	ComponentView entityView = a_chunk.GetView<ComponentTypes<ModelKey, Position, Rotation, Scale>>();
 	ComponentView cameraView = a_chunk.GetView<ComponentTypes<Position, Camera>>();
@@ -67,8 +66,8 @@ void DrawSystem(Chunk& a_chunk, const SystemContext& a_context, DrawResources& a
 	SetSamplerState(SAMPLER_COMPARISON_SHADOW, 1);
 	CameraDraw(a_chunk, a_context, cameraView, entityView, a_drawResources.GetShadowMap());
 	
+	SectorDraw(a_chunk, a_context, oBBCameraView);
 
-	
 	SpriteDraw(a_chunk, a_context);
 
 	EffectDraw(a_chunk, a_context);
@@ -943,6 +942,10 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 
 	if (!useCamera.IsValid() || !cameraPosition.IsValid()) return;
 
+	// Zバッファ対策に描画モードを変更
+	SetDepthTest(DEPTH_TEST_WRITE_OFF);
+	SetBlendMode(BLEND_ALPHA);
+
 	DrawMatrix::CreateViewMatrix(wvp[1], float3{ cameraPosition->x, cameraPosition->y, cameraPosition->z }, useCamera->lookPosition, useCamera->upVector);
 	DrawMatrix::CreateProjectionMatrix(wvp[2], useCamera->fovy, useCamera->aspect, useCamera->nearCrip, useCamera->farCrip);
 	Geometory::SetView(wvp[1]);
@@ -1113,4 +1116,7 @@ void SectorDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 
 		drawSectorMesh(telegraphEntity, progress, startup.Look().startupDuration, kTelegraphHighlightSeconds, color, Geometory::SectorShaderType::Telegraph);
 	}
+
+	// 描画モードを基に戻す
+	SetDepthTest(DEPTH_TEST_TRUE);
 }
