@@ -40,3 +40,5 @@ void CreateTutorialTextSystem(Chunk& a_chunk, const SystemContext& a_context);
 void UITextBoxCursorSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void CursorSelectSystem(Chunk& a_chunk, const SystemContext& a_context, SystemResponse& a_response, AIManager& a_aiManager, ComponentsSerialize& a_serialize);
+
+void DecalDrawSystem(Chunk& a_chunk, const SystemContext& a_context);

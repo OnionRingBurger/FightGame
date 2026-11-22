@@ -223,7 +223,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 			float3(0.0f, 0.0f, 0.0f),
 			float3(kDebugWorldSize.x, 80.0f, kDebugWorldSize.z)
 		),
-		ModelKey("Box"),
+		ModelKey("Floor"),
 		BoxCollider(float3(0.0f, 30.0f, 0.0f), float3(kDebugWorldSize.x, 20.0f, kDebugWorldSize.z)),
 		OBBCollider(OBB_PushOutLocked),
 		floorColor,
@@ -295,7 +295,7 @@ Chunk ProtoWorld::CreateNewChunk(AIManager& a_aiManager)
 			float3(0.0f, 0.0f, 0.0f),
 			float3(kDebugWorldSize.x * 10.0f, 1.0, kDebugWorldSize.z * 6.0f)
 		),
-		ModelKey("Box"),
+		ModelKey("Floor"),
 		seaColor
 	);
 
@@ -513,7 +513,9 @@ void ProtoWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, SystemRes
 	SoundSystem(a_chunk, a_context);
 	SpawnEfkEffectAreaSystem(a_chunk, a_context);
 	SpawnEfkEffectSystem(a_chunk, a_context);
+	DecalDrawSystem(a_chunk, a_context);
 	UpdateEfkEffectSystem(a_chunk, a_context);
+	ModelRotatoVelocitySystem(a_chunk, a_context);
 
 	// ?X?e?[?WÅg???????
 	SpawnJsonSystem(a_chunk, a_context, a_response);

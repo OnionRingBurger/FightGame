@@ -1,7 +1,8 @@
 {
   "models": [
     { "key": "Box", "scale": 1.0 },
-    { "key": "Ball", "scale": 1.0 }
+    { "key": "Ball", "scale": 1.0 },
+    { "key": "Floor", "scale":  1.0 }
   ],
   "textures": [
     "TitleLogo",
@@ -80,7 +81,9 @@
     "RightClickUI",
     "RightStick",
     "MouseMove",
-    "TargetUI"
+    "TargetUI",
+    "ufo",
+    "Decal"
   ],
   "effects": [
     { "key": "Freeze.efk", "magnificent": 1.0 },

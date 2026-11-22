@@ -1016,3 +1016,29 @@ void CursorSelectSystem(Chunk& a_chunk, const SystemContext& a_context, SystemRe
 
 
 }
+
+void DecalDrawSystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	ComponentView view = a_chunk.GetView<ComponentTypes<SectorDecal>>();
+
+	for (auto it : view)
+	{
+		// デカールを取得
+		ComponentHandle<SectorDecal> decal = a_chunk.GetComponent<SectorDecal>(it);
+		if (decal.Look().remainingDrawTime <= 0.0f)
+		{
+			continue;
+		}
+
+		// 攻撃判定がまだ残っていた場合残り時間を消費しない
+		ComponentHandle<SectorHitJudge> sector = a_chunk.GetComponent<SectorHitJudge>(it);
+		if (sector.IsValid())
+		{
+			continue;
+		}
+
+		// 残存時間を計算
+		decal->remainingDrawTime -= a_context.deltaTime;
+		decal->remainingDrawTime = std::clamp(decal.Look().remainingDrawTime, 0.0f, decal.Look().maxDrawTime);
+	}
+}

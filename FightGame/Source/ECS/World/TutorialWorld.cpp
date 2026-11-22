@@ -431,6 +431,7 @@ void TutorialWorld::UpdateChunk(Chunk& a_chunk, SystemContext& a_context, System
 	HPGaugeSystem(a_chunk, a_context);
 	SoundSystem(a_chunk, a_context);
 	SpawnEfkEffectAreaSystem(a_chunk, a_context);
+	DecalDrawSystem(a_chunk, a_context);
 	SpawnEfkEffectSystem(a_chunk, a_context);
 	UpdateEfkEffectSystem(a_chunk, a_context);
 

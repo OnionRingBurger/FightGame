@@ -245,6 +245,88 @@ void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		}
 	}
 
+	ShaderList::SectorDecalGPU decalGPU[kMaxSectorDecals];
+	// 登録用のキー配列
+	std::unordered_map<std::string, int> decalTextureKeyMap;
+
+
+	// 予めテクスチャを登録
+	int textureCount = 0;
+	ComponentView decalView = a_chunk.GetView<ComponentTypes<Position, Rotation, SectorDecal>>();
+	for(auto it : decalView)
+	{
+		// テクスチャキーを取得
+		ComponentHandle<SectorDecal> decal = a_chunk.GetComponent<SectorDecal>(it);
+		std::string textureKey = decal.Look().decalTextureKey;
+		// 既に登録されている場合は再登録しない
+		if(decalTextureKeyMap.find(textureKey) != decalTextureKeyMap.end())
+		{
+			continue;
+		}
+
+		// テクスチャのキーを登録
+		decalTextureKeyMap.insert(
+			{decal.Look().decalTextureKey, decalTextureKeyMap.size()} 
+		);
+
+		// 追加した分だけカウントを加算
+		textureCount++;
+		if (textureCount >= kMaxSectorDecals)
+		{
+			break;
+		}
+	}
+
+	// デカール配列を追加
+	int decalCount = 0;
+	for (auto it : decalView)
+	{	
+		ComponentHandle<Position> position = a_chunk.GetComponent<Position>(it);
+		ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(it);
+		ComponentHandle<SectorDecal> decal = a_chunk.GetComponent<SectorDecal>(it);
+
+		// テクスチャが存在しない場合は抜ける
+		if(decalTextureKeyMap.find(decal->decalTextureKey) == decalTextureKeyMap.end())
+		{
+			continue;
+		}
+
+		// GPU向けデータを登録
+		decalGPU[decalCount] = ShaderList::SectorDecalGPU(
+			DirectX::XMFLOAT3(position.Look().x, position.Look().y, position.Look().z),
+			rotation.Look().yaw,
+			decal.Look().minLength,
+			decal.Look().maxLength,
+			decal.Look().angle,
+			decal.Look().drawHeight,
+			decal.Look().drawLowness,
+			decal.Look().remainingDrawTime,
+			decal.Look().maxDrawTime,
+			DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+			decalTextureKeyMap.at(decal.Look().decalTextureKey)
+		);
+
+
+		// 追加した分だけカウントを加算
+		decalCount++;
+		if (decalCount >= kMaxSectorDecals)
+		{
+			break;
+		}
+	}
+
+	// 登録用に配列を作成
+	std::vector<Texture*> decalTextureVextor;
+	decalTextureVextor.resize(textureCount);
+	for(auto it : decalTextureKeyMap)
+	{
+		// テクスチャを取得して登録
+		std::shared_ptr<Texture> tex = a_context.uiCache.GetTexture(it.first);
+		decalTextureVextor[it.second] = tex.get();
+	}
+
+
+
 	auto it = cameraView.begin();
 	auto end = cameraView.end();
 
@@ -326,6 +408,8 @@ void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		{
 			continue;
 		}
+
+		// シェーダーを設定
 		bool isGhost = a_chunk.GetComponent<UseGhostShader>(it).IsValid();
 		bool isAlpha = alphaBlend.IsValid();
 		bool isShadow = a_chunk.GetComponent<UseShadowShader>(it).IsValid();
@@ -337,6 +421,7 @@ void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		else if (isAlpha) psKind = ShaderList::PS_ALPHA;
 		else if (isShadow && shadowMapReady) psKind = ShaderList::PS_SHADOW_RECEIVE;
 		else psKind = ShaderList::PS_SPECULAR;
+		// 定数バッファを登録
 		ShaderList::SetWVP(wvp);
 		itModel->SetVertexShader(ShaderList::GetVS(vsKind));
 		itModel->SetPixelShader(ShaderList::GetPS(psKind));
@@ -348,8 +433,9 @@ void CameraDraw(Chunk& a_chunk, const SystemContext& a_context, ComponentView ca
 		if (psKind == ShaderList::PS_ALPHA_SHADOW && shadowMapReady)
 		{
 			ShaderList::GetPS(psKind)->SetTexture(2, a_shadowMap->GetDepthStencil());
+			ShaderList::SetSectorDecals(decalGPU, decalCount, decalTextureVextor.data(), textureCount);
 		}
-
+		// 深度バッファ作成
 		if (key.Look().modelDrawFlag & MODEL_DRAW_NOTDEPTH)
 		{
 			SetDepthTest(DEPTH_TEST_FALSE);

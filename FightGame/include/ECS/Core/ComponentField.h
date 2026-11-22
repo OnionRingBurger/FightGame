@@ -1195,6 +1195,29 @@ namespace ComponentSystem
 	}
 
 	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(ModelRotatoVelocity& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("velocityX", component.velocity.x, 0.0f);
+		valueFunc("velocityY", component.velocity.y, 0.0f);
+		valueFunc("velocityZ", component.velocity.z, 0.0f);
+	}
+
+	// !!!New!!!
+	template<typename ValueFunc, typename EntityFunc>
+	inline void ApplyToFields(SectorDecal& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
+	{
+		valueFunc("maxLength", component.maxLength, 0.0f);
+		valueFunc("minLength", component.minLength, 0.0f);
+		valueFunc("angle", component.angle, 0.0f);
+		valueFunc("drawHeight", component.drawHeight, 0.0f);
+		valueFunc("drawLowness", component.drawLowness, 0.0f);
+		valueFunc("maxDrawTime", component.maxDrawTime, 0.0f);
+		valueFunc("remainingDrawTime", component.remainingDrawTime, 0.0f);
+		valueFunc("decalTextureKey", component.decalTextureKey, std::string(""));
+		entityFunc("attackInstance", component.attackInstance);
+	}
+
+	template<typename ValueFunc, typename EntityFunc>
 	inline void ApplyToFields(DropUI& component, ValueFunc&& valueFunc, EntityFunc&& entityFunc)
 	{
 		int size = static_cast<int>(component.playSounds.size());

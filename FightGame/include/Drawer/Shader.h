@@ -31,6 +31,8 @@ public:
 	void WriteBuffer(UINT slot, void* pData);
 	// テクスチャの設定
 	void SetTexture(UINT slot, Texture* tex);
+	// !!!New!!!
+	void SetTextureSRV(UINT slot, ID3D11ShaderResourceView* srv);
 	// シェーダーを描画に使用
 	virtual void Bind(void) = 0;
 

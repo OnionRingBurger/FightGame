@@ -39,3 +39,5 @@ void ShakeSystem(Chunk& a_chunk, const SystemContext& a_context);
 
 void MoveForwardSystem(Chunk& a_chunk, const SystemContext& a_context);
 
+void ModelRotatoVelocitySystem(Chunk& a_chunk, const SystemContext& a_context);
+

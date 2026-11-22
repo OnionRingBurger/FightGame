@@ -179,7 +179,9 @@
 	X(UIRailFly) \
 	X(ControllerInputUIReplace) \
 	X(Light) \
-	X(UseShadowShader)
+	X(UseShadowShader) \
+	X(ModelRotatoVelocity) \
+	X(SectorDecal)
 
 // ビットフラグ
 using BitFlag = unsigned int;
@@ -3874,6 +3876,78 @@ namespace Component
 		static constexpr int kVersion = 0;
 
 		UseShadowShader()
+		{
+		}
+	};
+
+	// モデルの回転速度
+	struct ModelRotatoVelocity
+	{
+		static constexpr TypeID kTypeId = 176;
+		static constexpr const char* kTypeName = "ModelRotatoVelocity";
+		static constexpr int kVersion = 0;
+
+		float3 velocity;
+
+		ModelRotatoVelocity(float3 a_velocity)
+			: velocity(a_velocity)
+		{
+		}
+
+		ModelRotatoVelocity()
+			: ModelRotatoVelocity(float3(0.0f, 0.0f, 0.0f))
+		{
+		}
+	};
+
+	// 扇形のデカール
+	struct SectorDecal
+	{
+		static constexpr TypeID kTypeId = 177;
+		static constexpr const char* kTypeName = "SectorDecal";
+		static constexpr int kVersion = 0;
+
+		// 扇の形
+		float maxLength;
+		float minLength;
+		float angle;
+		float drawHeight;
+		float drawLowness;
+
+		// 最大表示時間
+		float maxDrawTime;
+		// 残存時間
+		float remainingDrawTime;
+
+		// 攻撃者
+		Entity attackInstance;
+
+		// デカールのテクスチャ
+		std::string decalTextureKey;
+
+		SectorDecal(
+			float a_maxLength,
+			float a_minLength,
+			float a_angle,
+			float a_drawHeight,
+			float a_drawLowness,
+			float a_maxDrawTime,
+			Entity a_attackInstance,
+			std::string a_decalTextureKey)
+			: maxLength(a_maxLength)
+			, minLength(a_minLength)
+			, angle(a_angle)
+			, drawHeight(a_drawHeight)
+			, drawLowness(a_drawLowness)
+			, maxDrawTime(a_maxDrawTime)
+			, remainingDrawTime(a_maxDrawTime)
+			, attackInstance(a_attackInstance)
+			, decalTextureKey(a_decalTextureKey)
+		{
+		}
+
+		SectorDecal()
+			: SectorDecal(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, kInvalidEntity, "")
 		{
 		}
 	};

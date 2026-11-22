@@ -150,11 +150,53 @@ namespace
 		);
 	}
 
+	// 攻撃判定に応じてデカール
+	Entity SpawnAttackDecal(Chunk& a_chunk, Entity a_attacker, Entity a_attackSector, const AttackPower& a_attackPower, int a_attackIndex)
+	{
+		// コンポーネントを取得
+		const ComponentHandle<Rotation> rotation = a_chunk.GetComponent<Rotation>(a_attacker);
+		const ComponentHandle<SectorHitJudge> sector = a_chunk.GetComponent<SectorHitJudge>(a_attackSector);
+		const ComponentHandle<AddDamageComponent> damage = a_chunk.GetComponent<AddDamageComponent>(a_attackSector);
+
+		const float3 spawnPos = GetEntityPosePos(a_chunk, a_attacker)
+			+ GetLocalOffset(a_attackPower.followOffset, GetEntityPoseRot(a_chunk, a_attacker));
+
+		// コンポーネントが存在しない場合空のEntityを返す
+		if(!rotation.IsValid() || !sector.IsValid() || !damage.IsValid())
+		{
+			return kInvalidEntity;
+		}
+
+
+		// 減衰時間
+		const float subtractedTime = damage.Look().damageValue * kDecalSubtractedDamageRate;
+		// デカール生存時間
+		const float lifeTime = subtractedTime + a_attackPower.lifeTime;
+
+		// 上下の表示範囲
+		const float drawHeight = 0.01f; // 基本的に上方向には表示しない
+		const float drawLowness = a_attackPower.maxLowness * 2.0f;
+
+		// デカールを作成
+		Entity decal = a_chunk.CreateNewEntity(
+			Position(spawnPos),
+			Rotation(rotation.Look().pitch, rotation.Look().yaw, rotation.Look().roll),
+			SectorDecal(a_attackPower.maxLength, a_attackPower.minLength, a_attackPower.angle, drawHeight, drawLowness, subtractedTime, a_attackSector, kDecalTextureKey),
+			LifeTime(lifeTime)
+		);
+
+		// 作成したデカールを返す
+		return  decal;
+	}
+
 	// 攻撃開始
 	void BeginActiveAttackFromPower(Chunk& a_chunk, Entity a_attacker, const AttackPower& a_attackPower, int a_attackIndex)
 	{
+		// 攻撃を作成
 		Entity attack = SpawnActiveAttackEntity(a_chunk, a_attacker, a_attackPower, a_attackIndex);
 		if (attack == kInvalidEntity) return;
+		// デカールを作成、作れなくても抜けはしない
+		Entity decal = SpawnAttackDecal(a_chunk, a_attacker, attack, a_attackPower, a_attackIndex);
 
 		PlaySound(LoadSound("Assets/Sound/attack.mp3"));
 

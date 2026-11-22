@@ -55,3 +55,11 @@ constexpr float kShadowNearZ = 1.0f;
 constexpr float kShadowFarZ = 250.0f;
 constexpr float kShadowBias = 0.001f;
 
+// デカール生成設定
+constexpr float kDecalSubtractedDamageRate = 1.2f * 60.0f;
+constexpr const char* kDecalTextureKey = "Decal";
+
+// デカールのシェーダー設定
+constexpr int kMaxSectorDecals = 8;
+constexpr float3 kSectorDecalColor = float3(0.15f, 0.05f, 0.02f);
+constexpr float kSectorDecalAlpha = 0.55f;

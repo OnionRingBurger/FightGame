@@ -63,6 +63,8 @@ private:
 
 	AIStance GetNewStance(const AIContext& context, const AIBlackboard& blackBoard, const AIMind& mind);
 
+	AIStance SelectStanceByScore(float probeScore, float holdScore, float escapeScore);
+
 	float ApplyScoreBase(float score, float base);
 
 	float ScoreByDistance(float dist, float mid, float coefficient);

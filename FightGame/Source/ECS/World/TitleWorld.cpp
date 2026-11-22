@@ -146,7 +146,7 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 		),
 		BoxCollider(float3(0.0f, 30.0f, 0.0f), float3(kDebugWorldSize.x, 20.0f, kDebugWorldSize.z)),
 		OBBCollider(OBB_PushOutLocked),
-		ModelKey("Box"),
+		ModelKey("Floor"),
 		AlphaBlendComponent("Red", "Blue"),
 		UseShadowShader()
 	);
@@ -158,7 +158,7 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 			float3(0.0f, 0.0f, 0.0f),
 			float3(kDebugWorldSize.x * 10.0f, 1.0, kDebugWorldSize.z * 6.0f)
 		),
-		ModelKey("Box"),
+		ModelKey("Floor"),
 		AlphaBlendComponent("White", "White")
 	);
 	
@@ -169,7 +169,7 @@ Chunk TitleWorld::CreateNewChunk(AIManager& a_aiManager)
 			float3(0.0f, 0.0f, 0.0f),
 			float3(kDebugWorldSize.x * 10.0f, 180.0, 1.0f)
 		),
-		ModelKey("Box"),
+		ModelKey("Floor"),
 		AlphaBlendComponent("White", "Blue")
 	);
 

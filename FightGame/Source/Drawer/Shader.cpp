@@ -88,6 +88,20 @@ void Shader::SetTexture(UINT slot, Texture* tex)
 	}
 }
 
+// !!!New!!!
+void Shader::SetTextureSRV(UINT slot, ID3D11ShaderResourceView* srv)
+{
+	if (slot >= m_pTextures.size()) {
+		return;
+	}
+	m_pTextures[slot] = srv;
+	switch (m_kind)
+	{
+	case Vertex:	GetContext()->VSSetShaderResources(slot, 1, &srv); break;
+	case Pixel:		GetContext()->PSSetShaderResources(slot, 1, &srv); break;
+	}
+}
+
 HRESULT Shader::Make(void* pData, UINT size)
 {
 	HRESULT hr;

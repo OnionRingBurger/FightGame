@@ -1,9 +1,22 @@
 #include "ShaderList.h"
 #include "Defines.h"
+#include "MathAssist.h"
+#include "GameData.h"
+#include "DirectX.h"
 #include <algorithm>
 
 VertexShader* ShaderList::m_pVS[VS_KIND_MAX];
 PixelShader* ShaderList::m_pPS[PS_KIND_MAX];
+// !!!New!!!
+ID3D11Texture2D* ShaderList::m_pSectorDecalArrayTex = nullptr;
+// !!!New!!!
+ID3D11ShaderResourceView* ShaderList::m_pSectorDecalArraySRV = nullptr;
+// !!!New!!!
+UINT ShaderList::m_sectorDecalArrayWidth = 0;
+// !!!New!!!
+UINT ShaderList::m_sectorDecalArrayHeight = 0;
+// !!!New!!!
+DXGI_FORMAT ShaderList::m_sectorDecalArrayFormat = DXGI_FORMAT_UNKNOWN;
 
 
 ShaderList::ShaderList()
@@ -52,10 +65,14 @@ void ShaderList::Init()
 	DirectX::XMFLOAT4X4 identity;
 	DirectX::XMStoreFloat4x4(&identity, DirectX::XMMatrixIdentity());
 	SetShadow(&identity, &identity, 0.001f, 1.0f / static_cast<float>(kShadowMapSize));
+	// !!!New!!!
+	SetSectorDecals(nullptr, 0, nullptr, 0);
 }
 
 void ShaderList::Uninit()
 {
+	// !!!New!!!
+	ReleaseSectorDecalArray();
 	for (int i = 0; i < VS_KIND_MAX; ++i)
 	{
 		if (m_pVS[i])
@@ -182,6 +199,176 @@ void ShaderList::SetShadow(DirectX::XMFLOAT4X4* lightView, DirectX::XMFLOAT4X4* 
 	m_pPS[PS_SHADOW_RECEIVE]->WriteBuffer(3, &param);
 	// !!!New!!!
 	m_pPS[PS_ALPHA_SHADOW]->WriteBuffer(3, &param);
+}
+
+// デカールに扇形の範囲を設定
+void ShaderList::ReleaseSectorDecalArray()
+{
+	SAFE_RELEASE(m_pSectorDecalArraySRV);
+	SAFE_RELEASE(m_pSectorDecalArrayTex);
+	m_sectorDecalArrayWidth = 0;
+	m_sectorDecalArrayHeight = 0;
+	m_sectorDecalArrayFormat = DXGI_FORMAT_UNKNOWN;
+}
+
+bool ShaderList::EnsureSectorDecalArray(UINT width, UINT height, DXGI_FORMAT format)
+{
+	if (m_pSectorDecalArrayTex != nullptr &&
+		m_sectorDecalArrayWidth == width &&
+		m_sectorDecalArrayHeight == height &&
+		m_sectorDecalArrayFormat == format)
+	{
+		return true;
+	}
+
+	ReleaseSectorDecalArray();
+
+	D3D11_TEXTURE2D_DESC desc = {};
+	desc.Width = width;
+	desc.Height = height;
+	desc.MipLevels = 1;
+	desc.ArraySize = static_cast<UINT>(kMaxSectorDecals);
+	desc.Format = format;
+	desc.SampleDesc.Count = 1;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+	HRESULT hr = GetDevice()->CreateTexture2D(&desc, nullptr, &m_pSectorDecalArrayTex);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Format = format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+	srvDesc.Texture2DArray.MostDetailedMip = 0;
+	srvDesc.Texture2DArray.MipLevels = 1;
+	srvDesc.Texture2DArray.FirstArraySlice = 0;
+	srvDesc.Texture2DArray.ArraySize = static_cast<UINT>(kMaxSectorDecals);
+
+	hr = GetDevice()->CreateShaderResourceView(m_pSectorDecalArrayTex, &srvDesc, &m_pSectorDecalArraySRV);
+	if (FAILED(hr))
+	{
+		ReleaseSectorDecalArray();
+		return false;
+	}
+
+	m_sectorDecalArrayWidth = width;
+	m_sectorDecalArrayHeight = height;
+	m_sectorDecalArrayFormat = format;
+	return true;
+}
+
+// !!!New!!!
+static void BindSectorDecalSRV(ID3D11ShaderResourceView* srv)
+{
+	ShaderList::GetPS(ShaderList::PS_SHADOW_RECEIVE)->SetTextureSRV(2, srv);
+	ShaderList::GetPS(ShaderList::PS_ALPHA_SHADOW)->SetTextureSRV(3, srv);
+}
+
+void ShaderList::SetSectorDecals(const SectorDecalGPU* decals, int count, Texture* const* textures, int textureCount)
+{
+	struct SectorDecalBuffer
+	{
+		DirectX::XMFLOAT4 decalInfo;
+		SectorDecalGPU decals[kMaxSectorDecals];
+	};
+	SectorDecalBuffer param = {};
+	const int useCount = std::min(kMaxSectorDecals, std::max(0, count));
+	const int useTexCount = std::min(kMaxSectorDecals, std::max(0, textureCount));
+	param.decalInfo = DirectX::XMFLOAT4(static_cast<float>(useCount), 0.0f, 0.0f, 0.0f);
+	if (decals != nullptr)
+	{
+		for (int i = 0; i < useCount; ++i)
+		{
+			param.decals[i] = decals[i];
+		}
+	}
+	m_pPS[PS_SHADOW_RECEIVE]->WriteBuffer(4, &param);
+	// !!!New!!!
+	m_pPS[PS_ALPHA_SHADOW]->WriteBuffer(4, &param);
+
+	if (textures == nullptr || useTexCount <= 0)
+	{
+		BindSectorDecalSRV(nullptr);
+		return;
+	}
+
+	Texture* firstTex = nullptr;
+	for (int i = 0; i < useTexCount; ++i)
+	{
+		if (textures[i] != nullptr && textures[i]->GetResource() != nullptr)
+		{
+			firstTex = textures[i];
+			break;
+		}
+	}
+	if (firstTex == nullptr)
+	{
+		BindSectorDecalSRV(nullptr);
+		return;
+	}
+
+	ID3D11Resource* firstRes = nullptr;
+	firstTex->GetResource()->GetResource(&firstRes);
+	ID3D11Texture2D* firstTex2D = nullptr;
+	if (firstRes == nullptr || FAILED(firstRes->QueryInterface(IID_PPV_ARGS(&firstTex2D))))
+	{
+		SAFE_RELEASE(firstRes);
+		BindSectorDecalSRV(nullptr);
+		return;
+	}
+
+	D3D11_TEXTURE2D_DESC srcDesc = {};
+	firstTex2D->GetDesc(&srcDesc);
+	SAFE_RELEASE(firstTex2D);
+	SAFE_RELEASE(firstRes);
+
+	if (!EnsureSectorDecalArray(srcDesc.Width, srcDesc.Height, srcDesc.Format))
+	{
+		BindSectorDecalSRV(nullptr);
+		return;
+	}
+
+	for (int i = 0; i < useTexCount; ++i)
+	{
+		if (textures[i] == nullptr || textures[i]->GetResource() == nullptr)
+		{
+			continue;
+		}
+
+		ID3D11Resource* srcRes = nullptr;
+		textures[i]->GetResource()->GetResource(&srcRes);
+		if (srcRes == nullptr)
+		{
+			continue;
+		}
+
+		ID3D11Texture2D* srcTex2D = nullptr;
+		if (SUCCEEDED(srcRes->QueryInterface(IID_PPV_ARGS(&srcTex2D))))
+		{
+			D3D11_TEXTURE2D_DESC sliceDesc = {};
+			srcTex2D->GetDesc(&sliceDesc);
+			if (sliceDesc.Width == m_sectorDecalArrayWidth &&
+				sliceDesc.Height == m_sectorDecalArrayHeight &&
+				sliceDesc.Format == m_sectorDecalArrayFormat)
+			{
+				const UINT dstSubresource = D3D11CalcSubresource(0, static_cast<UINT>(i), 1);
+				GetContext()->CopySubresourceRegion(
+					m_pSectorDecalArrayTex,
+					dstSubresource,
+					0, 0, 0,
+					srcRes,
+					0,
+					nullptr);
+			}
+			SAFE_RELEASE(srcTex2D);
+		}
+		SAFE_RELEASE(srcRes);
+	}
+
+	BindSectorDecalSRV(m_pSectorDecalArraySRV);
 }
 
 void ShaderList::MakeWorldVS()
@@ -610,6 +797,7 @@ float4 main(PS_IN pin) : SV_TARGET
 
 void ShaderList::MakeShadowReceivePS()
 {
+	// !!!New!!!
 	const char* code = R"EOT(
 struct PS_IN {
 	float4 pos : SV_POSITION;
@@ -639,8 +827,21 @@ cbuffer Shadow : register(b3)
 	float4x4 lightProj;
 	float4 shadowParam;
 };
+struct SectorDecalGPU
+{
+	float4 posYaw;
+	float4 sector;
+	float4 heightFade;
+	float4 color;
+};
+cbuffer SectorDecals : register(b4)
+{
+	float4 decalInfo;
+	SectorDecalGPU decals[8];
+};
 Texture2D tex : register(t0);
 Texture2D shadowMap : register(t1);
+Texture2DArray decalTex : register(t2);
 SamplerState samp : register(s0);
 SamplerComparisonState shadowSamp : register(s1);
 float4 main(PS_IN pin) : SV_TARGET
@@ -682,6 +883,57 @@ float4 main(PS_IN pin) : SV_TARGET
 	}
 	shadow /= 9.0f;
 	color.rgb *= lerp(0.35f, 1.0f, shadow);
+
+	int decalCount = (int)decalInfo.x;
+	[loop]
+	for (int i = 0; i < decalCount; ++i)
+	{
+		float3 center = decals[i].posYaw.xyz;
+		float yawRad = decals[i].posYaw.w * 0.01745329251f;
+		float2 forward = float2(sin(yawRad), cos(yawRad));
+		float2 right = float2(cos(yawRad), -sin(yawRad));
+		float minLength = decals[i].sector.x;
+		float maxLength = decals[i].sector.y;
+		float angle = decals[i].sector.z;
+		float textureIndex = decals[i].sector.w;
+		float maxHeight = decals[i].heightFade.x;
+		float maxLowness = decals[i].heightFade.y;
+		float remaining = decals[i].heightFade.z;
+		float maxDraw = decals[i].heightFade.w;
+		float2 deltaXZ = pin.wPos.xz - center.xz;
+		float r = length(deltaXZ);
+		if (r < minLength || r > maxLength)
+		{
+			continue;
+		}
+		float cosHalf = cos(angle * 0.5f * 0.01745329251f);
+		float2 dir = deltaXZ / max(r, 1e-5f);
+		float cosTheta = dot(forward, dir);
+		if (cosTheta < cosHalf)
+		{
+			continue;
+		}
+		float dy = pin.wPos.y - center.y;
+		if (dy > maxHeight || dy < -maxLowness)
+		{
+			continue;
+		}
+		float localX = dot(deltaXZ, right);
+		float localZ = dot(deltaXZ, forward);
+		float halfWidth = max(maxLength * sin(angle * 0.5f * 0.01745329251f), 1e-5f);
+		float u = localX / halfWidth * 0.5f + 0.5f;
+		float v = localZ / max(maxLength, 1e-5f);
+		if (u < 0.0f || u > 1.0f || v < 0.0f || v > 1.0f)
+		{
+			continue;
+		}
+		float4 decalSample = decalTex.Sample(samp, float3(u, v, textureIndex));
+		float fade = saturate(remaining / max(maxDraw, 1e-5f));
+		float alpha = saturate(decalSample.a * decals[i].color.a * fade);
+		// !!!New!!!
+		float3 decalWhite = float3(1.0f, 1.0f, 1.0f);
+		color.rgb = lerp(color.rgb, decalSample.rgb * decalWhite, alpha);
+	}
 	return color;
 })EOT";
 	m_pPS[PS_SHADOW_RECEIVE] = new PixelShader();
@@ -719,11 +971,41 @@ cbuffer Shadow : register(b3)
 	float4x4 lightProj;
 	float4 shadowParam;
 };
+// !!!New!!!
+struct SectorDecalGPU
+{
+	float4 posYaw;
+	float4 sector;
+	float4 heightFade;
+	float4 color;
+};
+cbuffer SectorDecals : register(b4)
+{
+	float4 decalInfo;
+	SectorDecalGPU decals[8];
+};
 Texture2D alphaTex1 : register(t0);
 Texture2D alphaTex2 : register(t1);
 Texture2D shadowMap : register(t2);
+Texture2DArray decalTex : register(t3);
 SamplerState samp : register(s0);
 SamplerComparisonState shadowSamp : register(s1);
+// !!!New!!!
+float FrameHash(float2 p)
+{
+	return frac(sin(dot(p, float2(127.1f, 311.7f))) * 43758.5453f);
+}
+float FrameNoise(float2 p)
+{
+	float2 ip = floor(p);
+	float2 fp = frac(p);
+	float2 w = fp * fp * (3.0f - 2.0f * fp);
+	float a = FrameHash(ip);
+	float b = FrameHash(ip + float2(1.0f, 0.0f));
+	float c = FrameHash(ip + float2(0.0f, 1.0f));
+	float d = FrameHash(ip + float2(1.0f, 1.0f));
+	return lerp(lerp(a, b, w.x), lerp(c, d, w.x), w.y);
+}
 float4 main(PS_IN pin) : SV_TARGET
 {
 	float4 alphaColor1 = alphaTex1.Sample(samp, pin.uv);
@@ -752,6 +1034,97 @@ float4 main(PS_IN pin) : SV_TARGET
 	}
 	shadow /= 9.0f;
 	color.rgb *= lerp(0.35f, 1.0f, shadow);
+
+	// !!!New!!!
+	int decalCount = (int)decalInfo.x;
+	[loop]
+	for (int i = 0; i < decalCount; ++i)
+	{
+		float3 center = decals[i].posYaw.xyz;
+		float yawRad = decals[i].posYaw.w * 0.01745329251f;
+		float2 forward = float2(sin(yawRad), cos(yawRad));
+		float2 right = float2(cos(yawRad), -sin(yawRad));
+		float minLength = decals[i].sector.x;
+		float maxLength = decals[i].sector.y;
+		float angle = decals[i].sector.z;
+		float textureIndex = decals[i].sector.w;
+		float maxHeight = decals[i].heightFade.x;
+		float maxLowness = decals[i].heightFade.y;
+		float remaining = decals[i].heightFade.z;
+		float maxDraw = decals[i].heightFade.w;
+		float2 deltaXZ = pin.wPos.xz - center.xz;
+		float r = length(deltaXZ);
+		float cosHalf = cos(angle * 0.5f * 0.01745329251f);
+		float2 dir = deltaXZ / max(r, 1e-5f);
+		float cosTheta = dot(forward, dir);
+		float dy = pin.wPos.y - center.y;
+		if (dy > maxHeight || dy < -maxLowness)
+		{
+			continue;
+		}
+		// !!!New!!!
+		bool isFullCircle = angle >= 360.0f;
+		float localX = dot(deltaXZ, right);
+		float localZ = dot(deltaXZ, forward);
+		float halfWidth = max(maxLength * sin(angle * 0.5f * 0.01745329251f), 1e-5f);
+		float u = isFullCircle ? localX / maxLength * 0.5f + 0.5f : localX / halfWidth * 0.5f + 0.5f;
+		float v = isFullCircle ? localZ / maxLength * 0.5f + 0.5f : localZ / max(maxLength, 1e-5f);
+		if (u < 0.0f || u > 1.0f || v < 0.0f || v > 1.0f)
+		{
+			continue;
+		}
+		// !!!New!!!
+		bool inFan = r >= minLength && r <= maxLength && cosTheta >= cosHalf;
+		if (!inFan)
+		{
+			continue;
+		}
+		// !!!New!!!
+		float rangeLength = max(maxLength - minLength, 1e-5f);
+		float outerRatio = (maxLength - r) / rangeLength;
+		float innerRatio = (r - minLength) / rangeLength;
+		float halfAngleRad = angle * 0.5f * 0.01745329251f;
+		float sideRatio = isFullCircle ? 1.0f : (halfAngleRad - acos(clamp(cosTheta, -1.0f, 1.0f))) / max(halfAngleRad, 1e-5f);
+		float edgeRatio = min(outerRatio, min(innerRatio, sideRatio));
+		float edgeProgress = 1.0f - saturate(edgeRatio / 0.3f);
+		float edgeFade = lerp(1.0f, 0.2f, pow(edgeProgress, 4.0f));
+		float4 decalSample = decalTex.Sample(samp, float3(u, v, textureIndex));
+		float fade = saturate(remaining / max(maxDraw, 1e-5f));
+		float texAlpha = saturate(decalSample.a * decals[i].color.a * fade * edgeFade);
+		// !!!New!!!
+		float wobble = (FrameNoise(pin.wPos.xz * 3.0f) * 0.6f + FrameNoise(pin.wPos.xz * 9.0f) * 0.4f - 0.5f) * 0.2f;
+		float frameProgress = 1.0f - saturate((edgeRatio + wobble) / 0.3f);
+		float3 frameColor = float3(1.0f, 1.0f, 1.0f);
+		if (frameProgress > 0.0f)
+		{
+			float3 frameSum = float3(0.0f, 0.0f, 0.0f);
+			float frameWeight = 0.0f;
+			[unroll]
+			for (int fy = 0; fy < 4; ++fy)
+			{
+				[unroll]
+				for (int fx = 0; fx < 4; ++fx)
+				{
+					float4 frameSample = decalTex.SampleLevel(samp, float3((fx + 0.5f) / 4.0f, (fy + 0.5f) / 4.0f, textureIndex), 0);
+					frameSum += frameSample.rgb * frameSample.a;
+					frameWeight += frameSample.a;
+				}
+			}
+			if (frameWeight > 1e-5f)
+			{
+				frameColor = frameSum / frameWeight;
+			}
+		}
+		// !!!New!!!
+		float frameRise = pow(saturate(frameProgress / 0.9f), 5.0f);
+		float frameTail = lerp(1.0f, 0.3f, saturate((frameProgress - 0.9f) / 0.1f));
+		float frameBoost = lerp(1.0f, 1.5f, saturate((frameProgress - 0.92f) / 0.05f));
+		float frameAlpha = saturate(decals[i].color.a * fade * 0.3f * frameRise * frameTail * frameBoost);
+		float alpha = texAlpha + frameAlpha * (1.0f - texAlpha);
+		float3 decalRgb = (decalSample.rgb * texAlpha + frameColor * frameAlpha * (1.0f - texAlpha)) / max(alpha, 1e-5f);
+		float3 decalWhite = float3(1.0f, 1.0f, 1.0f);
+		color.rgb = lerp(color.rgb, decalRgb * decalWhite, alpha);
+	}
 	return color;
 })EOT";
 	m_pPS[PS_ALPHA_SHADOW] = new PixelShader();

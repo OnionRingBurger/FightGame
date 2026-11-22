@@ -991,3 +991,21 @@ void MoveForwardSystem(Chunk& a_chunk, const SystemContext& a_context)
 		result->posOffset.z += displacement.z;
 	}
 }
+
+void ModelRotatoVelocitySystem(Chunk& a_chunk, const SystemContext& a_context)
+{
+	// View作成
+	ComponentView view = a_chunk.GetView<ComponentTypes<ModelKey, ModelRotatoVelocity>>();
+
+	for (auto it : view)
+	{
+		// モデル周りのコンポーネント取得
+		ComponentHandle<ModelKey> model = a_chunk.GetComponent<ModelKey>(it);
+		ComponentHandle<ModelRotatoVelocity> rotatoVelocity = a_chunk.GetComponent<ModelRotatoVelocity>(it);
+
+		// 回転をかける
+		model->rotato += rotatoVelocity.Look().velocity * a_context.deltaTime;
+	}
+}
+
+

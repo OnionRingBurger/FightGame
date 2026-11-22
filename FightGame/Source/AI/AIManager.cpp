@@ -1,6 +1,7 @@
 #include "AI/AIManager.h"
 #include "DebugConsole.h"
 #include "AI/RoleCurve.h"
+#include "GameData.h"
 
 AIManager::AIManager(float a_behaviorTickInterval)
 	: behaviorTickInterval(a_behaviorTickInterval)
@@ -174,7 +175,9 @@ void AIManager::NotifyAttackResolved(Entity attacker, int attackIndex, bool conn
 	AIMind& mind = it->second.mind;
 	if (connected)
 	{
+		// 攻撃成功数を加算
 		mind.attackSuccessCount++;
+		// 同じ攻撃が連続したかを判定し、連続数を更新
 		if (mind.lastHitAttackIndex == attackIndex)
 		{
 			mind.sameAttackStreak++;
@@ -187,6 +190,7 @@ void AIManager::NotifyAttackResolved(Entity attacker, int attackIndex, bool conn
 	}
 	else
 	{
+		// 失敗数を加算し、連続数をリセット
 		mind.attackMissCount++;
 		mind.sameAttackStreak = 0;
 	}
@@ -279,7 +283,7 @@ void AIManager::TickAllAIMind(float deltaTime)
 
 void AIManager::TickAIMind(AIContext& context, const AIBlackboard& blackBoard, AIMind& mind, float deltaTime, AIResult& result)
 {
-	// スタンス変更に至るポイントを更新
+	// 方針変更に至るポイントを更新
 	UpdateStancePoint(mind, deltaTime);
 	// 更新
 	if (IsStanceUpdate(mind))
@@ -371,25 +375,7 @@ AIStance AIManager::GetNewStance(const AIContext& context, const AIBlackboard& b
 	const int hitTakenCount = mind.sameTakenCount - mind.sameGuardCount;
 	const int attackSuccessCount = mind.attackSuccessCount;
 
-    // 各係数を作成 !!!Old!!!
-    // const float distCoeff = enemyData.distCoefficient > 0.0f ? enemyData.distCoefficient : 1.0f;
-    // const float farnessCoeff = enemyData.farnessCoefficient > 0.0f ? enemyData.farnessCoefficient : 1.0f;
-    // const float hitCoeff = enemyData.hitCoefficient > 0.0f ? enemyData.hitCoefficient : 3.0f;
-    // const float stanceCoeff = enemyData.stanceCoefficient;
-
-	// 各係数を作成 !!!Old!!!
-	// RoleCurveKnobs roleKnobs;
-	// roleKnobs.distFocus = enemyData.distFocus;
-	// roleKnobs.farnessPref = enemyData.farnessPref;
-	// roleKnobs.hitSensitivity = enemyData.hitSensitivity;
-	// roleKnobs.stanceStickiness = enemyData.stanceStickiness;
-	// const RoleCurveParams roleParams = MapRoleCurveKnobsToParams(roleKnobs);
-	// const float distCoeff = roleParams.distCoefficient;
-	// const float farnessCoeff = roleParams.farnessCoefficient;
-	// const float hitCoeff = roleParams.hitCoefficient;
-	// const float stanceCoeff = roleParams.stanceCoefficient;
-
-	// !!!New!!!
+	// 登録時に予め計算した各要素への補正値
 	const float distCoeff = enemyData.distCoefficient;
 	const float farnessCoeff = enemyData.farnessCoefficient;
 	const float hitCoeff = enemyData.hitCoefficient;
@@ -410,40 +396,47 @@ AIStance AIManager::GetNewStance(const AIContext& context, const AIBlackboard& b
 	// 攻撃成功の多さ（未配線のため常に ScoreByHitCount(0)=1 寄り）
 	const float manySuccess = ApplyScoreBase(ScoreByHitCount(attackSuccessCount, hitCoeff), 0.7f);
 
-	// !!!New!!!
+	// 各方針への補正を出す
 	const float probeContinuePowRate = enemyData.probeContinuePowRate;
 	const float holdContinuePowRate = enemyData.holdContinuePowRate;
 	const float escapeContinuePowRate = enemyData.escapeContinuePowRate;
 
-	// 各要素をかけてスコアを算出
-	// 様子見: 被弾の少なさ * 距離の遠さ
-	float scoreProbe = fewHits * farness;
-	 // 継続戦闘(有利維持): 成功の多さ * 有利位置
-	float scoreHold = manySuccess * advantagePos;
-	// 戦闘回避(不利脱出): 不利位置 * 被弾の多さ
-	float scoreEscape = disadvantagePos * manyHits;
+	// 方針継続倍率を作成
+	float probeContinueRate = 1.0f;
+	float holdContinueRate = 1.0f;
+	float escapeContinueRate = 1.0f;
 
-
-	DebugConsole::SetDrawPos(15, 12);
-
-	// ステート継続を現行方針のスコアにだけ掛ける
+	// ステート継続を現行方針のスコアにかける
 	const float stanceContinue = ScoreByStance(mind.stanceContinueCount, stanceCoeff);
-	AIStance oldStance = mind.stance;
 	switch (mind.stance)
 	{
 	case AIStance::NeutralProbe:
-		scoreProbe *= std::pow(stanceContinue, probeContinuePowRate);
+		probeContinueRate = std::pow(stanceContinue, probeContinuePowRate);
 		break;
 	case AIStance::HoldAdvantage:
-		scoreHold *= std::pow(stanceContinue, holdContinuePowRate);
+		holdContinueRate = std::pow(stanceContinue, holdContinuePowRate);
 		break;
 	case AIStance::EscapeDisadvantage:
-		scoreEscape *= std::pow(stanceContinue, escapeContinuePowRate);
+		escapeContinueRate = std::pow(stanceContinue, escapeContinuePowRate);
 		break;
 	case AIStance::NoneStance:
 	default:
 		break;
 	}
+
+
+	// 各要素をかけてスコアを算出
+	// 様子見: 被弾の少なさ * 距離の遠さ * 方針継続倍率
+	float scoreProbe = fewHits * farness * probeContinueRate;
+	 // 継続戦闘(有利維持): 成功の多さ * 有利位置 * 方針継続倍率
+	float scoreHold = manySuccess * advantagePos * holdContinueRate;
+	// 戦闘回避(不利脱出): 不利位置 * 被弾の多さ * 方針継続倍率
+	float scoreEscape = disadvantagePos * manyHits * escapeContinueRate;
+
+
+	// スタンスを決定
+	AIStance newStance = SelectStanceByScore(scoreProbe, scoreHold, scoreEscape);
+
 
 	std::cout << "様子見スコア: " << scoreProbe << std::endl;
 	DebugConsole::SetDrawPos(15, 13);
@@ -453,6 +446,13 @@ AIStance AIManager::GetNewStance(const AIContext& context, const AIBlackboard& b
 	DebugConsole::SetDrawPos(15, 15);
 	std::cout << "得意間合いへの近さ: " << advantagePos << std::endl;
 
+	DebugConsole::SetDrawPos(15, 16);
+	std::cout << "被弾カウント" << hitTakenCount << std::endl;
+	return newStance;
+}
+
+AIStance AIManager::SelectStanceByScore(float scoreProbe, float scoreHold, float scoreEscape)
+{
 	// スタンスを決定
 	AIStance newStance = AIStance::NeutralProbe;
 	float best = scoreProbe;
@@ -466,8 +466,6 @@ AIStance AIManager::GetNewStance(const AIContext& context, const AIBlackboard& b
 		newStance = AIStance::EscapeDisadvantage;
 	}
 
-	DebugConsole::SetDrawPos(15, 16);
-	std::cout << "被弾カウント" << hitTakenCount << std::endl;
 	return newStance;
 }
 
